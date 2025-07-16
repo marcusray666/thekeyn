@@ -223,6 +223,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(req.user);
   });
 
+  // Get single certificate by ID (public endpoint for certificate verification)
+  app.get("/api/certificate/:id", async (req, res) => {
+    try {
+      const certificateId = req.params.id;
+      
+      // Find work by certificate ID
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      // Find certificate by work ID
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+      
+      // Return certificate with work data
+      res.json({
+        ...certificate,
+        work
+      });
+    } catch (error) {
+      console.error("Error fetching certificate:", error);
+      res.status(500).json({ error: "Failed to fetch certificate" });
+    }
+  });
+
   // Get all certificates for authenticated user
   app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

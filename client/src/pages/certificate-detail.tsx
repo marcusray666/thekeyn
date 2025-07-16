@@ -33,6 +33,7 @@ interface CertificateData {
     title: string;
     description: string;
     creatorName: string;
+    collaborators?: string[];
     originalName: string;
     mimeType: string;
     fileSize: number;
@@ -258,6 +259,22 @@ export default function CertificateDetail() {
                       <p className="text-white">{certificate.work.creatorName}</p>
                     </div>
                   </div>
+
+                  {certificate.work.collaborators && certificate.work.collaborators.length > 0 && (
+                    <div>
+                      <label className="text-sm text-gray-400">Collaborators</label>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {certificate.work.collaborators.map((collaborator, index) => (
+                          <span
+                            key={index}
+                            className="text-sm bg-emerald-900/30 text-emerald-300 px-2 py-1 rounded"
+                          >
+                            {collaborator}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <label className="text-sm text-gray-400">File Size</label>
