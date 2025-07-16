@@ -18,6 +18,9 @@ import Certificates from "@/pages/certificates";
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
 import ReportTheft from "@/pages/report-theft";
+import Analytics from "@/pages/analytics";
+import BulkOperations from "@/pages/bulk-operations";
+import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -44,6 +47,9 @@ function Router() {
           <Route path="/home" component={Home} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
+          <Route path="/analytics" component={Analytics} />
+          <Route path="/bulk-operations" component={BulkOperations} />
+          <Route path="/settings" component={Settings} />
         </>
       )}
       

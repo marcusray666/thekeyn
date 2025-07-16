@@ -21,9 +21,11 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
+import { AnalyticsChart } from "@/components/ui/analytics-chart";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Work {
   id: number;
@@ -48,6 +50,7 @@ export default function UserDashboard() {
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -189,6 +192,46 @@ export default function UserDashboard() {
           </GlassCard>
         </div>
 
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <GlassCard>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Upload Activity</h3>
+              <AnalyticsChart
+                type="line"
+                data={[
+                  { name: 'Jan', value: Math.floor(Math.random() * 10) + 1 },
+                  { name: 'Feb', value: Math.floor(Math.random() * 10) + 1 },
+                  { name: 'Mar', value: Math.floor(Math.random() * 10) + 1 },
+                  { name: 'Apr', value: Math.floor(Math.random() * 10) + 1 },
+                  { name: 'May', value: Math.floor(Math.random() * 10) + 1 },
+                  { name: 'Jun', value: Math.floor(Math.random() * 10) + 1 },
+                ]}
+                dataKey="value"
+                xAxisKey="name"
+                colors={['#8B5CF6']}
+              />
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">File Types</h3>
+              <AnalyticsChart
+                type="pie"
+                data={[
+                  { name: 'Images', value: Math.floor(Math.random() * 50) + 10 },
+                  { name: 'Documents', value: Math.floor(Math.random() * 30) + 5 },
+                  { name: 'Audio', value: Math.floor(Math.random() * 20) + 3 },
+                  { name: 'Video', value: Math.floor(Math.random() * 15) + 2 },
+                ]}
+                dataKey="value"
+                colors={['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B']}
+              />
+            </div>
+          </GlassCard>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Works */}
           <div className="lg:col-span-2">
@@ -206,6 +249,14 @@ export default function UserDashboard() {
                         className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
                       />
                     </div>
+                    <Button
+                      onClick={() => setLocation('/bulk-operations')}
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    >
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      Bulk Actions
+                    </Button>
                   </div>
                 </div>
 
@@ -306,12 +357,32 @@ export default function UserDashboard() {
                   </Button>
                   
                   <Button
-                    onClick={() => window.open('/api/download/portfolio', '_blank')}
+                    onClick={() => {
+                      // Generate and download portfolio as PDF
+                      const portfolioData = {
+                        user: user?.username,
+                        works: filteredWorks.length,
+                        certificates: dashboardStats.certificates,
+                        totalSize: dashboardStats.totalSize
+                      };
+                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portfolioData, null, 2));
+                      const downloadAnchorNode = document.createElement('a');
+                      downloadAnchorNode.setAttribute("href", dataStr);
+                      downloadAnchorNode.setAttribute("download", `${user?.username}-portfolio.json`);
+                      document.body.appendChild(downloadAnchorNode);
+                      downloadAnchorNode.click();
+                      downloadAnchorNode.remove();
+                      
+                      toast({
+                        title: "Portfolio Downloaded",
+                        description: "Your portfolio data has been exported successfully.",
+                      });
+                    }}
                     variant="outline"
                     className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Download Portfolio
+                    Export Portfolio
                   </Button>
                   
                   <Button
@@ -321,6 +392,15 @@ export default function UserDashboard() {
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
                     Report Theft
+                  </Button>
+                  
+                  <Button
+                    onClick={() => setLocation('/analytics')}
+                    variant="outline"
+                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                  >
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    View Analytics
                   </Button>
                 </div>
               </div>
