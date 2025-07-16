@@ -38,10 +38,12 @@ export default function Register() {
       // Immediately invalidate auth cache and refetch to get updated session
       queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
       
-      // Force full page reload to establish session cookie properly
+      // Check if session cookie was set and force navigation
       setTimeout(() => {
-        window.location.replace('/dashboard');
-      }, 200);
+        console.log("Document cookies after register:", document.cookie);
+        // Navigate to dashboard on same origin to maintain session
+        window.location.href = 'http://localhost:5000/dashboard';
+      }, 300);
     },
     onError: (error: Error) => {
       console.error("Registration error:", error);

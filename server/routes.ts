@@ -73,9 +73,9 @@ const sessionMiddleware = session({
     secure: false,
     httpOnly: false, // Allow JavaScript access for debugging
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: 'none', // Allow cross-origin
+    sameSite: 'lax', // Compatible setting
     path: '/',
-    domain: '.localhost', // Allow subdomains
+    // Remove domain to let browser handle it automatically
   },
 });
 
@@ -86,6 +86,8 @@ interface AuthenticatedRequest extends Request {
 
 const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   console.log("Auth check - Session ID:", req.sessionID, "User ID:", req.session?.userId);
+  console.log("Cookies received:", req.headers.cookie);
+  console.log("Session data:", req.session);
   
   if (!req.session || !req.session.userId) {
     console.log("Auth failed - No session or userId");

@@ -7,9 +7,14 @@ const app = express();
 // Trust proxy for proper session handling
 app.set('trust proxy', 1);
 
-// CORS configuration for session cookies - allow all origins in development
+// CORS configuration for session cookies - allow same-origin
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173'); // Vite dev server
+  // Allow both Vite dev server and direct access
+  const allowedOrigins = ['http://localhost:5173', 'http://localhost:5000'];
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin || 'http://localhost:5000');
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,Authorization,Cache-Control,Pragma');
