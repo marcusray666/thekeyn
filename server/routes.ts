@@ -54,7 +54,7 @@ function generateBlockchainHash(): string {
   return "0x" + crypto.randomBytes(32).toString("hex");
 }
 
-// Session store
+// Session store with corrected configuration
 const pgStore = connectPg(session);
 
 // Session middleware
@@ -63,10 +63,12 @@ const sessionMiddleware = session({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: true,
     ttl: 7 * 24 * 60 * 60, // 7 days in seconds
+    tableName: 'session'
   }),
-  secret: process.env.SESSION_SECRET || 'development-secret-key',
+  secret: process.env.SESSION_SECRET || 'development-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
+  name: 'connect.sid', // Use standard connect.sid name
   cookie: {
     secure: false, // Set to true in production with HTTPS
     httpOnly: true,
@@ -216,6 +218,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
     res.json(req.user);
+  });
+
+  // Get all certificates for authenticated user
+  app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const certificates = await storage.getAllCertificates();
+      res.json(certificates);
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+      res.status(500).json({ error: "Failed to fetch certificates" });
+    }
+  });
+
+  // Get specific certificate by ID (public endpoint)
+  app.get("/api/certificate/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const work = await storage.getWorkByCertificateId(id);
+      
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      res.json({ ...certificate, work });
+    } catch (error) {
+      console.error("Error fetching certificate:", error);
+      res.status(500).json({ error: "Failed to fetch certificate" });
+    }
+  });
+
+  // Report theft endpoint
+  app.post("/api/report-theft", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { certificateId, platform, infringingUrl, description, contactEmail } = req.body;
+      
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      // Generate DMCA takedown email template
+      const emailTemplate = `Subject: DMCA Takedown Notice - Copyright Infringement
+
+Dear ${platform} Copyright Team,
+
+I am writing to report copyright infringement of my original work hosted on your platform.
+
+ORIGINAL WORK INFORMATION:
+- Title: ${work.title}
+- Creator: ${work.creatorName}
+- Certificate ID: ${certificateId}
+- Registration Date: ${new Date(work.createdAt).toLocaleDateString()}
+- Blockchain Hash: ${work.blockchainHash}
+
+INFRINGING CONTENT:
+- Platform: ${platform}
+- Infringing URL: ${infringingUrl}
+- Description: ${description}
+
+GOOD FAITH STATEMENT:
+I have a good faith belief that the use of the copyrighted material described above is not authorized by the copyright owner, its agent, or the law.
+
+ACCURACY STATEMENT:
+I swear, under penalty of perjury, that the information in this notification is accurate and that I am the copyright owner or am authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
+
+CONTACT INFORMATION:
+Email: ${req.user?.email}
+Date: ${new Date().toLocaleDateString()}
+
+I request that you remove or disable access to the infringing material immediately.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+${work.creatorName}`;
+
+      res.json({ emailTemplate });
+    } catch (error) {
+      console.error("Error generating theft report:", error);
+      res.status(500).json({ error: "Failed to generate report" });
+    }
   });
 
   // Upload and register creative work (now requires authentication)

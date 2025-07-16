@@ -14,6 +14,9 @@ import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Certificates from "@/pages/certificates";
+import MyCertificates from "@/pages/my-certificates";
+import CertificateDetail from "@/pages/certificate-detail";
+import ReportTheft from "@/pages/report-theft";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,10 +41,14 @@ function Router() {
         <>
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/home" component={Home} />
-          <Route path="/certificates" component={Certificates} />
+          <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
         </>
       )}
+      
+      {/* Public certificate routes */}
+      <Route path="/certificate/:id" component={CertificateDetail} />
+      <Route path="/report-theft/:id" component={ReportTheft} />
       
       <Route component={NotFound} />
     </Switch>
