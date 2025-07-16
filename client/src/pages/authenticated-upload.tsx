@@ -119,7 +119,7 @@ export default function AuthenticatedUpload() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-16">
+    <div className="min-h-screen px-4 pt-20 py-8">
       <div className="max-w-2xl mx-auto">
         <GlassCard className="p-8">
           {/* Header */}

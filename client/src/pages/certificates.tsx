@@ -51,7 +51,7 @@ export default function Certificates() {
   }
 
   return (
-    <div className="pt-16 min-h-screen px-4 py-8">
+    <div className="pt-20 min-h-screen px-4 py-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold gradient-text mb-4">
