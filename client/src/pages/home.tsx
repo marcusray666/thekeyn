@@ -153,6 +153,7 @@ export default function Home() {
               <FileUpload
                 onFileSelect={setFiles}
                 multiple={false}
+                maxSize={500}
               />
               
               <Button

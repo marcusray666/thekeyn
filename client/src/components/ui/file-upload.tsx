@@ -14,7 +14,7 @@ export function FileUpload({
   onFileSelect,
   accept = "image/*,audio/*,.pdf,.doc,.docx",
   multiple = false,
-  maxSize = 50,
+  maxSize = 500,
   className
 }: FileUploadProps) {
   const [dragActive, setDragActive] = useState(false);

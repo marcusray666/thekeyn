@@ -51,7 +51,7 @@ Preferred communication style: Simple, everyday language.
 
 ### File Processing
 - **Upload Handling**: Multi-format support (images, audio, documents)
-- **File Validation**: Type and size restrictions (50MB limit)
+- **File Validation**: Type and size restrictions (500MB limit for large creative works)
 - **Hash Generation**: SHA-256 for file integrity verification
 - **Secure Storage**: Local filesystem with organized directory structure
 

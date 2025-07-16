@@ -152,7 +152,7 @@ export default function AuthenticatedUpload() {
                 <FileUpload
                   onFileSelect={handleFileSelect}
                   accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
-                  maxSize={50}
+                  maxSize={500}
                   className="upload-zone rounded-2xl border-2 border-dashed p-8 text-center"
                 />
               ) : (
