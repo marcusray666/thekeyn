@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, FileText, Music, Image, Video, X, ArrowLeft, Shield, Award } from "lucide-react";
+import { Upload, FileText, Music, Image, Video, X, ArrowLeft, Shield, Award, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { GlassCard } from "@/components/ui/glass-card";
 import { FileUpload } from "@/components/ui/file-upload";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,7 +23,9 @@ export default function AuthenticatedUpload() {
     title: "",
     creatorName: user?.username || "",
     description: "",
+    collaborators: [] as string[]
   });
+  const [newCollaborator, setNewCollaborator] = useState("");
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -73,6 +76,23 @@ export default function AuthenticatedUpload() {
     }));
   };
 
+  const addCollaborator = () => {
+    if (newCollaborator.trim() && !formData.collaborators.includes(newCollaborator.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        collaborators: [...prev.collaborators, newCollaborator.trim()]
+      }));
+      setNewCollaborator("");
+    }
+  };
+
+  const removeCollaborator = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      collaborators: prev.collaborators.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -99,6 +119,7 @@ export default function AuthenticatedUpload() {
     uploadData.append('title', formData.title);
     uploadData.append('creatorName', formData.creatorName);
     uploadData.append('description', formData.description);
+    uploadData.append('collaborators', JSON.stringify(formData.collaborators));
 
     uploadMutation.mutate(uploadData);
   };
@@ -225,6 +246,59 @@ export default function AuthenticatedUpload() {
                   className="glass-morphism border-gray-600 text-white placeholder-gray-400"
                   placeholder="Describe your work..."
                 />
+              </div>
+
+              {/* Collaborators */}
+              <div>
+                <Label htmlFor="collaborators" className="text-white">
+                  Collaborators (Optional)
+                </Label>
+                <p className="text-xs text-gray-400 mb-2">
+                  Add people who worked on this project with you
+                </p>
+                <div className="flex gap-2 mb-3">
+                  <Input
+                    value={newCollaborator}
+                    onChange={(e) => setNewCollaborator(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCollaborator();
+                      }
+                    }}
+                    className="glass-morphism border-gray-600 text-white placeholder-gray-400"
+                    placeholder="Collaborator name or email"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addCollaborator}
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-emerald-600 hover:border-emerald-500"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                {formData.collaborators.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.collaborators.map((collaborator, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/50"
+                      >
+                        {collaborator}
+                        <button
+                          type="button"
+                          onClick={() => removeCollaborator(index)}
+                          className="ml-1 hover:text-red-400"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

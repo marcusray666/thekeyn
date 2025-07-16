@@ -306,10 +306,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const { title, description, creatorName } = req.body;
+      const { title, description, creatorName, collaborators } = req.body;
 
       if (!title || !creatorName) {
         return res.status(400).json({ error: "Title and creator name are required" });
+      }
+
+      // Parse collaborators if provided (could be JSON string from form data)
+      let collaboratorList = [];
+      if (collaborators) {
+        try {
+          collaboratorList = typeof collaborators === 'string' ? JSON.parse(collaborators) : collaborators;
+        } catch (e) {
+          // If not JSON, treat as comma-separated string
+          collaboratorList = collaborators.split(',').map((c: string) => c.trim()).filter(Boolean);
+        }
       }
 
       // Generate file hash
@@ -322,9 +333,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title,
         description: description || "",
         creatorName,
+        collaborators: collaboratorList,
         originalName: req.file.originalname,
-        fileName: req.file.filename,
-        filePath: req.file.path,
+        filename: req.file.filename,
         mimeType: req.file.mimetype,
         fileSize: req.file.size,
         fileHash,
@@ -348,6 +359,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error uploading work:", error);
       res.status(500).json({ error: "Failed to upload work" });
+    }
+  });
+
+  // Update work endpoint
+  app.put("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+      const { title, description, creatorName, collaborators } = req.body;
+
+      if (!title || !creatorName) {
+        return res.status(400).json({ error: "Title and creator name are required" });
+      }
+
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      const updatedWork = await storage.updateWork(workId, {
+        title,
+        description: description || "",
+        creatorName,
+        collaborators: collaborators || [],
+      });
+
+      res.json({
+        work: updatedWork,
+        message: "Work updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating work:", error);
+      res.status(500).json({ error: "Failed to update work" });
+    }
+  });
+
+  // Delete work endpoint
+  app.delete("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      // Delete associated certificate first
+      const certificate = await storage.getCertificateByWorkId(workId);
+      if (certificate) {
+        await storage.deleteCertificate(certificate.id);
+      }
+
+      // Delete the work
+      await storage.deleteWork(workId);
+
+      // Delete file from filesystem
+      if (work.filename) {
+        const filePath = path.join("uploads", work.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
+      res.json({
+        message: "Work deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting work:", error);
+      res.status(500).json({ error: "Failed to delete work" });
     }
   });
 

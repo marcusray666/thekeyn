@@ -13,11 +13,14 @@ export interface IStorage {
   getWorkByCertificateId(certificateId: string): Promise<Work | undefined>;
   getAllWorks(): Promise<Work[]>;
   getRecentWorks(limit?: number): Promise<Work[]>;
+  updateWork(id: number, updates: Partial<InsertWork>): Promise<Work>;
+  deleteWork(id: number): Promise<void>;
   
   createCertificate(certificate: InsertCertificate): Promise<Certificate>;
   getCertificate(id: number): Promise<Certificate | undefined>;
   getCertificateByWorkId(workId: number): Promise<Certificate | undefined>;
   getAllCertificates(): Promise<Certificate[]>;
+  deleteCertificate(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -102,6 +105,23 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(certificates)
       .orderBy(desc(certificates.createdAt));
+  }
+
+  async updateWork(id: number, updates: Partial<InsertWork>): Promise<Work> {
+    const [work] = await db
+      .update(works)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(works.id, id))
+      .returning();
+    return work;
+  }
+
+  async deleteWork(id: number): Promise<void> {
+    await db.delete(works).where(eq(works.id, id));
+  }
+
+  async deleteCertificate(id: number): Promise<void> {
+    await db.delete(certificates).where(eq(certificates.id, id));
   }
 }
 

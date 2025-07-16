@@ -22,7 +22,9 @@ export const works = pgTable("works", {
   certificateId: text("certificate_id").notNull().unique(),
   blockchainHash: text("blockchain_hash"),
   creatorName: text("creator_name").notNull(),
+  collaborators: text("collaborators").array().default([]), // Array of collaborator names/emails
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const certificates = pgTable("certificates", {
@@ -63,6 +65,7 @@ export const insertWorkSchema = createInsertSchema(works).pick({
   certificateId: true,
   blockchainHash: true,
   creatorName: true,
+  collaborators: true,
 });
 
 export const insertCertificateSchema = createInsertSchema(certificates).pick({

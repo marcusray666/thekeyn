@@ -15,13 +15,17 @@ import {
   Settings,
   Upload,
   Eye,
-  BarChart3
+  BarChart3,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { AnalyticsChart } from "@/components/ui/analytics-chart";
+import { EditWorkDialog } from "@/components/ui/edit-work-dialog";
+import { DeleteWorkDialog } from "@/components/ui/delete-work-dialog";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -30,7 +34,10 @@ import { useToast } from "@/hooks/use-toast";
 interface Work {
   id: number;
   title: string;
+  description: string;
   creatorName: string;
+  collaborators?: string[];
+  originalName: string;
   createdAt: string | Date;
   certificateId: string;
   mimeType: string;
@@ -49,6 +56,8 @@ interface Stats {
 export default function UserDashboard() {
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingWork, setEditingWork] = useState<Work | null>(null);
+  const [deletingWork, setDeletingWork] = useState<Work | null>(null);
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -286,7 +295,7 @@ export default function UserDashboard() {
                     {filteredWorks.slice(0, 5).map((work: Work) => (
                       <div 
                         key={work.id}
-                        className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors cursor-pointer"
+                        className="group flex items-center justify-between p-4 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors cursor-pointer"
                         onClick={() => setLocation(`/certificate/${work.certificateId}`)}
                       >
                         <div className="flex items-center space-x-4">
@@ -312,6 +321,28 @@ export default function UserDashboard() {
                             {work.certificateId.slice(-8)}
                           </div>
                           <Shield className="h-4 w-4 text-green-400" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingWork(work);
+                            }}
+                            className="text-gray-400 hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingWork(work);
+                            }}
+                            className="text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -478,6 +509,23 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Edit and Delete Dialogs */}
+      {editingWork && (
+        <EditWorkDialog
+          work={editingWork}
+          open={!!editingWork}
+          onOpenChange={(open) => !open && setEditingWork(null)}
+        />
+      )}
+
+      {deletingWork && (
+        <DeleteWorkDialog
+          work={deletingWork}
+          open={!!deletingWork}
+          onOpenChange={(open) => !open && setDeletingWork(null)}
+        />
+      )}
     </div>
   );
 }
