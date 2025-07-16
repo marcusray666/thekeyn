@@ -1,4 +1,6 @@
 import { users, works, certificates, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -18,113 +20,89 @@ export interface IStorage {
   getAllCertificates(): Promise<Certificate[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private works: Map<number, Work>;
-  private certificates: Map<number, Certificate>;
-  private userIdCounter: number;
-  private workIdCounter: number;
-  private certificateIdCounter: number;
-
-  constructor() {
-    this.users = new Map();
-    this.works = new Map();
-    this.certificates = new Map();
-    this.userIdCounter = 1;
-    this.workIdCounter = 1;
-    this.certificateIdCounter = 1;
-  }
+export class DatabaseStorage implements IStorage {
+  // Database storage - no constructor needed
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: new Date(),
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async createWork(insertWork: InsertWork): Promise<Work> {
-    const id = this.workIdCounter++;
-    const work: Work = { 
-      ...insertWork, 
-      id,
-      description: insertWork.description || null,
-      blockchainHash: insertWork.blockchainHash || null,
-      createdAt: new Date()
-    };
-    this.works.set(id, work);
+    const [work] = await db
+      .insert(works)
+      .values(insertWork)
+      .returning();
     return work;
   }
 
   async getWork(id: number): Promise<Work | undefined> {
-    return this.works.get(id);
+    const [work] = await db.select().from(works).where(eq(works.id, id));
+    return work || undefined;
   }
 
   async getWorkByCertificateId(certificateId: string): Promise<Work | undefined> {
-    return Array.from(this.works.values()).find(
-      (work) => work.certificateId === certificateId,
-    );
+    const [work] = await db.select().from(works).where(eq(works.certificateId, certificateId));
+    return work || undefined;
   }
 
   async getAllWorks(): Promise<Work[]> {
-    return Array.from(this.works.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return await db
+      .select()
+      .from(works)
+      .orderBy(desc(works.createdAt));
   }
 
   async getRecentWorks(limit: number = 10): Promise<Work[]> {
-    const allWorks = await this.getAllWorks();
-    return allWorks.slice(0, limit);
+    return await db
+      .select()
+      .from(works)
+      .orderBy(desc(works.createdAt))
+      .limit(limit);
   }
 
   async createCertificate(insertCertificate: InsertCertificate): Promise<Certificate> {
-    const id = this.certificateIdCounter++;
-    const certificate: Certificate = { 
-      ...insertCertificate, 
-      id,
-      pdfPath: insertCertificate.pdfPath || null,
-      qrCode: insertCertificate.qrCode || null,
-      shareableLink: insertCertificate.shareableLink || null,
-      createdAt: new Date()
-    };
-    this.certificates.set(id, certificate);
+    const [certificate] = await db
+      .insert(certificates)
+      .values(insertCertificate)
+      .returning();
     return certificate;
   }
 
   async getCertificate(id: number): Promise<Certificate | undefined> {
-    return this.certificates.get(id);
+    const [certificate] = await db.select().from(certificates).where(eq(certificates.id, id));
+    return certificate || undefined;
   }
 
   async getCertificateByWorkId(workId: number): Promise<Certificate | undefined> {
-    return Array.from(this.certificates.values()).find(
-      (certificate) => certificate.workId === workId,
-    );
+    const [certificate] = await db.select().from(certificates).where(eq(certificates.workId, workId));
+    return certificate || undefined;
   }
 
   async getAllCertificates(): Promise<Certificate[]> {
-    return Array.from(this.certificates.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return await db
+      .select()
+      .from(certificates)
+      .orderBy(desc(certificates.createdAt));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

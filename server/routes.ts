@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import bcrypt from "bcryptjs";
 import session from "express-session";
-import MemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { insertWorkSchema, insertCertificateSchema, loginSchema, registerSchema } from "@shared/schema";
 
@@ -52,12 +52,14 @@ function generateBlockchainHash(): string {
 }
 
 // Session store
-const sessionStore = MemoryStore(session);
+const pgStore = connectPg(session);
 
 // Session middleware
 const sessionMiddleware = session({
-  store: new sessionStore({
-    checkPeriod: 86400000, // prune expired entries every 24h
+  store: new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: true,
+    ttl: 7 * 24 * 60 * 60, // 7 days in seconds
   }),
   secret: process.env.SESSION_SECRET || 'development-secret-key',
   resave: false,
@@ -65,7 +67,7 @@ const sessionMiddleware = session({
   cookie: {
     secure: false, // Set to true in production with HTTPS
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   },
 });
 
