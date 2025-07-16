@@ -32,6 +32,9 @@ export async function apiRequest(
   // Always use absolute URL to backend server
   const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url}`;
   
+  console.log("Making API request to:", fullUrl);
+  console.log("Request options:", options);
+  
   const res = await fetch(fullUrl, {
     credentials: "include",
     mode: "cors",
@@ -41,6 +44,9 @@ export async function apiRequest(
     },
     ...options,
   });
+
+  console.log("Response status:", res.status);
+  console.log("Response headers:", Object.fromEntries(res.headers.entries()));
 
   await throwIfResNotOk(res);
 
