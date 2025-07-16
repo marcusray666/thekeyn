@@ -96,12 +96,36 @@ export default function CertificateDetail() {
     }
   };
 
-  const handleDownloadCertificate = () => {
-    // In a real app, this would generate and download a PDF certificate
-    toast({
-      title: "Download started",
-      description: "Your certificate PDF is being prepared...",
-    });
+  const handleDownloadCertificate = async () => {
+    if (!certificate) return;
+    
+    try {
+      const { generateCertificatePDF } = await import('@/lib/certificateGenerator');
+      await generateCertificatePDF({
+        certificateId: certificate.certificateId,
+        title: certificate.work.title,
+        description: certificate.work.description || '',
+        creatorName: certificate.work.creatorName,
+        originalName: certificate.work.originalName,
+        mimeType: certificate.work.mimeType,
+        fileSize: certificate.work.fileSize,
+        fileHash: certificate.work.fileHash,
+        blockchainHash: certificate.work.blockchainHash,
+        createdAt: certificate.work.createdAt,
+        shareableLink: certificate.shareableLink,
+      });
+      
+      toast({
+        title: "Certificate downloaded!",
+        description: "Your PDF certificate has been saved to your device.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Unable to generate certificate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReportTheft = () => {

@@ -13,6 +13,8 @@ Prooff is a modern web application that empowers creators to protect, register, 
 - ✅ All authentication endpoints functional: login, register, logout, user verification
 - ✅ Comprehensive UI: My Certificates, Certificate Detail, Report Theft, Analytics, Bulk Operations, Settings
 - ✅ Beautiful liquid glass morphism design with loading animations throughout
+- ✅ INCREASED FILE UPLOAD LIMITS: Now supports 500MB files for large creative works (images, audio, video)
+- ✅ DOWNLOADABLE PDF CERTIFICATES: Professional certificates with QR codes, metadata, blockchain verification
 
 ## User Preferences
 
@@ -58,8 +60,9 @@ Preferred communication style: Simple, everyday language.
 ### Certificate Generation
 - **Unique IDs**: Time-based certificate identifiers with random components
 - **Blockchain Integration**: Simulated blockchain hash generation (ready for real implementation)
-- **Multi-format Output**: PDF certificates, QR codes, and shareable links
+- **Multi-format Output**: Professional PDF certificates with QR codes, comprehensive metadata, and shareable links
 - **Verification System**: Public certificate lookup and validation
+- **PDF Generation**: Complete work information including description, file metadata, unique numbers, blockchain hashes
 
 ### UI/UX Features
 - **Glass Morphism Design**: Modern, translucent interface elements

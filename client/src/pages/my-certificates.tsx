@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, FileText, Calendar, Image, Search } from "lucide-react";
+import { Plus, FileText, Calendar, Image, Search, Download, ExternalLink, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface Certificate {
   id: number;
@@ -30,6 +31,7 @@ export default function MyCertificates() {
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
 
   const { data: certificates, isLoading } = useQuery({
     queryKey: ["/api/certificates"],
@@ -55,6 +57,36 @@ export default function MyCertificates() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleDownloadCertificate = async (certificate: Certificate) => {
+    try {
+      const { generateCertificatePDF } = await import('@/lib/certificateGenerator');
+      await generateCertificatePDF({
+        certificateId: certificate.certificateId,
+        title: certificate.work.title,
+        description: certificate.work.description || '',
+        creatorName: certificate.work.creatorName,
+        originalName: certificate.work.originalName,
+        mimeType: certificate.work.mimeType,
+        fileSize: certificate.work.fileSize,
+        fileHash: certificate.work.fileHash,
+        blockchainHash: certificate.work.blockchainHash,
+        createdAt: certificate.work.createdAt,
+        shareableLink: certificate.shareableLink,
+      });
+      
+      toast({
+        title: "Certificate downloaded!",
+        description: `PDF certificate for "${certificate.work.title}" has been saved.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Unable to generate certificate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (authLoading || isLoading) {
@@ -117,10 +149,12 @@ export default function MyCertificates() {
             {filteredCertificates.map((certificate: Certificate) => (
               <GlassCard 
                 key={certificate.id} 
-                className="hover:scale-105 transition-transform duration-200 cursor-pointer group"
-                onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
+                className="hover:scale-105 transition-transform duration-200 group"
               >
-                <div className="p-6">
+                <div 
+                  className="p-6 cursor-pointer"
+                  onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
+                >
                   {/* Work Preview */}
                   <div className="mb-4">
                     {certificate.work.mimeType.startsWith('image/') ? (
@@ -152,9 +186,41 @@ export default function MyCertificates() {
                     {formatDate(certificate.createdAt)}
                   </div>
 
-                  <div className="text-xs font-mono text-purple-400 bg-purple-900/20 px-2 py-1 rounded">
+                  <div className="text-xs font-mono text-purple-400 bg-purple-900/20 px-2 py-1 rounded mb-4">
                     {certificate.certificateId}
                   </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="px-6 pb-6 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownloadCertificate(certificate);
+                    }}
+                    className="flex-1 border-gray-600 text-gray-300 hover:bg-purple-600 hover:border-purple-500 hover:text-white"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download PDF
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(certificate.shareableLink);
+                      toast({
+                        title: "Link copied!",
+                        description: "Certificate verification link copied to clipboard.",
+                      });
+                    }}
+                    className="border-gray-600 text-gray-300 hover:bg-cyan-600 hover:border-cyan-500 hover:text-white"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </div>
               </GlassCard>
             ))}
