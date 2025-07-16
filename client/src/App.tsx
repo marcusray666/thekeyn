@@ -13,6 +13,7 @@ import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
+import UserDashboard from "@/pages/user-dashboard";
 import Certificates from "@/pages/certificates";
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -31,7 +32,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
-      <Route path="/" component={isAuthenticated ? Dashboard : Welcome} />
+      <Route path="/" component={isAuthenticated ? UserDashboard : Welcome} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
@@ -39,7 +40,7 @@ function Router() {
       {/* Protected routes */}
       {isAuthenticated && (
         <>
-          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/dashboard" component={UserDashboard} />
           <Route path="/home" component={Home} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />

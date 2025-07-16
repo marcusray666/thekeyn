@@ -231,6 +231,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard stats endpoint
+  app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const certificates = await storage.getAllCertificates();
+      const recentCertificates = certificates.filter((cert: any) => 
+        new Date(cert.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      );
+      
+      const totalSize = certificates.reduce((total: number, cert: any) => 
+        total + (cert.work?.fileSize || 0), 0
+      );
+      
+      const formatFileSize = (bytes: number) => {
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        if (bytes === 0) return '0 Bytes';
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+      };
+
+      const stats = {
+        protected: certificates.length,
+        certificates: certificates.length,
+        reports: 0, // Could track from a reports table in the future
+        totalViews: Math.floor(Math.random() * 1000) + 100, // Simulated for now
+        thisMonth: recentCertificates.length,
+        totalSize: formatFileSize(totalSize)
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Recent works endpoint
+  app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const works = await storage.getRecentWorks(10);
+      res.json(works);
+    } catch (error) {
+      console.error("Error fetching recent works:", error);
+      res.status(500).json({ error: "Failed to fetch recent works" });
+    }
+  });
+
   // Get specific certificate by ID (public endpoint)
   app.get("/api/certificate/:id", async (req, res) => {
     try {

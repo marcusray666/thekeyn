@@ -27,27 +27,25 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
       });
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast({
         title: "Welcome back!",
         description: "You've been logged in successfully.",
       });
-      // Force refetch auth state immediately
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      // Clear any cached auth data first
+      queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
       
-      // Immediately refetch auth state and navigate
-      queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      // Force immediate refetch
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
       
-      // Navigate after a brief moment to ensure auth state updates
-      setTimeout(() => {
-        const pendingUpload = localStorage.getItem('pendingUpload');
-        if (pendingUpload) {
-          localStorage.removeItem('pendingUpload');
-          setLocation('/upload-work');
-        } else {
-          setLocation('/');
-        }
-      }, 200);
+      // Navigate after ensuring auth state is updated
+      const pendingUpload = localStorage.getItem('pendingUpload');
+      if (pendingUpload) {
+        localStorage.removeItem('pendingUpload');
+        setLocation('/upload-work');
+      } else {
+        setLocation('/dashboard');
+      }
     },
     onError: (error: Error) => {
       console.error("Login error:", error);
