@@ -71,10 +71,10 @@ const sessionMiddleware = session({
   name: 'connect.sid', // Use standard connect.sid name
   cookie: {
     secure: false, // Set to true in production with HTTPS
-    httpOnly: true,
+    httpOnly: false, // Allow JavaScript access for debugging
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
     sameSite: 'lax', // Allow cookies in same-site context
-    domain: undefined, // Let browser handle domain
+    path: '/', // Explicit path
   },
 });
 
