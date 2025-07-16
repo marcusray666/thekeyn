@@ -29,10 +29,18 @@ export default function AuthenticatedUpload() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return await apiRequest('/api/works', {
+      const response = await fetch('/api/works', {
         method: 'POST',
         body: data,
+        credentials: 'include',
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `${response.status}: ${response.statusText}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
