@@ -49,7 +49,7 @@ export default function Dashboard() {
   };
 
   const getGlassVariant = (index: number) => {
-    const variants = ['purple', 'pink', 'orange', 'teal', 'cyan', 'indigo'] as const;
+    const variants = ['purple', 'blue', 'cyan', 'emerald'] as const;
     return variants[index % variants.length];
   };
 

@@ -5,7 +5,9 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const works = pgTable("works", {
@@ -35,7 +37,19 @@ export const certificates = pgTable("certificates", {
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  password: true,
+  email: true,
+  passwordHash: true,
+});
+
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const registerSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export const insertWorkSchema = createInsertSchema(works).pick({

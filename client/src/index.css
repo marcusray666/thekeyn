@@ -24,17 +24,11 @@
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
   
-  /* Vibrant Glass morphism colors */
+  /* Professional Glass morphism colors */
   --glass-purple: hsl(266, 80%, 65%);
   --glass-blue: hsl(221, 83%, 59%);
   --glass-cyan: hsl(187, 94%, 42%);
   --glass-emerald: hsl(158, 84%, 40%);
-  --glass-pink: hsl(330, 80%, 60%);
-  --glass-orange: hsl(25, 95%, 60%);
-  --glass-yellow: hsl(52, 98%, 60%);
-  --glass-indigo: hsl(253, 93%, 70%);
-  --glass-teal: hsl(172, 90%, 50%);
-  --glass-lime: hsl(84, 85%, 55%);
   
   /* Rich Charcoal backgrounds */
   --charcoal-900: hsl(0, 0%, 6%);
@@ -97,47 +91,12 @@
     border: 1px solid hsla(158, 84%, 40%, 0.3);
   }
   
-  .glass-pink {
-    background: linear-gradient(135deg, hsla(330, 80%, 60%, 0.2) 0%, hsla(330, 80%, 60%, 0.05) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsla(330, 80%, 60%, 0.3);
-  }
-  
-  .glass-orange {
-    background: linear-gradient(135deg, hsla(25, 95%, 60%, 0.2) 0%, hsla(25, 95%, 60%, 0.05) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsla(25, 95%, 60%, 0.3);
-  }
-  
-  .glass-yellow {
-    background: linear-gradient(135deg, hsla(52, 98%, 60%, 0.2) 0%, hsla(52, 98%, 60%, 0.05) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsla(52, 98%, 60%, 0.3);
-  }
-  
-  .glass-indigo {
-    background: linear-gradient(135deg, hsla(253, 93%, 70%, 0.2) 0%, hsla(253, 93%, 70%, 0.05) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsla(253, 93%, 70%, 0.3);
-  }
-  
-  .glass-teal {
-    background: linear-gradient(135deg, hsla(172, 90%, 50%, 0.2) 0%, hsla(172, 90%, 50%, 0.05) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsla(172, 90%, 50%, 0.3);
-  }
+
   
   .gradient-text {
     background: linear-gradient(135deg, 
       var(--glass-purple), 
-      var(--glass-pink), 
-      var(--glass-orange), 
-      var(--glass-yellow), 
+      var(--glass-blue), 
       var(--glass-cyan), 
       var(--glass-emerald));
     -webkit-background-clip: text;
@@ -160,9 +119,9 @@
   .logo-glass {
     background: linear-gradient(135deg, 
       var(--glass-purple), 
-      var(--glass-pink), 
-      var(--glass-orange), 
-      var(--glass-cyan));
+      var(--glass-blue), 
+      var(--glass-cyan), 
+      var(--glass-emerald));
     border-radius: 16px;
     padding: 12px;
     backdrop-filter: blur(8px);
@@ -198,10 +157,8 @@
   .upload-zone {
     background: linear-gradient(135deg, 
       hsla(266, 80%, 65%, 0.15) 0%, 
-      hsla(330, 80%, 60%, 0.12) 20%, 
-      hsla(25, 95%, 60%, 0.10) 40%, 
-      hsla(52, 98%, 60%, 0.08) 60%, 
-      hsla(187, 94%, 42%, 0.12) 80%, 
+      hsla(221, 83%, 59%, 0.12) 33%, 
+      hsla(187, 94%, 42%, 0.12) 66%, 
       hsla(158, 84%, 40%, 0.15) 100%);
     border: 2px dashed hsla(266, 80%, 65%, 0.5);
     backdrop-filter: blur(16px);
@@ -210,13 +167,11 @@
   }
   
   .upload-zone:hover {
-    border-color: hsla(330, 80%, 60%, 0.8);
+    border-color: hsla(221, 83%, 59%, 0.8);
     background: linear-gradient(135deg, 
       hsla(266, 80%, 65%, 0.25) 0%, 
-      hsla(330, 80%, 60%, 0.22) 20%, 
-      hsla(25, 95%, 60%, 0.20) 40%, 
-      hsla(52, 98%, 60%, 0.18) 60%, 
-      hsla(187, 94%, 42%, 0.22) 80%, 
+      hsla(221, 83%, 59%, 0.22) 33%, 
+      hsla(187, 94%, 42%, 0.22) 66%, 
       hsla(158, 84%, 40%, 0.25) 100%);
     transform: translateY(-2px);
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
@@ -225,7 +180,6 @@
   .btn-glass {
     background: linear-gradient(135deg, 
       hsla(266, 80%, 65%, 0.8) 0%, 
-      hsla(330, 80%, 60%, 0.7) 50%, 
       hsla(221, 83%, 59%, 0.8) 100%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -236,10 +190,9 @@
   .btn-glass:hover {
     background: linear-gradient(135deg, 
       hsla(266, 80%, 65%, 0.9) 0%, 
-      hsla(330, 80%, 60%, 0.8) 50%, 
       hsla(221, 83%, 59%, 0.9) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px hsla(330, 80%, 60%, 0.4);
+    box-shadow: 0 8px 24px hsla(266, 80%, 65%, 0.4);
   }
   
   .status-indicator {

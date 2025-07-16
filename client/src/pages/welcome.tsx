@@ -1,86 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Shield, Upload, Link as LinkIcon, Gavel, Plus, Tag, Flag } from "lucide-react";
+import { Link } from "wouter";
+import { Shield, Upload, Link as LinkIcon, Gavel, Plus, Tag, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FileUpload } from "@/components/ui/file-upload";
 import { GlassCard } from "@/components/ui/glass-card";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 
-export default function Home() {
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [creatorName, setCreatorName] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
-  
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await apiRequest("POST", "/api/works", formData);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Success!",
-        description: "Your work has been registered and certificate generated.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/works"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/certificates"] });
-      
-      // Reset form
-      setFiles(null);
-      setTitle("");
-      setDescription("");
-      setCreatorName("");
-      setIsUploading(false);
-    },
-    onError: (error) => {
-      toast({
-        title: "Upload Failed",
-        description: error.message || "Failed to upload and register your work.",
-        variant: "destructive",
-      });
-      setIsUploading(false);
-    },
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!files || files.length === 0) {
-      toast({
-        title: "No File Selected",
-        description: "Please select a file to upload.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!title || !creatorName) {
-      toast({
-        title: "Missing Information", 
-        description: "Please provide both title and creator name.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-
-    const formData = new FormData();
-    formData.append("file", files[0]);
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("creatorName", creatorName);
-
-    uploadMutation.mutate(formData);
-  };
-
+export default function Welcome() {
   const features = [
     {
       icon: Upload,
@@ -123,47 +47,38 @@ export default function Home() {
               Right from your phone or browser.
             </p>
             
-            {/* Upload Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <Input
-                  placeholder="Work Title *"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder-gray-400"
-                  required
-                />
-                <Input
-                  placeholder="Creator Name *"
-                  value={creatorName}
-                  onChange={(e) => setCreatorName(e.target.value)}
-                  className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder-gray-400"
-                  required
-                />
-              </div>
-              
-              <Textarea
-                placeholder="Description (optional)"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder-gray-400"
-                rows={3}
-              />
-              
-              <FileUpload
-                onFileSelect={setFiles}
-                multiple={false}
-              />
-              
-              <Button
-                type="submit"
-                className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg"
-                disabled={isUploading}
-              >
-                <Shield className="mr-2 h-5 w-5" />
-                {isUploading ? "Creating Tag..." : "Create Tag Now"}
-              </Button>
-            </form>
+            {/* Auth Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <Link href="/login">
+                <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Login
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  variant="outline"
+                  className="glass-morphism px-8 py-4 rounded-2xl font-semibold text-white text-lg hover:bg-opacity-80 transition-all"
+                >
+                  <User className="mr-2 h-5 w-5" />
+                  Register
+                </Button>
+              </Link>
+            </div>
+
+            {/* Quick Upload Option */}
+            <div className="border-t border-gray-600 pt-6">
+              <p className="text-gray-400 mb-4">Want to try first?</p>
+              <Link href="/upload">
+                <Button
+                  variant="ghost"
+                  className="text-purple-400 hover:text-purple-300 hover:bg-white hover:bg-opacity-5"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload a file to see how it works
+                </Button>
+              </Link>
+            </div>
           </GlassCard>
         </div>
       </section>
@@ -216,17 +131,21 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
-                <Plus className="mr-2 h-5 w-5" />
-                Get Started Free
-              </Button>
-              <Button
-                variant="outline"
-                className="glass-morphism px-8 py-4 rounded-2xl font-semibold text-white text-lg hover:bg-opacity-80 transition-all"
-              >
-                <Tag className="mr-2 h-5 w-5" />
-                View Demo
-              </Button>
+              <Link href="/register">
+                <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Get Started Free
+                </Button>
+              </Link>
+              <Link href="/upload">
+                <Button
+                  variant="outline"
+                  className="glass-morphism px-8 py-4 rounded-2xl font-semibold text-white text-lg hover:bg-opacity-80 transition-all"
+                >
+                  <Tag className="mr-2 h-5 w-5" />
+                  Try Demo
+                </Button>
+              </Link>
             </div>
             
             <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-400">

@@ -1,11 +1,14 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
+import bcrypt from "bcryptjs";
+import session from "express-session";
+import MemoryStore from "memorystore";
 import { storage } from "./storage";
-import { insertWorkSchema, insertCertificateSchema } from "@shared/schema";
+import { insertWorkSchema, insertCertificateSchema, loginSchema, registerSchema } from "@shared/schema";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -48,9 +51,153 @@ function generateBlockchainHash(): string {
   return "0x" + crypto.randomBytes(32).toString("hex");
 }
 
+// Session store
+const sessionStore = MemoryStore(session);
+
+// Session middleware
+const sessionMiddleware = session({
+  store: new sessionStore({
+    checkPeriod: 86400000, // prune expired entries every 24h
+  }),
+  secret: process.env.SESSION_SECRET || 'development-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // Set to true in production with HTTPS
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  },
+});
+
+// Authentication middleware
+interface AuthenticatedRequest extends Request {
+  user?: { id: number; username: string; email: string };
+}
+
+const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
+  try {
+    const user = await storage.getUser(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    req.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    
+    next();
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+    res.status(500).json({ error: "Authentication error" });
+  }
+};
+
+// Extend session type
+declare module "express-session" {
+  interface SessionData {
+    userId?: number;
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Upload and register creative work
-  app.post("/api/works", upload.single("file"), async (req, res) => {
+  // Add session middleware
+  app.use(sessionMiddleware);
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const validatedData = registerSchema.parse(req.body);
+      
+      // Check if username or email already exists
+      const existingUser = await storage.getUserByUsername(validatedData.username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const existingEmail = await storage.getUserByEmail(validatedData.email);
+      if (existingEmail) {
+        return res.status(400).json({ error: "Email already exists" });
+      }
+
+      // Hash password
+      const saltRounds = 10;
+      const passwordHash = await bcrypt.hash(validatedData.password, saltRounds);
+
+      // Create user
+      const user = await storage.createUser({
+        username: validatedData.username,
+        email: validatedData.email,
+        passwordHash,
+      });
+
+      // Set session
+      req.session.userId = user.id;
+
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      
+      // Find user
+      const user = await storage.getUserByUsername(validatedData.username);
+      if (!user) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Check password
+      const passwordMatch = await bcrypt.compare(validatedData.password, user.passwordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Set session
+      req.session.userId = user.id;
+
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.clearCookie('connect.sid');
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
+    res.json(req.user);
+  });
+
+  // Upload and register creative work (now requires authentication)
+  app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });

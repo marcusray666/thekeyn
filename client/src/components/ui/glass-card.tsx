@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 interface GlassCardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: "default" | "purple" | "blue" | "cyan" | "emerald" | "pink" | "orange" | "yellow" | "indigo" | "teal";
+  variant?: "default" | "purple" | "blue" | "cyan" | "emerald";
   floating?: boolean;
 }
 
@@ -19,11 +19,6 @@ export function GlassCard({
     blue: "glass-blue", 
     cyan: "glass-cyan",
     emerald: "glass-emerald",
-    pink: "glass-pink",
-    orange: "glass-orange",
-    yellow: "glass-yellow",
-    indigo: "glass-indigo",
-    teal: "glass-teal",
   };
 
   return (

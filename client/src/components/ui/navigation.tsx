@@ -1,16 +1,58 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export function Navigation() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/certificates", label: "Certificates" },
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/auth/logout', {
+        method: 'POST',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Logged out",
+        description: "You've been logged out successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Logout failed",
+        description: error.message || "Unable to log out. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const publicNavItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/upload", label: "Try Demo", icon: Upload },
   ];
+
+  const authenticatedNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/home", label: "Upload", icon: Upload },
+    { href: "/certificates", label: "Certificates", icon: Award },
+  ];
+
+  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
@@ -28,19 +70,48 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`transition-colors ${
+                className={`flex items-center space-x-2 transition-colors ${
                   location === item.href
                     ? "text-white"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
-                {item.label}
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
               </Link>
             ))}
-            <div className="flex items-center space-x-2">
-              <div className="status-indicator"></div>
-              <span className="text-sm text-gray-400">Connected</span>
-            </div>
+
+            {/* User Section */}
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <User className="h-4 w-4" />
+                  <span className="text-sm">{user?.username}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  disabled={logoutMutation.isPending}
+                  className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link href="/login">
+                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="btn-glass">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
           
           <button
@@ -59,16 +130,53 @@ export function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-colors ${
                     location === item.href
                       ? "text-white bg-white bg-opacity-10"
                       : "text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.label}
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
                 </Link>
               ))}
+
+              {/* Mobile User Section */}
+              {isAuthenticated ? (
+                <>
+                  <div className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span>{user?.username}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                    className="w-full justify-start text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                  >
+                    <LogOut className="h-5 w-5 mr-2" />
+                    {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block px-3 py-2 rounded-md text-base font-medium btn-glass text-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
