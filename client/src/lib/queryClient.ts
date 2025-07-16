@@ -31,11 +31,20 @@ export async function apiRequest(
 ): Promise<any> {
   const res = await fetch(url, {
     credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
     ...options,
   });
 
   await throwIfResNotOk(res);
-  return await res.json();
+
+  if (res.headers.get("Content-Type")?.includes("application/json")) {
+    return res.json();
+  }
+
+  return res.text();
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

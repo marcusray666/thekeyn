@@ -71,6 +71,7 @@ const sessionMiddleware = session({
     secure: false, // Set to true in production with HTTPS
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    sameSite: 'lax', // Allow cookies in same-site context
   },
 });
 
@@ -141,12 +142,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordHash,
       });
 
-      // Set session
+      // Set session and save it explicitly  
       req.session.userId = user.id;
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error("Registration session save error:", err);
+          return res.status(500).json({ error: "Session creation failed" });
+        }
+        
+        // Return user without password
+        const { passwordHash: _, ...userWithoutPassword } = user;
 
-      // Return user without password
-      const { passwordHash: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+        res.json({ user: userWithoutPassword });
+      });
     } catch (error: any) {
       console.error("Registration error:", error);
       if (error.name === 'ZodError') {
@@ -172,12 +181,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // Set session
+      // Set session and save it explicitly
       req.session.userId = user.id;
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error("Login session save error:", err);
+          return res.status(500).json({ error: "Session creation failed" });
+        }
+        
+        // Return user without password
+        const { passwordHash: _, ...userWithoutPassword } = user;
 
-      // Return user without password
-      const { passwordHash: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+        res.json({ user: userWithoutPassword });
+      });
     } catch (error: any) {
       console.error("Login error:", error);
       if (error.name === 'ZodError') {

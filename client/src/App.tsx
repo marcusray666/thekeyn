@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/ui/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { FullScreenLoader } from "@/components/ui/liquid-glass-loader";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -20,9 +21,7 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
-      </div>
+      <FullScreenLoader text="Loading your creative space..." />
     );
   }
 

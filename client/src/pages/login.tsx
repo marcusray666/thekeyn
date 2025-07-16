@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { ButtonLoader } from "@/components/ui/liquid-glass-loader";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -31,9 +32,13 @@ export default function Login() {
         title: "Welcome back!",
         description: "You've been logged in successfully.",
       });
+      // Force refetch auth state immediately
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Wait for auth state to update, then navigate to home
+      // Immediately refetch auth state and navigate
+      queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      
+      // Navigate after a brief moment to ensure auth state updates
       setTimeout(() => {
         const pendingUpload = localStorage.getItem('pendingUpload');
         if (pendingUpload) {
@@ -42,7 +47,7 @@ export default function Login() {
         } else {
           setLocation('/');
         }
-      }, 500);
+      }, 200);
     },
     onError: (error: Error) => {
       console.error("Login error:", error);
@@ -130,7 +135,7 @@ export default function Login() {
             >
               {loginMutation.isPending ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <ButtonLoader />
                   <span>Signing in...</span>
                 </div>
               ) : (
