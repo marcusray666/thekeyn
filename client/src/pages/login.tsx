@@ -33,14 +33,16 @@ export default function Login() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Check if there's a pending upload in localStorage
-      const pendingUpload = localStorage.getItem('pendingUpload');
-      if (pendingUpload) {
-        localStorage.removeItem('pendingUpload');
-        setLocation('/upload-work');
-      } else {
-        setLocation('/dashboard');
-      }
+      // Wait for auth state to update, then navigate to home
+      setTimeout(() => {
+        const pendingUpload = localStorage.getItem('pendingUpload');
+        if (pendingUpload) {
+          localStorage.removeItem('pendingUpload');
+          setLocation('/upload-work');
+        } else {
+          setLocation('/');
+        }
+      }, 500);
     },
     onError: (error: Error) => {
       console.error("Login error:", error);

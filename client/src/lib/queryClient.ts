@@ -3,12 +3,24 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     try {
-      const json = await res.json();
-      const message = json.error || json.message || res.statusText;
-      throw new Error(`${res.status}: ${message}`);
-    } catch (parseError) {
       const text = await res.text();
-      throw new Error(`${res.status}: ${text || res.statusText}`);
+      let message = res.statusText;
+      
+      if (text) {
+        try {
+          const json = JSON.parse(text);
+          message = json.error || json.message || text;
+        } catch {
+          message = text;
+        }
+      }
+      
+      throw new Error(message);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(`${res.status}: ${res.statusText}`);
     }
   }
 }
