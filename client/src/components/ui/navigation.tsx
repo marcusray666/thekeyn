@@ -43,7 +43,7 @@ export function Navigation() {
 
   const authenticatedNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/home", label: "Upload", icon: Upload },
+    { href: "/upload-work", label: "Upload", icon: Upload },
     { href: "/certificates", label: "Certificates", icon: Award },
   ];
 

@@ -17,15 +17,18 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024, // 50MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Allow images, documents, and audio files
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|mp3|wav|ogg|m4a/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    // Allow most common creative file types
+    const allowedExtensions = /\.(jpeg|jpg|png|gif|svg|pdf|doc|docx|txt|rtf|mp3|wav|ogg|m4a|mp4|mov|avi|webm|mkv|flv)$/i;
+    const extname = allowedExtensions.test(file.originalname);
     
-    if (mimetype && extname) {
+    // More permissive MIME type check
+    const allowedMimes = /^(image|audio|video|text|application)\//;
+    const mimetype = allowedMimes.test(file.mimetype);
+    
+    if (extname || mimetype) {
       return cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Only images, documents, and audio files are allowed."));
+      cb(new Error("Invalid file type. Only creative content files are allowed."));
     }
   },
 });
@@ -314,6 +317,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching certificate:", error);
       res.status(500).json({ message: "Failed to fetch certificate" });
+    }
+  });
+
+  // Get stats for dashboard
+  app.get("/api/stats", async (req, res) => {
+    try {
+      const works = await storage.getAllWorks();
+      const certificates = await storage.getAllCertificates();
+      
+      const stats = {
+        protected: works.length,
+        certificates: certificates.length,
+        reports: 0, // Placeholder for future reporting feature
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
     }
   });
 

@@ -37,7 +37,7 @@ export default function Login() {
       const pendingUpload = localStorage.getItem('pendingUpload');
       if (pendingUpload) {
         localStorage.removeItem('pendingUpload');
-        setLocation('/upload');
+        setLocation('/upload-work');
       } else {
         setLocation('/dashboard');
       }

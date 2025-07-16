@@ -9,6 +9,7 @@ import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import UploadPage from "@/pages/upload";
+import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Certificates from "@/pages/certificates";
@@ -39,6 +40,7 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/home" component={Home} />
           <Route path="/certificates" component={Certificates} />
+          <Route path="/upload-work" component={AuthenticatedUpload} />
         </>
       )}
       

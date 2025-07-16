@@ -115,6 +115,8 @@ Preferred communication style: Simple, everyday language.
 - **Connection**: Neon serverless PostgreSQL active with session storage
 - **Schema Updates**: `npm run db:push` for schema synchronization
 - **Authentication**: Session-based authentication with database-backed storage
+- **File Upload System**: Complete with certificate generation and blockchain hashing
+- **API Endpoints**: All CRUD operations functional (works, certificates, stats, auth)
 
 ### Scaling Considerations
 - File storage can be moved to cloud storage (S3, Cloudinary)

@@ -39,7 +39,7 @@ export default function Register() {
       const pendingUpload = localStorage.getItem('pendingUpload');
       if (pendingUpload) {
         localStorage.removeItem('pendingUpload');
-        setLocation('/upload');
+        setLocation('/upload-work');
       } else {
         setLocation('/dashboard');
       }

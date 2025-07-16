@@ -161,7 +161,7 @@ export default function Dashboard() {
               <GlassCard>
                 <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <Link href="/">
+                  <Link href="/upload-work">
                     <Button className="w-full glass-purple rounded-xl py-3 px-4 text-white font-medium hover:bg-opacity-80 transition-all">
                       <Plus className="mr-2 h-4 w-4" />
                       Add New Work
