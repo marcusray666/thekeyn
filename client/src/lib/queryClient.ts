@@ -31,6 +31,7 @@ export async function apiRequest(
 ): Promise<any> {
   const res = await fetch(url, {
     credentials: "include",
+    mode: "cors",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -55,6 +56,7 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      mode: "cors",
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

@@ -74,6 +74,7 @@ const sessionMiddleware = session({
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
     sameSite: 'lax', // Allow cookies in same-site context
+    domain: undefined, // Let browser handle domain
   },
 });
 
