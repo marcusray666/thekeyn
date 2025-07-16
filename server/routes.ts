@@ -1,47 +1,22 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import multer from "multer";
-import crypto from "crypto";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import multer from "multer";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
+import { z } from "zod";
 import { storage } from "./storage";
-import { insertWorkSchema, insertCertificateSchema, loginSchema, registerSchema } from "@shared/schema";
+import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 
-// Configure multer for file uploads
-const upload = multer({
-  dest: "uploads/",
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    // Allow most common creative file types
-    const allowedExtensions = /\.(jpeg|jpg|png|gif|svg|pdf|doc|docx|txt|rtf|mp3|wav|ogg|m4a|mp4|mov|avi|webm|mkv|flv)$/i;
-    const extname = allowedExtensions.test(file.originalname);
-    
-    // More permissive MIME type check
-    const allowedMimes = /^(image|audio|video|text|application)\//;
-    const mimetype = allowedMimes.test(file.mimetype);
-    
-    if (extname || mimetype) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Invalid file type. Only creative content files are allowed."));
-    }
-  },
-});
-
-// Ensure uploads directory exists
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads", { recursive: true });
-}
+const MemStore = MemoryStore(session);
 
 function generateCertificateId(): string {
   const timestamp = Date.now().toString(36);
-  const random = crypto.randomBytes(4).toString("hex").toUpperCase();
-  return `PRF-${new Date().getFullYear()}-${timestamp}-${random}`;
+  const random = crypto.randomBytes(8).toString("hex");
+  return `CERT-${timestamp}-${random}`.toUpperCase();
 }
 
 function generateFileHash(filePath: string): string {
@@ -50,64 +25,35 @@ function generateFileHash(filePath: string): string {
 }
 
 function generateBlockchainHash(): string {
-  // Simulate blockchain hash generation
-  return "0x" + crypto.randomBytes(32).toString("hex");
+  return crypto.randomBytes(32).toString("hex");
 }
 
-// Session store with corrected configuration
-const pgStore = connectPg(session);
-
-// Session middleware with Vite dev server compatibility
-const sessionMiddleware = session({
-  store: new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
-    ttl: 7 * 24 * 60 * 60, // 7 days in seconds
-    tableName: 'session'
-  }),
-  secret: process.env.SESSION_SECRET || 'development-secret-key-change-in-production',
-  resave: true, // Force session save
-  saveUninitialized: true, // Create session for all requests
-  name: 'prooff.sid', // Custom name to avoid conflicts
-  cookie: {
-    secure: false,
-    httpOnly: false, // Allow JavaScript access for debugging
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: 'lax', // Compatible setting
-    path: '/',
-    // Remove domain to let browser handle it automatically
-  },
-});
-
-// Authentication middleware
 interface AuthenticatedRequest extends Request {
   user?: { id: number; username: string; email: string };
 }
 
 const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  console.log("Auth check - Session ID:", req.sessionID, "User ID:", req.session?.userId);
-  console.log("Cookies received:", req.headers.cookie);
-  console.log("Session data:", req.session);
-  
-  if (!req.session || !req.session.userId) {
-    console.log("Auth failed - No session or userId");
-    return res.status(401).json({ error: "Authentication required" });
-  }
-
   try {
-    const user = await storage.getUser(req.session.userId);
+    interface SessionData {
+      userId?: number;
+    }
+
+    const sessionData = req.session as SessionData;
+    if (!sessionData || !sessionData.userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const user = await storage.getUser(sessionData.userId);
     if (!user) {
-      console.log("Auth failed - User not found:", req.session.userId);
       return res.status(401).json({ error: "User not found" });
     }
 
-    console.log("Auth success - User found:", user.username);
     req.user = {
       id: user.id,
       username: user.username,
       email: user.email,
     };
-    
+
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);
@@ -115,23 +61,76 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
   }
 };
 
-// Extend session type
-declare module "express-session" {
-  interface SessionData {
-    userId?: number;
-  }
-}
+// Set up multer for file uploads
+const storage_multer = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = "uploads";
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const randomString = crypto.randomBytes(8).toString("hex");
+    const extension = path.extname(file.originalname);
+    cb(null, `${timestamp}-${randomString}${extension}`);
+  },
+});
+
+const upload = multer({
+  storage: storage_multer,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "audio/mpeg",
+      "audio/wav",
+      "audio/ogg",
+      "video/mp4",
+      "video/webm",
+      "application/pdf",
+      "text/plain",
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Unsupported file type"));
+    }
+  },
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Add session middleware
+  // Session middleware
+  const sessionMiddleware = session({
+    store: new MemStore({
+      checkPeriod: 86400000, // prune expired entries every 24h
+    }),
+    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+    },
+  });
+
   app.use(sessionMiddleware);
 
-  // Authentication routes
+  // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {
       const validatedData = registerSchema.parse(req.body);
       
-      // Check if username or email already exists
+      // Check if user already exists
       const existingUser = await storage.getUserByUsername(validatedData.username);
       if (existingUser) {
         return res.status(400).json({ error: "Username already exists" });
@@ -139,12 +138,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const existingEmail = await storage.getUserByEmail(validatedData.email);
       if (existingEmail) {
-        return res.status(400).json({ error: "Email already exists" });
+        return res.status(400).json({ error: "Email already registered" });
       }
 
       // Hash password
-      const saltRounds = 10;
-      const passwordHash = await bcrypt.hash(validatedData.password, saltRounds);
+      const passwordHash = await bcrypt.hash(validatedData.password, 12);
 
       // Create user
       const user = await storage.createUser({
@@ -153,23 +151,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordHash,
       });
 
-      // Set session and save it explicitly with promise
+      // Set session
       req.session.userId = user.id;
       
-      // Use promisified session save
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
-          if (err) {
-            console.error("Registration session save error:", err);
-            reject(err);
-          } else {
-            console.log("Registration session saved successfully for user:", user.id, "Session ID:", req.sessionID);
-            resolve();
-          }
+          if (err) reject(err);
+          else resolve();
         });
       });
       
-      // Return user without password
       const { passwordHash: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error: any) {
@@ -197,23 +188,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // Set session and save it explicitly with promise
+      // Set session
       req.session.userId = user.id;
       
-      // Use promisified session save
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
-          if (err) {
-            console.error("Login session save error:", err);
-            reject(err);
-          } else {
-            console.log("Login session saved successfully for user:", user.id, "Session ID:", req.sessionID);
-            resolve();
-          }
+          if (err) reject(err);
+          else resolve();
         });
       });
       
-      // Return user without password
       const { passwordHash: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error: any) {
@@ -239,54 +223,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(req.user);
   });
 
-  // Session validation endpoint for debugging
-  app.get("/api/auth/session-debug", (req, res) => {
-    res.json({
-      sessionID: req.sessionID,
-      hasSession: !!req.session,
-      userId: req.session?.userId,
-      cookie: req.headers.cookie,
-      sessionData: req.session
-    });
-  });
-
   // Get all certificates for authenticated user
   app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const certificates = await storage.getAllCertificates();
-      res.json(certificates);
+      
+      // Transform certificates to include work data
+      const certificatesWithWorks = await Promise.all(
+        certificates.map(async (cert) => {
+          const work = await storage.getWork(cert.workId);
+          return {
+            ...cert,
+            work: work || null,
+          };
+        })
+      );
+
+      res.json(certificatesWithWorks);
     } catch (error) {
       console.error("Error fetching certificates:", error);
       res.status(500).json({ error: "Failed to fetch certificates" });
     }
   });
 
-  // Dashboard stats endpoint
+  // Get dashboard stats
   app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
+      const works = await storage.getAllWorks();
       const certificates = await storage.getAllCertificates();
-      const recentCertificates = certificates.filter((cert: any) => 
-        new Date(cert.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      );
-      
-      const totalSize = certificates.reduce((total: number, cert: any) => 
-        total + (cert.work?.fileSize || 0), 0
-      );
-      
-      const formatFileSize = (bytes: number) => {
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        if (bytes === 0) return '0 Bytes';
-        const i = Math.floor(Math.log(bytes) / Math.log(1024));
-        return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-      };
 
       const stats = {
-        protected: certificates.length,
+        protected: works.length,
         certificates: certificates.length,
-        reports: 0, // Could track from a reports table in the future
-        totalViews: Math.floor(Math.random() * 1000) + 100, // Simulated for now
-        thisMonth: recentCertificates.length,
-        totalSize: formatFileSize(totalSize)
+        reports: 0, // Placeholder for future implementation
       };
 
       res.json(stats);
@@ -296,36 +265,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Recent works endpoint
+  // Get recent works
   app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const works = await storage.getRecentWorks(10);
-      res.json(works);
+      const recentWorks = await storage.getRecentWorks(10);
+      res.json(recentWorks);
     } catch (error) {
       console.error("Error fetching recent works:", error);
       res.status(500).json({ error: "Failed to fetch recent works" });
-    }
-  });
-
-  // Get specific certificate by ID (public endpoint)
-  app.get("/api/certificate/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const work = await storage.getWorkByCertificateId(id);
-      
-      if (!work) {
-        return res.status(404).json({ error: "Certificate not found" });
-      }
-      
-      const certificate = await storage.getCertificateByWorkId(work.id);
-      if (!certificate) {
-        return res.status(404).json({ error: "Certificate not found" });
-      }
-      
-      res.json({ ...certificate, work });
-    } catch (error) {
-      console.error("Error fetching certificate:", error);
-      res.status(500).json({ error: "Failed to fetch certificate" });
     }
   });
 
@@ -334,227 +281,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { certificateId, platform, infringingUrl, description, contactEmail } = req.body;
       
+      // Validate the certificate exists
       const work = await storage.getWorkByCertificateId(certificateId);
       if (!work) {
         return res.status(404).json({ error: "Certificate not found" });
       }
-      
-      // Generate DMCA takedown email template
-      const emailTemplate = `Subject: DMCA Takedown Notice - Copyright Infringement
 
-Dear ${platform} Copyright Team,
-
-I am writing to report copyright infringement of my original work hosted on your platform.
-
-ORIGINAL WORK INFORMATION:
-- Title: ${work.title}
-- Creator: ${work.creatorName}
-- Certificate ID: ${certificateId}
-- Registration Date: ${new Date(work.createdAt).toLocaleDateString()}
-- Blockchain Hash: ${work.blockchainHash}
-
-INFRINGING CONTENT:
-- Platform: ${platform}
-- Infringing URL: ${infringingUrl}
-- Description: ${description}
-
-GOOD FAITH STATEMENT:
-I have a good faith belief that the use of the copyrighted material described above is not authorized by the copyright owner, its agent, or the law.
-
-ACCURACY STATEMENT:
-I swear, under penalty of perjury, that the information in this notification is accurate and that I am the copyright owner or am authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
-
-CONTACT INFORMATION:
-Email: ${req.user?.email}
-Date: ${new Date().toLocaleDateString()}
-
-I request that you remove or disable access to the infringing material immediately.
-
-Thank you for your prompt attention to this matter.
-
-Sincerely,
-${work.creatorName}`;
-
-      res.json({ emailTemplate });
+      // Here you would implement the actual theft reporting logic
+      // For now, we'll just return a success response
+      res.json({ 
+        message: "Theft report submitted successfully",
+        reportId: crypto.randomUUID(),
+      });
     } catch (error) {
-      console.error("Error generating theft report:", error);
-      res.status(500).json({ error: "Failed to generate report" });
+      console.error("Error submitting theft report:", error);
+      res.status(500).json({ error: "Failed to submit theft report" });
     }
   });
 
-  // Upload and register creative work (now requires authentication)
+  // Upload work endpoint
   app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+        return res.status(400).json({ error: "No file uploaded" });
       }
 
       const { title, description, creatorName } = req.body;
-      
+
       if (!title || !creatorName) {
-        return res.status(400).json({ message: "Title and creator name are required" });
+        return res.status(400).json({ error: "Title and creator name are required" });
       }
 
+      // Generate file hash
       const fileHash = generateFileHash(req.file.path);
       const certificateId = generateCertificateId();
       const blockchainHash = generateBlockchainHash();
 
-      const workData = {
+      // Create work record
+      const work = await storage.createWork({
         title,
         description: description || "",
-        filename: req.file.filename,
+        creatorName,
         originalName: req.file.originalname,
+        fileName: req.file.filename,
+        filePath: req.file.path,
         mimeType: req.file.mimetype,
         fileSize: req.file.size,
         fileHash,
         certificateId,
         blockchainHash,
-        creatorName,
-      };
-
-      const validatedData = insertWorkSchema.parse(workData);
-      const work = await storage.createWork(validatedData);
+      });
 
       // Create certificate
-      const certificateData = {
+      const certificate = await storage.createCertificate({
         workId: work.id,
         certificateId,
         shareableLink: `${req.protocol}://${req.get("host")}/certificate/${certificateId}`,
-        qrCode: `data:image/svg+xml;base64,${Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><text x="100" y="100" text-anchor="middle" font-family="Arial" font-size="12">${certificateId}</text></svg>`).toString("base64")}`,
-      };
+        qrCode: `data:image/svg+xml;base64,${Buffer.from(`<svg></svg>`).toString("base64")}`,
+      });
 
-      const validatedCertificateData = insertCertificateSchema.parse(certificateData);
-      const certificate = await storage.createCertificate(validatedCertificateData);
-
-      res.json({ work, certificate });
+      res.json({
+        work,
+        certificate,
+        message: "Work uploaded and protected successfully",
+      });
     } catch (error) {
       console.error("Error uploading work:", error);
-      res.status(500).json({ message: "Failed to upload and register work" });
-    }
-  });
-
-  // Get all works
-  app.get("/api/works", async (req, res) => {
-    try {
-      const works = await storage.getAllWorks();
-      res.json(works);
-    } catch (error) {
-      console.error("Error fetching works:", error);
-      res.status(500).json({ message: "Failed to fetch works" });
-    }
-  });
-
-  // Get recent works
-  app.get("/api/works/recent", async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      const works = await storage.getRecentWorks(limit);
-      res.json(works);
-    } catch (error) {
-      console.error("Error fetching recent works:", error);
-      res.status(500).json({ message: "Failed to fetch recent works" });
-    }
-  });
-
-  // Get work by ID
-  app.get("/api/works/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const work = await storage.getWork(id);
-      
-      if (!work) {
-        return res.status(404).json({ message: "Work not found" });
-      }
-
-      res.json(work);
-    } catch (error) {
-      console.error("Error fetching work:", error);
-      res.status(500).json({ message: "Failed to fetch work" });
-    }
-  });
-
-  // Get all certificates
-  app.get("/api/certificates", async (req, res) => {
-    try {
-      const certificates = await storage.getAllCertificates();
-      res.json(certificates);
-    } catch (error) {
-      console.error("Error fetching certificates:", error);
-      res.status(500).json({ message: "Failed to fetch certificates" });
-    }
-  });
-
-  // Get certificate by work ID
-  app.get("/api/certificates/work/:workId", async (req, res) => {
-    try {
-      const workId = parseInt(req.params.workId);
-      const certificate = await storage.getCertificateByWorkId(workId);
-      
-      if (!certificate) {
-        return res.status(404).json({ message: "Certificate not found" });
-      }
-
-      res.json(certificate);
-    } catch (error) {
-      console.error("Error fetching certificate:", error);
-      res.status(500).json({ message: "Failed to fetch certificate" });
-    }
-  });
-
-  // Get stats for dashboard
-  app.get("/api/stats", async (req, res) => {
-    try {
-      const works = await storage.getAllWorks();
-      const certificates = await storage.getAllCertificates();
-      
-      const stats = {
-        protected: works.length,
-        certificates: certificates.length,
-        reports: 0, // Placeholder for future reporting feature
-      };
-      
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-      res.status(500).json({ message: "Failed to fetch stats" });
-    }
-  });
-
-  // Get public certificate by certificate ID
-  app.get("/api/certificate/:certificateId", async (req, res) => {
-    try {
-      const certificateId = req.params.certificateId;
-      const work = await storage.getWorkByCertificateId(certificateId);
-      
-      if (!work) {
-        return res.status(404).json({ message: "Certificate not found" });
-      }
-
-      const certificate = await storage.getCertificateByWorkId(work.id);
-      
-      res.json({ work, certificate });
-    } catch (error) {
-      console.error("Error fetching public certificate:", error);
-      res.status(500).json({ message: "Failed to fetch certificate" });
-    }
-  });
-
-  // Get stats
-  app.get("/api/stats", async (req, res) => {
-    try {
-      const works = await storage.getAllWorks();
-      const certificates = await storage.getAllCertificates();
-      
-      const stats = {
-        protected: works.length,
-        certificates: certificates.length,
-        reports: 0, // Placeholder for reports functionality
-      };
-
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-      res.status(500).json({ message: "Failed to fetch stats" });
+      res.status(500).json({ error: "Failed to upload work" });
     }
   });
 

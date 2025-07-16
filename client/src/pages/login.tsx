@@ -21,18 +21,10 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { username: string; password: string }) => {
-      console.log("Starting login mutation with data:", data);
-      try {
-        const result = await apiRequest('/api/auth/login', {
-          method: 'POST',
-          body: JSON.stringify(data),
-        });
-        console.log("Login mutation result:", result);
-        return result;
-      } catch (error) {
-        console.error("Login mutation failed:", error);
-        throw error;
-      }
+      return await apiRequest('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: async (data) => {
       toast({
@@ -40,18 +32,13 @@ export default function Login() {
         description: "You've been logged in successfully.",
       });
       
-      // Immediately invalidate auth cache and refetch to get updated session
-      queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
+      // Invalidate and refetch user data
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Check if session cookie was set and force navigation
-      setTimeout(() => {
-        console.log("Document cookies after login:", document.cookie);
-        // Navigate to dashboard on same origin to maintain session
-        window.location.href = 'http://localhost:5000/dashboard';
-      }, 300);
+      // Navigate to dashboard
+      setLocation('/dashboard');
     },
     onError: (error: Error) => {
-      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error.message || "Invalid username or password.",
@@ -96,9 +83,11 @@ export default function Login() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-white">Username</Label>
+              <Label htmlFor="username" className="text-gray-300">
+                Username
+              </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="username"
                   name="username"
@@ -106,16 +95,18 @@ export default function Login() {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                  className="pl-10 glass-input"
                   placeholder="Enter your username"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="password" className="text-gray-300">
+                Password
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="password"
                   name="password"
@@ -123,7 +114,7 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                  className="pl-10 glass-input"
                   placeholder="Enter your password"
                 />
               </div>
@@ -132,46 +123,38 @@ export default function Login() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full btn-glass py-3 rounded-2xl font-semibold text-white"
+              className="w-full relative overflow-hidden"
             >
               {loginMutation.isPending ? (
-                <div className="flex items-center space-x-2">
-                  <ButtonLoader />
-                  <span>Signing in...</span>
-                </div>
+                <ButtonLoader />
               ) : (
-                <div className="flex items-center space-x-2">
-                  <LogIn className="h-5 w-5" />
-                  <span>Sign In</span>
-                </div>
+                <>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </>
               )}
             </Button>
           </form>
 
-          {/* Register Link */}
-          <div className="mt-6 text-center">
+          {/* Footer */}
+          <div className="mt-6 text-center space-y-4">
             <p className="text-gray-400">
               Don't have an account?{" "}
-              <Button
-                variant="link"
+              <button
                 onClick={() => setLocation('/register')}
-                className="text-purple-400 hover:text-purple-300 p-0 h-auto"
+                className="text-blue-400 hover:text-blue-300 font-medium"
               >
-                Create one here
-              </Button>
+                Create one
+              </button>
             </p>
-          </div>
-
-          {/* Back to Welcome */}
-          <div className="mt-4 text-center">
-            <Button
-              variant="ghost"
+            
+            <button
               onClick={() => setLocation('/')}
-              className="text-gray-400 hover:text-gray-300 hover:bg-white hover:bg-opacity-5"
+              className="flex items-center justify-center w-full text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Welcome
-            </Button>
+            </button>
           </div>
         </GlassCard>
       </div>

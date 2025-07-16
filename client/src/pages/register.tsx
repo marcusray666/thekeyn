@@ -18,7 +18,6 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
   const registerMutation = useMutation({
@@ -26,30 +25,24 @@ export default function Register() {
       return await apiRequest('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: async (data) => {
       toast({
         title: "Account created!",
-        description: "Welcome to Prooff! You can now start protecting your creative work.",
+        description: "Welcome to Prooff. Your account has been created successfully.",
       });
       
-      // Immediately invalidate auth cache and refetch to get updated session
-      queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
+      // Invalidate and refetch user data
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Check if session cookie was set and force navigation
-      setTimeout(() => {
-        console.log("Document cookies after register:", document.cookie);
-        // Navigate to dashboard on same origin to maintain session
-        window.location.href = 'http://localhost:5000/dashboard';
-      }, 300);
+      // Navigate to dashboard
+      setLocation('/dashboard');
     },
     onError: (error: Error) => {
-      console.error("Registration error:", error);
       toast({
         title: "Registration failed",
-        description: error.message || "Unable to create account. Please try again.",
+        description: error.message || "Please check your information and try again.",
         variant: "destructive",
       });
     },
@@ -57,8 +50,7 @@ export default function Register() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.username || !formData.email || !formData.password) {
       toast({
         title: "Missing information",
         description: "Please fill in all fields.",
@@ -66,30 +58,7 @@ export default function Register() {
       });
       return;
     }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password mismatch",
-        description: "Passwords do not match. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    registerMutation.mutate({
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-    });
+    registerMutation.mutate(formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,15 +78,17 @@ export default function Register() {
               <span className="text-3xl font-bold text-white">P</span>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Create Account</h1>
-            <p className="text-gray-400">Join thousands of creators protecting their work</p>
+            <p className="text-gray-400">Join Prooff to protect your creative work</p>
           </div>
 
-          {/* Register Form */}
+          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-white">Username</Label>
+              <Label htmlFor="username" className="text-gray-300">
+                Username
+              </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="username"
                   name="username"
@@ -125,16 +96,18 @@ export default function Register() {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                  className="pl-10 glass-input"
                   placeholder="Choose a username"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="email" className="text-gray-300">
+                Email
+              </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="email"
                   name="email"
@@ -142,16 +115,18 @@ export default function Register() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                  className="pl-10 glass-input"
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="password" className="text-gray-300">
+                Password
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="password"
                   name="password"
@@ -159,25 +134,8 @@ export default function Register() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                  className="pl-10 glass-input"
                   placeholder="Create a password"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
-                  placeholder="Confirm your password"
                 />
               </div>
             </div>
@@ -185,46 +143,38 @@ export default function Register() {
             <Button
               type="submit"
               disabled={registerMutation.isPending}
-              className="w-full btn-glass py-3 rounded-2xl font-semibold text-white"
+              className="w-full relative overflow-hidden"
             >
               {registerMutation.isPending ? (
-                <div className="flex items-center space-x-2">
-                  <ButtonLoader />
-                  <span>Creating account...</span>
-                </div>
+                <ButtonLoader />
               ) : (
-                <div className="flex items-center space-x-2">
-                  <UserPlus className="h-5 w-5" />
-                  <span>Create Account</span>
-                </div>
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Create Account
+                </>
               )}
             </Button>
           </form>
 
-          {/* Login Link */}
-          <div className="mt-6 text-center">
+          {/* Footer */}
+          <div className="mt-6 text-center space-y-4">
             <p className="text-gray-400">
               Already have an account?{" "}
-              <Button
-                variant="link"
+              <button
                 onClick={() => setLocation('/login')}
-                className="text-purple-400 hover:text-purple-300 p-0 h-auto"
+                className="text-blue-400 hover:text-blue-300 font-medium"
               >
-                Sign in here
-              </Button>
+                Sign in
+              </button>
             </p>
-          </div>
-
-          {/* Back to Welcome */}
-          <div className="mt-4 text-center">
-            <Button
-              variant="ghost"
+            
+            <button
               onClick={() => setLocation('/')}
-              className="text-gray-400 hover:text-gray-300 hover:bg-white hover:bg-opacity-5"
+              className="flex items-center justify-center w-full text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Welcome
-            </Button>
+            </button>
           </div>
         </GlassCard>
       </div>
