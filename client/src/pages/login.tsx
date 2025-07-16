@@ -43,6 +43,7 @@ export default function Login() {
       }
     },
     onError: (error: Error) => {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error.message || "Invalid username or password.",

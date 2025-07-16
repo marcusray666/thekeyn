@@ -45,6 +45,7 @@ export default function Register() {
       }
     },
     onError: (error: Error) => {
+      console.error("Registration error:", error);
       toast({
         title: "Registration failed",
         description: error.message || "Unable to create account. Please try again.",
