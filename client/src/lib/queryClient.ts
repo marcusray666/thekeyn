@@ -35,26 +35,45 @@ export async function apiRequest(
   console.log("Making API request to:", fullUrl);
   console.log("Request options:", options);
   
-  const res = await fetch(fullUrl, {
-    credentials: "include",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  });
+  try {
+    const res = await fetch(fullUrl, {
+      credentials: "include",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    });
+
+    console.log("Fetch completed successfully");
+    return await handleResponse(res);
+  } catch (networkError) {
+    console.error("Network error:", networkError);
+    throw new Error(`Network error: ${networkError.message}`);
+  }
+}
+
+async function handleResponse(res: Response) {
 
   console.log("Response status:", res.status);
   console.log("Response headers:", Object.fromEntries(res.headers.entries()));
 
-  await throwIfResNotOk(res);
-
-  if (res.headers.get("Content-Type")?.includes("application/json")) {
-    return res.json();
+  if (!res.ok) {
+    let errorMessage = `${res.status}: ${res.statusText}`;
+    try {
+      const errorData = await res.json();
+      console.log("Error response body:", errorData);
+      errorMessage = errorData.error || errorMessage;
+    } catch (e) {
+      console.log("Could not parse error response as JSON");
+    }
+    throw new Error(errorMessage);
   }
 
-  return res.text();
+  const responseData = await res.json();
+  console.log("Response data:", responseData);
+  return responseData;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
