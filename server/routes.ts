@@ -83,16 +83,21 @@ interface AuthenticatedRequest extends Request {
 }
 
 const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  console.log("Auth check - Session ID:", req.sessionID, "User ID:", req.session?.userId);
+  
   if (!req.session || !req.session.userId) {
+    console.log("Auth failed - No session or userId");
     return res.status(401).json({ error: "Authentication required" });
   }
 
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
+      console.log("Auth failed - User not found:", req.session.userId);
       return res.status(401).json({ error: "User not found" });
     }
 
+    console.log("Auth success - User found:", user.username);
     req.user = {
       id: user.id,
       username: user.username,
@@ -144,20 +149,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordHash,
       });
 
-      // Set session and save it explicitly  
+      // Set session and save it explicitly with promise
       req.session.userId = user.id;
       
-      req.session.save((err) => {
-        if (err) {
-          console.error("Registration session save error:", err);
-          return res.status(500).json({ error: "Session creation failed" });
-        }
-        
-        // Return user without password
-        const { passwordHash: _, ...userWithoutPassword } = user;
-
-        res.json({ user: userWithoutPassword });
+      // Use promisified session save
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error("Registration session save error:", err);
+            reject(err);
+          } else {
+            console.log("Registration session saved successfully for user:", user.id, "Session ID:", req.sessionID);
+            resolve();
+          }
+        });
       });
+      
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
     } catch (error: any) {
       console.error("Registration error:", error);
       if (error.name === 'ZodError') {
@@ -183,20 +193,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // Set session and save it explicitly
+      // Set session and save it explicitly with promise
       req.session.userId = user.id;
       
-      req.session.save((err) => {
-        if (err) {
-          console.error("Login session save error:", err);
-          return res.status(500).json({ error: "Session creation failed" });
-        }
-        
-        // Return user without password
-        const { passwordHash: _, ...userWithoutPassword } = user;
-
-        res.json({ user: userWithoutPassword });
+      // Use promisified session save
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error("Login session save error:", err);
+            reject(err);
+          } else {
+            console.log("Login session saved successfully for user:", user.id, "Session ID:", req.sessionID);
+            resolve();
+          }
+        });
       });
+      
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
     } catch (error: any) {
       console.error("Login error:", error);
       if (error.name === 'ZodError') {
@@ -218,6 +233,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
     res.json(req.user);
+  });
+
+  // Session validation endpoint for debugging
+  app.get("/api/auth/session-debug", (req, res) => {
+    res.json({
+      sessionID: req.sessionID,
+      hasSession: !!req.session,
+      userId: req.session?.userId,
+      cookie: req.headers.cookie,
+      sessionData: req.session
+    });
   });
 
   // Get all certificates for authenticated user

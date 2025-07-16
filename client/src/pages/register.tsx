@@ -34,20 +34,29 @@ export default function Register() {
         title: "Account created!",
         description: "Welcome to Prooff! You can now start protecting your creative work.",
       });
-      // Clear any cached auth data first
+      
+      // Immediately invalidate auth cache and refetch to get updated session
       queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
       
-      // Force immediate refetch
-      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
-      
-      // Navigate after ensuring auth state is updated
-      const pendingUpload = localStorage.getItem('pendingUpload');
-      if (pendingUpload) {
-        localStorage.removeItem('pendingUpload');
-        setLocation('/upload-work');
-      } else {
-        setLocation('/dashboard');
-      }
+      // Wait longer for browser cookie to be set, then refetch and navigate
+      setTimeout(async () => {
+        try {
+          await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+          
+          // Navigate after ensuring auth state is updated
+          const pendingUpload = localStorage.getItem('pendingUpload');
+          if (pendingUpload) {
+            localStorage.removeItem('pendingUpload');
+            setLocation('/upload-work');
+          } else {
+            setLocation('/dashboard');
+          }
+        } catch (error) {
+          console.error("Auth refetch failed:", error);
+          // Try navigation anyway, auth will redirect if needed
+          setLocation('/dashboard');
+        }
+      }, 500);
     },
     onError: (error: Error) => {
       console.error("Registration error:", error);

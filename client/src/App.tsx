@@ -35,7 +35,9 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
-      <Route path="/" component={isAuthenticated ? UserDashboard : Welcome} />
+      <Route path="/">
+        {isAuthenticated ? <UserDashboard /> : <Welcome />}
+      </Route>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
