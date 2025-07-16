@@ -38,10 +38,10 @@ export default function Register() {
       // Immediately invalidate auth cache and refetch to get updated session
       queryClient.removeQueries({ queryKey: ['/api/auth/user'] });
       
-      // Force page reload to ensure session cookie is properly set
+      // Force full page reload to establish session cookie properly
       setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 100);
+        window.location.replace('/dashboard');
+      }, 200);
     },
     onError: (error: Error) => {
       console.error("Registration error:", error);

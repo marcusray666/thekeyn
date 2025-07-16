@@ -57,7 +57,7 @@ function generateBlockchainHash(): string {
 // Session store with corrected configuration
 const pgStore = connectPg(session);
 
-// Session middleware
+// Session middleware with Vite dev server compatibility
 const sessionMiddleware = session({
   store: new pgStore({
     conString: process.env.DATABASE_URL,
@@ -66,15 +66,16 @@ const sessionMiddleware = session({
     tableName: 'session'
   }),
   secret: process.env.SESSION_SECRET || 'development-secret-key-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  name: 'connect.sid', // Use standard connect.sid name
+  resave: true, // Force session save
+  saveUninitialized: true, // Create session for all requests
+  name: 'prooff.sid', // Custom name to avoid conflicts
   cookie: {
-    secure: false, // Set to true in production with HTTPS
+    secure: false,
     httpOnly: false, // Allow JavaScript access for debugging
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-    sameSite: 'lax', // Allow cookies in same-site context
-    path: '/', // Explicit path
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite: 'none', // Allow cross-origin
+    path: '/',
+    domain: '.localhost', // Allow subdomains
   },
 });
 

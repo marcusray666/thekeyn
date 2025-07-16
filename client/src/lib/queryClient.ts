@@ -29,7 +29,10 @@ export async function apiRequest(
   url: string,
   options: RequestInit = {}
 ): Promise<any> {
-  const res = await fetch(url, {
+  // Always use absolute URL to backend server
+  const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url}`;
+  
+  const res = await fetch(fullUrl, {
     credentials: "include",
     mode: "cors",
     headers: {
@@ -54,7 +57,10 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const url = queryKey.join("/") as string;
+    const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    
+    const res = await fetch(fullUrl, {
       credentials: "include",
       mode: "cors",
     });
