@@ -68,7 +68,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <GlassCard className="p-8">
           {/* Header */}
