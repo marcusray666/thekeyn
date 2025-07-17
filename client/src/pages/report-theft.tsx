@@ -54,6 +54,9 @@ export default function ReportTheft() {
 
   const [generatedEmail, setGeneratedEmail] = useState('');
 
+  const [platformEmail, setPlatformEmail] = useState('');
+  const [certificateUrl, setCertificateUrl] = useState('');
+
   const reportMutation = useMutation({
     mutationFn: async (data: TheftReport) => {
       return await apiRequest('/api/report-theft', {
@@ -63,9 +66,11 @@ export default function ReportTheft() {
     },
     onSuccess: (data) => {
       setGeneratedEmail(data.emailTemplate);
+      setPlatformEmail(data.platformEmail);
+      setCertificateUrl(data.certificateUrl);
       toast({
-        title: "Report generated!",
-        description: "Your takedown email has been prepared. Copy and send it to the platform.",
+        title: "Takedown request generated!",
+        description: "Your DMCA takedown email has been prepared and is ready to send.",
       });
     },
     onError: (error: Error) => {
@@ -112,10 +117,20 @@ export default function ReportTheft() {
   };
 
   const openEmailClient = () => {
-    const subject = `Copyright Infringement Report - Certificate ${certificateId}`;
+    const subject = `Takedown Request – Unauthorized Use of Copyrighted Content`;
     const body = encodeURIComponent(generatedEmail);
-    const mailto = `mailto:${formData.contactEmail}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    const mailto = `mailto:${platformEmail}?subject=${encodeURIComponent(subject)}&body=${body}`;
     window.open(mailto);
+  };
+
+  const sendDirectEmail = async () => {
+    // This would integrate with an email service like SendGrid
+    // For now, we'll just open the email client
+    openEmailClient();
+    toast({
+      title: "Email client opened",
+      description: "Your default email client has been opened with the takedown request.",
+    });
   };
 
   return (
@@ -264,6 +279,17 @@ export default function ReportTheft() {
                 
                 {generatedEmail ? (
                   <div className="space-y-4">
+                    {platformEmail && (
+                      <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-3">
+                        <p className="text-blue-300 text-sm">
+                          <strong>Send to:</strong> {platformEmail}
+                        </p>
+                        <p className="text-blue-300 text-sm">
+                          <strong>Platform:</strong> {formData.platform}
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className="bg-gray-800 rounded-lg p-4 max-h-96 overflow-y-auto">
                       <pre className="text-sm text-gray-300 whitespace-pre-wrap">
                         {generatedEmail}
@@ -288,6 +314,17 @@ export default function ReportTheft() {
                         Send Email
                       </Button>
                     </div>
+                    
+                    {certificateUrl && (
+                      <div className="bg-green-900/20 border border-green-600/30 rounded-lg p-3">
+                        <p className="text-green-300 text-sm">
+                          <strong>Certificate Verification:</strong>
+                        </p>
+                        <p className="text-green-300 text-sm font-mono break-all">
+                          {certificateUrl}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-12">

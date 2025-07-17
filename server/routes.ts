@@ -28,6 +28,63 @@ function generateBlockchainHash(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+// DMCA Takedown Email Template Generator
+function generateTakedownEmail(data: {
+  work: any;
+  certificate: any;
+  platform: string;
+  infringingUrl: string;
+  description: string;
+  contactEmail: string;
+  baseUrl: string;
+}) {
+  const { work, certificate, platform, infringingUrl, description, contactEmail, baseUrl } = data;
+  
+  return `Subject: Takedown Request – Unauthorized Use of Copyrighted Content
+
+Hello,
+
+I am contacting you on behalf of ${work.creatorName}, the rights holder of the original content referenced below. We have identified that our content has been published or distributed without permission on your platform.
+
+Details of the original content:
+
+Title: ${work.title}
+Author: ${work.creatorName}${work.collaborators && work.collaborators.length > 0 ? `
+Collaborators: ${work.collaborators.join(', ')}` : ''}
+Original file name: ${work.originalName}
+Copyright registration: Certificate ID ${certificate.certificateId}
+URL/Location of original content: ${baseUrl}/certificate/${certificate.certificateId}
+Blockchain verification hash: ${work.blockchainHash}
+
+Details of the infringing content:
+
+URL/Location where infringing content appears: ${infringingUrl}
+Platform: ${platform}
+Description of the infringing content: ${description}
+
+This unauthorized use constitutes copyright infringement. We request that you promptly remove or disable access to the infringing material.
+
+I have a good faith belief that use of the copyrighted content described above is not authorized by the copyright owner, its agent, or the law.
+
+I declare, under penalty of perjury, that the information in this notice is accurate and that I am the copyright owner or am authorized to act on behalf of the copyright owner.
+
+Please confirm when this content has been removed. If you need additional information, you can contact me at ${contactEmail}.
+
+You can verify the authenticity of this copyright claim by visiting our certificate page: ${baseUrl}/certificate/${certificate.certificateId}
+
+Thank you for your cooperation.
+
+Sincerely,
+${work.creatorName}
+${contactEmail}
+
+---
+This takedown request was generated through Prooff Digital Copyright Protection Platform
+Certificate ID: ${certificate.certificateId}
+File Hash: ${work.fileHash}
+Registration Date: ${new Date(certificate.createdAt).toLocaleDateString()}`;
+}
+
 interface AuthenticatedRequest extends Request {
   user?: { id: number; username: string; email: string };
 }
@@ -315,11 +372,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Certificate not found" });
       }
 
-      // Here you would implement the actual theft reporting logic
-      // For now, we'll just return a success response
+      // Get certificate data
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+
+      // Generate DMCA takedown email template
+      const emailTemplate = generateTakedownEmail({
+        work,
+        certificate,
+        platform,
+        infringingUrl,
+        description,
+        contactEmail,
+        baseUrl: `${req.protocol}://${req.get("host")}`
+      });
+
+      // Get platform contact info
+      const platformContacts = {
+        'Twitter/X': 'copyright@twitter.com',
+        'Instagram': 'ip@instagram.com',
+        'Facebook': 'ip@facebook.com',
+        'YouTube': 'copyright@youtube.com',
+        'LinkedIn': 'copyright@linkedin.com',
+        'TikTok': 'legal@tiktok.com',
+        'Pinterest': 'copyright@pinterest.com'
+      };
+
+      const reportId = crypto.randomUUID();
+
       res.json({ 
-        message: "Theft report submitted successfully",
-        reportId: crypto.randomUUID(),
+        message: "Takedown request generated successfully",
+        reportId,
+        emailTemplate,
+        platformEmail: platformContacts[platform as keyof typeof platformContacts] || 'Unknown platform',
+        certificateUrl: `${req.protocol}://${req.get("host")}/certificate/${certificate.certificateId}`
       });
     } catch (error) {
       console.error("Error submitting theft report:", error);
