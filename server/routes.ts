@@ -97,6 +97,7 @@ Registration Date: ${new Date(certificate.createdAt).toLocaleDateString()}`;
 
 interface AuthenticatedRequest extends Request {
   user?: { id: number; username: string; email: string };
+  userId?: number;
 }
 
 const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -120,6 +121,9 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       username: user.username,
       email: user.email,
     };
+    
+    // CRITICAL FIX: Set userId for profile updates
+    req.userId = user.id;
 
     next();
   } catch (error) {

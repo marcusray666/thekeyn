@@ -474,27 +474,38 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
-/* Universal text readability fixes */
+/* CRITICAL TEXT READABILITY FIXES - Force dark text on light backgrounds */
 h1, h2, h3, h4, h5, h6,
 p, span, div, a, label,
 .text-foreground,
-.text-sm, .text-xs, .text-lg, .text-xl, .text-2xl {
-  color: hsl(var(--foreground)) !important;
+.text-sm, .text-xs, .text-lg, .text-xl, .text-2xl,
+button, .btn {
+  color: #1a1a1a !important;
+  text-shadow: none !important;
 }
 
-/* Form elements */
+/* Form elements - dark text */
 input, textarea, select {
-  color: hsl(var(--foreground)) !important;
+  color: #1a1a1a !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Card content */
-.card *, .glass-morphism * {
-  color: hsl(var(--card-foreground)) !important;
+/* Card content - force dark text */
+.card *, .glass-morphism *,
+.glass-morphism h1, .glass-morphism h2, .glass-morphism h3,
+.glass-morphism p, .glass-morphism span, .glass-morphism div {
+  color: #1a1a1a !important;
 }
 
-/* Override any gray text colors */
-.text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600 {
-  color: hsl(var(--muted-foreground)) !important;
+/* Muted text - readable dark gray */
+.text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600,
+.text-muted-foreground {
+  color: #4a4a4a !important;
+}
+
+/* Navigation and button text */
+nav *, .nav-link, .btn * {
+  color: #1a1a1a !important;
 }
 
 /* Accessibility Enhancements */

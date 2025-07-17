@@ -209,28 +209,26 @@ export function AccessibilityToolkit() {
             </div>
 
             <div className="space-y-4">
-              {/* Quick Presets */}
-              <div>
-                <Label className="text-sm font-medium text-foreground mb-2 block">
-                  Quick Presets
-                </Label>
-                <div className="space-y-2">
-                  {presetConfigurations.map((preset) => (
-                    <Button
-                      key={preset.name}
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start text-left glass-input"
-                      onClick={() => setSettings(prev => ({ ...prev, ...preset.settings }))}
-                    >
-                      <div>
-                        <div className="font-medium">{preset.name}</div>
-                        <div className="text-xs text-muted-foreground">{preset.description}</div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              {/* Reset Button */}
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  const defaultSettings = {
+                    highContrast: false,
+                    fontSize: 100,
+                    focusIndicator: false,
+                    motionReduce: false,
+                    colorBlindMode: 'none' as ColorBlindnessType
+                  };
+                  setSettings(defaultSettings);
+                  localStorage.setItem('accessibility-settings', JSON.stringify(defaultSettings));
+                  setTheme('liquid-glass');
+                }}
+                className="w-full mb-4"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset to Defaults
+              </Button>
 
               {/* High Contrast */}
               <div className="flex items-center justify-between">
