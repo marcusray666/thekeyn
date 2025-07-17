@@ -347,14 +347,10 @@ export default function Settings() {
           transition={{ delay: 0.1 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="glass-input grid w-full grid-cols-5">
+            <TabsList className="glass-input grid w-full grid-cols-4">
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Profile
-              </TabsTrigger>
-              <TabsTrigger value="appearance" className="flex items-center gap-2">
-                <Palette className="h-4 w-4" />
-                Appearance
               </TabsTrigger>
               <TabsTrigger value="notifications" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
@@ -536,73 +532,7 @@ export default function Settings() {
               </GlassCard>
             </TabsContent>
 
-            {/* Appearance Settings */}
-            <TabsContent value="appearance" className="space-y-6">
-              <GlassCard className="p-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <Palette className="h-6 w-6 text-purple-400" />
-                  <h2 className="text-2xl font-bold text-white">Theme Selection</h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {Object.entries(themes).map(([key, theme]) => (
-                    <motion.div
-                      key={key}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`relative cursor-pointer rounded-lg p-4 border-2 transition-all ${
-                        selectedTheme === key
-                          ? 'border-purple-500 bg-purple-500/10'
-                          : 'border-gray-600 hover:border-gray-500'
-                      }`}
-                      onClick={() => handleThemeChange(key)}
-                    >
-                      {selectedTheme === key && (
-                        <div className="absolute top-2 right-2">
-                          <div className="bg-purple-500 rounded-full p-1">
-                            <Check className="h-4 w-4 text-white" />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="mb-3">
-                        <h3 className="font-semibold text-white mb-1">{theme.name}</h3>
-                        <p className="text-sm text-gray-400">{theme.description}</p>
-                      </div>
-
-                      {/* Theme Preview */}
-                      <div className="flex gap-1 mb-3">
-                        {theme.preview.map((color, index) => (
-                          <div
-                            key={index}
-                            className="w-8 h-8 rounded"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-
-                      <Badge variant="outline" className={`text-xs ${
-                        selectedTheme === key ? 'border-purple-400 text-purple-300' : 'border-gray-600'
-                      }`}>
-                        {selectedTheme === key ? 'Active' : 'Select'}
-                      </Badge>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="mt-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="h-5 w-5 text-blue-400 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-blue-300 mb-1">Theme Preview</h4>
-                      <p className="text-sm text-gray-400">
-                        Changes will be applied immediately. You can switch between themes anytime in your settings.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </GlassCard>
-            </TabsContent>
+            {/* Appearance tab removed - only liquid glass theme */}
 
             {/* Notification Settings */}
             <TabsContent value="notifications" className="space-y-6">

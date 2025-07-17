@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "liquid-glass";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "light",
+  theme: "liquid-glass",
   setTheme: () => null,
 };
 
@@ -22,7 +22,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "liquid-glass",
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
@@ -33,12 +33,8 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-    
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.add("light");
-    }
+    // Always use the liquid glass theme
+    document.body.classList.add("liquid-glass");
   }, [theme]);
 
   const value = {
