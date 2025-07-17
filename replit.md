@@ -4,7 +4,7 @@
 
 Prooff is a modern web application that empowers creators to protect, register, and prove ownership of their digital artwork and creative projects. The platform provides blockchain-powered certificates of authenticity, enabling artists, designers, musicians, and other creators to instantly secure their work and defend against theft.
 
-**Recent Updates (July 16, 2025):**
+**Recent Updates (July 17, 2025):**
 - ✅ AUTHENTICATION COMPLETELY REBUILT AND WORKING: Single-server architecture eliminates all cross-origin issues
 - ✅ Backend login/register successfully creating sessions and returning user data
 - ✅ Frontend using relative URLs for same-origin requests (no more CORS issues)
@@ -15,6 +15,9 @@ Prooff is a modern web application that empowers creators to protect, register, 
 - ✅ Beautiful liquid glass morphism design with loading animations throughout
 - ✅ INCREASED FILE UPLOAD LIMITS: Now supports 500MB files for large creative works (images, audio, video)
 - ✅ DOWNLOADABLE PDF CERTIFICATES: Professional certificates with QR codes, metadata, blockchain verification
+- ✅ AUTOMATED DMCA TAKEDOWN SYSTEM: Professional email generation for copyright theft reporting
+- ✅ COLLABORATIVE WORK SUPPORT: Multiple collaborators can be added to shared creative projects
+- ✅ INTERACTIVE ONBOARDING TUTORIAL: Smooth walkthrough for new users with targeted highlights and welcome modal
 
 ## User Preferences
 

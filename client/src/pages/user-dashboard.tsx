@@ -30,6 +30,9 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { OnboardingTutorial } from "@/components/ui/onboarding-tutorial";
+import { WelcomeModal } from "@/components/ui/welcome-modal";
 
 interface Work {
   id: number;
@@ -61,6 +64,15 @@ export default function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { 
+    showOnboarding, 
+    showWelcome,
+    completeOnboarding, 
+    closeOnboarding,
+    startOnboarding,
+    closeWelcome,
+    startTutorialFromWelcome
+  } = useOnboarding();
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
@@ -161,6 +173,15 @@ export default function UserDashboard() {
               >
                 <Eye className="mr-2 h-5 w-5" />
                 View All
+              </Button>
+
+              <Button
+                onClick={startOnboarding}
+                variant="outline"
+                className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20"
+              >
+                <Settings className="mr-2 h-5 w-5" />
+                Tutorial
               </Button>
             </div>
           </div>
@@ -526,6 +547,21 @@ export default function UserDashboard() {
           onOpenChange={(open) => !open && setDeletingWork(null)}
         />
       )}
+
+      {/* Welcome Modal */}
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={closeWelcome}
+        onStartTutorial={startTutorialFromWelcome}
+        username={user?.username}
+      />
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial
+        isOpen={showOnboarding}
+        onClose={closeOnboarding}
+        onComplete={completeOnboarding}
+      />
     </div>
   );
 }
