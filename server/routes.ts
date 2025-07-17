@@ -844,6 +844,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile routes
+  app.get('/api/profile/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Remove sensitive information
+      const { passwordHash, ...publicProfile } = user;
+      res.json(publicProfile);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.get('/api/profile/:username/works', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const works = await storage.getUserWorks(user.id);
+      res.json(works);
+    } catch (error) {
+      console.error("Error fetching user works:", error);
+      res.status(500).json({ message: "Failed to fetch user works" });
+    }
+  });
+
   // Social media routes
   app.get('/api/social/feed', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

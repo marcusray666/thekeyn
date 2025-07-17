@@ -22,6 +22,7 @@ import ReportTheft from "@/pages/report-theft";
 import Analytics from "@/pages/analytics";
 import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
+import Profile from "@/pages/profile";
 import CopyrightRegistration from "@/pages/copyright-registration";
 import NFTMinting from "@/pages/nft-minting";
 import SubscriptionManagement from "@/pages/subscription-management";
@@ -62,6 +63,7 @@ function Router() {
           <Route path="/subscription" component={SubscriptionManagement} />
           <Route path="/social" component={SocialFeed} />
           <Route path="/settings" component={Settings} />
+          <Route path="/profile/:username" component={Profile} />
         </>
       )}
       
