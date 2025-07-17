@@ -22,6 +22,8 @@ import Analytics from "@/pages/analytics";
 import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
 import CopyrightRegistration from "@/pages/copyright-registration";
+import NFTMinting from "@/pages/nft-minting";
+import SubscriptionManagement from "@/pages/subscription-management";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -53,6 +55,8 @@ function Router() {
           <Route path="/analytics" component={Analytics} />
           <Route path="/bulk-operations" component={BulkOperations} />
           <Route path="/copyright-registration" component={CopyrightRegistration} />
+          <Route path="/nft-minting" component={NFTMinting} />
+          <Route path="/subscription" component={SubscriptionManagement} />
           <Route path="/settings" component={Settings} />
         </>
       )}

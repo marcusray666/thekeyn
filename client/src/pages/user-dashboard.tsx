@@ -18,7 +18,8 @@ import {
   BarChart3,
   Edit,
   Trash2,
-  Building2
+  Building2,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -183,6 +184,15 @@ export default function UserDashboard() {
               >
                 <Building2 className="mr-2 h-5 w-5" />
                 Register Copyright
+              </Button>
+
+              <Button
+                onClick={() => setLocation('/nft-minting')}
+                variant="outline"
+                className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20"
+              >
+                <Sparkles className="mr-2 h-5 w-5" />
+                Mint NFTs
               </Button>
 
               <Button

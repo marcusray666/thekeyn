@@ -1,4 +1,4 @@
-import { users, works, certificates, copyrightApplications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication } from "@shared/schema";
+import { users, works, certificates, copyrightApplications, nftMints, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -7,6 +7,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   
   createWork(work: InsertWork): Promise<Work>;
   getWork(id: number): Promise<Work | undefined>;
@@ -26,6 +27,11 @@ export interface IStorage {
   getCopyrightApplication(id: string, userId: number): Promise<CopyrightApplication | undefined>;
   getCopyrightApplications(userId: number): Promise<CopyrightApplication[]>;
   updateCopyrightApplication(id: string, updates: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication>;
+  
+  createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint>;
+  getNftMint(id: number): Promise<NftMint | undefined>;
+  getNftMints(userId: number): Promise<NftMint[]>;
+  updateNftMint(id: number, updates: Partial<InsertNftMint>): Promise<NftMint>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -50,6 +56,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .insert(users)
       .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
       .returning();
     return user;
   }
@@ -182,6 +197,49 @@ export class DatabaseStorage implements IStorage {
       .where(eq(copyrightApplications.id, parseInt(id)))
       .returning();
     return application;
+  }
+
+  async createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint> {
+    const mintData = {
+      ...mint,
+      status: mint.status || 'pending',
+      royaltyPercentage: mint.royaltyPercentage || 10,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const [nftMint] = await db
+      .insert(nftMints)
+      .values(mintData as any)
+      .returning();
+    return nftMint;
+  }
+
+  async getNftMint(id: number): Promise<NftMint | undefined> {
+    const [mint] = await db.select().from(nftMints).where(eq(nftMints.id, id));
+    return mint || undefined;
+  }
+
+  async getNftMints(userId: number): Promise<NftMint[]> {
+    return await db
+      .select()
+      .from(nftMints)
+      .where(eq(nftMints.userId, userId))
+      .orderBy(desc(nftMints.createdAt));
+  }
+
+  async updateNftMint(id: number, updates: Partial<InsertNftMint>): Promise<NftMint> {
+    const updateData = {
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    const [mint] = await db
+      .update(nftMints)
+      .set(updateData as any)
+      .where(eq(nftMints.id, id))
+      .returning();
+    return mint;
   }
 }
 

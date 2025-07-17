@@ -619,6 +619,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // NFT minting routes
+  app.post('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Simulate blockchain minting process
+      const mockTransactionHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+      const mockTokenId = Math.floor(Math.random() * 10000) + 1;
+      
+      const nftMint = await storage.createNftMint({
+        ...req.body,
+        userId: req.userId!,
+        transactionHash: mockTransactionHash,
+        tokenId: mockTokenId.toString(),
+        status: 'minting',
+        mintingCost: req.body.blockchain === 'ethereum' ? '$25.43' : 
+                    req.body.blockchain === 'polygon' ? '$3.21' :
+                    req.body.blockchain === 'arbitrum' ? '$6.18' : '$2.14',
+        metadataUri: `https://prooff.app/metadata/${mockTokenId}`,
+        marketplaceListings: ['OpenSea']
+      });
+
+      // Simulate minting completion after a delay
+      setTimeout(async () => {
+        try {
+          await storage.updateNftMint(nftMint.id, {
+            status: 'completed'
+          });
+        } catch (error) {
+          console.error('Error updating NFT mint status:', error);
+        }
+      }, 5000);
+
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error creating NFT mint:', error);
+      res.status(500).json({ message: 'Failed to create NFT mint' });
+    }
+  });
+
+  app.get('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMints = await storage.getNftMints(req.userId!);
+      res.json(nftMints);
+    } catch (error) {
+      console.error('Error fetching NFT mints:', error);
+      res.status(500).json({ message: 'Failed to fetch NFT mints' });
+    }
+  });
+
+  app.get('/api/nft-mints/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMint = await storage.getNftMint(parseInt(req.params.id));
+      if (!nftMint || nftMint.userId !== req.userId!) {
+        return res.status(404).json({ message: 'NFT mint not found' });
+      }
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error fetching NFT mint:', error);
+      res.status(500).json({ message: 'Failed to fetch NFT mint' });
+    }
+  });
+
+  app.put('/api/nft-mints/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMint = await storage.updateNftMint(parseInt(req.params.id), req.body);
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error updating NFT mint:', error);
+      res.status(500).json({ message: 'Failed to update NFT mint' });
+    }
+  });
+
+  // Subscription management routes
+  app.post('/api/subscription/upgrade', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { tierId } = req.body;
+      
+      // Simulate payment processing and subscription update
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Calculate expiration date (30 days from now for monthly plans)
+      const expirationDate = new Date();
+      expirationDate.setMonth(expirationDate.getMonth() + 1);
+
+      // Update user subscription
+      await storage.updateUser(req.userId!, {
+        subscriptionTier: tierId,
+        subscriptionExpiresAt: expirationDate
+      });
+
+      res.json({ 
+        message: 'Subscription upgraded successfully',
+        tier: tierId,
+        expiresAt: expirationDate
+      });
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      res.status(500).json({ message: 'Failed to upgrade subscription' });
+    }
+  });
+
+  app.get('/api/subscription/status', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.json({
+        tier: user.subscriptionTier,
+        expiresAt: user.subscriptionExpiresAt,
+        isActive: !user.subscriptionExpiresAt || user.subscriptionExpiresAt > new Date()
+      });
+    } catch (error) {
+      console.error('Error fetching subscription status:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription status' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

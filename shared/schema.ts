@@ -7,6 +7,9 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  subscriptionTier: text("subscription_tier").notNull().default("free"), // free, premium, enterprise
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  walletAddress: text("wallet_address"), // For NFT minting
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -93,6 +96,24 @@ export const insertCertificateSchema = createInsertSchema(certificates).pick({
   shareableLink: true,
 });
 
+export const nftMints = pgTable("nft_mints", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workId: integer("work_id").references(() => works.id).notNull(),
+  certificateId: text("certificate_id").references(() => certificates.certificateId).notNull(),
+  blockchain: text("blockchain").notNull(), // ethereum, polygon, arbitrum, base
+  contractAddress: text("contract_address"),
+  tokenId: text("token_id"),
+  transactionHash: text("transaction_hash"),
+  status: text("status").notNull().default("pending"), // pending, minting, completed, failed
+  mintingCost: text("minting_cost"), // Gas fees + platform fees
+  royaltyPercentage: integer("royalty_percentage").default(10), // Default 10% royalties
+  metadataUri: text("metadata_uri"), // IPFS or other decentralized storage
+  marketplaceListings: text("marketplace_listings").array().default([]), // OpenSea, Rarible, etc.
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertCopyrightApplicationSchema = createInsertSchema(copyrightApplications).pick({
   userId: true,
   workId: true,
@@ -115,3 +136,21 @@ export type InsertCertificate = z.infer<typeof insertCertificateSchema>;
 export type Certificate = typeof certificates.$inferSelect;
 export type CopyrightApplication = typeof copyrightApplications.$inferSelect;
 export type InsertCopyrightApplication = z.infer<typeof insertCopyrightApplicationSchema>;
+
+export const insertNftMintSchema = createInsertSchema(nftMints).pick({
+  userId: true,
+  workId: true,
+  certificateId: true,
+  blockchain: true,
+  contractAddress: true,
+  tokenId: true,
+  transactionHash: true,
+  status: true,
+  mintingCost: true,
+  royaltyPercentage: true,
+  metadataUri: true,
+  marketplaceListings: true,
+});
+
+export type NftMint = typeof nftMints.$inferSelect;
+export type InsertNftMint = z.infer<typeof insertNftMintSchema>;

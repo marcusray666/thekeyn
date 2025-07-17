@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Building2 } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,6 +46,7 @@ export function Navigation() {
     { href: "/upload-work", label: "Upload", icon: Upload },
     { href: "/certificates", label: "Certificates", icon: Award },
     { href: "/copyright-registration", label: "Registration", icon: Building2 },
+    { href: "/nft-minting", label: "NFT Studio", icon: Sparkles },
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;

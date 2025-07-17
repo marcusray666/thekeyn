@@ -19,6 +19,8 @@ Prooff is a modern web application that empowers creators to protect, register, 
 - ✅ COLLABORATIVE WORK SUPPORT: Multiple collaborators can be added to shared creative projects
 - ✅ INTERACTIVE ONBOARDING TUTORIAL: Smooth walkthrough for new users with targeted highlights and welcome modal
 - ✅ GOVERNMENT COPYRIGHT OFFICE INTEGRATION: Submit works for official registration with US, UK, Canada, and EU copyright offices
+- ✅ NFT MINTING CAPABILITIES: Transform protected works into NFTs on multiple blockchain networks (Ethereum, Polygon, Arbitrum, Base)
+- ✅ PREMIUM TIER SYSTEM: Free, Premium, and Enterprise subscriptions with advanced features for serious creators
 
 ## User Preferences
 
