@@ -19,6 +19,8 @@ export const users = pgTable("users", {
   followerCount: integer("follower_count").default(0),
   followingCount: integer("following_count").default(0),
   totalLikes: integer("total_likes").default(0),
+  themePreference: text("theme_preference").default("liquid-glass"),
+  settings: text("settings").default("{}"), // JSON string for settings
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

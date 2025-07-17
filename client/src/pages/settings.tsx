@@ -27,6 +27,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTheme } from "@/components/theme-provider";
 
 // Theme definitions
 const themes = {
@@ -111,6 +112,7 @@ export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { theme, setTheme } = useTheme();
 
   // Load user settings
   const { data: userSettings } = useQuery({
@@ -130,9 +132,23 @@ export default function Settings() {
         location: user.location || "",
         profileImageUrl: user.profileImageUrl || "",
       }));
-      setSelectedTheme(user.themePreference || 'liquid-glass');
+      const userTheme = user.themePreference || localStorage.getItem('theme-preference') || 'liquid-glass';
+      setSelectedTheme(userTheme);
+      applyTheme(userTheme);
     }
   }, [user]);
+
+  // Apply theme on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme-preference') || 'liquid-glass';
+    setSelectedTheme(savedTheme);
+    applyTheme(savedTheme);
+  }, []);
+
+  // Synchronize with theme context
+  useEffect(() => {
+    setSelectedTheme(theme);
+  }, [theme]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
@@ -235,14 +251,19 @@ export default function Settings() {
     const themeConfig = themes[theme as keyof typeof themes];
     
     if (themeConfig) {
+      // Remove existing theme classes
+      document.body.className = document.body.className.replace(/theme-\w+/g, '');
+      
+      // Apply new theme class
+      document.body.classList.add(`theme-${theme}`);
+      
       // Apply CSS custom properties for the selected theme
       root.style.setProperty('--theme-primary', themeConfig.primary);
       root.style.setProperty('--theme-background', themeConfig.background);
       root.style.setProperty('--theme-card', themeConfig.card);
       
-      // Update body classes for theme switching
-      document.body.className = document.body.className.replace(/theme-\w+/g, '');
-      document.body.classList.add(`theme-${theme}`);
+      // Store theme preference in localStorage for immediate application
+      localStorage.setItem('theme-preference', theme);
     }
   };
 
@@ -283,9 +304,10 @@ export default function Settings() {
     });
   };
 
-  const handleThemeChange = (theme: string) => {
-    setSelectedTheme(theme);
-    updateThemeMutation.mutate(theme);
+  const handleThemeChange = (newTheme: string) => {
+    setSelectedTheme(newTheme);
+    setTheme(newTheme as any); // Apply theme immediately via context
+    updateThemeMutation.mutate(newTheme); // Save to database
   };
 
   const handleSaveSettings = (settingsType: string, settings: any) => {

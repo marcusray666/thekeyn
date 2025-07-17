@@ -237,3 +237,109 @@
     filter: blur(8px);
   }
 }
+
+/* Theme-specific overrides */
+.theme-ethereal-ivory {
+  --background: 240 10% 98%;
+  --foreground: 240 10% 3.9%;
+  --card: 240 10% 96%;
+  --card-foreground: 240 10% 11%;
+  --primary: 25 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 45%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+}
+
+.theme-ethereal-ivory .glass-morphism {
+  background: rgba(228, 228, 222, 0.8);
+  border: 1px solid rgba(89, 95, 57, 0.2);
+}
+
+.theme-ethereal-ivory .glass-input,
+.theme-ethereal-ivory .glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(89, 95, 57, 0.3);
+  color: #1B1B1B;
+}
+
+.theme-sage-moss {
+  --background: 120 10% 95%;
+  --foreground: 120 10% 10%;
+  --card: 120 10% 92%;
+  --card-foreground: 120 10% 15%;
+  --primary: 120 30% 25%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 120 5% 88%;
+  --muted-foreground: 120 5% 40%;
+  --accent: 120 5% 88%;
+  --accent-foreground: 120 10% 15%;
+  --border: 120 10% 85%;
+  --input: 120 10% 85%;
+}
+
+.theme-sage-moss .glass-morphism {
+  background: rgba(183, 183, 164, 0.6);
+  border: 1px solid rgba(40, 54, 24, 0.2);
+}
+
+.theme-sage-moss .glass-input,
+.theme-sage-moss .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(40, 54, 24, 0.3);
+  color: #283618;
+}
+
+.theme-pastel-rose {
+  --background: 340 10% 98%;
+  --foreground: 340 10% 15%;
+  --card: 340 10% 95%;
+  --card-foreground: 340 10% 20%;
+  --primary: 340 80% 55%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 340 5% 92%;
+  --muted-foreground: 340 5% 45%;
+  --accent: 340 5% 92%;
+  --accent-foreground: 340 10% 20%;
+  --border: 340 10% 88%;
+  --input: 340 10% 88%;
+}
+
+.theme-pastel-rose .glass-morphism {
+  background: rgba(244, 244, 245, 0.8);
+  border: 1px solid rgba(233, 30, 99, 0.2);
+}
+
+.theme-pastel-rose .glass-input,
+.theme-pastel-rose .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(233, 30, 99, 0.3);
+  color: #374151;
+}
+
+/* Global theme transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure text visibility in light themes */
+.theme-ethereal-ivory .text-white,
+.theme-sage-moss .text-white,
+.theme-pastel-rose .text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+.theme-ethereal-ivory .text-gray-300,
+.theme-sage-moss .text-gray-300,
+.theme-pastel-rose .text-gray-300 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.theme-ethereal-ivory .text-gray-400,
+.theme-sage-moss .text-gray-400,
+.theme-pastel-rose .text-gray-400 {
+  color: hsl(var(--muted-foreground)) !important;
+}
