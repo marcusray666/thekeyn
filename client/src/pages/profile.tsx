@@ -135,15 +135,15 @@ export default function Profile() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground">Profile not found</h1>
-          <p className="text-muted-foreground mt-2">The user you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-white">Profile not found</h1>
+          <p className="text-gray-400 mt-2">The user you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-20 pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
@@ -203,7 +203,7 @@ export default function Profile() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <h1 className="text-2xl font-bold text-foreground">
+                        <h1 className="text-2xl font-bold text-white">
                           {profile.displayName || profile.username}
                         </h1>
                         {isOwnProfile && (
@@ -223,7 +223,7 @@ export default function Profile() {
                     )}
                   </div>
 
-                  <p className="text-muted-foreground mb-4">@{profile.username}</p>
+                  <p className="text-gray-400 mb-4">@{profile.username}</p>
 
                   {/* Bio Section */}
                   {isEditingProfile ? (
@@ -262,10 +262,10 @@ export default function Profile() {
                   ) : (
                     <div>
                       {profile.bio && (
-                        <p className="text-foreground mb-4">{profile.bio}</p>
+                        <p className="text-white mb-4">{profile.bio}</p>
                       )}
                       
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
                         {profile.website && (
                           <div className="flex items-center gap-1">
                             <Globe className="h-4 w-4" />
@@ -298,20 +298,20 @@ export default function Profile() {
                   {/* Stats */}
                   <div className="flex gap-6 mt-6 pt-6 border-t border-border">
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{works.length}</div>
-                      <div className="text-sm text-muted-foreground">Works</div>
+                      <div className="text-xl font-bold text-white">{works.length}</div>
+                      <div className="text-sm text-gray-400">Works</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{profile.followerCount}</div>
-                      <div className="text-sm text-muted-foreground">Followers</div>
+                      <div className="text-xl font-bold text-white">{profile.followerCount}</div>
+                      <div className="text-sm text-gray-400">Followers</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{profile.followingCount}</div>
-                      <div className="text-sm text-muted-foreground">Following</div>
+                      <div className="text-xl font-bold text-white">{profile.followingCount}</div>
+                      <div className="text-sm text-gray-400">Following</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{profile.totalLikes}</div>
-                      <div className="text-sm text-muted-foreground">Total Likes</div>
+                      <div className="text-xl font-bold text-white">{profile.totalLikes}</div>
+                      <div className="text-sm text-gray-400">Total Likes</div>
                     </div>
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export default function Profile() {
                   {works.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {works.map((work: any) => (
-                        <div key={work.id} className="aspect-square bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
+                        <div key={work.id} className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-gray-400">
                           <span className="text-sm">{work.title}</span>
                         </div>
                       ))}
@@ -352,10 +352,10 @@ export default function Profile() {
                           <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <h3 className="text-lg font-medium text-foreground mb-2">
+                      <h3 className="text-lg font-medium text-white mb-2">
                         {isOwnProfile ? "Start building your portfolio" : "No works yet"}
                       </h3>
-                      <p className="text-muted-foreground">
+                      <p className="text-gray-400">
                         {isOwnProfile 
                           ? "Start building your portfolio by uploading your first work!"
                           : "This user hasn't uploaded any works yet."
@@ -371,19 +371,19 @@ export default function Profile() {
                 </TabsContent>
 
                 <TabsContent value="masonry">
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-gray-400">
                     Masonry view coming soon
                   </div>
                 </TabsContent>
 
                 <TabsContent value="carousel">
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-gray-400">
                     Carousel view coming soon
                   </div>
                 </TabsContent>
 
                 <TabsContent value="timeline">
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-gray-400">
                     Timeline view coming soon
                   </div>
                 </TabsContent>
