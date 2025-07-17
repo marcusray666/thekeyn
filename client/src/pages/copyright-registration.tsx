@@ -289,8 +289,8 @@ export default function CopyrightRegistration() {
                             disabled={office.status === 'coming_soon'}
                           >
                             <div className="flex items-center justify-between w-full">
-                              <span>{office.name}</span>
-                              <span className="text-sm text-gray-400">{office.country}</span>
+                              <span className="text-white">{office.name}</span>
+                              <span className="text-sm text-gray-300">{office.country}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -311,8 +311,8 @@ export default function CopyrightRegistration() {
                         {works?.map((work: any) => (
                           <SelectItem key={work.id} value={work.id.toString()}>
                             <div className="flex items-center space-x-2">
-                              <span>{work.title}</span>
-                              <span className="text-sm text-gray-400">({work.mimeType})</span>
+                              <span className="text-white">{work.title}</span>
+                              <span className="text-sm text-gray-300">({work.mimeType})</span>
                             </div>
                           </SelectItem>
                         ))}
