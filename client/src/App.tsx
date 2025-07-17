@@ -7,6 +7,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { FullScreenLoader } from "@/components/ui/liquid-glass-loader";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AccessibilityToolkit } from "@/components/accessibility-toolkit";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -85,8 +86,15 @@ function App() {
       <ThemeProvider>
         <TooltipProvider>
           <div className="min-h-screen bg-background text-foreground">
+            {/* Skip Links for Screen Readers */}
+            <a href="#main-content" className="skip-link">
+              Skip to main content
+            </a>
             <Navigation />
-            <Router />
+            <main id="main-content">
+              <Router />
+            </main>
+            <AccessibilityToolkit />
           </div>
           <Toaster />
         </TooltipProvider>

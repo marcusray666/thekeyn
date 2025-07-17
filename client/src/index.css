@@ -474,6 +474,184 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
+/* Accessibility Enhancements */
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 100%;
+  --primary: 210 100% 60%;
+  --primary-foreground: 0 0% 0%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 80%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 100%;
+  --border: 0 0% 30%;
+  --input: 0 0% 20%;
+  --ring: 210 100% 60%;
+}
+
+.high-contrast * {
+  border-color: hsl(var(--border)) !important;
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.high-contrast .glass-morphism {
+  background: rgba(0, 0, 0, 0.9) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: none !important;
+}
+
+.high-contrast .glass-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  color: white !important;
+}
+
+.high-contrast button {
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border: 2px solid hsl(var(--primary)) !important;
+}
+
+/* Reduced Motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.reduce-motion .animate-spin {
+  animation: none !important;
+}
+
+.reduce-motion .animate-pulse {
+  animation: none !important;
+}
+
+/* Enhanced Focus Indicators */
+.enhanced-focus *:focus {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3) !important;
+}
+
+.enhanced-focus button:focus {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 2px !important;
+  transform: scale(1.05) !important;
+}
+
+.enhanced-focus a:focus {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 2px !important;
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Large Text Support */
+@media (min-resolution: 120dpi) {
+  .enhanced-focus {
+    font-size: 110% !important;
+  }
+}
+
+/* Skip Links for Screen Readers */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 8px;
+  z-index: 1000;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Color Blind Friendly Indicators */
+.colorblind-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
+
+.colorblind-indicator.success::before {
+  background: repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 2px, currentColor 4px);
+}
+
+.colorblind-indicator.warning::before {
+  background: repeating-linear-gradient(90deg, transparent, transparent 2px, currentColor 2px, currentColor 4px);
+}
+
+.colorblind-indicator.error::before {
+  background: repeating-linear-gradient(135deg, transparent, transparent 2px, currentColor 2px, currentColor 4px);
+}
+
+/* Accessible Form Labels */
+.required::after {
+  content: ' *';
+  color: hsl(var(--destructive));
+  font-weight: bold;
+}
+
+/* Accessible Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid hsl(var(--border));
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  background-color: hsl(var(--muted));
+  font-weight: bold;
+}
+
+/* Print Accessibility */
+@media print {
+  .high-contrast {
+    filter: none !important;
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Button theme overrides */
 .theme-ethereal-ivory .btn-glass {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8)) !important;
