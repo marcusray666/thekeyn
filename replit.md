@@ -5,7 +5,12 @@
 Prooff is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 17, 2025):**
-- ✅ TRANSFORMED INTO SOCIAL MEDIA PLATFORM: Full creator community with sharing, commenting, liking, following, and user connections
+- ✅ COMPLETELY SIMPLIFIED THEME SYSTEM: Removed complex 4-palette system, now only Light/Dark modes
+- ✅ FIXED CRITICAL TEXT READABILITY: Theme-aware text colors with proper contrast ratios
+- ✅ LIGHT THEME: Clean white backgrounds with dark (#050505) text for maximum readability  
+- ✅ DARK THEME: Original liquid glass aesthetic with light (#f8fafc) text on dark backgrounds
+- ✅ SIMPLIFIED ACCESSIBILITY TOOLKIT: Streamlined interface with prominent "Reset to Defaults" button
+- ✅ FIXED PROFILE EDITING BUG: Added missing userId to authentication middleware, profile updates now work
 - ✅ AUTHENTICATION COMPLETELY REBUILT AND WORKING: Single-server architecture eliminates all cross-origin issues
 - ✅ Backend login/register successfully creating sessions and returning user data
 - ✅ Frontend using relative URLs for same-origin requests (no more CORS issues)
@@ -24,7 +29,6 @@ Prooff is a comprehensive social media platform for creators that combines digit
 - ✅ PREMIUM TIER SYSTEM: Free, Premium, and Enterprise subscriptions with advanced features for serious creators
 - ✅ SOCIAL MEDIA PLATFORM: Community features with sharing, liking, commenting, following, and user tagging functionality
 - ✅ ANIMATED PROFILE SHOWCASE: Interactive digital portfolio display with 4 viewing modes (Grid, Masonry, Carousel, Timeline), autoplay functionality, responsive design, and social engagement features
-- ✅ ADAPTIVE COLOR ACCESSIBILITY TOOLKIT: Comprehensive accessibility system with real-time WCAG compliance checking, color blindness simulation, high contrast mode, enhanced focus indicators, motion reduction, and font size adjustments
 
 ## User Preferences
 

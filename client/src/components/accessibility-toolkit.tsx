@@ -222,7 +222,7 @@ export function AccessibilityToolkit() {
                   };
                   setSettings(defaultSettings);
                   localStorage.setItem('accessibility-settings', JSON.stringify(defaultSettings));
-                  setTheme('liquid-glass');
+                  setTheme('light');
                 }}
                 className="w-full mb-4"
               >
