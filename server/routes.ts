@@ -896,14 +896,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/social/notifications', requireAuth, async (req: AuthenticatedRequest, res) => {
+  // Profile showcase routes
+  app.get('/api/social/profile/:username', async (req, res) => {
     try {
-      const { unreadOnly = false } = req.query;
-      const notifications = await storage.getUserNotifications(req.userId!, unreadOnly === 'true');
-      res.json(notifications);
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check if current user is following this profile (if authenticated)
+      let isFollowing = false;
+      if (req.userId) {
+        isFollowing = await storage.isFollowing(req.userId, user.id);
+      }
+
+      const profile = {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        bio: user.bio,
+        profileImageUrl: user.profileImageUrl,
+        website: user.website,
+        location: user.location,
+        isVerified: user.isVerified,
+        followerCount: user.followerCount || 0,
+        followingCount: user.followingCount || 0,
+        totalLikes: user.totalLikes || 0,
+        createdAt: user.createdAt,
+        isFollowing
+      };
+
+      res.json(profile);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
-      res.status(500).json({ message: 'Failed to fetch notifications' });
+      console.error('Error fetching profile:', error);
+      res.status(500).json({ message: 'Failed to fetch profile' });
+    }
+  });
+
+  app.get('/api/social/profile/:username/works', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const { sort = 'recent' } = req.query;
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const userWorks = await storage.getUserWorks(user.id);
+      
+      // Sort works based on request
+      let sortedWorks = [...userWorks];
+      switch (sort) {
+        case 'popular':
+          sortedWorks.sort((a, b) => (b.likeCount || 0) + (b.viewCount || 0) - (a.likeCount || 0) - (a.viewCount || 0));
+          break;
+        case 'liked':
+          sortedWorks.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+          break;
+        case 'recent':
+        default:
+          sortedWorks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          break;
+      }
+
+      // Enrich with like status if user is authenticated
+      const enrichedWorks = await Promise.all(
+        sortedWorks.map(async (work) => {
+          let isLiked = false;
+          if (req.userId) {
+            isLiked = await storage.isWorkLiked(req.userId, work.id);
+          }
+          
+          return {
+            ...work,
+            isLiked,
+            // Set default values for social counts if missing
+            likeCount: work.likeCount || 0,
+            commentCount: work.commentCount || 0,
+            shareCount: work.shareCount || 0,
+            viewCount: work.viewCount || 0
+          };
+        })
+      );
+
+      res.json(enrichedWorks);
+    } catch (error) {
+      console.error('Error fetching user works:', error);
+      res.status(500).json({ message: 'Failed to fetch user works' });
     }
   });
 

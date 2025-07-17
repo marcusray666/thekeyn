@@ -93,10 +93,10 @@ export function Navigation() {
             {/* User Section */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2 text-gray-300">
+                <Link href={`/profile/${user?.username}`} className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
                   <User className="h-4 w-4" />
                   <span className="text-sm">{user?.username}</span>
-                </div>
+                </Link>
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
@@ -154,10 +154,14 @@ export function Navigation() {
               {/* Mobile User Section */}
               {isAuthenticated ? (
                 <>
-                  <div className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2">
+                  <Link 
+                    href={`/profile/${user?.username}`}
+                    className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2 hover:text-white hover:bg-white hover:bg-opacity-5 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <User className="h-4 w-4" />
                     <span>{user?.username}</span>
-                  </div>
+                  </Link>
                   <Button
                     variant="ghost"
                     onClick={handleLogout}

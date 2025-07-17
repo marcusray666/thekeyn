@@ -25,6 +25,7 @@ import CopyrightRegistration from "@/pages/copyright-registration";
 import NFTMinting from "@/pages/nft-minting";
 import SubscriptionManagement from "@/pages/subscription-management";
 import SocialFeed from "@/pages/social-feed";
+import ProfileShowcase from "@/pages/profile-showcase";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -66,6 +67,9 @@ function Router() {
       {/* Public certificate routes */}
       <Route path="/certificate/:id" component={CertificateDetail} />
       <Route path="/report-theft/:id" component={ReportTheft} />
+      
+      {/* Profile showcase routes */}
+      <Route path="/profile/:username" component={ProfileShowcase} />
       
       <Route component={NotFound} />
     </Switch>

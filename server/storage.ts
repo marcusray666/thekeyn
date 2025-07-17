@@ -35,6 +35,7 @@ export interface IStorage {
   
   // Social features
   getPublicWorks(options?: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] }): Promise<Work[]>;
+  getUserWorks(userId: number): Promise<Work[]>;
   followUser(followerId: number, followingId: number): Promise<Follow>;
   unfollowUser(followerId: number, followingId: number): Promise<void>;
   isFollowing(followerId: number, followingId: number): Promise<boolean>;
@@ -270,6 +271,12 @@ export class DatabaseStorage implements IStorage {
       .offset(offset);
       
     return publicWorks;
+  }
+
+  async getUserWorks(userId: number): Promise<Work[]> {
+    return await db.select().from(works)
+      .where(eq(works.userId, userId))
+      .orderBy(desc(works.createdAt));
   }
 
   async followUser(followerId: number, followingId: number): Promise<Follow> {
