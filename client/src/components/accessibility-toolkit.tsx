@@ -368,15 +368,7 @@ export function AccessibilityToolkit() {
                     <Moon className="h-3 w-3 mr-1" />
                     Dark
                   </Button>
-                  <Button
-                    variant={theme === 'ethereal-ivory' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setTheme('ethereal-ivory')}
-                    className="glass-input"
-                  >
-                    <Sun className="h-3 w-3 mr-1" />
-                    Light
-                  </Button>
+                  {/* Theme switching removed - using single liquid glass theme only */}
                 </div>
                 
                 {/* Color Blindness Simulation Preview */}

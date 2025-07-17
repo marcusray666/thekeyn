@@ -37,7 +37,15 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
+    color: white !important;
+    min-height: 100vh;
+  }
+  
+  /* Force all pages to use dark background */
+  html, body, #root, [data-theme] {
+    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
+    color: white !important;
   }
 }
 

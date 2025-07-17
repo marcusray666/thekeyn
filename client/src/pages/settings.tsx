@@ -29,41 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useTheme } from "@/components/theme-provider";
 
-// Theme definitions
-const themes = {
-  'liquid-glass': {
-    name: 'Liquid Glass',
-    description: 'Dark theme with glass morphism effects',
-    primary: '#8B5CF6',
-    background: 'from-gray-900 via-gray-800 to-gray-900',
-    card: 'rgba(17, 24, 39, 0.7)',
-    preview: ['#1F2937', '#374151', '#8B5CF6', '#6366F1']
-  },
-  'ethereal-ivory': {
-    name: 'Ethereal Ivory',
-    description: 'Light and tranquil with sophisticated tones',
-    primary: '#595F39',
-    background: 'from-stone-100 via-stone-50 to-neutral-100',
-    card: 'rgba(228, 228, 222, 0.8)',
-    preview: ['#E4E4DE', '#C4C5BA', '#1B1B1B', '#595F39']
-  },
-  'sage-moss': {
-    name: 'Sage & Moss',
-    description: 'Earthy green tones with clean undertones',
-    primary: '#283618',
-    background: 'from-gray-100 via-stone-50 to-gray-50',
-    card: 'rgba(183, 183, 164, 0.6)',
-    preview: ['#283618', '#B7B7A4', '#D4D4D4', '#F0EFEB']
-  },
-  'pastel-rose': {
-    name: 'Pastel Rose',
-    description: 'Soft greys with gentle pink accents',
-    primary: '#E91E63',
-    background: 'from-rose-50 via-gray-50 to-pink-50',
-    card: 'rgba(244, 244, 245, 0.8)',
-    preview: ['#F8FAFC', '#E2E8F0', '#F1F5F9', '#FDF2F8']
-  }
-};
+// Theme functionality completely removed - using single liquid glass theme only
 
 export default function Settings() {
   const [, setLocation] = useLocation();

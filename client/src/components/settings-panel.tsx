@@ -11,28 +11,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-const themes = {
-  'liquid-glass': {
-    name: 'Liquid Glass',
-    description: 'Dark cosmic theme with purple and blue gradients',
-    preview: 'linear-gradient(135deg, #8B5CF6, #3B82F6)',
-  },
-  'ethereal-ivory': {
-    name: 'Ethereal Ivory',
-    description: 'Light elegant theme with warm tones',
-    preview: 'linear-gradient(135deg, #F59E0B, #F3F4F6)',
-  },
-  'sage-moss': {
-    name: 'Sage & Moss',
-    description: 'Nature-inspired green theme',
-    preview: 'linear-gradient(135deg, #10B981, #6B7280)',
-  },
-  'pastel-rose': {
-    name: 'Pastel Rose',
-    description: 'Soft pink and gray theme',
-    preview: 'linear-gradient(135deg, #F472B6, #E5E7EB)',
-  },
-};
+// Theme selection completely removed - using single liquid glass theme only
 
 export function SettingsPanel() {
   const { toast } = useToast();
