@@ -48,15 +48,15 @@ export function ThemeProvider({
       case 'ethereal-ivory':
         // Light warm theme
         root.style.setProperty('--background', '40 20% 97%'); // Warm white
-        root.style.setProperty('--foreground', '20 14% 15%'); // Dark brown
+        root.style.setProperty('--foreground', '20 14% 8%'); // Much darker brown for better contrast
         root.style.setProperty('--card', '40 15% 94%'); // Light cream
-        root.style.setProperty('--card-foreground', '20 14% 20%');
+        root.style.setProperty('--card-foreground', '20 14% 8%'); // Much darker
         root.style.setProperty('--primary', '25 95% 53%'); // Warm orange
         root.style.setProperty('--primary-foreground', '0 0% 100%');
         root.style.setProperty('--muted', '40 10% 90%');
-        root.style.setProperty('--muted-foreground', '20 8% 45%');
+        root.style.setProperty('--muted-foreground', '20 14% 25%'); // Much darker muted text
         root.style.setProperty('--accent', '40 10% 88%');
-        root.style.setProperty('--accent-foreground', '20 14% 20%');
+        root.style.setProperty('--accent-foreground', '20 14% 8%'); // Much darker
         root.style.setProperty('--border', '40 15% 85%');
         root.style.setProperty('--input', '40 15% 92%');
         root.style.setProperty('--ring', '25 95% 53%');
@@ -64,15 +64,15 @@ export function ThemeProvider({
       case 'sage-moss':
         // Nature green theme
         root.style.setProperty('--background', '100 15% 96%'); // Light sage
-        root.style.setProperty('--foreground', '140 20% 15%'); // Dark forest green
+        root.style.setProperty('--foreground', '140 25% 8%'); // Much darker forest green
         root.style.setProperty('--card', '100 12% 93%');
-        root.style.setProperty('--card-foreground', '140 20% 20%');
+        root.style.setProperty('--card-foreground', '140 25% 8%'); // Much darker
         root.style.setProperty('--primary', '140 40% 35%'); // Forest green
         root.style.setProperty('--primary-foreground', '0 0% 100%');
         root.style.setProperty('--muted', '100 8% 88%');
-        root.style.setProperty('--muted-foreground', '140 10% 40%');
+        root.style.setProperty('--muted-foreground', '140 20% 25%'); // Much darker muted text
         root.style.setProperty('--accent', '100 8% 85%');
-        root.style.setProperty('--accent-foreground', '140 20% 20%');
+        root.style.setProperty('--accent-foreground', '140 25% 8%'); // Much darker
         root.style.setProperty('--border', '100 12% 82%');
         root.style.setProperty('--input', '100 12% 90%');
         root.style.setProperty('--ring', '140 40% 35%');
@@ -80,15 +80,15 @@ export function ThemeProvider({
       case 'pastel-rose':
         // Soft pink theme
         root.style.setProperty('--background', '340 15% 97%'); // Light rose
-        root.style.setProperty('--foreground', '340 25% 15%'); // Dark rose
+        root.style.setProperty('--foreground', '340 30% 8%'); // Much darker rose
         root.style.setProperty('--card', '340 12% 94%');
-        root.style.setProperty('--card-foreground', '340 25% 20%');
+        root.style.setProperty('--card-foreground', '340 30% 8%'); // Much darker
         root.style.setProperty('--primary', '340 70% 55%'); // Rose pink
         root.style.setProperty('--primary-foreground', '0 0% 100%');
         root.style.setProperty('--muted', '340 8% 90%');
-        root.style.setProperty('--muted-foreground', '340 12% 45%');
+        root.style.setProperty('--muted-foreground', '340 20% 25%'); // Much darker muted text
         root.style.setProperty('--accent', '340 8% 87%');
-        root.style.setProperty('--accent-foreground', '340 25% 20%');
+        root.style.setProperty('--accent-foreground', '340 30% 8%'); // Much darker
         root.style.setProperty('--border', '340 12% 85%');
         root.style.setProperty('--input', '340 12% 92%');
         root.style.setProperty('--ring', '340 70% 55%');

@@ -59,23 +59,43 @@ export default function Profile() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<ProfileData>) => {
-      return await apiRequest('/api/user/profile', {
+      console.log('Sending profile update:', updates);
+      const response = await apiRequest('/api/user/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
+      console.log('Profile update response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (updatedUser) => {
+      console.log('Profile update successful:', updatedUser);
+      
+      // Update local state immediately
+      setEditedProfile(prev => ({
+        ...prev,
+        displayName: updatedUser.displayName || prev.displayName,
+        bio: updatedUser.bio || prev.bio,
+        website: updatedUser.website || prev.website,
+        location: updatedUser.location || prev.location,
+      }));
+      
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
+      
+      // Force refresh of profile data
       queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername] });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.refetchQueries({ queryKey: ['/api/profile', profileUsername] });
+      queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      
       setIsEditingProfile(false);
       setIsEditingDisplayName(false);
     },
     onError: (error: Error) => {
+      console.error('Profile update error:', error);
       toast({
         title: "Update failed",
         description: error.message || "Failed to update profile.",

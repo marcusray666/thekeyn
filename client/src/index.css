@@ -285,7 +285,7 @@
 .theme-ethereal-ivory .text-white,
 .theme-ethereal-ivory .text-gray-300,
 .theme-ethereal-ivory .text-gray-400 {
-  color: #1a1a1a !important;
+  color: #0a0a0a !important;
 }
 
 .theme-ethereal-ivory a {
@@ -337,7 +337,7 @@
 .theme-sage-moss .text-white,
 .theme-sage-moss .text-gray-300,
 .theme-sage-moss .text-gray-400 {
-  color: #0f2a15 !important;
+  color: #051008 !important;
 }
 
 .theme-sage-moss a {
@@ -389,7 +389,7 @@
 .theme-pastel-rose .text-white,
 .theme-pastel-rose .text-gray-300,
 .theme-pastel-rose .text-gray-400 {
-  color: #2a1525 !important;
+  color: #0f0509 !important;
 }
 
 .theme-pastel-rose a {
@@ -472,6 +472,29 @@
 /* Global theme transitions */
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Universal text readability fixes */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, label,
+.text-foreground,
+.text-sm, .text-xs, .text-lg, .text-xl, .text-2xl {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Form elements */
+input, textarea, select {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Card content */
+.card *, .glass-morphism * {
+  color: hsl(var(--card-foreground)) !important;
+}
+
+/* Override any gray text colors */
+.text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600 {
+  color: hsl(var(--muted-foreground)) !important;
 }
 
 /* Accessibility Enhancements */

@@ -764,16 +764,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates = req.body;
       const userId = req.userId!;
       
-      await storage.updateUser(userId, {
-        username: updates.username,
-        email: updates.email,
-        displayName: updates.displayName,
-        bio: updates.bio,
-        website: updates.website,
-        location: updates.location,
-      });
+      console.log('Profile update request:', { userId, updates });
       
-      res.json({ message: "Profile updated successfully" });
+      // Filter out undefined values and update user profile
+      const filteredUpdates: any = {};
+      if (updates.displayName !== undefined) filteredUpdates.displayName = updates.displayName;
+      if (updates.bio !== undefined) filteredUpdates.bio = updates.bio;
+      if (updates.website !== undefined) filteredUpdates.website = updates.website;
+      if (updates.location !== undefined) filteredUpdates.location = updates.location;
+      if (updates.username !== undefined) filteredUpdates.username = updates.username;
+      if (updates.email !== undefined) filteredUpdates.email = updates.email;
+      
+      await storage.updateUser(userId, filteredUpdates);
+      
+      // Return updated user data
+      const updatedUser = await storage.getUser(userId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { passwordHash, ...userWithoutPassword } = updatedUser;
+      console.log('Profile updated successfully:', userWithoutPassword);
+      
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error updating profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
