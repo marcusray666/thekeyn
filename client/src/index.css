@@ -474,38 +474,49 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
-/* CRITICAL TEXT READABILITY FIXES - Force dark text on light backgrounds */
-h1, h2, h3, h4, h5, h6,
-p, span, div, a, label,
-.text-foreground,
-.text-sm, .text-xs, .text-lg, .text-xl, .text-2xl,
-button, .btn {
+/* THEME-AWARE TEXT READABILITY FIXES */
+
+/* Light themes - dark text */
+.theme-liquid-glass h1, .theme-ocean-breeze h1, .theme-forest-mist h1, .theme-pastel-rose h1,
+.theme-liquid-glass h2, .theme-ocean-breeze h2, .theme-forest-mist h2, .theme-pastel-rose h2,
+.theme-liquid-glass h3, .theme-ocean-breeze h3, .theme-forest-mist h3, .theme-pastel-rose h3,
+.theme-liquid-glass h4, .theme-ocean-breeze h4, .theme-forest-mist h4, .theme-pastel-rose h4,
+.theme-liquid-glass h5, .theme-ocean-breeze h5, .theme-forest-mist h5, .theme-pastel-rose h5,
+.theme-liquid-glass h6, .theme-ocean-breeze h6, .theme-forest-mist h6, .theme-pastel-rose h6,
+.theme-liquid-glass p, .theme-ocean-breeze p, .theme-forest-mist p, .theme-pastel-rose p,
+.theme-liquid-glass span, .theme-ocean-breeze span, .theme-forest-mist span, .theme-pastel-rose span,
+.theme-liquid-glass div, .theme-ocean-breeze div, .theme-forest-mist div, .theme-pastel-rose div,
+.theme-liquid-glass a, .theme-ocean-breeze a, .theme-forest-mist a, .theme-pastel-rose a,
+.theme-liquid-glass label, .theme-ocean-breeze label, .theme-forest-mist label, .theme-pastel-rose label,
+.theme-liquid-glass button, .theme-ocean-breeze button, .theme-forest-mist button, .theme-pastel-rose button {
   color: #1a1a1a !important;
-  text-shadow: none !important;
 }
 
-/* Form elements - dark text */
-input, textarea, select {
+.theme-liquid-glass input, .theme-ocean-breeze input, .theme-forest-mist input, .theme-pastel-rose input,
+.theme-liquid-glass textarea, .theme-ocean-breeze textarea, .theme-forest-mist textarea, .theme-pastel-rose textarea,
+.theme-liquid-glass select, .theme-ocean-breeze select, .theme-forest-mist select, .theme-pastel-rose select {
   color: #1a1a1a !important;
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Card content - force dark text */
-.card *, .glass-morphism *,
-.glass-morphism h1, .glass-morphism h2, .glass-morphism h3,
-.glass-morphism p, .glass-morphism span, .glass-morphism div {
-  color: #1a1a1a !important;
-}
-
-/* Muted text - readable dark gray */
-.text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600,
-.text-muted-foreground {
+.theme-liquid-glass .text-muted-foreground, .theme-ocean-breeze .text-muted-foreground, 
+.theme-forest-mist .text-muted-foreground, .theme-pastel-rose .text-muted-foreground {
   color: #4a4a4a !important;
 }
 
-/* Navigation and button text */
-nav *, .nav-link, .btn * {
-  color: #1a1a1a !important;
+/* Dark theme - light text */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span, .dark div, .dark a, .dark label, .dark button {
+  color: #f0f0f0 !important;
+}
+
+.dark input, .dark textarea, .dark select {
+  color: #f0f0f0 !important;
+  background-color: rgba(30, 30, 30, 0.9) !important;
+}
+
+.dark .text-muted-foreground {
+  color: #a0a0a0 !important;
 }
 
 /* Accessibility Enhancements */

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Palette, Contrast, Sun, Moon, Settings, Check, AlertTriangle, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Palette, Contrast, Sun, Moon, Settings, Check, AlertTriangle, CheckCircle, RotateCcw } from "lucide-react";
 import { analyzeContrast, validatePageAccessibility, extractPageColors, simulateColorBlindness } from "@/utils/accessibility";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
