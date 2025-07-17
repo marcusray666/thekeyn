@@ -128,7 +128,11 @@ export default function UserDashboard() {
   };
 
   if (statsLoading || worksLoading || certsLoading) {
-    return <LiquidGlassLoader size="xl" text="Loading your dashboard..." />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <LiquidGlassLoader size="xl" text="Loading your dashboard..." />
+      </div>
+    );
   }
 
   // Mock stats if not available
