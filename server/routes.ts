@@ -28,6 +28,16 @@ function generateBlockchainHash(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+function getCopyrightOfficeFee(officeId: string): string {
+  const fees: Record<string, string> = {
+    'us_copyright_office': '$65',
+    'uk_ipo': '£10',
+    'cipo_canada': 'CAD $100',
+    'eu_copyright': '€250'
+  };
+  return fees[officeId] || '$50';
+}
+
 // DMCA Takedown Email Template Generator
 function generateTakedownEmail(data: {
   work: any;
@@ -543,6 +553,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting work:", error);
       res.status(500).json({ error: "Failed to delete work" });
+    }
+  });
+
+  // Copyright Registration Routes
+  app.get("/api/copyright-registrations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const applications = await storage.getCopyrightApplications(userId);
+      res.json(applications);
+    } catch (error) {
+      console.error("Error fetching copyright applications:", error);
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+
+  app.post("/api/copyright-registrations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const { workId, officeId, applicationData } = req.body;
+      
+      // Validate required fields
+      if (!workId || !officeId || !applicationData) {
+        return res.status(400).json({ message: "Missing required application data" });
+      }
+
+      // Verify work belongs to user
+      const work = await storage.getWork(workId);
+      if (!work || work.userId !== userId) {
+        return res.status(403).json({ message: "Work not found or access denied" });
+      }
+
+      // Create application
+      const application = await storage.createCopyrightApplication({
+        userId,
+        workId,
+        officeId,
+        applicationData,
+        status: 'submitted',
+        submissionDate: new Date().toISOString(),
+        fee: getCopyrightOfficeFee(officeId)
+      });
+
+      res.json(application);
+    } catch (error) {
+      console.error("Error creating copyright application:", error);
+      res.status(500).json({ message: "Failed to submit application" });
+    }
+  });
+
+  app.get("/api/copyright-registrations/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const { id } = req.params;
+      
+      const application = await storage.getCopyrightApplication(id, userId);
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      res.json(application);
+    } catch (error) {
+      console.error("Error fetching copyright application:", error);
+      res.status(500).json({ message: "Failed to fetch application" });
     }
   });
 

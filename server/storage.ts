@@ -1,4 +1,4 @@
-import { users, works, certificates, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate } from "@shared/schema";
+import { users, works, certificates, copyrightApplications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -21,6 +21,11 @@ export interface IStorage {
   getCertificateByWorkId(workId: number): Promise<Certificate | undefined>;
   getAllCertificates(): Promise<Certificate[]>;
   deleteCertificate(id: number): Promise<void>;
+  
+  createCopyrightApplication(application: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication>;
+  getCopyrightApplication(id: string, userId: number): Promise<CopyrightApplication | undefined>;
+  getCopyrightApplications(userId: number): Promise<CopyrightApplication[]>;
+  updateCopyrightApplication(id: string, updates: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -122,6 +127,61 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCertificate(id: number): Promise<void> {
     await db.delete(certificates).where(eq(certificates.id, id));
+  }
+
+  async createCopyrightApplication(application: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication> {
+    const appData = {
+      ...application,
+      applicationData: typeof application.applicationData === 'string' 
+        ? application.applicationData 
+        : JSON.stringify(application.applicationData || {}),
+      submissionDate: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const [copyrightApp] = await db
+      .insert(copyrightApplications)
+      .values(appData as any)
+      .returning();
+    return copyrightApp;
+  }
+
+  async getCopyrightApplication(id: string, userId: number): Promise<CopyrightApplication | undefined> {
+    const [application] = await db
+      .select()
+      .from(copyrightApplications)
+      .where(eq(copyrightApplications.id, parseInt(id)));
+    
+    if (application && application.userId === userId) {
+      return application;
+    }
+    return undefined;
+  }
+
+  async getCopyrightApplications(userId: number): Promise<CopyrightApplication[]> {
+    return await db
+      .select()
+      .from(copyrightApplications)
+      .where(eq(copyrightApplications.userId, userId))
+      .orderBy(desc(copyrightApplications.createdAt));
+  }
+
+  async updateCopyrightApplication(id: string, updates: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication> {
+    const updateData = {
+      ...updates,
+      applicationData: typeof updates.applicationData === 'string' 
+        ? updates.applicationData 
+        : JSON.stringify(updates.applicationData || {}),
+      updatedAt: new Date()
+    };
+
+    const [application] = await db
+      .update(copyrightApplications)
+      .set(updateData as any)
+      .where(eq(copyrightApplications.id, parseInt(id)))
+      .returning();
+    return application;
   }
 }
 

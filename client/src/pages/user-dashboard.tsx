@@ -17,7 +17,8 @@ import {
   Eye,
   BarChart3,
   Edit,
-  Trash2
+  Trash2,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -173,6 +174,15 @@ export default function UserDashboard() {
               >
                 <Eye className="mr-2 h-5 w-5" />
                 View All
+              </Button>
+
+              <Button
+                onClick={() => setLocation('/copyright-registration')}
+                variant="outline"
+                className="border-blue-600 text-blue-300 hover:bg-blue-900 hover:bg-opacity-20"
+              >
+                <Building2 className="mr-2 h-5 w-5" />
+                Register Copyright
               </Button>
 
               <Button
