@@ -1,4 +1,4 @@
-import { users, works, certificates, copyrightApplications, nftMints, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint } from "@shared/schema";
+import { users, works, certificates, copyrightApplications, nftMints, follows, likes, comments, shares, notifications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, type Share, type InsertShare, type Notification, type InsertNotification } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -32,6 +32,23 @@ export interface IStorage {
   getNftMint(id: number): Promise<NftMint | undefined>;
   getNftMints(userId: number): Promise<NftMint[]>;
   updateNftMint(id: number, updates: Partial<InsertNftMint>): Promise<NftMint>;
+  
+  // Social features
+  getPublicWorks(options?: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] }): Promise<Work[]>;
+  followUser(followerId: number, followingId: number): Promise<Follow>;
+  unfollowUser(followerId: number, followingId: number): Promise<void>;
+  isFollowing(followerId: number, followingId: number): Promise<boolean>;
+  likeWork(userId: number, workId: number): Promise<Like>;
+  unlikeWork(userId: number, workId: number): Promise<void>;
+  isWorkLiked(userId: number, workId: number): Promise<boolean>;
+  addComment(comment: Partial<InsertComment>): Promise<Comment>;
+  getWorkComments(workId: number): Promise<Comment[]>;
+  shareWork(share: Partial<InsertShare>): Promise<Share>;
+  createNotification(notification: Partial<InsertNotification>): Promise<Notification>;
+  getUserNotifications(userId: number, unreadOnly?: boolean): Promise<Notification[]>;
+  markNotificationRead(notificationId: number): Promise<void>;
+  incrementWorkViews(workId: number): Promise<void>;
+  getTrendingTags(limit?: number): Promise<string[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -240,6 +257,110 @@ export class DatabaseStorage implements IStorage {
       .where(eq(nftMints.id, id))
       .returning();
     return mint;
+  }
+
+  // Social feature implementations
+  async getPublicWorks(options: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] } = {}): Promise<Work[]> {
+    const { userId, limit = 20, offset = 0, filter, search, tags } = options;
+    
+    // For now, return all works until we add the isPublic column
+    const publicWorks = await db.select().from(works)
+      .orderBy(desc(works.createdAt))
+      .limit(limit)
+      .offset(offset);
+      
+    return publicWorks;
+  }
+
+  async followUser(followerId: number, followingId: number): Promise<Follow> {
+    // Simple implementation for now
+    const [follow] = await db.insert(follows)
+      .values({ followerId, followingId })
+      .returning();
+    return follow;
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    await db.delete(follows)
+      .where(eq(follows.followerId, followerId));
+  }
+
+  async isFollowing(followerId: number, followingId: number): Promise<boolean> {
+    const result = await db.select().from(follows)
+      .where(eq(follows.followerId, followerId));
+    return result.length > 0;
+  }
+
+  async likeWork(userId: number, workId: number): Promise<Like> {
+    const [like] = await db.insert(likes)
+      .values({ userId, workId })
+      .returning();
+    return like;
+  }
+
+  async unlikeWork(userId: number, workId: number): Promise<void> {
+    await db.delete(likes)
+      .where(eq(likes.userId, userId));
+  }
+
+  async isWorkLiked(userId: number, workId: number): Promise<boolean> {
+    const result = await db.select().from(likes)
+      .where(eq(likes.userId, userId));
+    return result.length > 0;
+  }
+
+  async addComment(comment: Partial<InsertComment>): Promise<Comment> {
+    const [newComment] = await db.insert(comments)
+      .values(comment as any)
+      .returning();
+    return newComment;
+  }
+
+  async getWorkComments(workId: number): Promise<Comment[]> {
+    return await db.select().from(comments)
+      .where(eq(comments.workId, workId))
+      .orderBy(desc(comments.createdAt));
+  }
+
+  async shareWork(share: Partial<InsertShare>): Promise<Share> {
+    const [newShare] = await db.insert(shares)
+      .values(share as any)
+      .returning();
+    return newShare;
+  }
+
+  async createNotification(notification: Partial<InsertNotification>): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications)
+      .values(notification as any)
+      .returning();
+    return newNotification;
+  }
+
+  async getUserNotifications(userId: number, unreadOnly = false): Promise<Notification[]> {
+    let query = db.select().from(notifications).where(eq(notifications.userId, userId));
+    
+    if (unreadOnly) {
+      query = query.where(eq(notifications.isRead, false));
+    }
+    
+    return await query.orderBy(desc(notifications.createdAt));
+  }
+
+  async markNotificationRead(notificationId: number): Promise<void> {
+    await db.update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, notificationId));
+  }
+
+  async incrementWorkViews(workId: number): Promise<void> {
+    // Will implement once we add the viewCount column
+    console.log(`Incrementing views for work ${workId}`);
+  }
+
+  async getTrendingTags(limit = 10): Promise<string[]> {
+    // Simple implementation - in production, use proper analytics
+    const mockTags = ['digital-art', 'photography', 'design', 'nft', 'blockchain', 'ai-art', 'illustration', 'music', 'video', 'creative'];
+    return mockTags.slice(0, limit);
   }
 }
 

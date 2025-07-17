@@ -740,6 +740,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Social media routes
+  app.get('/api/social/feed', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { filter = 'all', search, tags, limit = 20, offset = 0 } = req.query;
+      
+      const tagArray = tags ? (tags as string).split(',').filter(Boolean) : [];
+      
+      const works = await storage.getPublicWorks({
+        userId: req.userId!,
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string),
+        filter: filter as string,
+        search: search as string,
+        tags: tagArray
+      });
+
+      // Enrich with user data and interaction status
+      const enrichedWorks = await Promise.all(
+        works.map(async (work) => {
+          const user = await storage.getUser(work.userId);
+          const isLiked = await storage.isWorkLiked(req.userId!, work.id);
+          const hasUserFollowed = user ? await storage.isFollowing(req.userId!, user.id) : false;
+          
+          return {
+            ...work,
+            user: user ? {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              profileImageUrl: user.profileImageUrl,
+              isVerified: user.isVerified
+            } : null,
+            isLiked,
+            hasUserFollowed: user?.id !== req.userId! ? hasUserFollowed : false
+          };
+        })
+      );
+
+      res.json(enrichedWorks);
+    } catch (error) {
+      console.error('Error fetching social feed:', error);
+      res.status(500).json({ message: 'Failed to fetch social feed' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/like', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const like = await storage.likeWork(req.userId!, workId);
+      
+      // Create notification for work owner
+      const work = await storage.getWork(workId);
+      if (work && work.userId !== req.userId!) {
+        await storage.createNotification({
+          userId: work.userId,
+          type: 'like',
+          fromUserId: req.userId!,
+          workId: workId,
+          message: 'liked your work'
+        });
+      }
+      
+      res.json(like);
+    } catch (error) {
+      console.error('Error liking work:', error);
+      res.status(500).json({ message: 'Failed to like work' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/unlike', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      await storage.unlikeWork(req.userId!, workId);
+      res.json({ message: 'Work unliked successfully' });
+    } catch (error) {
+      console.error('Error unliking work:', error);
+      res.status(500).json({ message: 'Failed to unlike work' });
+    }
+  });
+
+  app.post('/api/social/users/:userId/follow', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (userId === req.userId!) {
+        return res.status(400).json({ message: 'Cannot follow yourself' });
+      }
+      
+      const follow = await storage.followUser(req.userId!, userId);
+      
+      // Create notification
+      await storage.createNotification({
+        userId: userId,
+        type: 'follow',
+        fromUserId: req.userId!,
+        message: 'started following you'
+      });
+      
+      res.json(follow);
+    } catch (error) {
+      console.error('Error following user:', error);
+      res.status(500).json({ message: 'Failed to follow user' });
+    }
+  });
+
+  app.post('/api/social/users/:userId/unfollow', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      await storage.unfollowUser(req.userId!, userId);
+      res.json({ message: 'User unfollowed successfully' });
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+      res.status(500).json({ message: 'Failed to unfollow user' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/share', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const { shareText } = req.body;
+      
+      const share = await storage.shareWork({
+        userId: req.userId!,
+        workId: workId,
+        shareText: shareText || ''
+      });
+      
+      // Create notification for work owner
+      const work = await storage.getWork(workId);
+      if (work && work.userId !== req.userId!) {
+        await storage.createNotification({
+          userId: work.userId,
+          type: 'share',
+          fromUserId: req.userId!,
+          workId: workId,
+          message: 'shared your work'
+        });
+      }
+      
+      res.json(share);
+    } catch (error) {
+      console.error('Error sharing work:', error);
+      res.status(500).json({ message: 'Failed to share work' });
+    }
+  });
+
+  app.get('/api/social/trending-tags', async (req, res) => {
+    try {
+      const { limit = 10 } = req.query;
+      const tags = await storage.getTrendingTags(parseInt(limit as string));
+      res.json(tags);
+    } catch (error) {
+      console.error('Error fetching trending tags:', error);
+      res.status(500).json({ message: 'Failed to fetch trending tags' });
+    }
+  });
+
+  app.get('/api/social/notifications', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { unreadOnly = false } = req.query;
+      const notifications = await storage.getUserNotifications(req.userId!, unreadOnly === 'true');
+      res.json(notifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ message: 'Failed to fetch notifications' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

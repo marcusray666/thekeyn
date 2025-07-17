@@ -19,7 +19,8 @@ import {
   Edit,
   Trash2,
   Building2,
-  Sparkles
+  Sparkles,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -193,6 +194,15 @@ export default function UserDashboard() {
               >
                 <Sparkles className="mr-2 h-5 w-5" />
                 Mint NFTs
+              </Button>
+
+              <Button
+                onClick={() => setLocation('/social')}
+                variant="outline"
+                className="border-green-600 text-green-300 hover:bg-green-900 hover:bg-opacity-20"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Join Community
               </Button>
 
               <Button
