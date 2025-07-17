@@ -369,6 +369,10 @@ export class DatabaseStorage implements IStorage {
     const mockTags = ['digital-art', 'photography', 'design', 'nft', 'blockchain', 'ai-art', 'illustration', 'music', 'video', 'creative'];
     return mockTags.slice(0, limit);
   }
+
+  async getUserWorks(userId: number): Promise<Work[]> {
+    return await db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt));
+  }
 }
 
 export const storage = new DatabaseStorage();

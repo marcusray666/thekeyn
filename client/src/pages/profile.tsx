@@ -70,7 +70,7 @@ export default function Profile() {
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername] });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       setIsEditingProfile(false);
       setIsEditingDisplayName(false);

@@ -279,16 +279,21 @@
 .theme-ethereal-ivory .glass-card {
   background: rgba(255, 255, 255, 0.7) !important;
   border: 1px solid rgba(217, 119, 6, 0.3) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #1a1a1a !important;
 }
 
-.theme-ethereal-ivory .text-white {
-  color: hsl(var(--foreground)) !important;
-}
-
+.theme-ethereal-ivory .text-white,
 .theme-ethereal-ivory .text-gray-300,
 .theme-ethereal-ivory .text-gray-400 {
-  color: hsl(var(--muted-foreground)) !important;
+  color: #1a1a1a !important;
+}
+
+.theme-ethereal-ivory a {
+  color: #D97706 !important;
+}
+
+.theme-ethereal-ivory a:hover {
+  color: #B45309 !important;
 }
 
 /* Sage & Moss - Nature green theme */
@@ -326,16 +331,21 @@
 .theme-sage-moss .glass-card {
   background: rgba(255, 255, 255, 0.8) !important;
   border: 1px solid rgba(34, 197, 94, 0.3) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #0f2a15 !important;
 }
 
-.theme-sage-moss .text-white {
-  color: hsl(var(--foreground)) !important;
-}
-
+.theme-sage-moss .text-white,
 .theme-sage-moss .text-gray-300,
 .theme-sage-moss .text-gray-400 {
-  color: hsl(var(--muted-foreground)) !important;
+  color: #0f2a15 !important;
+}
+
+.theme-sage-moss a {
+  color: #15803D !important;
+}
+
+.theme-sage-moss a:hover {
+  color: #166534 !important;
 }
 
 /* Pastel Rose - Soft pink theme */
@@ -373,16 +383,90 @@
 .theme-pastel-rose .glass-card {
   background: rgba(255, 255, 255, 0.9) !important;
   border: 1px solid rgba(244, 114, 182, 0.3) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #2a1525 !important;
 }
 
-.theme-pastel-rose .text-white {
-  color: hsl(var(--foreground)) !important;
-}
-
+.theme-pastel-rose .text-white,
 .theme-pastel-rose .text-gray-300,
 .theme-pastel-rose .text-gray-400 {
-  color: hsl(var(--muted-foreground)) !important;
+  color: #2a1525 !important;
+}
+
+.theme-pastel-rose a {
+  color: #DB2777 !important;
+}
+
+.theme-pastel-rose a:hover {
+  color: #BE185D !important;
+}
+
+/* Global text readability overrides for light themes */
+.theme-ethereal-ivory *,
+.theme-sage-moss *,
+.theme-pastel-rose * {
+  color: inherit !important;
+}
+
+.theme-ethereal-ivory h1, .theme-ethereal-ivory h2, .theme-ethereal-ivory h3,
+.theme-ethereal-ivory h4, .theme-ethereal-ivory h5, .theme-ethereal-ivory h6,
+.theme-ethereal-ivory p, .theme-ethereal-ivory span, .theme-ethereal-ivory div,
+.theme-ethereal-ivory label, .theme-ethereal-ivory button {
+  color: #1a1a1a !important;
+}
+
+.theme-sage-moss h1, .theme-sage-moss h2, .theme-sage-moss h3,
+.theme-sage-moss h4, .theme-sage-moss h5, .theme-sage-moss h6,
+.theme-sage-moss p, .theme-sage-moss span, .theme-sage-moss div,
+.theme-sage-moss label, .theme-sage-moss button {
+  color: #0f2a15 !important;
+}
+
+.theme-pastel-rose h1, .theme-pastel-rose h2, .theme-pastel-rose h3,
+.theme-pastel-rose h4, .theme-pastel-rose h5, .theme-pastel-rose h6,
+.theme-pastel-rose p, .theme-pastel-rose span, .theme-pastel-rose div,
+.theme-pastel-rose label, .theme-pastel-rose button {
+  color: #2a1525 !important;
+}
+
+/* Navigation text overrides for light themes */
+.theme-ethereal-ivory .nav-glass *,
+.theme-sage-moss .nav-glass *,
+.theme-pastel-rose .nav-glass * {
+  color: #1a1a1a !important;
+}
+
+.theme-sage-moss .nav-glass * {
+  color: #0f2a15 !important;
+}
+
+.theme-pastel-rose .nav-glass * {
+  color: #2a1525 !important;
+}
+
+/* Button text overrides */
+.theme-ethereal-ivory button,
+.theme-sage-moss button,
+.theme-pastel-rose button {
+  color: white !important;
+}
+
+/* Input and form field overrides */
+.theme-ethereal-ivory input,
+.theme-ethereal-ivory textarea,
+.theme-ethereal-ivory select {
+  color: #1a1a1a !important;
+}
+
+.theme-sage-moss input,
+.theme-sage-moss textarea,
+.theme-sage-moss select {
+  color: #0f2a15 !important;
+}
+
+.theme-pastel-rose input,
+.theme-pastel-rose textarea,
+.theme-pastel-rose select {
+  color: #2a1525 !important;
 }
 
 /* Global theme transitions */
