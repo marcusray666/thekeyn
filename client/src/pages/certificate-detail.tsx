@@ -344,28 +344,28 @@ export default function CertificateDetail() {
                   <Button
                     onClick={handleGovernmentSubmission}
                     variant="outline"
-                    className="w-full justify-start border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    className="w-full justify-start border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 text-sm py-3 h-auto whitespace-normal text-left"
                   >
-                    <Building className="mr-3 h-4 w-4" />
-                    Submit to Copyright Office
+                    <Building className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1">Submit to Copyright Office</span>
                   </Button>
                   
                   <Button
                     onClick={handleNotaryService}
                     variant="outline"
-                    className="w-full justify-start border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    className="w-full justify-start border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 text-sm py-3 h-auto whitespace-normal text-left"
                   >
-                    <Stamp className="mr-3 h-4 w-4" />
-                    Get Notarized
+                    <Stamp className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1">Get Notarized</span>
                   </Button>
                   
                   <Button
                     onClick={handleReportTheft}
                     variant="outline"
-                    className="w-full justify-start border-red-600 text-red-400 hover:bg-red-900 hover:bg-opacity-20"
+                    className="w-full justify-start border-red-600 text-red-400 hover:bg-red-900 hover:bg-opacity-20 text-sm py-3 h-auto whitespace-normal text-left"
                   >
-                    <AlertTriangle className="mr-3 h-4 w-4" />
-                    Report Theft
+                    <AlertTriangle className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1">Report Theft</span>
                   </Button>
                 </div>
               </div>
