@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles, Users } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles, Users, Settings } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -161,6 +161,14 @@ export function Navigation() {
                   >
                     <User className="h-4 w-4" />
                     <span>{user?.username}</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2 hover:text-white hover:bg-white hover:bg-opacity-5 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
                   </Link>
                   <Button
                     variant="ghost"

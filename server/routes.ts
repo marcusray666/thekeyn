@@ -740,6 +740,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User settings routes
+  app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({
+        notifications: user.settings?.notifications || {},
+        privacy: user.settings?.privacy || {},
+        security: user.settings?.security || {},
+        theme: user.themePreference || 'liquid-glass'
+      });
+    } catch (error) {
+      console.error("Error fetching user settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const updates = req.body;
+      const userId = req.userId!;
+      
+      await storage.updateUser(userId, {
+        username: updates.username,
+        email: updates.email,
+        displayName: updates.displayName,
+        bio: updates.bio,
+        website: updates.website,
+        location: updates.location,
+      });
+      
+      res.json({ message: "Profile updated successfully" });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  app.patch('/api/user/password', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify current password
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUser(userId, { passwordHash: hashedPassword });
+      
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
+  app.patch('/api/user/theme', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { theme } = req.body;
+      const userId = req.userId!;
+      
+      await storage.updateUser(userId, { themePreference: theme });
+      res.json({ message: "Theme updated successfully" });
+    } catch (error) {
+      console.error("Error updating theme:", error);
+      res.status(500).json({ message: "Failed to update theme" });
+    }
+  });
+
+  app.patch('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { type, settings } = req.body;
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const currentSettings = user.settings || {};
+      const updatedSettings = {
+        ...currentSettings,
+        [type]: settings
+      };
+
+      await storage.updateUser(userId, { settings: updatedSettings });
+      res.json({ message: "Settings updated successfully" });
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
   // Social media routes
   app.get('/api/social/feed', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
