@@ -32,10 +32,16 @@ export async function apiRequest(
   // Use relative URLs so requests go to the same server
   const fullUrl = url.startsWith('/') ? url : `/${url}`;
   
+  // Don't set Content-Type for FormData - let the browser set it automatically
+  const headers: Record<string, string> = {};
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+  
   const res = await fetch(fullUrl, {
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...headers,
       ...options.headers,
     },
     ...options,
