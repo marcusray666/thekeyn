@@ -227,8 +227,8 @@ export default function ProfileShowcase() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 pb-12 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Profile Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -269,11 +269,12 @@ export default function ProfileShowcase() {
                       )}
                     </div>
                     
-                    <div className="flex space-x-3 mt-4 sm:mt-0">
+                    <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
                       {isOwnProfile ? (
                         <Button
                           onClick={() => setLocation('/settings')}
                           variant="outline"
+                          size="sm"
                           className="border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white"
                         >
                           <Settings className="h-4 w-4 mr-2" />
@@ -284,6 +285,7 @@ export default function ProfileShowcase() {
                           <Button
                             onClick={handleFollow}
                             disabled={followMutation.isPending}
+                            size="sm"
                             className={profile.isFollowing ? 'bg-gray-600 hover:bg-gray-700' : 'btn-glass'}
                           >
                             <UserPlus className="h-4 w-4 mr-2" />
@@ -294,7 +296,7 @@ export default function ProfileShowcase() {
                                 : 'Follow'
                             }
                           </Button>
-                          <Button variant="outline" className="border-gray-600">
+                          <Button variant="outline" size="sm" className="border-gray-600">
                             <MessageCircle className="h-4 w-4 mr-2" />
                             Message
                           </Button>
@@ -338,12 +340,12 @@ export default function ProfileShowcase() {
                                 <button
                                   onClick={() => {
                                     setShowProfileActions(false);
-                                    setLocation('/');
+                                    setLocation('/home');
                                   }}
                                   className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
                                 >
                                   <ChevronLeft className="h-4 w-4 mr-2" />
-                                  Back to Main
+                                  Back to Dashboard
                                 </button>
                               </div>
                             </motion.div>

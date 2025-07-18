@@ -45,9 +45,9 @@ export function Navigation() {
     { href: "/", label: "Portfolio", icon: Home },
     { href: "/social", label: "Community", icon: Users },
     { href: "/studio", label: "Studio", icon: Upload },
-    { href: "/certificates", label: "Certificates", icon: Award },
+    { href: "/certificates", label: "My Certificates", icon: Award },
     { href: "/mobile", label: "Mobile App", icon: Smartphone },
-    { href: "/copyright-registration", label: "Registration", icon: Building2 },
+    { href: "/copyright-registration", label: "Copyright Registration", icon: Building2 },
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
@@ -202,6 +202,24 @@ export function Navigation() {
                   >
                     <Settings className="h-5 w-5" />
                     <span className="font-medium">Settings</span>
+                  </Link>
+
+                  <Link
+                    href="/report-theft"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Award className="h-5 w-5" />
+                    <span className="font-medium">Report Theft</span>
+                  </Link>
+
+                  <Link
+                    href="/analytics"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    <span className="font-medium">Analytics</span>
                   </Link>
                   
                   <Button

@@ -72,6 +72,7 @@ function Router() {
       {isAuthenticated && (
         <>
           <Route path="/home" component={Home} />
+          <Route path="/dashboard" component={Home} />
           <Route path="/studio" component={Studio} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
