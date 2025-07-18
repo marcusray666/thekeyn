@@ -245,14 +245,10 @@ export default function UserDashboard() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="mb-4">
               <div>
                 <p className="text-sm text-gray-400">Total Storage</p>
                 <p className="text-white font-medium">{dashboardStats.totalSize}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Account Type</p>
-                <p className="text-white font-medium">Creator</p>
               </div>
             </div>
             
