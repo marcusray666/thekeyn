@@ -27,7 +27,7 @@ import Profile from "@/pages/profile";
 import CopyrightRegistration from "@/pages/copyright-registration";
 import NFTMinting from "@/pages/nft-minting";
 import SubscriptionManagement from "@/pages/subscription-management";
-import SocialFeed from "@/pages/social-feed";
+import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
 import NotFound from "@/pages/not-found";
 
@@ -62,7 +62,7 @@ function Router() {
           <Route path="/copyright-registration" component={CopyrightRegistration} />
           <Route path="/nft-minting" component={NFTMinting} />
           <Route path="/subscription" component={SubscriptionManagement} />
-          <Route path="/social" component={SocialFeed} />
+          <Route path="/social" component={Social} />
           <Route path="/settings" component={Settings} />
           <Route path="/profile/:username" component={Profile} />
         </>
