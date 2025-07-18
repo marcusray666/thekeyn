@@ -14,7 +14,7 @@ import Register from "@/pages/register";
 import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
-import Dashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/dashboard-redesigned";
 import UserDashboard from "@/pages/user-dashboard";
 import Certificates from "@/pages/certificates";
 import MyCertificates from "@/pages/my-certificates";

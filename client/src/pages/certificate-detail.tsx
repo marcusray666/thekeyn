@@ -20,6 +20,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { WorkImage } from "@/components/work-image";
 
 interface CertificateData {
   id: number;
@@ -322,6 +323,28 @@ export default function CertificateDetail() {
 
           {/* Actions Sidebar */}
           <div className="space-y-6">
+            {/* Work Preview */}
+            <GlassCard>
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <FileText className="h-6 w-6 text-blue-400 mr-3" />
+                  <h2 className="text-xl font-semibold text-white">Work Preview</h2>
+                </div>
+                
+                <WorkImage
+                  filename={certificate.work.filename}
+                  mimeType={certificate.work.mimeType}
+                  title={certificate.work.title}
+                  className="w-full h-48 mb-4"
+                />
+                
+                <div className="text-sm text-gray-400">
+                  <p><span className="font-medium">Original Name:</span> {certificate.work.originalName}</p>
+                  <p><span className="font-medium">File Type:</span> {certificate.work.mimeType}</p>
+                </div>
+              </div>
+            </GlassCard>
+            
             {/* QR Code */}
             <GlassCard>
               <div className="p-6 text-center">

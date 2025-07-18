@@ -100,7 +100,7 @@ export default function ProfileShowcase() {
       likes: 234,
       views: 1520,
       tags: ['digital-art', 'space', 'surreal', 'cosmic'],
-      certificateId: 'PRF-2025-CD001',
+      certificateId: 'CERT-1752800000-ABC123',
       featured: true
     },
     {
@@ -112,7 +112,7 @@ export default function ProfileShowcase() {
       likes: 89,
       views: 456,
       tags: ['audio', 'experimental', 'urban', 'ambient'],
-      certificateId: 'PRF-2025-US002'
+      certificateId: 'CERT-1752800001-DEF456'
     },
     {
       id: '3',
@@ -123,7 +123,7 @@ export default function ProfileShowcase() {
       likes: 567,
       views: 2340,
       tags: ['ai-art', 'renaissance', 'classical', 'modern'],
-      certificateId: 'PRF-2025-DR003',
+      certificateId: 'CERT-1752800002-GHI789',
       featured: true
     },
     {
@@ -135,7 +135,7 @@ export default function ProfileShowcase() {
       likes: 123,
       views: 890,
       tags: ['video', 'motion', 'experimental', 'abstract'],
-      certificateId: 'PRF-2025-MS004'
+      certificateId: 'CERT-1752800003-JKL012'
     },
     {
       id: '5',
@@ -146,7 +146,7 @@ export default function ProfileShowcase() {
       likes: 78,
       views: 234,
       tags: ['generative', 'code', 'poetry', 'algorithm'],
-      certificateId: 'PRF-2025-CP005'
+      certificateId: 'CERT-1752800004-MNO345'
     }
   ];
 

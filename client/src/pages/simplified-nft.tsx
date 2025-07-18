@@ -9,8 +9,10 @@ import {
   Loader2,
   Award,
   ExternalLink,
-  Zap
+  Zap,
+  Plus
 } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
@@ -38,6 +40,7 @@ export default function SimplifiedNFT() {
   // Fetch user's works
   const { data: works, isLoading: worksLoading } = useQuery({
     queryKey: ['/api/works'],
+    retry: 3,
   });
 
   // One-click NFT minting mutation
@@ -170,8 +173,9 @@ export default function SimplifiedNFT() {
               
               {mintingStatus === 'idle' && (
                 <div className="space-y-4">
-                  {works?.map((work: Work) => (
-                    <div
+                  {works && works.length > 0 ? (
+                    works.map((work: Work) => (
+                      <div
                       key={work.id}
                       onClick={() => setSelectedWork(work)}
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
@@ -193,14 +197,18 @@ export default function SimplifiedNFT() {
                           <CheckCircle className="h-5 w-5 text-purple-500" />
                         )}
                       </div>
-                    </div>
-                  ))}
-                  
-                  {(!works || works.length === 0) && (
+                      </div>
+                    ))
+                  ) : (
                     <div className="text-center py-8">
                       <Upload className="h-12 w-12 text-gray-600 mx-auto mb-4" />
                       <p className="text-gray-400 mb-4">No artworks found</p>
-                      <Button className="btn-glass">Upload Your First Artwork</Button>
+                      <Link href="/authenticated-upload">
+                        <Button className="btn-glass">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Upload Your First Artwork
+                        </Button>
+                      </Link>
                     </div>
                   )}
 

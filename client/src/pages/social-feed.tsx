@@ -218,7 +218,7 @@ export default function SocialFeed() {
             
             <div className="flex items-center space-x-4">
               <Button
-                onClick={() => window.location.href = '/upload-work'}
+                onClick={() => window.location.href = '/authenticated-upload'}
                 className="btn-glass bg-gradient-to-r from-purple-600 to-blue-600 text-white"
               >
                 <ImageIcon className="mr-2 h-5 w-5" />
@@ -479,7 +479,7 @@ export default function SocialFeed() {
                     : "Be the first to share your creative work!"}
                 </p>
                 <Button
-                  onClick={() => window.location.href = '/upload-work'}
+                  onClick={() => window.location.href = '/authenticated-upload'}
                   className="btn-glass bg-gradient-to-r from-purple-600 to-blue-600 text-white"
                 >
                   Share Your First Work

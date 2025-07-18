@@ -153,10 +153,8 @@ export default function AuthenticatedUpload() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="logo-glass w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">P</span>
-            </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Protect Your Work</h1>
+            <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
+            <h2 className="text-2xl font-bold text-white mb-2">Protect Your Work</h2>
             <p className="text-gray-400">Upload your creative work to generate a blockchain certificate</p>
           </div>
 
