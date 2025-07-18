@@ -55,7 +55,9 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
-      <Route path="/" component={() => isAuthenticated ? <AuthenticatedHome /> : <Welcome />} />
+      <Route path="/">
+        {isAuthenticated ? <AuthenticatedHome /> : <Welcome />}
+      </Route>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
