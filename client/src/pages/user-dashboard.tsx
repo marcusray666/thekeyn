@@ -502,35 +502,6 @@ export default function UserDashboard() {
             </GlassCard>
 
             {/* Account section removed - already at top */}
-
-            {/* Recent Activity */}
-            <GlassCard>
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
-                
-                <div className="space-y-3">
-                  {certificates?.slice(0, 3).map((cert: any, index: number) => (
-                    <div key={cert.id} className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
-                      <div className="flex-1">
-                        <p className="text-sm text-white">
-                          Certificate generated for "{cert.work?.title}"
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {formatDate(cert.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {(!certificates || certificates.length === 0) && (
-                    <div className="text-center py-4">
-                      <p className="text-sm text-gray-400">No recent activity</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </GlassCard>
           </div>
         </div>
       </div>
