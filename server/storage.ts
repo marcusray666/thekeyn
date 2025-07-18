@@ -1,14 +1,15 @@
 import { 
   users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications,
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
-  marketplace, purchases, collaborationProjects, projectCollaborators,
+  marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
   type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, 
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
   type UserNotification, type InsertUserNotification, type ContentCategory, type UserPreference, type UserAnalytic,
   type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
   type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
-  type Share, type InsertShare, type Notification, type InsertNotification 
+  type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
+  type SubscriptionUsage, type InsertSubscriptionUsage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -119,6 +120,24 @@ export interface IStorage {
   
   // Content categories
   getContentCategories(): Promise<ContentCategory[]>;
+
+  // Subscription management
+  getUserSubscription(userId: number): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription>;
+  getSubscriptionUsage(userId: number, month: string): Promise<SubscriptionUsage | undefined>;
+  updateSubscriptionUsage(userId: number, month: string, usage: Partial<SubscriptionUsage>): Promise<SubscriptionUsage>;
+  checkUploadLimit(userId: number): Promise<{ canUpload: boolean; remainingUploads: number; limit: number }>;
+  resetMonthlyUploads(userId: number): Promise<void>;
+  getUserSubscriptionLimits(userId: number): Promise<{
+    tier: string;
+    uploadLimit: number;
+    hasDownloadableCertificates: boolean;
+    hasCustomBranding: boolean;
+    hasIPFSStorage: boolean;
+    hasAPIAccess: boolean;
+    teamSize: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1076,6 +1095,162 @@ export class DatabaseStorage implements IStorage {
       .orderBy(contentCategories.name);
     
     return categories;
+  }
+
+  // Subscription management
+  async getUserSubscription(userId: number): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId))
+      .orderBy(desc(subscriptions.createdAt))
+      .limit(1);
+    
+    return subscription;
+  }
+
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const [newSubscription] = await db
+      .insert(subscriptions)
+      .values(subscription)
+      .returning();
+    
+    return newSubscription;
+  }
+
+  async updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription> {
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    
+    return subscription;
+  }
+
+  async getSubscriptionUsage(userId: number, month: string): Promise<SubscriptionUsage | undefined> {
+    const [usage] = await db
+      .select()
+      .from(subscriptionUsage)
+      .where(and(
+        eq(subscriptionUsage.userId, userId),
+        eq(subscriptionUsage.month, month)
+      ));
+    
+    return usage;
+  }
+
+  async updateSubscriptionUsage(userId: number, month: string, usage: Partial<SubscriptionUsage>): Promise<SubscriptionUsage> {
+    const existingUsage = await this.getSubscriptionUsage(userId, month);
+    
+    if (existingUsage) {
+      const [updated] = await db
+        .update(subscriptionUsage)
+        .set({ ...usage, updatedAt: new Date() })
+        .where(and(
+          eq(subscriptionUsage.userId, userId),
+          eq(subscriptionUsage.month, month)
+        ))
+        .returning();
+      
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(subscriptionUsage)
+        .values({
+          userId,
+          month,
+          ...usage
+        })
+        .returning();
+      
+      return created;
+    }
+  }
+
+  async checkUploadLimit(userId: number): Promise<{ canUpload: boolean; remainingUploads: number; limit: number }> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      return { canUpload: false, remainingUploads: 0, limit: 0 };
+    }
+
+    const limits = await this.getUserSubscriptionLimits(userId);
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const usage = await this.getSubscriptionUsage(userId, currentMonth);
+    
+    const uploadsUsed = usage?.uploadsUsed || 0;
+    const remainingUploads = Math.max(0, limits.uploadLimit - uploadsUsed);
+    
+    return {
+      canUpload: remainingUploads > 0 || limits.uploadLimit === -1, // -1 means unlimited
+      remainingUploads: limits.uploadLimit === -1 ? Infinity : remainingUploads,
+      limit: limits.uploadLimit
+    };
+  }
+
+  async resetMonthlyUploads(userId: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        monthlyUploads: 0,
+        lastUploadReset: new Date()
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async getUserSubscriptionLimits(userId: number): Promise<{
+    tier: string;
+    uploadLimit: number;
+    hasDownloadableCertificates: boolean;
+    hasCustomBranding: boolean;
+    hasIPFSStorage: boolean;
+    hasAPIAccess: boolean;
+    teamSize: number;
+  }> {
+    const user = await this.getUser(userId);
+    const subscription = await this.getUserSubscription(userId);
+    
+    const tier = subscription?.tier || user?.subscriptionTier || 'free';
+    
+    const tierLimits = {
+      free: {
+        uploadLimit: 3,
+        hasDownloadableCertificates: false,
+        hasCustomBranding: false,
+        hasIPFSStorage: false,
+        hasAPIAccess: false,
+        teamSize: 1
+      },
+      starter: {
+        uploadLimit: 10,
+        hasDownloadableCertificates: true,
+        hasCustomBranding: false,
+        hasIPFSStorage: false,
+        hasAPIAccess: false,
+        teamSize: 1
+      },
+      pro: {
+        uploadLimit: -1, // unlimited
+        hasDownloadableCertificates: true,
+        hasCustomBranding: true,
+        hasIPFSStorage: true,
+        hasAPIAccess: true,
+        teamSize: 1
+      },
+      agency: {
+        uploadLimit: -1, // unlimited
+        hasDownloadableCertificates: true,
+        hasCustomBranding: true,
+        hasIPFSStorage: true,
+        hasAPIAccess: true,
+        teamSize: 10
+      }
+    };
+    
+    return {
+      tier,
+      ...tierLimits[tier as keyof typeof tierLimits] || tierLimits.free
+    };
   }
 }
 

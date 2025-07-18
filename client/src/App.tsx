@@ -28,6 +28,9 @@ import NFTMinting from "@/pages/nft-minting";
 import NFTStudio from "@/pages/nft-studio";
 import SimplifiedNFT from "@/pages/simplified-nft";
 import SubscriptionManagement from "@/pages/subscription-management";
+import Subscription from "@/pages/subscription";
+import SubscriptionSuccess from "@/pages/subscription-success";
+import SubscriptionCancelled from "@/pages/subscription-cancelled";
 import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
 import Studio from "@/pages/studio";
@@ -82,7 +85,9 @@ function Router() {
           <Route path="/nft-minting" component={NFTMinting} />
           <Route path="/nft-studio" component={NFTStudio} />
           <Route path="/nft-simple" component={SimplifiedNFT} />
-          <Route path="/subscription" component={SubscriptionManagement} />
+          <Route path="/subscription" component={Subscription} />
+          <Route path="/subscription/success" component={SubscriptionSuccess} />
+          <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
           <Route path="/social" component={Social} />
           <Route path="/mobile" component={MobileFeatures} />
           <Route path="/settings" component={Settings} />

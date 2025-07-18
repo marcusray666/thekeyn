@@ -10,8 +10,11 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  subscriptionTier: text("subscription_tier").notNull().default("free"), // free, premium, enterprise
+  subscriptionTier: text("subscription_tier").notNull().default("free"), // free, starter, pro, agency
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  monthlyUploads: integer("monthly_uploads").default(0), // Current month upload count
+  monthlyUploadLimit: integer("monthly_upload_limit").default(3), // Monthly upload limit based on tier
+  lastUploadReset: timestamp("last_upload_reset").defaultNow(), // When monthly counter was last reset
   walletAddress: text("wallet_address"), // For NFT minting
   displayName: text("display_name"),
   bio: text("bio"),
@@ -59,7 +62,38 @@ export const certificates = pgTable("certificates", {
   pdfPath: text("pdf_path"),
   qrCode: text("qr_code"),
   shareableLink: text("shareable_link"),
+  isDownloadable: boolean("is_downloadable").default(false), // Based on subscription tier
+  hasCustomBranding: boolean("has_custom_branding").default(false), // Pro+ feature
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  tier: text("tier").notNull(), // free, starter, pro, agency
+  status: text("status").notNull().default("active"), // active, cancelled, expired, pending
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  priceId: text("price_id"), // Stripe price ID
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  features: text("features").default("{}"), // JSON string of enabled features
+  teamSize: integer("team_size").default(1), // For agency plans
+  apiKey: text("api_key"), // For Pro+ plans
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const subscriptionUsage = pgTable("subscription_usage", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  month: text("month").notNull(), // YYYY-MM format
+  uploadsUsed: integer("uploads_used").default(0),
+  storageUsed: integer("storage_used").default(0), // in bytes
+  apiCallsUsed: integer("api_calls_used").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const copyrightApplications = pgTable("copyright_applications", {
@@ -414,6 +448,12 @@ export type Purchase = typeof purchases.$inferSelect;
 export type CollaborationProject = typeof collaborationProjects.$inferSelect;
 export type InsertCollaborationProject = z.infer<typeof insertCollaborationProjectSchema>;
 export type ProjectCollaborator = typeof projectCollaborators.$inferSelect;
+
+// Subscription types
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+export type SubscriptionUsage = typeof subscriptionUsage.$inferSelect;
+export type InsertSubscriptionUsage = typeof subscriptionUsage.$inferInsert;
 
 // Social media tables
 export const follows = pgTable("follows", {

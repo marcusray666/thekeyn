@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { 
   Upload, 
   FileText, 
@@ -16,7 +17,8 @@ import {
   AlertCircle,
   Plus,
   ArrowRight,
-  Zap
+  Zap,
+  Crown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -69,6 +71,11 @@ export default function Studio() {
   const [createdCertificate, setCreatedCertificate] = useState<Certificate | null>(null);
   const [progress, setProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Fetch subscription data
+  const { data: subscriptionData } = useQuery({
+    queryKey: ["/api/subscription"],
+  });
 
   // Upload work mutation
   const uploadMutation = useMutation({
@@ -255,6 +262,56 @@ export default function Studio() {
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Upload your work, generate legal certificates, and mint NFTs - all in one place
           </p>
+          
+          {/* Subscription Usage Display */}
+          {subscriptionData && (
+            <div className="mt-6 max-w-md mx-auto">
+              <GlassCard>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Crown className="w-4 h-4 text-purple-400" />
+                      <span className="text-sm font-medium text-white">
+                        {subscriptionData.limits.tier.charAt(0).toUpperCase() + subscriptionData.limits.tier.slice(1)} Plan
+                      </span>
+                    </div>
+                    <Badge variant="secondary" className="bg-purple-500/20 text-purple-100">
+                      {subscriptionData.usage.uploads.remainingUploads === Infinity ? '∞' : subscriptionData.usage.uploads.remainingUploads} remaining
+                    </Badge>
+                  </div>
+                  
+                  {subscriptionData.usage.uploads.limit !== -1 && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-gray-300">
+                        <span>Monthly uploads</span>
+                        <span>
+                          {subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads} / {subscriptionData.usage.uploads.limit}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={((subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads) / subscriptionData.usage.uploads.limit) * 100} 
+                        className="h-2"
+                      />
+                    </div>
+                  )}
+                  
+                  {subscriptionData.usage.uploads.remainingUploads <= 1 && subscriptionData.limits.tier === 'free' && (
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <p className="text-xs text-yellow-300 mb-2">
+                        You're running low on uploads. Upgrade for unlimited access!
+                      </p>
+                      <Button asChild size="sm" className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                        <Link href="/subscription">
+                          <Crown className="w-3 h-3 mr-1" />
+                          Upgrade Now
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+            </div>
+          )}
         </motion.div>
 
         {/* Progress Bar */}
