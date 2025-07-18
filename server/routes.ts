@@ -516,7 +516,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check subscription limits
       const userId = req.session!.userId;
+      console.log('Checking upload limits for user:', userId);
       const uploadCheck = await storage.checkUploadLimit(userId);
+      console.log('Upload limit check result:', uploadCheck);
       
       if (!uploadCheck.canUpload) {
         return res.status(403).json({ 
@@ -550,11 +552,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate file hash
+      console.log('Generating file hash for:', req.file.filename);
       const fileHash = generateFileHash(req.file.path);
       const certificateId = generateCertificateId();
       const blockchainHash = generateBlockchainHash();
+      console.log('Generated IDs:', { fileHash, certificateId, blockchainHash });
 
       // Create work record
+      console.log('Creating work record...');
       const work = await storage.createWork({
         title,
         description: description || "",
@@ -569,10 +574,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         blockchainHash,
       });
 
+      console.log('Work created successfully:', work.id);
+
       // Get user's subscription limits for certificate features
+      console.log('Getting subscription limits...');
       const limits = await storage.getUserSubscriptionLimits(userId);
+      console.log('Subscription limits:', limits);
       
       // Create certificate
+      console.log('Creating certificate...');
       const certificate = await storage.createCertificate({
         workId: work.id,
         certificateId,
@@ -588,6 +598,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateSubscriptionUsage(userId, currentMonth, {
         uploadsUsed: (currentUsage?.uploadsUsed || 0) + 1,
         storageUsed: (currentUsage?.storageUsed || 0) + req.file.size
+      });
+
+      console.log('Upload completed successfully:', {
+        workId: work.id,
+        certificateId: certificate.certificateId,
+        title: work.title
       });
 
       res.json({
