@@ -149,32 +149,42 @@ export function Navigation() {
           </button>
         </div>
         
-        {/* Mobile menu */}
+        {/* Mobile menu dropdown */}
         {isMenuOpen && (
           <div 
-            className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40"
+            className="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40 shadow-2xl"
             onClick={() => setIsMenuOpen(false)}
           >
             <div className="px-4 py-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
-                    location === item.href
-                      ? "text-white bg-purple-600/30 border border-purple-500/50 shadow-lg"
-                      : "text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-md"
-                  }`}
-                >
-                  <item.icon className="h-6 w-6" />
-                  <span className="font-semibold">{item.label}</span>
-                </Link>
-              ))}
+              
+              {/* Main Navigation Items */}
+              <div className="space-y-2">
+                <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  Navigation
+                </div>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                      location === item.href
+                        ? "text-white bg-purple-600/30 border border-purple-500/50 shadow-lg"
+                        : "text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-md"
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
 
-              {/* Mobile User Section */}
+              {/* User Profile Section */}
               {isAuthenticated ? (
                 <div className="pt-4 border-t border-gray-700 space-y-3">
+                  <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                    User Profile
+                  </div>
                   <div className="px-4 py-3 bg-purple-600/20 rounded-xl border border-purple-500/30">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
@@ -188,6 +198,15 @@ export function Navigation() {
                   </div>
                   
                   <Link 
+                    href={`/showcase/${user?.username}`}
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    <span className="font-medium">Portfolio Showcase</span>
+                  </Link>
+                  
+                  <Link 
                     href={`/profile/${user?.username}`}
                     className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                     onClick={() => setIsMenuOpen(false)}
@@ -196,45 +215,54 @@ export function Navigation() {
                     <span className="font-medium">View Profile</span>
                   </Link>
                   
-                  <Link
-                    href="/settings"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">Settings</span>
-                  </Link>
+                  <div className="pt-3 border-t border-gray-700 space-y-2">
+                    <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                      Account & Tools
+                    </div>
+                    
+                    <Link
+                      href="/settings"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Settings className="h-5 w-5" />
+                      <span className="font-medium">Settings</span>
+                    </Link>
 
-                  <Link
-                    href="/report-theft"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Award className="h-5 w-5" />
-                    <span className="font-medium">Report Theft</span>
-                  </Link>
+                    <Link
+                      href="/report-theft"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Award className="h-5 w-5" />
+                      <span className="font-medium">Report Theft</span>
+                    </Link>
 
-                  <Link
-                    href="/analytics"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Sparkles className="h-5 w-5" />
-                    <span className="font-medium">Analytics</span>
-                  </Link>
-                  
-                  <Button
-                    variant="ghost"
-                    onClick={handleLogout}
-                    disabled={logoutMutation.isPending}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
-                  </Button>
+                    <Link
+                      href="/analytics"
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Sparkles className="h-5 w-5" />
+                      <span className="font-medium">Analytics</span>
+                    </Link>
+                    
+                    <Button
+                      variant="ghost"
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                      className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="pt-4 border-t border-gray-700 space-y-3">
+                  <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                    Account
+                  </div>
                   <Link
                     href="/login"
                     className="block px-4 py-3 rounded-xl text-center font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
