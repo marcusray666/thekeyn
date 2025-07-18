@@ -10,6 +10,7 @@ import MemoryStore from "memorystore";
 import { z } from "zod";
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
+import blockchainRoutes from "./routes/blockchain-routes";
 
 const MemStore = MemoryStore(session);
 
@@ -195,6 +196,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.use(sessionMiddleware);
+
+  // Blockchain/NFT routes (protected)
+  app.use('/api/blockchain', requireAuth, blockchainRoutes);
 
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
