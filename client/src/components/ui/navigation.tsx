@@ -48,7 +48,7 @@ export function Navigation() {
     { href: "/upload-work", label: "Upload", icon: Upload },
     { href: "/certificates", label: "Certificates", icon: Award },
     { href: "/copyright-registration", label: "Registration", icon: Building2 },
-    { href: "/nft-studio", label: "NFT Studio", icon: Sparkles },
+    { href: "/nft-simple", label: "Create NFT", icon: Sparkles },
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;

@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import crypto from 'crypto';
 import type { 
   NFTMintRequest, 
   NFTMintResponse, 
@@ -93,11 +94,11 @@ export class BlockchainService {
     });
   }
 
-  // Mint NFT on specified blockchain
-  async mintNFT(
+  // Mint NFT on specified blockchain (using app-managed wallet)
+  async mintNFTForUser(
     request: NFTMintRequest,
     metadataUri: string,
-    creatorAddress: string
+    userId: number
   ): Promise<NFTMintResponse> {
     try {
       const network = this.networks.get(request.network);
@@ -128,8 +129,8 @@ export class BlockchainService {
         wallet
       );
 
-      // Get recipient address (default to creator)
-      const recipientAddress = request.recipientAddress || creatorAddress;
+      // Use app's master wallet to mint, but set user as recipient
+      const recipientAddress = request.recipientAddress || await this.getUserWalletAddress(userId);
 
       // Estimate gas
       const gasEstimate = await contract.mintNFT.estimateGas(
@@ -176,7 +177,8 @@ export class BlockchainService {
       if (request.royaltyPercentage && tokenId) {
         try {
           const royaltyBasisPoints = request.royaltyPercentage * 100; // Convert percentage to basis points
-          await contract.setRoyalty(tokenId, creatorAddress, royaltyBasisPoints);
+          const userWalletAddress = await this.getUserWalletAddress(userId);
+          await contract.setRoyalty(tokenId, userWalletAddress, royaltyBasisPoints);
         } catch (error) {
           console.warn('Failed to set royalty:', error);
         }
@@ -307,6 +309,29 @@ export class BlockchainService {
       console.error('Gas estimation error:', error);
       throw new Error(`Failed to estimate gas: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  // Get user's wallet address (app-managed)
+  private async getUserWalletAddress(userId: number): Promise<string> {
+    // Generate deterministic address from user ID
+    // In production, you'd store this in the database
+    const seed = crypto
+      .createHash('sha256')
+      .update(`user-${userId}-${process.env.WALLET_ENCRYPTION_KEY || 'default'}`)
+      .digest('hex');
+    
+    const wallet = new ethers.Wallet(seed);
+    return wallet.address;
+  }
+
+  // Original mint function for backwards compatibility
+  async mintNFT(
+    request: NFTMintRequest,
+    metadataUri: string,
+    creatorAddress: string
+  ): Promise<NFTMintResponse> {
+    // Redirect to user-managed version
+    return this.mintNFTForUser(request, metadataUri, 0); // 0 as placeholder
   }
 
   // Get supported networks

@@ -260,11 +260,11 @@ router.post('/mint-nft', async (req: AuthenticatedRequest, res) => {
     // Get creator address from request or user wallet
     const creatorAddress = requestData.recipientAddress || '0x0000000000000000000000000000000000000000';
 
-    // Mint NFT using blockchain service
-    const mintResult = await blockchainService.mintNFT(
+    // Mint NFT using blockchain service (app-managed)
+    const mintResult = await blockchainService.mintNFTForUser(
       requestData,
       metadata.metadataUri,
-      creatorAddress
+      userId
     );
 
     // Save transaction record
