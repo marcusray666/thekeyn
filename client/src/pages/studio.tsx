@@ -87,13 +87,16 @@ export default function Studio() {
         body: formData,
       });
     },
-    onSuccess: (data) => {
-      setCreatedWork(data);
-      setProgress(50);
-      setCurrentStep('certificate');
+    onSuccess: (response) => {
+      console.log('Upload response:', response);
+      setCreatedWork(response.work);
+      setCreatedCertificate(response.certificate);
+      setProgress(100);
+      setCurrentStep('complete');
+      setIsProcessing(false);
       toast({
         title: "Work uploaded successfully!",
-        description: "Your creative work has been secured and timestamped.",
+        description: "Your creative work has been secured with blockchain verification.",
       });
     },
     onError: (error) => {
