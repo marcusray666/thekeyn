@@ -245,7 +245,21 @@ export default function UserDashboard() {
               </div>
             </div>
             
-            <div className="mb-4">
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div>
+                <p className="text-sm text-gray-400">Works Protected</p>
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 text-purple-400 mr-2" />
+                  <p className="text-white font-medium">{dashboardStats.protected}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Total Views</p>
+                <div className="flex items-center">
+                  <TrendingUp className="h-4 w-4 text-emerald-400 mr-2" />
+                  <p className="text-white font-medium">{dashboardStats.totalViews}</p>
+                </div>
+              </div>
               <div>
                 <p className="text-sm text-gray-400">Total Storage</p>
                 <p className="text-white font-medium">{dashboardStats.totalSize}</p>
@@ -272,24 +286,7 @@ export default function UserDashboard() {
           </div>
         </GlassCard>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <GlassCard className="text-center py-6">
-            <Shield className="mx-auto h-8 w-8 text-purple-400 mb-3" />
-            <div className="text-3xl font-bold text-purple-400 mb-1">
-              {dashboardStats.protected}
-            </div>
-            <div className="text-gray-400 text-sm">Works Protected</div>
-          </GlassCard>
-          
-          <GlassCard className="text-center py-6">
-            <TrendingUp className="mx-auto h-8 w-8 text-emerald-400 mb-3" />
-            <div className="text-3xl font-bold text-emerald-400 mb-1">
-              {dashboardStats.totalViews}
-            </div>
-            <div className="text-gray-400 text-sm">Total Views</div>
-          </GlassCard>
-        </div>
+
 
 
 
