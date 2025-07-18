@@ -303,45 +303,7 @@ export default function UserDashboard() {
           </GlassCard>
         </div>
 
-        {/* Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <GlassCard>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Upload Activity</h3>
-              <AnalyticsChart
-                type="line"
-                data={[
-                  { name: 'Jan', value: Math.floor(Math.random() * 10) + 1 },
-                  { name: 'Feb', value: Math.floor(Math.random() * 10) + 1 },
-                  { name: 'Mar', value: Math.floor(Math.random() * 10) + 1 },
-                  { name: 'Apr', value: Math.floor(Math.random() * 10) + 1 },
-                  { name: 'May', value: Math.floor(Math.random() * 10) + 1 },
-                  { name: 'Jun', value: Math.floor(Math.random() * 10) + 1 },
-                ]}
-                dataKey="value"
-                xAxisKey="name"
-                colors={['#8B5CF6']}
-              />
-            </div>
-          </GlassCard>
 
-          <GlassCard>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">File Types</h3>
-              <AnalyticsChart
-                type="pie"
-                data={[
-                  { name: 'Images', value: Math.floor(Math.random() * 50) + 10 },
-                  { name: 'Documents', value: Math.floor(Math.random() * 30) + 5 },
-                  { name: 'Audio', value: Math.floor(Math.random() * 20) + 3 },
-                  { name: 'Video', value: Math.floor(Math.random() * 15) + 2 },
-                ]}
-                dataKey="value"
-                colors={['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B']}
-              />
-            </div>
-          </GlassCard>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Works */}
