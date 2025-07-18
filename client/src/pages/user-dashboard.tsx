@@ -232,7 +232,7 @@ export default function UserDashboard() {
           <div className="p-6">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center">
               <User className="mr-2 h-5 w-5" />
-              Account
+              {user?.username || 'mark123'}
             </h2>
             
             <div className="flex items-center space-x-4 mb-6">
@@ -245,7 +245,7 @@ export default function UserDashboard() {
               </div>
             </div>
             
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="text-sm text-gray-400">Works Protected</p>
                 <div className="flex items-center">
@@ -259,10 +259,6 @@ export default function UserDashboard() {
                   <TrendingUp className="h-4 w-4 text-emerald-400 mr-2" />
                   <p className="text-white font-medium">{dashboardStats.totalViews}</p>
                 </div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Total Storage</p>
-                <p className="text-white font-medium">{dashboardStats.totalSize}</p>
               </div>
             </div>
             
