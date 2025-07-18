@@ -153,70 +153,84 @@ export function Navigation() {
         
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700">
-            <div className="px-4 py-3 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40">
+            <div className="px-4 py-3 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                  className={`flex items-center space-x-3 px-4 py-4 rounded-xl text-base font-medium transition-all ${
                     location === item.href
-                      ? "text-white bg-purple-600/20 border border-purple-500/30"
-                      : "text-gray-300 hover:text-white hover:bg-white/5"
+                      ? "text-white bg-purple-600/30 border border-purple-500/50 shadow-lg"
+                      : "text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-md"
                   }`}
                 >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
+                  <item.icon className="h-6 w-6" />
+                  <span className="font-semibold">{item.label}</span>
                 </Link>
               ))}
 
               {/* Mobile User Section */}
               {isAuthenticated ? (
-                <>
+                <div className="pt-4 border-t border-gray-700 space-y-3">
+                  <div className="px-4 py-3 bg-purple-600/20 rounded-xl border border-purple-500/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{user?.username}</p>
+                        <p className="text-xs text-gray-300">{user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <Link 
                     href={`/profile/${user?.username}`}
-                    className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2 hover:text-white hover:bg-white hover:bg-opacity-5 rounded-md transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <User className="h-4 w-4" />
-                    <span>{user?.username}</span>
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">View Profile</span>
                   </Link>
+                  
                   <Link
                     href="/settings"
-                    className="px-3 py-2 text-gray-300 text-sm flex items-center space-x-2 hover:text-white hover:bg-white hover:bg-opacity-5 rounded-md transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
+                    <Settings className="h-5 w-5" />
+                    <span className="font-medium">Settings</span>
                   </Link>
+                  
                   <Button
                     variant="ghost"
                     onClick={handleLogout}
                     disabled={logoutMutation.isPending}
-                    className="w-full justify-start text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start"
                   >
-                    <LogOut className="h-5 w-5 mr-2" />
-                    {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                    <LogOut className="h-5 w-5" />
+                    <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
                   </Button>
-                </>
+                </div>
               ) : (
-                <>
+                <div className="pt-4 border-t border-gray-700 space-y-3">
                   <Link
                     href="/login"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                    className="block px-4 py-3 rounded-xl text-center font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block px-3 py-2 rounded-md text-base font-medium btn-glass text-center"
+                    className="block px-4 py-3 rounded-xl text-center font-medium btn-glass"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign Up
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>

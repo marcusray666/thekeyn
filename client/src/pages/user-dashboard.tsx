@@ -530,46 +530,7 @@ export default function UserDashboard() {
               </div>
             </GlassCard>
 
-            {/* Account Info */}
-            <GlassCard>
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                      <User className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white">{user?.username}</p>
-                      <p className="text-sm text-gray-400">{user?.email}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-gray-700 pt-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-400">Total Storage</p>
-                        <p className="text-white font-semibold">{dashboardStats.totalSize}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Account Type</p>
-                        <p className="text-white font-semibold">Creator</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    onClick={() => setLocation('/settings')}
-                    variant="outline"
-                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Account Settings
-                  </Button>
-                </div>
-              </div>
-            </GlassCard>
+            {/* Account section removed - already at top */}
 
             {/* Recent Activity */}
             <GlassCard>
