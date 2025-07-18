@@ -6,17 +6,11 @@ import { GlassCard } from "@/components/ui/glass-card";
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onStartTutorial: () => void;
   username?: string;
 }
 
-export function WelcomeModal({ isOpen, onClose, onStartTutorial, username }: WelcomeModalProps) {
+export function WelcomeModal({ isOpen, onClose, username }: WelcomeModalProps) {
   if (!isOpen) return null;
-
-  const handleStartTutorial = () => {
-    onClose();
-    onStartTutorial();
-  };
 
   return (
     <>
@@ -91,26 +85,16 @@ export function WelcomeModal({ isOpen, onClose, onStartTutorial, username }: Wel
 
             {/* Call to Action */}
             <div className="text-center">
-              <div className="flex gap-4 justify-center">
-                <Button
-                  onClick={onClose}
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
-                >
-                  Explore on My Own
-                </Button>
-                
-                <Button
-                  onClick={handleStartTutorial}
-                  className="btn-glass px-8 py-3 rounded-2xl font-semibold text-white"
-                >
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Take the Tour
-                </Button>
-              </div>
+              <Button
+                onClick={onClose}
+                className="btn-glass px-8 py-3 rounded-2xl font-semibold text-white"
+              >
+                <Sparkles className="mr-2 h-5 w-5" />
+                Let's Get Started
+              </Button>
               
               <p className="text-gray-500 text-sm mt-4">
-                The interactive tutorial takes 2 minutes and shows you all the key features
+                Ready to protect your creative works with blockchain certificates
               </p>
             </div>
 

@@ -108,13 +108,13 @@ export default function UserDashboard() {
             </Button>
 
             <Button
-              onClick={startOnboarding}
+              onClick={() => setLocation('/settings')}
               variant="outline"
               className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
             >
               <Settings className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-              <span className="hidden sm:inline">Tutorial</span>
-              <span className="sm:hidden">Help</span>
+              <span className="hidden sm:inline">Settings</span>
+              <span className="sm:hidden">Settings</span>
             </Button>
           </div>
         </div>

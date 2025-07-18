@@ -7,15 +7,12 @@ import { Navigation } from "@/components/ui/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { FullScreenLoader } from "@/components/ui/liquid-glass-loader";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AccessibilityToolkit } from "@/components/accessibility-toolkit";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
-import Dashboard from "@/pages/dashboard-redesigned";
-import UserDashboard from "@/pages/user-dashboard";
 import Certificates from "@/pages/certificates";
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -46,7 +43,7 @@ function Router() {
     <Switch>
       {/* Public routes */}
       <Route path="/">
-        {isAuthenticated ? <UserDashboard /> : <Welcome />}
+        {isAuthenticated ? <ProfileShowcase /> : <Welcome />}
       </Route>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
@@ -55,7 +52,6 @@ function Router() {
       {/* Protected routes */}
       {isAuthenticated && (
         <>
-          <Route path="/dashboard" component={UserDashboard} />
           <Route path="/home" component={Home} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
@@ -99,7 +95,7 @@ function App() {
             <main id="main-content">
               <Router />
             </main>
-            <AccessibilityToolkit />
+
           </div>
           <Toaster />
         </TooltipProvider>

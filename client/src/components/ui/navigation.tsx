@@ -42,7 +42,7 @@ export function Navigation() {
   ];
 
   const authenticatedNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/", label: "Portfolio", icon: Home },
     { href: "/social", label: "Community", icon: Users },
     { href: "/upload-work", label: "Upload", icon: Upload },
     { href: "/certificates", label: "Certificates", icon: Award },
@@ -70,12 +70,6 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                data-tutorial={
-                  item.href === '/dashboard' ? 'dashboard-button' :
-                  item.href === '/upload-work' ? 'upload-button' :
-                  item.href === '/certificates' ? 'certificates-button' :
-                  undefined
-                }
                 className={`flex items-center space-x-2 transition-colors ${
                   location === item.href
                     ? "text-white"

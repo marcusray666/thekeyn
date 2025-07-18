@@ -18,7 +18,12 @@ import {
   TrendingUp,
   Verified,
   Settings,
-  User
+  User,
+  Upload,
+  Download,
+  AlertTriangle,
+  BarChart3,
+  Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -72,6 +77,10 @@ export default function ProfileShowcase() {
   const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'carousel' | 'timeline'>('grid');
   const [autoplay, setAutoplay] = useState(false);
   const [activeTab, setActiveTab] = useState('works');
+  const [showQuickActions, setShowQuickActions] = useState(false);
+  
+  // If no username provided, show current user's profile
+  const isOwnProfile = !username || username === user?.username;
 
   // Mock data for demonstration - replace with actual API calls
   const profile: CreatorProfile = {
@@ -197,7 +206,7 @@ export default function ProfileShowcase() {
     return num.toString();
   };
 
-  const isOwnProfile = user?.username === username;
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-12">
@@ -449,6 +458,82 @@ export default function ProfileShowcase() {
             </TabsContent>
           </Tabs>
         </motion.div>
+
+        {/* Quick Actions Floating Button - Only for own profile */}
+        {isOwnProfile && (
+          <div className="fixed bottom-6 right-6 z-50">
+            <div className="relative">
+              {/* Quick Actions Menu */}
+              <AnimatePresence>
+                {showQuickActions && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                    className="absolute bottom-16 right-0 w-64"
+                  >
+                    <GlassCard className="p-4">
+                      <h3 className="text-white font-semibold mb-4">Quick Actions</h3>
+                      <div className="space-y-2">
+                        <Button
+                          onClick={() => setLocation('/upload-work')}
+                          className="w-full btn-glass justify-start"
+                        >
+                          <Upload className="mr-3 h-4 w-4" />
+                          Upload New Work
+                        </Button>
+
+                        <Button
+                          onClick={() => setLocation('/my-certificates')}
+                          variant="outline"
+                          className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 justify-start"
+                        >
+                          <Shield className="mr-3 h-4 w-4" />
+                          Manage Certificates
+                        </Button>
+
+                        <Button
+                          onClick={() => setLocation('/nft-studio')}
+                          variant="outline"
+                          className="w-full border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 justify-start"
+                        >
+                          <Sparkles className="mr-3 h-4 w-4" />
+                          Mint NFTs
+                        </Button>
+
+                        <Button
+                          onClick={() => setLocation('/analytics')}
+                          variant="outline"
+                          className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 justify-start"
+                        >
+                          <BarChart3 className="mr-3 h-4 w-4" />
+                          View Analytics
+                        </Button>
+
+                        <Button
+                          onClick={() => setLocation('/report-theft')}
+                          variant="outline"
+                          className="w-full border-red-600 text-red-300 hover:bg-red-900 hover:bg-opacity-20 justify-start"
+                        >
+                          <AlertTriangle className="mr-3 h-4 w-4" />
+                          Report Theft
+                        </Button>
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Floating Action Button */}
+              <Button
+                onClick={() => setShowQuickActions(!showQuickActions)}
+                className="w-14 h-14 rounded-full btn-glass shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Settings className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
