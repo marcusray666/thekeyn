@@ -224,8 +224,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = registerSchema.parse(req.body);
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByUsername(validatedData.username);
+      // Check if user already exists (case insensitive username)
+      const existingUser = await storage.getUserByUsername(validatedData.username.toLowerCase());
       if (existingUser) {
         return res.status(400).json({ error: "Username already exists" });
       }
@@ -238,9 +238,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const passwordHash = await bcrypt.hash(validatedData.password, 12);
 
-      // Create user
+      // Create user (store username in lowercase)
       const user = await storage.createUser({
-        username: validatedData.username,
+        username: validatedData.username.toLowerCase(),
         email: validatedData.email,
         passwordHash,
       });
@@ -270,8 +270,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
-      // Find user
-      const user = await storage.getUserByUsername(validatedData.username);
+      // Find user (case insensitive username)
+      const user = await storage.getUserByUsername(validatedData.username.toLowerCase());
       if (!user) {
         return res.status(401).json({ error: "Invalid username or password" });
       }
