@@ -352,31 +352,53 @@ export default function Studio() {
         >
           <GlassCard>
             <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                {Object.entries(stepConfig).map(([step, config], index) => {
-                  const isActive = currentStep === step;
-                  const isCompleted = ['upload', 'certificate', 'nft'].indexOf(currentStep) > index || currentStep === 'complete';
-                  const StepIcon = config.icon;
-                  
-                  return (
-                    <div key={step} className="flex items-center">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        isCompleted 
-                          ? 'bg-emerald-600 text-white' 
-                          : isActive 
-                            ? `bg-${config.color}-600 text-white`
-                            : 'bg-gray-600 text-gray-400'
-                      }`}>
-                        <StepIcon className="h-6 w-6" />
+              <div className="flex items-center justify-center mb-4">
+                <div className="flex items-center">
+                  {Object.entries(stepConfig).map(([step, config], index) => {
+                    const isActive = currentStep === step;
+                    const isCompleted = ['upload', 'certificate', 'nft'].indexOf(currentStep) > index || currentStep === 'complete';
+                    const StepIcon = config.icon;
+                    
+                    return (
+                      <div key={step} className="flex items-center">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                          isCompleted 
+                            ? 'bg-emerald-500 text-white shadow-lg' 
+                            : isActive 
+                              ? `bg-${config.color}-500 text-white shadow-lg scale-110`
+                              : 'bg-gray-600 text-gray-400'
+                        }`}>
+                          <StepIcon className="h-5 w-5" />
+                        </div>
+                        {index < 3 && (
+                          <div className={`w-12 h-0.5 mx-3 transition-colors duration-200 ${
+                            isCompleted ? 'bg-emerald-500' : 'bg-gray-600'
+                          }`} />
+                        )}
                       </div>
-                      {index < 3 && (
-                        <div className={`w-16 h-1 mx-2 ${
-                          isCompleted ? 'bg-emerald-600' : 'bg-gray-600'
-                        }`} />
-                      )}
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center space-x-8 text-xs">
+                  {Object.entries(stepConfig).map(([step, config]) => {
+                    const isActive = currentStep === step;
+                    const isCompleted = ['upload', 'certificate', 'nft'].indexOf(currentStep) > ['upload', 'certificate', 'nft'].indexOf(step) || currentStep === 'complete';
+                    
+                    return (
+                      <span key={step} className={`transition-colors duration-200 ${
+                        isCompleted 
+                          ? 'text-emerald-400 font-medium' 
+                          : isActive 
+                            ? 'text-white font-medium'
+                            : 'text-gray-500'
+                      }`}>
+                        {config.title}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
               <Progress value={progress} className="w-full" />
               <p className="text-center text-gray-400 mt-2">
