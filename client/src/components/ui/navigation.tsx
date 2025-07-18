@@ -142,8 +142,11 @@ export function Navigation() {
           </div>
           
           <button
-            className="md:hidden text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+            onClick={() => {
+              console.log('Hamburger clicked, current state:', isMenuOpen);
+              setIsMenuOpen(!isMenuOpen);
+            }}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
