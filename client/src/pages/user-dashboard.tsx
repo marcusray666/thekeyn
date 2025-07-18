@@ -1,294 +1,127 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { GlassCard } from '@/components/ui/glass-card';
 import { 
-  Plus, 
-  FileText, 
-  Calendar, 
-  Image, 
-  Search,
-  TrendingUp,
-  Shield,
-  AlertTriangle,
-  Download,
-  Share2,
-  User,
-  Settings,
-  Upload,
-  Eye,
-  BarChart3,
-  Edit,
-  Trash2,
-  Building2,
-  Sparkles,
-  Users
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Input } from "@/components/ui/input";
-import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
-import { AnalyticsChart } from "@/components/ui/analytics-chart";
-import { EditWorkDialog } from "@/components/ui/edit-work-dialog";
-import { DeleteWorkDialog } from "@/components/ui/delete-work-dialog";
-import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useOnboarding } from "@/hooks/useOnboarding";
-import { OnboardingTutorial } from "@/components/ui/onboarding-tutorial";
-import { WelcomeModal } from "@/components/ui/welcome-modal";
+  Upload, Plus, Users, Settings, Sparkles, 
+  BarChart3, TrendingUp, Shield, Image, 
+  FileText, Search, Edit3, Trash2, MoreHorizontal,
+  Download, AlertTriangle, User
+} from 'lucide-react';
+import { formatDate, formatFileSize } from '@/lib/utils';
 
 interface Work {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  creatorName: string;
-  collaborators?: string[];
-  originalName: string;
-  createdAt: string | Date;
-  certificateId: string;
+  fileName: string;
   mimeType: string;
   fileSize: number;
+  fileHash: string;
+  certificateId: string;
+  creator: string;
+  createdAt: Date;
+  views: number;
 }
 
-interface Stats {
+interface DashboardStats {
   protected: number;
-  certificates: number;
-  reports: number;
   totalViews: number;
-  thisMonth: number;
   totalSize: string;
 }
 
 export default function UserDashboard() {
-  const [, setLocation] = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [location, setLocation] = useLocation();
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingWork, setEditingWork] = useState<Work | null>(null);
-  const [deletingWork, setDeletingWork] = useState<Work | null>(null);
-  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { 
-    showOnboarding, 
-    showWelcome,
-    completeOnboarding, 
-    closeOnboarding,
-    startOnboarding,
-    closeWelcome,
-    startTutorialFromWelcome
-  } = useOnboarding();
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["/api/dashboard/stats"],
-    enabled: isAuthenticated,
+  // Sample data - replace with real API calls
+  const { data: works = [] } = useQuery<Work[]>({
+    queryKey: ['/api/works'],
   });
 
-  const { data: recentWorks, isLoading: worksLoading } = useQuery({
-    queryKey: ["/api/dashboard/recent-works"],
-    enabled: isAuthenticated,
+  const { data: dashboardStats = { protected: 0, totalViews: 0, totalSize: '0 MB' } } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats'],
   });
 
-  const { data: certificates, isLoading: certsLoading } = useQuery({
-    queryKey: ["/api/certificates"],
-    enabled: isAuthenticated,
+  const { data: user } = useQuery({
+    queryKey: ['/api/auth/user'],
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      return await apiRequest('/api/works', {
-        method: 'POST',
-        body: formData,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-works'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/certificates'] });
-    },
-  });
-
-  const filteredWorks = recentWorks?.filter((work: Work) =>
+  const filteredWorks = works.filter(work =>
     work.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    work.creatorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    work.certificateId.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+    work.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const formatFileSize = (bytes: number) => {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    if (bytes === 0) return '0 Bytes';
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  if (statsLoading || worksLoading || certsLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <LiquidGlassLoader size="xl" text="Loading your dashboard..." />
-      </div>
-    );
-  }
-
-  // Mock stats if not available
-  const dashboardStats: Stats = stats || {
-    protected: certificates?.length || 0,
-    certificates: certificates?.length || 0,
-    reports: 0,
-    totalViews: Math.floor(Math.random() * 1000) + 100,
-    thisMonth: certificates?.filter((cert: any) => 
-      new Date(cert.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    ).length || 0,
-    totalSize: certificates ? 
-      formatFileSize(certificates.reduce((total: number, cert: any) => total + (cert.work?.fileSize || 0), 0)) :
-      "0 MB"
+  const startOnboarding = () => {
+    const welcomeModal = document.getElementById('welcome-modal');
+    if (welcomeModal) {
+      welcomeModal.style.display = 'flex';
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-3 lg:px-6 py-3 lg:py-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Welcome Header */}
+        {/* Header */}
         <div className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
-            <div>
-              <h1 className="text-2xl lg:text-4xl font-bold text-white mb-2">
-                Welcome back, {user?.username || 'Creator'}!
-              </h1>
-              <p className="text-gray-400">
-                Manage your protected works and track your creative portfolio
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 lg:gap-3">
-              <Button
-                onClick={() => setLocation('/upload-work')}
-                className="btn-glass px-4 lg:px-6 py-2 lg:py-3 rounded-xl lg:rounded-2xl font-semibold text-white text-sm lg:text-base"
-              >
-                <Plus className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden sm:inline">Protect New Work</span>
-                <span className="sm:hidden">Upload</span>
-              </Button>
-              
-              <Button
-                onClick={() => setLocation('/certificates')}
-                variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
-              >
-                <Eye className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden sm:inline">View All</span>
-                <span className="sm:hidden">View</span>
-              </Button>
+          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+            Creator Dashboard
+          </h1>
+          <p className="text-gray-300 text-lg lg:text-xl max-w-3xl">
+            Manage your protected works, track analytics, and grow your creative presence.
+          </p>
 
-              <Button
-                onClick={() => setLocation('/copyright-registration')}
-                variant="outline"
-                className="border-blue-600 text-blue-300 hover:bg-blue-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
-              >
-                <Building2 className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden lg:inline">Register Copyright</span>
-                <span className="lg:hidden">Register</span>
-              </Button>
+          {/* Quick Action Buttons */}
+          <div className="mt-8 flex flex-wrap gap-3 lg:gap-4">
+            <Button
+              onClick={() => setLocation('/upload-work')}
+              className="btn-glass px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base font-medium rounded-2xl"
+            >
+              <Upload className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
+              <span className="hidden lg:inline">Upload New Work</span>
+              <span className="lg:hidden">Upload</span>
+            </Button>
 
-              <Button
-                onClick={() => setLocation('/nft-minting')}
-                variant="outline"
-                className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
-              >
-                <Sparkles className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden lg:inline">Mint NFTs</span>
-                <span className="lg:hidden">NFT</span>
-              </Button>
+            <Button
+              onClick={() => setLocation('/nft-studio')}
+              variant="outline"
+              className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
+            >
+              <Sparkles className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
+              <span className="hidden lg:inline">Mint NFTs</span>
+              <span className="lg:hidden">NFT</span>
+            </Button>
 
-              <Button
-                onClick={() => setLocation('/social')}
-                variant="outline"
-                className="border-green-600 text-green-300 hover:bg-green-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
-              >
-                <Users className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden lg:inline">Join Community</span>
-                <span className="lg:hidden">Social</span>
-              </Button>
+            <Button
+              onClick={() => setLocation('/social')}
+              variant="outline"
+              className="border-green-600 text-green-300 hover:bg-green-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
+            >
+              <Users className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
+              <span className="hidden lg:inline">Join Community</span>
+              <span className="lg:hidden">Social</span>
+            </Button>
 
-              <Button
-                onClick={startOnboarding}
-                variant="outline"
-                className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
-              >
-                <Settings className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
-                <span className="hidden sm:inline">Tutorial</span>
-                <span className="sm:hidden">Help</span>
-              </Button>
-            </div>
+            <Button
+              onClick={startOnboarding}
+              variant="outline"
+              className="border-purple-600 text-purple-300 hover:bg-purple-900 hover:bg-opacity-20 px-3 lg:px-4 py-2 lg:py-3 text-sm lg:text-base"
+            >
+              <Settings className="mr-1 lg:mr-2 h-4 lg:h-5 w-4 lg:w-5" />
+              <span className="hidden sm:inline">Tutorial</span>
+              <span className="sm:hidden">Help</span>
+            </Button>
           </div>
         </div>
 
-        {/* Account Section - Moved to top */}
-        <GlassCard className="mb-8">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-              <User className="mr-2 h-5 w-5" />
-              {user?.username || 'mark123'}
-            </h2>
-            
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-purple-600 flex items-center justify-center">
-                <User className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white">{user?.username || 'mark123'}</h3>
-                <p className="text-gray-400">{user?.email || 'mark@icloud.ru'}</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <p className="text-sm text-gray-400">Works Protected</p>
-                <div className="flex items-center">
-                  <Shield className="h-4 w-4 text-purple-400 mr-2" />
-                  <p className="text-white font-medium">{dashboardStats.protected}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Total Views</p>
-                <div className="flex items-center">
-                  <TrendingUp className="h-4 w-4 text-emerald-400 mr-2" />
-                  <p className="text-white font-medium">{dashboardStats.totalViews}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => setLocation('/settings')}
-                variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-              <Button
-                onClick={() => setLocation(`/showcase/${user?.username}`)}
-                className="btn-glass"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Portfolio
-              </Button>
-            </div>
-          </div>
-        </GlassCard>
-
-
-
-
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Works */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Recent Works - Smaller and above Quick Actions */}
+          <div>
             <GlassCard>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -366,37 +199,15 @@ export default function UserDashboard() {
                             {work.certificateId.slice(-8)}
                           </div>
                           <Shield className="h-4 w-4 text-green-400" />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingWork(work);
-                            }}
-                            className="text-gray-400 hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeletingWork(work);
-                            }}
-                            className="text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       </div>
                     ))}
-                    
+
                     {filteredWorks.length > 5 && (
                       <Button
-                        onClick={() => setLocation('/certificates')}
+                        onClick={() => setLocation('/my-certificates')}
                         variant="outline"
-                        className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                        className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 mt-4"
                       >
                         View All {filteredWorks.length} Works
                       </Button>
@@ -407,117 +218,61 @@ export default function UserDashboard() {
             </GlassCard>
           </div>
 
-          {/* Quick Actions & Account */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
+          {/* Quick Actions */}
+          <div>
             <GlassCard>
               <div className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-                
-                <div className="space-y-3">
+                <h2 className="text-xl font-semibold text-white mb-6">Quick Actions</h2>
+                <div className="space-y-4">
                   <Button
                     onClick={() => setLocation('/upload-work')}
-                    className="w-full btn-glass py-3 rounded-2xl font-semibold text-white"
+                    className="w-full btn-glass justify-start py-4 text-lg"
                   >
-                    <Upload className="mr-2 h-4 w-4" />
+                    <Upload className="mr-3 h-5 w-5" />
                     Upload New Work
                   </Button>
-                  
+
                   <Button
-                    onClick={() => setLocation('/certificates')}
+                    onClick={() => setLocation('/my-certificates')}
                     variant="outline"
-                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 justify-start py-4 text-lg"
                   >
-                    <FileText className="mr-2 h-4 w-4" />
+                    <Shield className="mr-3 h-5 w-5" />
                     Manage Certificates
                   </Button>
-                  
+
                   <Button
-                    onClick={() => {
-                      // Generate and download portfolio as PDF
-                      const portfolioData = {
-                        user: user?.username,
-                        works: filteredWorks.length,
-                        certificates: dashboardStats.certificates,
-                        totalSize: dashboardStats.totalSize
-                      };
-                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portfolioData, null, 2));
-                      const downloadAnchorNode = document.createElement('a');
-                      downloadAnchorNode.setAttribute("href", dataStr);
-                      downloadAnchorNode.setAttribute("download", `${user?.username}-portfolio.json`);
-                      document.body.appendChild(downloadAnchorNode);
-                      downloadAnchorNode.click();
-                      downloadAnchorNode.remove();
-                      
-                      toast({
-                        title: "Portfolio Downloaded",
-                        description: "Your portfolio data has been exported successfully.",
-                      });
-                    }}
+                    onClick={() => setLocation('/export-portfolio')}
                     variant="outline"
-                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 justify-start py-4 text-lg"
                   >
-                    <Download className="mr-2 h-4 w-4" />
+                    <Download className="mr-3 h-5 w-5" />
                     Export Portfolio
                   </Button>
-                  
+
                   <Button
                     onClick={() => setLocation('/report-theft')}
                     variant="outline"
-                    className="w-full border-red-600 text-red-400 hover:bg-red-900 hover:bg-opacity-20"
+                    className="w-full border-red-600 text-red-300 hover:bg-red-900 hover:bg-opacity-20 justify-start py-4 text-lg"
                   >
-                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    <AlertTriangle className="mr-3 h-5 w-5" />
                     Report Theft
                   </Button>
-                  
+
                   <Button
                     onClick={() => setLocation('/analytics')}
                     variant="outline"
-                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                    className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 justify-start py-4 text-lg"
                   >
-                    <BarChart3 className="mr-2 h-4 w-4" />
+                    <BarChart3 className="mr-3 h-5 w-5" />
                     View Analytics
                   </Button>
                 </div>
               </div>
             </GlassCard>
-
-            {/* Account section removed - already at top */}
           </div>
         </div>
       </div>
-
-      {/* Edit and Delete Dialogs */}
-      {editingWork && (
-        <EditWorkDialog
-          work={editingWork}
-          open={!!editingWork}
-          onOpenChange={(open) => !open && setEditingWork(null)}
-        />
-      )}
-
-      {deletingWork && (
-        <DeleteWorkDialog
-          work={deletingWork}
-          open={!!deletingWork}
-          onOpenChange={(open) => !open && setDeletingWork(null)}
-        />
-      )}
-
-      {/* Welcome Modal */}
-      <WelcomeModal
-        isOpen={showWelcome}
-        onClose={closeWelcome}
-        onStartTutorial={startTutorialFromWelcome}
-        username={user?.username}
-      />
-
-      {/* Onboarding Tutorial */}
-      <OnboardingTutorial
-        isOpen={showOnboarding}
-        onClose={closeOnboarding}
-        onComplete={completeOnboarding}
-      />
     </div>
   );
 }
