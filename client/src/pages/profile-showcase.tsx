@@ -83,8 +83,12 @@ export default function ProfileShowcase() {
   const profileUsername = username || user?.username;
   const isOwnProfile = profileUsername === user?.username;
 
+  // Debug: log the state
+  console.log('ProfileShowcase - username param:', username, 'user:', user, 'profileUsername:', profileUsername, 'isAuthenticated:', isAuthenticated);
+
   // Don't render if we don't have a profile username
   if (!profileUsername) {
+    console.log('ProfileShowcase - No profile username, showing loader');
     return <LiquidGlassLoader text="Loading your profile..." />;
   }
 

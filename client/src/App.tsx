@@ -33,10 +33,13 @@ import ProfileShowcase from "@/pages/profile-showcase";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedHome() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  
+  // Debug: log the user state
+  console.log('AuthenticatedHome - User:', user, 'IsAuthenticated:', isAuthenticated);
   
   // If user is loaded, show their profile showcase directly
-  if (user?.username) {
+  if (isAuthenticated && user) {
     return <ProfileShowcase />;
   }
   
