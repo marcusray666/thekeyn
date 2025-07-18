@@ -34,14 +34,12 @@ import NotFound from "@/pages/not-found";
 
 function AuthenticatedHome() {
   const { user } = useAuth();
-  const [location, setLocation] = useLocation();
-
-  useEffect(() => {
-    if (user?.username) {
-      setLocation(`/showcase/${user.username}`);
-    }
-  }, [user?.username, setLocation]);
-
+  
+  // If user is loaded, show their profile showcase directly
+  if (user?.username) {
+    return <ProfileShowcase />;
+  }
+  
   return <FullScreenLoader text="Loading your portfolio..." />;
 }
 

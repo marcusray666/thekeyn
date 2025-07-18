@@ -79,13 +79,14 @@ export default function ProfileShowcase() {
   const [activeTab, setActiveTab] = useState('works');
   const [showQuickActions, setShowQuickActions] = useState(false);
   
-  // Check if this is the current user's profile
-  const isOwnProfile = username === user?.username;
+  // If no username from URL, use current user's username (for authenticated home)
+  const profileUsername = username || user?.username;
+  const isOwnProfile = profileUsername === user?.username;
 
   // Mock data for demonstration - replace with actual API calls
   const profile: CreatorProfile = {
     id: 1,
-    username: username || 'mark123',
+    username: profileUsername || 'mark123',
     displayName: 'Mark Thompson',
     bio: 'Digital artist & blockchain enthusiast. Protecting creativity through technology. Creating the future of digital art ownership.',
     profileImageUrl: undefined,
