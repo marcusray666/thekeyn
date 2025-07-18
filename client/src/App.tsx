@@ -31,6 +31,7 @@ import SubscriptionManagement from "@/pages/subscription-management";
 import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
 import Studio from "@/pages/studio";
+import MobileFeatures from "@/pages/mobile-features";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedHome() {
@@ -82,6 +83,7 @@ function Router() {
           <Route path="/nft-simple" component={SimplifiedNFT} />
           <Route path="/subscription" component={SubscriptionManagement} />
           <Route path="/social" component={Social} />
+          <Route path="/mobile" component={MobileFeatures} />
           <Route path="/settings" component={Settings} />
           <Route path="/profile/:username" component={Profile} />
         </>

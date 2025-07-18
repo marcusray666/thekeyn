@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Loggin\'</string>
+    <string name="title_activity_main">Loggin\'</string>
+    <string name="package_name">com.loggin.app</string>
+    <string name="custom_url_scheme">com.loggin.app</string>
+</resources>
