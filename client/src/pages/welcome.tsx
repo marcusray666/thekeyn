@@ -127,7 +127,7 @@ export default function Welcome() {
               <span className="text-white">Your Creative Work?</span>
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of creators who trust Loggin to secure their digital assets with blockchain technology.
+              Join thousands of creators who trust Loggin' to secure their digital assets with blockchain technology.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">

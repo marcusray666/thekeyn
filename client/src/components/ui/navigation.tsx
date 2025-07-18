@@ -63,10 +63,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="logo-glass w-16 h-12 flex items-center justify-center">
-              <span className="text-sm font-bold text-white">lggn'</span>
-            </div>
-            <h1 className="text-xl font-bold gradient-text">Loggin</h1>
+            <h1 className="text-2xl font-bold gradient-text">Loggin'</h1>
           </Link>
           
           <div className="hidden md:flex items-center space-x-8">

@@ -1,8 +1,8 @@
-# Loggin - Digital Art Protection Platform
+# Loggin' - Digital Art Protection Platform
 
 ## Overview
 
-Loggin is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
+Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 18, 2025):**
 - ✅ COMPLETE NFT BLOCKCHAIN SYSTEM IMPLEMENTED: Full workflow from upload to NFT minting
@@ -14,7 +14,7 @@ Loggin is a comprehensive social media platform for creators that combines digit
 - ✅ COMPLETE WORKFLOW: Upload to IPFS → Generate metadata → Estimate gas → Mint NFT → Track transaction
 
 **Previous Updates (July 17, 2025):**
-- ✅ COMPLETE REBRANDING: Changed app name from "Prooff" to "Loggin" and logo from "P" to "lggn'"
+- ✅ COMPLETE REBRANDING: Changed app name from "Prooff" to "Loggin'" with clean typography, removed logo abbreviations
 - ✅ Updated all UI components, pages, and metadata with new branding
 - ✅ REVERTED TO ORIGINAL LIQUID GLASS THEME: Restored single original theme with purple/blue cosmic aesthetic
 - ✅ REMOVED THEME SETTINGS MENU: Eliminated theme switching interface completely for simplicity

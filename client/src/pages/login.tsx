@@ -73,11 +73,9 @@ export default function Login() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="logo-glass w-20 h-16 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">lggn'</span>
-            </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-400">Sign in to your Loggin account</p>
+            <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
+            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+            <p className="text-gray-400">Sign in to your Loggin' account</p>
           </div>
 
           {/* Login Form */}

@@ -29,14 +29,10 @@ export function WelcomeModal({ isOpen, onClose, onStartTutorial, username }: Wel
           <div className="p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <div className="logo-glass w-16 h-16 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">lggn'</span>
-                </div>
-              </div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Welcome to Loggin{username ? `, ${username}` : ''}!
-              </h1>
+              <h1 className="text-4xl font-bold gradient-text mb-4">Loggin'</h1>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Welcome{username ? `, ${username}` : ''}!
+              </h2>
               <p className="text-gray-400 text-lg">
                 Your digital copyright protection platform is ready
               </p>
