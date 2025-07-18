@@ -66,19 +66,7 @@ export default function Welcome() {
               </Link>
             </div>
 
-            {/* Quick Upload Option */}
-            <div className="border-t border-gray-600 pt-6">
-              <p className="text-gray-400 mb-4">Want to try first?</p>
-              <Link href="/upload">
-                <Button
-                  variant="ghost"
-                  className="text-purple-400 hover:text-purple-300 hover:bg-white hover:bg-opacity-5"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload a file to see how it works
-                </Button>
-              </Link>
-            </div>
+
           </GlassCard>
         </div>
       </section>

@@ -39,7 +39,6 @@ export function Navigation() {
 
   const publicNavItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/upload", label: "Try Demo", icon: Upload },
   ];
 
   const authenticatedNavItems = [
