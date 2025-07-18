@@ -498,6 +498,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload work endpoint
   app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
+      console.log('Upload request received:', {
+        hasFile: !!req.file,
+        bodyKeys: Object.keys(req.body),
+        body: req.body
+      });
+
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
@@ -525,10 +531,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let collaboratorList = [];
       if (collaborators) {
         try {
-          collaboratorList = typeof collaborators === 'string' ? JSON.parse(collaborators) : collaborators;
+          if (typeof collaborators === 'string') {
+            // Clean up the string first - remove any problematic characters
+            const cleanedCollaborators = collaborators.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+            if (cleanedCollaborators.startsWith('[') || cleanedCollaborators.startsWith('{')) {
+              collaboratorList = JSON.parse(cleanedCollaborators);
+            } else {
+              collaboratorList = cleanedCollaborators.split(',').map((c: string) => c.trim()).filter(Boolean);
+            }
+          } else {
+            collaboratorList = collaborators;
+          }
         } catch (e) {
-          // If not JSON, treat as comma-separated string
-          collaboratorList = collaborators.split(',').map((c: string) => c.trim()).filter(Boolean);
+          console.error('Error parsing collaborators:', e);
+          // If not valid JSON, treat as comma-separated string
+          collaboratorList = String(collaborators).split(',').map((c: string) => c.trim()).filter(Boolean);
         }
       }
 
@@ -581,7 +598,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error uploading work:", error);
-      res.status(500).json({ error: "Failed to upload work" });
+      
+      // Check if it's a JSON parsing error
+      if (error instanceof SyntaxError && error.message.includes('Unexpected token')) {
+        return res.status(400).json({ 
+          error: "Invalid JSON data in request", 
+          details: error.message,
+          suggestion: "Please check the format of the data being sent"
+        });
+      }
+      
+      res.status(500).json({ error: "Failed to upload work", details: error instanceof Error ? error.message : String(error) });
     }
   });
 

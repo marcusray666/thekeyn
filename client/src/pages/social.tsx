@@ -248,7 +248,7 @@ export default function Social() {
 
 
 
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = (posts || []).filter(post => {
     const matchesSearch = post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
