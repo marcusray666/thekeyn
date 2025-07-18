@@ -30,7 +30,7 @@ export default function Register() {
     onSuccess: async (data) => {
       toast({
         title: "Account created!",
-        description: "Welcome to Prooff. Your account has been created successfully.",
+        description: "Welcome to Loggin. Your account has been created successfully.",
       });
       
       // Invalidate and refetch user data
@@ -74,11 +74,11 @@ export default function Register() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="logo-glass w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">P</span>
+            <div className="logo-glass w-20 h-16 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-lg font-bold text-white">lggn'</span>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Create Account</h1>
-            <p className="text-gray-400">Join Prooff to protect your creative work</p>
+            <p className="text-gray-400">Join Loggin to protect your creative work</p>
           </div>
 
           {/* Registration Form */}

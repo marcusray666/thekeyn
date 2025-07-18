@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-const ONBOARDING_STORAGE_KEY = "prooff_onboarding_completed";
-const WELCOME_STORAGE_KEY = "prooff_welcome_shown";
+const ONBOARDING_STORAGE_KEY = "loggin_onboarding_completed";
+const WELCOME_STORAGE_KEY = "loggin_welcome_shown";
 
 export function useOnboarding() {
   const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean | null>(null);

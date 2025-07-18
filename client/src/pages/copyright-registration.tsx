@@ -514,7 +514,7 @@ export default function CopyrightRegistration() {
                   </p>
                   
                   <p>
-                    Your Prooff certificate serves as valuable supporting evidence for your 
+                    Your Loggin certificate serves as valuable supporting evidence for your 
                     registration applications.
                   </p>
                 </div>

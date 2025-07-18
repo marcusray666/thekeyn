@@ -73,11 +73,11 @@ export default function Login() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="logo-glass w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">P</span>
+            <div className="logo-glass w-20 h-16 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-lg font-bold text-white">lggn'</span>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-400">Sign in to your Prooff account</p>
+            <p className="text-gray-400">Sign in to your Loggin account</p>
           </div>
 
           {/* Login Form */}

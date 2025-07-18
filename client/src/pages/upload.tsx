@@ -96,11 +96,11 @@ export default function UploadPage() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="logo-glass w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">P</span>
+            <div className="logo-glass w-20 h-16 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-lg font-bold text-white">lggn'</span>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Upload Your Work</h1>
-            <p className="text-gray-400">Try Prooff by uploading a file and seeing how protection works</p>
+            <p className="text-gray-400">Try Loggin by uploading a file and seeing how protection works</p>
           </div>
 
           {/* Auth Notice */}
