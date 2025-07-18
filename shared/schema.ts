@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 
 // Re-export blockchain schema for convenience
 export * from "./blockchain-schema";
@@ -383,8 +384,51 @@ export const projectCollaborators = pgTable("project_collaborators", {
   permissions: text("permissions").array().default([]), // 'edit', 'comment', 'share', 'export'
   joinedAt: timestamp("joined_at").defaultNow(),
   contribution: text("contribution"), // Description of their contribution
-  status: text("status").notNull().default("active"), // 'active', 'left', 'removed'
 });
+
+// Advanced blockchain verification table
+export const blockchainVerifications = pgTable("blockchain_verifications", {
+  id: text("id").primaryKey().default(nanoid()),
+  workId: integer("work_id").notNull().references(() => works.id),
+  certificateId: varchar("certificate_id").notNull(),
+  fileHash: varchar("file_hash").notNull(),
+  merkleRoot: varchar("merkle_root").notNull(),
+  merkleProof: jsonb("merkle_proof").notNull().$type<string[]>(),
+  timestampHash: varchar("timestamp_hash").notNull(),
+  blockchainAnchor: varchar("blockchain_anchor").notNull(),
+  ipfsHash: varchar("ipfs_hash"),
+  digitalSignature: varchar("digital_signature").notNull(),
+  networkId: varchar("network_id").notNull().default("ethereum"),
+  blockNumber: integer("block_number"),
+  transactionHash: varchar("transaction_hash"),
+  contractAddress: varchar("contract_address"),
+  tokenId: varchar("token_id"),
+  verificationLevel: varchar("verification_level").notNull().default("basic"), // basic, enhanced, premium
+  confidence: integer("confidence").notNull().default(100), // 0-100
+  verificationTimestamp: timestamp("verification_timestamp").defaultNow(),
+  lastVerified: timestamp("last_verified").defaultNow(),
+  verificationCount: integer("verification_count").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type BlockchainVerification = typeof blockchainVerifications.$inferSelect;
+export type InsertBlockchainVerification = typeof blockchainVerifications.$inferInsert;
+
+// Verification audit log for tracking verification attempts
+export const verificationAuditLog = pgTable("verification_audit_log", {
+  id: text("id").primaryKey().default(nanoid()),
+  verificationId: text("verification_id").notNull().references(() => blockchainVerifications.id),
+  verifierIp: varchar("verifier_ip"),
+  verifierUserAgent: text("verifier_user_agent"),
+  verificationResult: boolean("verification_result").notNull(),
+  confidenceScore: integer("confidence_score").notNull(),
+  verificationDetails: jsonb("verification_details").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export type VerificationAuditLog = typeof verificationAuditLog.$inferSelect;
+export type InsertVerificationAuditLog = typeof verificationAuditLog.$inferInsert;
 
 // Insert schemas for new tables
 export const insertPostCommentSchema = createInsertSchema(postComments).pick({

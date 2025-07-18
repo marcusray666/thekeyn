@@ -31,6 +31,7 @@ import SubscriptionManagement from "@/pages/subscription-management";
 import Subscription from "@/pages/subscription";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import SubscriptionCancelled from "@/pages/subscription-cancelled";
+import BlockchainVerification from "@/pages/blockchain-verification";
 import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
 import Studio from "@/pages/studio";
@@ -88,6 +89,7 @@ function Router() {
           <Route path="/subscription" component={Subscription} />
           <Route path="/subscription/success" component={SubscriptionSuccess} />
           <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
+          <Route path="/blockchain-verification" component={BlockchainVerification} />
           <Route path="/social" component={Social} />
           <Route path="/mobile" component={MobileFeatures} />
           <Route path="/settings" component={Settings} />

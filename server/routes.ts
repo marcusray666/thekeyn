@@ -13,6 +13,7 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import blockchainRoutes from "./routes/blockchain-routes";
+import { blockchainVerification } from "./blockchain-verification";
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -2122,6 +2123,185 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // Advanced blockchain verification routes
+  app.post("/api/verification/generate", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { workId, verificationLevel = 'basic' } = req.body;
+      
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      // Read the file to generate verification proof
+      const filePath = path.join(process.cwd(), "uploads", work.filename);
+      const fileBuffer = fs.readFileSync(filePath);
+
+      // Generate comprehensive verification proof
+      const verificationProof = await blockchainVerification.generateVerificationProof(
+        fileBuffer,
+        {
+          title: work.title,
+          creator: work.creatorName,
+          certificateId: work.certificateId,
+          collaborators: work.collaborators
+        },
+        {
+          verificationLevel: verificationLevel as 'basic' | 'enhanced' | 'premium',
+          networkId: 'ethereum',
+          includeIPFS: verificationLevel !== 'basic'
+        }
+      );
+
+      res.json({
+        proof: verificationProof,
+        message: "Advanced verification generated successfully",
+        details: {
+          verificationLevel,
+          networkId: 'ethereum',
+          confidence: 100,
+          timestampProof: verificationProof.blockchainAnchor,
+          merkleProofLength: verificationProof.merkleProof.length
+        }
+      });
+    } catch (error) {
+      console.error("Error generating verification:", error);
+      res.status(500).json({ error: "Failed to generate verification" });
+    }
+  });
+
+  app.post("/api/verification/verify", async (req, res) => {
+    try {
+      const { fileHash, proof, fileBuffer } = req.body;
+      
+      if (!proof || !fileHash) {
+        return res.status(400).json({ error: "Missing required verification data" });
+      }
+
+      // Verify the proof
+      const verificationResult = await blockchainVerification.verifyProof(
+        proof,
+        fileBuffer ? Buffer.from(fileBuffer, 'base64') : undefined
+      );
+
+      res.json({
+        isValid: verificationResult.isValid,
+        confidence: verificationResult.confidence,
+        details: verificationResult.verificationDetails,
+        timestamp: new Date().toISOString(),
+        message: verificationResult.isValid ? "Verification successful" : "Verification failed"
+      });
+    } catch (error) {
+      console.error("Error verifying proof:", error);
+      res.status(500).json({ error: "Failed to verify proof" });
+    }
+  });
+
+  app.post("/api/verification/batch-verify", async (req, res) => {
+    try {
+      const { workIds, verificationLevel = 'basic' } = req.body;
+      
+      if (!Array.isArray(workIds) || workIds.length === 0) {
+        return res.status(400).json({ error: "Invalid work IDs array" });
+      }
+
+      const results = [];
+      
+      for (const workId of workIds) {
+        try {
+          const work = await storage.getWork(workId);
+          if (!work) {
+            results.push({
+              workId,
+              status: 'failed',
+              error: 'Work not found'
+            });
+            continue;
+          }
+
+          const filePath = path.join(process.cwd(), "uploads", work.filename);
+          const fileBuffer = fs.readFileSync(filePath);
+
+          const blockchainCertificate = await blockchainVerification.generateBlockchainCertificate(
+            fileBuffer,
+            {
+              title: work.title,
+              creator: work.creatorName,
+              description: work.description,
+              certificateId: work.certificateId,
+              collaborators: work.collaborators
+            },
+            verificationLevel as 'basic' | 'enhanced' | 'premium'
+          );
+
+          results.push({
+            workId,
+            certificate: blockchainCertificate,
+            status: 'verified'
+          });
+        } catch (error) {
+          results.push({
+            workId,
+            status: 'failed',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      res.json({
+        results,
+        summary: {
+          totalProcessed: results.length,
+          successful: results.filter(r => r.status === 'verified').length,
+          failed: results.filter(r => r.status === 'failed').length
+        },
+        message: "Batch verification completed"
+      });
+    } catch (error) {
+      console.error("Error in batch verification:", error);
+      res.status(500).json({ error: "Failed to complete batch verification" });
+    }
+  });
+
+  app.get("/api/verification/network-status", async (req, res) => {
+    try {
+      // Get status of supported blockchain networks
+      const networks = ['ethereum', 'polygon', 'arbitrum', 'base'];
+      const networkStatus = [];
+
+      for (const network of networks) {
+        try {
+          const timestampProof = await blockchainVerification.generateTimestampProof('test', network);
+          networkStatus.push({
+            network,
+            status: 'online',
+            blockNumber: timestampProof.blockNumber,
+            blockHash: timestampProof.blockHash,
+            timestamp: timestampProof.timestamp
+          });
+        } catch (error) {
+          networkStatus.push({
+            network,
+            status: 'offline',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      res.json({
+        networks: networkStatus,
+        summary: {
+          totalNetworks: networks.length,
+          onlineNetworks: networkStatus.filter(n => n.status === 'online').length,
+          offlineNetworks: networkStatus.filter(n => n.status === 'offline').length
+        }
+      });
+    } catch (error) {
+      console.error("Error checking network status:", error);
+      res.status(500).json({ error: "Failed to check network status" });
     }
   });
 

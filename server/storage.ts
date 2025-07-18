@@ -2,6 +2,7 @@ import {
   users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications,
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
+  blockchainVerifications, verificationAuditLog,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
   type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, 
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
@@ -9,7 +10,8 @@ import {
   type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
   type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
   type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
-  type SubscriptionUsage, type InsertSubscriptionUsage
+  type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
+  type VerificationAuditLog, type InsertVerificationAuditLog
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
@@ -138,6 +140,13 @@ export interface IStorage {
     hasAPIAccess: boolean;
     teamSize: number;
   }>;
+
+  // Blockchain verification
+  createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification>;
+  getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined>;
+  getBlockchainVerificationByFileHash(fileHash: string): Promise<BlockchainVerification | undefined>;
+  updateBlockchainVerification(id: string, updates: Partial<InsertBlockchainVerification>): Promise<BlockchainVerification>;
+  logVerificationAttempt(log: InsertVerificationAuditLog): Promise<VerificationAuditLog>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1251,6 +1260,53 @@ export class DatabaseStorage implements IStorage {
       tier,
       ...tierLimits[tier as keyof typeof tierLimits] || tierLimits.free
     };
+  }
+
+  // Blockchain verification methods
+  async createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification> {
+    const [created] = await db
+      .insert(blockchainVerifications)
+      .values(verification)
+      .returning();
+    
+    return created;
+  }
+
+  async getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(blockchainVerifications)
+      .where(eq(blockchainVerifications.id, id));
+    
+    return verification;
+  }
+
+  async getBlockchainVerificationByFileHash(fileHash: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(blockchainVerifications)
+      .where(eq(blockchainVerifications.fileHash, fileHash));
+    
+    return verification;
+  }
+
+  async updateBlockchainVerification(id: string, updates: Partial<InsertBlockchainVerification>): Promise<BlockchainVerification> {
+    const [updated] = await db
+      .update(blockchainVerifications)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(blockchainVerifications.id, id))
+      .returning();
+    
+    return updated;
+  }
+
+  async logVerificationAttempt(log: InsertVerificationAuditLog): Promise<VerificationAuditLog> {
+    const [created] = await db
+      .insert(verificationAuditLog)
+      .values(log)
+      .returning();
+    
+    return created;
   }
 }
 
