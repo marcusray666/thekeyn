@@ -73,11 +73,28 @@ export default function ProfileShowcase() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+  const [showProfileActions, setShowProfileActions] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'carousel' | 'timeline'>('grid');
   const [autoplay, setAutoplay] = useState(false);
   const [activeTab, setActiveTab] = useState('works');
-  const [showQuickActions, setShowQuickActions] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showProfileActions) {
+        setShowProfileActions(false);
+      }
+      if (showQuickActions) {
+        setShowQuickActions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileActions, showQuickActions]);
   
   // If no username from URL, use current user's username (for authenticated home)
   const profileUsername = username || user?.username || 'mark123'; // fallback to known username
@@ -257,7 +274,7 @@ export default function ProfileShowcase() {
                         <Button
                           onClick={() => setLocation('/settings')}
                           variant="outline"
-                          className="border-gray-600 text-gray-300 hover:bg-white/10"
+                          className="border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white"
                         >
                           <Settings className="h-4 w-4 mr-2" />
                           Edit Profile
@@ -284,9 +301,55 @@ export default function ProfileShowcase() {
                         </>
                       )}
                       
-                      <Button variant="outline" size="sm" className="border-gray-600">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <div className="relative">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="border-gray-600"
+                          onClick={() => setShowProfileActions(!showProfileActions)}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        
+                        {/* Profile Actions Dropdown */}
+                        <AnimatePresence>
+                          {showProfileActions && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                              className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50"
+                            >
+                              <div className="py-1">
+                                <button
+                                  onClick={() => {
+                                    setShowProfileActions(false);
+                                    // Add share functionality here
+                                    toast({
+                                      title: "Profile link copied!",
+                                      description: "Share this profile with others.",
+                                    });
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+                                >
+                                  <Share2 className="h-4 w-4 mr-2" />
+                                  Share Profile
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setShowProfileActions(false);
+                                    setLocation('/');
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+                                >
+                                  <ChevronLeft className="h-4 w-4 mr-2" />
+                                  Back to Main
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 </div>

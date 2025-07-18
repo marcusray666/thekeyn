@@ -150,8 +150,11 @@ export function Navigation() {
         
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40">
-            <div className="px-4 py-3 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div 
+            className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <div className="px-4 py-3 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               {navItems.map((item) => (
                 <Link
                   key={item.href}
