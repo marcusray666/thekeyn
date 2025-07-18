@@ -33,17 +33,18 @@ import ProfileShowcase from "@/pages/profile-showcase";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedHome() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   
-  // Debug: log the user state
-  console.log('AuthenticatedHome - User:', user, 'IsAuthenticated:', isAuthenticated);
-  
-  // If user is loaded, show their profile showcase directly
-  if (isAuthenticated && user) {
-    return <ProfileShowcase />;
+  if (isLoading) {
+    return <FullScreenLoader text="Loading your portfolio..." />;
   }
   
-  return <FullScreenLoader text="Loading your portfolio..." />;
+  if (!isAuthenticated) {
+    return <Welcome />;
+  }
+  
+  // For authenticated users, show the profile showcase
+  return <ProfileShowcase />;
 }
 
 function Router() {
