@@ -67,19 +67,19 @@ export function Navigation() {
             <h1 className="text-2xl font-bold text-white">Loggin'</h1>
           </Link>
           
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-2 transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
                   location === item.href
-                    ? "text-white"
-                    : "text-gray-300 hover:text-white"
+                    ? "text-white bg-purple-600/30 border border-purple-500/50"
+                    : "text-gray-300 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <span className="font-medium">{item.label}</span>
               </Link>
             ))}
 
@@ -94,13 +94,12 @@ export function Navigation() {
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-800 border-gray-700">
-                    <DropdownMenuItem 
-                      onClick={() => setLocation(`/showcase/${user?.username}`)}
-                      className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Portfolio Showcase
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/showcase/${user?.username}`} className="flex items-center w-full">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Portfolio Showcase
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
@@ -156,13 +155,13 @@ export function Navigation() {
             className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40"
             onClick={() => setIsMenuOpen(false)}
           >
-            <div className="px-4 py-3 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-4 rounded-xl text-base font-medium transition-all ${
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
                     location === item.href
                       ? "text-white bg-purple-600/30 border border-purple-500/50 shadow-lg"
                       : "text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-md"
@@ -178,12 +177,12 @@ export function Navigation() {
                 <div className="pt-4 border-t border-gray-700 space-y-3">
                   <div className="px-4 py-3 bg-purple-600/20 rounded-xl border border-purple-500/30">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                        <User className="h-4 w-4 text-white" />
+                      <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-white" />
                       </div>
-                      <div>
-                        <p className="font-semibold text-white">{user?.username}</p>
-                        <p className="text-xs text-gray-300">{user?.email}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-white truncate">{user?.username}</p>
+                        <p className="text-xs text-gray-300 truncate">{user?.email}</p>
                       </div>
                     </div>
                   </div>
