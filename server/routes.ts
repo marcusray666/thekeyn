@@ -1653,6 +1653,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.userId;
       const { content } = req.body;
       
+      if (isNaN(commentId) || !isFinite(commentId) || commentId <= 0) {
+        return res.status(400).json({ error: "Invalid comment ID" });
+      }
+      
       if (!content || !content.trim()) {
         return res.status(400).json({ error: "Comment content is required" });
       }
@@ -1702,6 +1706,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const followingId = Number(req.params.id);
       const followerId = req.session.userId;
       
+      if (isNaN(followingId) || !isFinite(followingId) || followingId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
       if (followerId === followingId) {
         return res.status(400).json({ error: "Cannot follow yourself" });
       }
@@ -1720,6 +1728,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const followingId = Number(req.params.id);
       const followerId = req.session.userId;
       
+      if (isNaN(followingId) || !isFinite(followingId) || followingId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
       await storage.unfollowUser(followerId, followingId);
       
       res.json({ message: "User unfollowed successfully" });
@@ -1733,6 +1745,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = Number(req.params.id);
       const { limit = 50, offset = 0 } = req.query;
+      
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
       
       const following = await storage.getFollowing(userId, {
         limit: Number(limit),
@@ -1751,6 +1767,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = Number(req.params.id);
       const { limit = 50, offset = 0 } = req.query;
       
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
       const followers = await storage.getFollowers(userId, {
         limit: Number(limit),
         offset: Number(offset),
@@ -1766,6 +1786,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/social/users/:id/follow-stats", async (req, res) => {
     try {
       const userId = Number(req.params.id);
+      
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
       
       const stats = await storage.getFollowStats(userId);
       
@@ -1935,6 +1959,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const listingId = Number(req.params.id);
       
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
+      
       const listing = await storage.getMarketplaceListing(listingId);
       
       if (!listing) {
@@ -1954,6 +1983,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sellerId = req.session.userId;
       const updates = req.body;
       
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
+      
       const updatedListing = await storage.updateMarketplaceListing(listingId, updates);
       
       res.json(updatedListing);
@@ -1967,6 +2001,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const listingId = Number(req.params.id);
       const sellerId = req.session.userId;
+      
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
       
       await storage.deleteMarketplaceListing(listingId, sellerId);
       
