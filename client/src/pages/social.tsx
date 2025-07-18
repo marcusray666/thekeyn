@@ -179,60 +179,72 @@ export default function Social() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-32 px-3 lg:px-6 py-3 lg:py-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Community</h1>
-              <p className="text-gray-400">Share your protected works with fellow creators</p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="pt-20 px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12 pt-8"
+          >
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 gradient-text">
+              Community
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Share your protected works with fellow creators
+            </p>
             
             <Button
               onClick={() => setShowCreatePost(true)}
-              className="btn-glass px-4 lg:px-6 py-2 lg:py-3 rounded-xl font-semibold text-white"
+              className="btn-glass px-8 py-4 text-lg font-semibold text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-3 h-5 w-5" />
               Share Art
             </Button>
-          </div>
+          </motion.div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search posts, creators, or tags..."
-                className="glass-input pl-10"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              {["all", "images", "audio", "following"].map((filter) => (
-                <Button
-                  key={filter}
-                  variant={selectedFilter === filter ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedFilter(filter)}
-                  className={`capitalize ${
-                    selectedFilter === filter 
-                      ? "bg-purple-600 text-white" 
-                      : "border-gray-600 text-gray-300 hover:bg-white/5"
-                  }`}
-                >
-                  {filter}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          {/* Search and Filters Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-8"
+          >
+            <GlassCard className="p-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search posts, creators, or tags..."
+                    className="glass-input pl-12 py-3 text-lg"
+                  />
+                </div>
+                
+                <div className="flex gap-2 flex-wrap">
+                  {["all", "images", "audio", "following"].map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={selectedFilter === filter ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => setSelectedFilter(filter)}
+                      className={`capitalize px-6 py-3 ${
+                        selectedFilter === filter 
+                          ? "bg-purple-600 text-white shadow-lg" 
+                          : "border-gray-600 text-gray-300 hover:bg-white/5 hover:border-purple-500"
+                      }`}
+                    >
+                      {filter}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+
+
 
         {/* Create Post Modal */}
         {showCreatePost && (
@@ -288,120 +300,138 @@ export default function Social() {
           </motion.div>
         )}
 
-        {/* Posts Feed */}
-        <div className="space-y-6">
-          {filteredPosts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <GlassCard>
-                <div className="p-6">
-                  {/* Post Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">{post.username}</h4>
-                        <div className="flex items-center text-sm text-gray-400">
-                          <Calendar className="mr-1 h-3 w-3" />
-                          {formatTimeAgo(post.createdAt)}
+          {/* Posts Feed */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-6"
+          >
+            {filteredPosts.map((post, index) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <GlassCard>
+                  <div className="p-6">
+                    {/* Post Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-white">{post.username}</h4>
+                          <div className="flex items-center text-sm text-gray-400">
+                            <Calendar className="mr-1 h-3 w-3" />
+                            {formatTimeAgo(post.createdAt)}
+                          </div>
                         </div>
                       </div>
+                      
+                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
                     </div>
-                    
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
 
-                  {/* Post Content */}
-                  <div className="mb-4">
-                    <p className="text-gray-300 leading-relaxed">{post.content}</p>
-                  </div>
+                    {/* Post Content */}
+                    <div className="mb-4">
+                      <p className="text-gray-300 leading-relaxed">{post.content}</p>
+                    </div>
 
-                  {/* Post Media */}
-                  {post.imageUrl && (
-                    <div className="mb-4 rounded-lg overflow-hidden">
-                      <div className="w-full h-64 bg-gray-700 rounded-lg flex items-center justify-center">
+                    {/* Post Media */}
+                    {post.imageUrl && (
+                      <div className="mb-4 rounded-lg overflow-hidden">
+                        <div className="w-full h-64 bg-gray-700 rounded-lg flex items-center justify-center">
+                          <div className="text-center text-gray-400">
+                            <Eye className="mx-auto h-8 w-8 mb-2" />
+                            <p className="text-sm">Protected Artwork Preview</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {post.fileType === "audio" && (
+                      <div className="mb-4 p-4 bg-gray-800/50 rounded-lg">
                         <div className="text-center text-gray-400">
-                          <Eye className="mx-auto h-8 w-8 mb-2" />
-                          <p className="text-sm">Protected Artwork Preview</p>
+                          <div className="flex items-center justify-center space-x-2 mb-2">
+                            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                          </div>
+                          <p className="text-sm">Protected Audio Track</p>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {post.fileType === "audio" && (
-                    <div className="mb-4 p-4 bg-gray-800/50 rounded-lg">
-                      <div className="text-center text-gray-400">
-                        <div className="flex items-center justify-center space-x-2 mb-2">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                          <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                        </div>
-                        <p className="text-sm">Protected Audio Track</p>
+                    {/* Tags */}
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        {post.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="bg-purple-900/30 text-purple-300">
+                            #{tag}
+                          </Badge>
+                        ))}
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Tags */}
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="bg-purple-900/30 text-purple-300">
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Post Actions */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                    <div className="flex items-center space-x-6">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => likePostMutation.mutate(post.id)}
-                        className={`flex items-center space-x-2 ${
-                          post.isLiked ? "text-red-400" : "text-gray-400"
-                        } hover:text-red-300`}
-                      >
-                        <Heart className={`h-4 w-4 ${post.isLiked ? "fill-current" : ""}`} />
-                        <span>{post.likes}</span>
-                      </Button>
-                      
-                      <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-blue-300">
-                        <MessageCircle className="h-4 w-4" />
-                        <span>{post.comments}</span>
-                      </Button>
-                      
-                      <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-green-300">
-                        <Share2 className="h-4 w-4" />
-                        <span>{post.shares}</span>
-                      </Button>
+                    {/* Post Actions */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                      <div className="flex items-center space-x-6">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => likePostMutation.mutate(post.id)}
+                          className={`flex items-center space-x-2 ${
+                            post.isLiked ? "text-red-400" : "text-gray-400"
+                          } hover:text-red-300`}
+                        >
+                          <Heart className={`h-4 w-4 ${post.isLiked ? "fill-current" : ""}`} />
+                          <span>{post.likes}</span>
+                        </Button>
+                        
+                        <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-blue-300">
+                          <MessageCircle className="h-4 w-4" />
+                          <span>{post.comments}</span>
+                        </Button>
+                        
+                        <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-green-300">
+                          <Share2 className="h-4 w-4" />
+                          <span>{post.shares}</span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
+                </GlassCard>
+              </motion.div>
+            ))}
 
-        {/* Empty State */}
-        {filteredPosts.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <User className="mx-auto h-12 w-12 mb-4" />
-              <p>No posts found</p>
-              {searchQuery && <p className="text-sm">Try adjusting your search or filters</p>}
-            </div>
-          </div>
-        )}
+            {/* Empty State */}
+            {filteredPosts.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-center py-12"
+              >
+                <GlassCard className="p-12">
+                  <div className="text-gray-400">
+                    <User className="mx-auto h-16 w-16 mb-6 text-purple-400" />
+                    <h3 className="text-xl font-semibold text-white mb-2">No posts found</h3>
+                    <p className="text-gray-400">
+                      {searchQuery 
+                        ? "Try adjusting your search or filters" 
+                        : "Be the first to share your protected artwork with the community!"
+                      }
+                    </p>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
       </div>
     </div>
   );
