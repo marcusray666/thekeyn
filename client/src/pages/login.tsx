@@ -35,8 +35,8 @@ export default function Login() {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Navigate to dashboard
-      setLocation('/dashboard');
+      // Navigate to home page (will show ProfileShowcase for authenticated users)
+      setLocation('/');
     },
     onError: (error: Error) => {
       toast({
