@@ -83,6 +83,11 @@ export default function ProfileShowcase() {
   const profileUsername = username || user?.username;
   const isOwnProfile = profileUsername === user?.username;
 
+  // Don't render if we don't have a profile username
+  if (!profileUsername) {
+    return <LiquidGlassLoader text="Loading your profile..." />;
+  }
+
   // Mock data for demonstration - replace with actual API calls
   const profile: CreatorProfile = {
     id: 1,
@@ -210,7 +215,7 @@ export default function ProfileShowcase() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Header */}
         <motion.div

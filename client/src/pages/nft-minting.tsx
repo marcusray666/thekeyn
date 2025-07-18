@@ -246,7 +246,7 @@ export default function NFTMinting() {
 
   if (worksLoading || mintsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 p-6">
         <div className="max-w-7xl mx-auto">
           <LiquidGlassLoader />
         </div>

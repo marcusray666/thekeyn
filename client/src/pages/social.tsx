@@ -179,7 +179,7 @@ export default function Social() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-3 lg:px-6 py-3 lg:py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 px-3 lg:px-6 py-3 lg:py-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
