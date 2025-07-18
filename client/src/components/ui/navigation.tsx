@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles, Users, Settings } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles, Users, Settings, ChevronDown } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -92,20 +93,39 @@ export function Navigation() {
 
             {/* User Section */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <Link href={`/profile/${user?.username}`} className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm">{user?.username}</span>
-                </Link>
-                <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  disabled={logoutMutation.isPending}
-                  className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
-                </Button>
+              <div className="relative">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm">{user?.username}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-800 border-gray-700">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        View Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center w-full">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               <div className="flex items-center space-x-4">

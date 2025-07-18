@@ -227,22 +227,54 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Account Section - Moved to top */}
+        <GlassCard className="mb-8">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+              <User className="mr-2 h-5 w-5" />
+              Account
+            </h2>
+            
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-16 h-16 rounded-full bg-purple-600 flex items-center justify-center">
+                <User className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">{user?.username || 'mark123'}</h3>
+                <p className="text-gray-400">{user?.email || 'mark@icloud.ru'}</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-sm text-gray-400">Total Storage</p>
+                <p className="text-white font-medium">{dashboardStats.totalSize}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Account Type</p>
+                <p className="text-white font-medium">Creator</p>
+              </div>
+            </div>
+            
+            <Button
+              onClick={() => setLocation('/settings')}
+              variant="outline"
+              className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Account Settings
+            </Button>
+          </div>
+        </GlassCard>
+
+        {/* Stats Overview - Removed "Certificates Issued" */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <GlassCard className="text-center py-6">
             <Shield className="mx-auto h-8 w-8 text-purple-400 mb-3" />
             <div className="text-3xl font-bold text-purple-400 mb-1">
               {dashboardStats.protected}
             </div>
             <div className="text-gray-400 text-sm">Works Protected</div>
-          </GlassCard>
-          
-          <GlassCard className="text-center py-6">
-            <FileText className="mx-auto h-8 w-8 text-cyan-400 mb-3" />
-            <div className="text-3xl font-bold text-cyan-400 mb-1">
-              {dashboardStats.certificates}
-            </div>
-            <div className="text-gray-400 text-sm">Certificates Issued</div>
           </GlassCard>
           
           <GlassCard className="text-center py-6">
