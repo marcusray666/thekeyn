@@ -30,6 +30,7 @@ import SimplifiedNFT from "@/pages/simplified-nft";
 import SubscriptionManagement from "@/pages/subscription-management";
 import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
+import Studio from "@/pages/studio";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedHome() {
@@ -70,6 +71,7 @@ function Router() {
       {isAuthenticated && (
         <>
           <Route path="/home" component={Home} />
+          <Route path="/studio" component={Studio} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
           <Route path="/analytics" component={Analytics} />
