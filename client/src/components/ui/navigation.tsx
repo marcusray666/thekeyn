@@ -155,16 +155,16 @@ export function Navigation() {
         {/* Mobile menu dropdown */}
         {isMenuOpen && (
           <div 
-            className="md:hidden bg-gray-900/98 border-t border-gray-700 shadow-2xl"
-            style={{ position: 'fixed', top: '64px', left: '0', right: '0', zIndex: 9999 }}
+            className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 shadow-2xl z-50"
+            onClick={() => setIsMenuOpen(false)}
           >
-            <div className="px-4 py-4 space-y-2 max-h-[calc(100vh-64px)] overflow-y-auto"
+            <div className="px-4 py-6 space-y-3 h-full overflow-y-auto"
               onClick={(e) => e.stopPropagation()}>
-              <div className="text-green-400 text-xs mb-2">✓ Mobile Menu Active</div>
+              <div className="text-green-400 text-sm mb-4 font-medium">✓ Mobile Menu Active</div>
               
               {/* Main Navigation Items */}
-              <div className="space-y-2">
-                <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              <div className="space-y-3">
+                <div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wide">
                   Navigation
                 </div>
                 {navItems.map((item) => (
@@ -172,13 +172,13 @@ export function Navigation() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                    className={`flex items-center space-x-4 px-4 py-4 rounded-xl text-lg font-medium transition-all ${
                       location === item.href
                         ? "text-white bg-purple-600/30 border border-purple-500/50 shadow-lg"
                         : "text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-md"
                     }`}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-6 w-6" />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 ))}
@@ -186,69 +186,69 @@ export function Navigation() {
 
               {/* User Profile Section */}
               {isAuthenticated ? (
-                <div className="pt-4 border-t border-gray-700 space-y-3">
-                  <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                <div className="pt-6 border-t border-gray-700 space-y-4">
+                  <div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wide">
                     User Profile
                   </div>
-                  <div className="px-4 py-3 bg-purple-600/20 rounded-xl border border-purple-500/30">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
+                  <div className="px-4 py-4 bg-purple-600/20 rounded-xl border border-purple-500/30">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-white truncate">{user?.username}</p>
-                        <p className="text-xs text-gray-300 truncate">{user?.email}</p>
+                        <p className="font-semibold text-white text-lg truncate">{user?.username}</p>
+                        <p className="text-sm text-gray-300 truncate">{user?.email}</p>
                       </div>
                     </div>
                   </div>
                   
                   <Link 
                     href={`/showcase/${user?.username}`}
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Sparkles className="h-5 w-5" />
+                    <Sparkles className="h-6 w-6" />
                     <span className="font-medium">Portfolio Showcase</span>
                   </Link>
                   
                   <Link 
                     href={`/profile/${user?.username}`}
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <User className="h-5 w-5" />
+                    <User className="h-6 w-6" />
                     <span className="font-medium">View Profile</span>
                   </Link>
                   
-                  <div className="pt-3 border-t border-gray-700 space-y-2">
-                    <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  <div className="pt-4 border-t border-gray-700 space-y-3">
+                    <div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wide">
                       Account & Tools
                     </div>
                     
                     <Link
                       href="/settings"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Settings className="h-5 w-5" />
+                      <Settings className="h-6 w-6" />
                       <span className="font-medium">Settings</span>
                     </Link>
 
                     <Link
                       href="/report-theft"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Award className="h-5 w-5" />
+                      <Award className="h-6 w-6" />
                       <span className="font-medium">Report Theft</span>
                     </Link>
 
                     <Link
                       href="/analytics"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Sparkles className="h-5 w-5" />
+                      <Sparkles className="h-6 w-6" />
                       <span className="font-medium">Analytics</span>
                     </Link>
                     
@@ -256,28 +256,28 @@ export function Navigation() {
                       variant="ghost"
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
-                      className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start"
+                      className="w-full flex items-center space-x-4 px-4 py-4 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start text-lg"
                     >
-                      <LogOut className="h-5 w-5" />
+                      <LogOut className="h-6 w-6" />
                       <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-gray-700 space-y-3">
-                  <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                <div className="pt-6 border-t border-gray-700 space-y-4">
+                  <div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wide">
                     Account
                   </div>
                   <Link
                     href="/login"
-                    className="block px-4 py-3 rounded-xl text-center font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                    className="block px-6 py-4 rounded-xl text-center font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block px-4 py-3 rounded-xl text-center font-medium btn-glass"
+                    className="block px-6 py-4 rounded-xl text-center font-medium btn-glass text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign Up
