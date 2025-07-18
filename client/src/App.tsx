@@ -73,7 +73,8 @@ function Router() {
       <Route path="/report-theft/:id" component={ReportTheft} />
       
       {/* Profile showcase routes */}
-      <Route path="/profile/:username" component={ProfileShowcase} />
+      <Route path="/showcase/:username" component={ProfileShowcase} />
+      <Route path="/portfolio/:username" component={ProfileShowcase} />
       
       <Route component={NotFound} />
     </Switch>

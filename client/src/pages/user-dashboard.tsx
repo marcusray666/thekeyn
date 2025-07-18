@@ -256,14 +256,23 @@ export default function UserDashboard() {
               </div>
             </div>
             
-            <Button
-              onClick={() => setLocation('/settings')}
-              variant="outline"
-              className="w-full border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Account Settings
-            </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={() => setLocation('/settings')}
+                variant="outline"
+                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Button>
+              <Button
+                onClick={() => setLocation(`/showcase/${user?.username}`)}
+                className="btn-glass"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Portfolio
+              </Button>
+            </div>
           </div>
         </GlassCard>
 

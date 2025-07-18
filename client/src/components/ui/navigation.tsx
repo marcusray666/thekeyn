@@ -103,6 +103,13 @@ export function Navigation() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-gray-800 border-gray-700">
+                    <DropdownMenuItem 
+                      onClick={() => setLocation(`/showcase/${user?.username}`)}
+                      className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Portfolio Showcase
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
                         <User className="mr-2 h-4 w-4" />
