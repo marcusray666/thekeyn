@@ -155,10 +155,11 @@ export function Navigation() {
         {/* Mobile menu dropdown */}
         {isMenuOpen && (
           <div 
-            className="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 z-40 shadow-2xl"
+            className="block md:hidden fixed top-16 left-0 right-0 bg-gray-900 backdrop-blur-md border-t border-gray-700 z-[9999] shadow-2xl min-h-[200px]"
             onClick={() => setIsMenuOpen(false)}
           >
-            <div className="px-4 py-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-4 space-y-2 bg-gray-900 text-white" onClick={(e) => e.stopPropagation()}>
+              <div className="text-red-400 text-sm">DEBUG: Menu is open - isMenuOpen: {isMenuOpen.toString()}</div>
               
               {/* Main Navigation Items */}
               <div className="space-y-2">
