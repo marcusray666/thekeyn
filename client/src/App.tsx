@@ -7,6 +7,8 @@ import { Navigation } from "@/components/ui/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { FullScreenLoader } from "@/components/ui/liquid-glass-loader";
 import { ThemeProvider } from "@/components/theme-provider";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -30,6 +32,19 @@ import Social from "@/pages/social";
 import ProfileShowcase from "@/pages/profile-showcase";
 import NotFound from "@/pages/not-found";
 
+function AuthenticatedHome() {
+  const { user } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (user?.username) {
+      setLocation(`/showcase/${user.username}`);
+    }
+  }, [user?.username, setLocation]);
+
+  return <FullScreenLoader text="Loading your portfolio..." />;
+}
+
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -43,7 +58,7 @@ function Router() {
     <Switch>
       {/* Public routes */}
       <Route path="/">
-        {isAuthenticated ? <ProfileShowcase /> : <Welcome />}
+        {isAuthenticated ? <AuthenticatedHome /> : <Welcome />}
       </Route>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />

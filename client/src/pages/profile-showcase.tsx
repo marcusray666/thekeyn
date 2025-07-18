@@ -79,8 +79,8 @@ export default function ProfileShowcase() {
   const [activeTab, setActiveTab] = useState('works');
   const [showQuickActions, setShowQuickActions] = useState(false);
   
-  // If no username provided, show current user's profile
-  const isOwnProfile = !username || username === user?.username;
+  // Check if this is the current user's profile
+  const isOwnProfile = username === user?.username;
 
   // Mock data for demonstration - replace with actual API calls
   const profile: CreatorProfile = {
