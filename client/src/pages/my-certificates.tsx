@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
+import { WorkImage } from "@/components/work-image";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +23,11 @@ interface Certificate {
     description: string;
     creatorName: string;
     originalName: string;
+    filename: string;
     mimeType: string;
+    fileSize: number;
+    fileHash: string;
+    blockchainHash: string;
     createdAt: string;
   };
 }
@@ -157,19 +162,12 @@ export default function MyCertificates() {
                 >
                   {/* Work Preview */}
                   <div className="mb-4">
-                    {certificate.work.mimeType.startsWith('image/') ? (
-                      <div className="w-full h-32 bg-gray-700 rounded-lg flex items-center justify-center">
-                        <Image className="h-8 w-8 text-gray-400" />
-                        <span className="ml-2 text-sm text-gray-400">Image</span>
-                      </div>
-                    ) : (
-                      <div className="w-full h-32 bg-gray-700 rounded-lg flex items-center justify-center">
-                        <FileText className="h-8 w-8 text-gray-400" />
-                        <span className="ml-2 text-sm text-gray-400">
-                          {certificate.work.mimeType.split('/')[0].toUpperCase()}
-                        </span>
-                      </div>
-                    )}
+                    <WorkImage
+                      filename={certificate.work.filename}
+                      mimeType={certificate.work.mimeType}
+                      title={certificate.work.title}
+                      className="w-full h-32"
+                    />
                   </div>
 
                   {/* Certificate Info */}
