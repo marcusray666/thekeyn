@@ -1347,6 +1347,519 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Social Media API Routes
+  
+  // Post search and discovery
+  app.get("/api/social/posts/search", async (req, res) => {
+    try {
+      const { q, limit = 20, offset = 0 } = req.query;
+      
+      if (!q) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+      
+      const posts = await storage.searchPosts(q as string, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error searching posts:", error);
+      res.status(500).json({ error: "Failed to search posts" });
+    }
+  });
+
+  app.get("/api/social/posts/trending", async (req, res) => {
+    try {
+      const { limit = 10 } = req.query;
+      
+      const posts = await storage.getTrendingPosts(Number(limit));
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error getting trending posts:", error);
+      res.status(500).json({ error: "Failed to get trending posts" });
+    }
+  });
+
+  // Comments API
+  app.post("/api/social/posts/:id/comments", requireAuth, async (req: any, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session.userId;
+      const { content, parentId, mentionedUsers } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const comment = await storage.createComment({
+        postId,
+        userId,
+        content: content.trim(),
+        parentId: parentId || null,
+        mentionedUsers: mentionedUsers || [],
+      });
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  app.get("/api/social/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const { limit = 50, offset = 0 } = req.query;
+      
+      const comments = await storage.getPostComments(postId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(comments);
+    } catch (error) {
+      console.error("Error getting comments:", error);
+      res.status(500).json({ error: "Failed to get comments" });
+    }
+  });
+
+  app.put("/api/social/comments/:id", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      const { content } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const updatedComment = await storage.updateComment(commentId, {
+        content: content.trim(),
+      });
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      res.status(500).json({ error: "Failed to update comment" });
+    }
+  });
+
+  app.delete("/api/social/comments/:id", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.deleteComment(commentId, userId);
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  app.post("/api/social/comments/:id/like", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.likeComment(userId, commentId);
+      
+      res.json({ message: "Comment liked successfully" });
+    } catch (error) {
+      console.error("Error liking comment:", error);
+      res.status(500).json({ error: "Failed to like comment" });
+    }
+  });
+
+  // Following API
+  app.post("/api/social/users/:id/follow", requireAuth, async (req: any, res) => {
+    try {
+      const followingId = Number(req.params.id);
+      const followerId = req.session.userId;
+      
+      if (followerId === followingId) {
+        return res.status(400).json({ error: "Cannot follow yourself" });
+      }
+      
+      const follow = await storage.followUser(followerId, followingId);
+      
+      res.json(follow);
+    } catch (error) {
+      console.error("Error following user:", error);
+      res.status(500).json({ error: "Failed to follow user" });
+    }
+  });
+
+  app.delete("/api/social/users/:id/follow", requireAuth, async (req: any, res) => {
+    try {
+      const followingId = Number(req.params.id);
+      const followerId = req.session.userId;
+      
+      await storage.unfollowUser(followerId, followingId);
+      
+      res.json({ message: "User unfollowed successfully" });
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      res.status(500).json({ error: "Failed to unfollow user" });
+    }
+  });
+
+  app.get("/api/social/users/:id/following", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const { limit = 50, offset = 0 } = req.query;
+      
+      const following = await storage.getFollowing(userId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(following);
+    } catch (error) {
+      console.error("Error getting following:", error);
+      res.status(500).json({ error: "Failed to get following" });
+    }
+  });
+
+  app.get("/api/social/users/:id/followers", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const { limit = 50, offset = 0 } = req.query;
+      
+      const followers = await storage.getFollowers(userId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(followers);
+    } catch (error) {
+      console.error("Error getting followers:", error);
+      res.status(500).json({ error: "Failed to get followers" });
+    }
+  });
+
+  app.get("/api/social/users/:id/follow-stats", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      
+      const stats = await storage.getFollowStats(userId);
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting follow stats:", error);
+      res.status(500).json({ error: "Failed to get follow stats" });
+    }
+  });
+
+  // Notifications API
+  app.get("/api/notifications", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { unreadOnly = false, limit = 50, offset = 0 } = req.query;
+      
+      const notifications = await storage.getUserNotifications(userId, {
+        unreadOnly: unreadOnly === 'true',
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error getting notifications:", error);
+      res.status(500).json({ error: "Failed to get notifications" });
+    }
+  });
+
+  app.get("/api/notifications/unread-count", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      const count = await storage.getUnreadNotificationCount(userId);
+      
+      res.json({ count });
+    } catch (error) {
+      console.error("Error getting unread notification count:", error);
+      res.status(500).json({ error: "Failed to get unread notification count" });
+    }
+  });
+
+  app.post("/api/notifications/:id/read", requireAuth, async (req: any, res) => {
+    try {
+      const notificationId = Number(req.params.id);
+      
+      await storage.markNotificationRead(notificationId);
+      
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  app.post("/api/notifications/mark-all-read", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      await storage.markAllNotificationsRead(userId);
+      
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ error: "Failed to mark all notifications as read" });
+    }
+  });
+
+  // User preferences API
+  app.get("/api/user/preferences", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      const preferences = await storage.getUserPreferences(userId);
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error getting user preferences:", error);
+      res.status(500).json({ error: "Failed to get user preferences" });
+    }
+  });
+
+  app.put("/api/user/preferences", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const preferences = req.body;
+      
+      const updatedPreferences = await storage.updateUserPreferences(userId, preferences);
+      
+      res.json(updatedPreferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ error: "Failed to update user preferences" });
+    }
+  });
+
+  // Analytics API
+  app.get("/api/user/analytics", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { days = 30 } = req.query;
+      
+      const analytics = await storage.getUserAnalytics(userId, Number(days));
+      
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error getting user analytics:", error);
+      res.status(500).json({ error: "Failed to get user analytics" });
+    }
+  });
+
+  // Marketplace API
+  app.post("/api/marketplace/listings", requireAuth, async (req: any, res) => {
+    try {
+      const sellerId = req.session.userId;
+      const { workId, title, description, price, currency, licenseType, tags } = req.body;
+      
+      if (!workId || !title || !price || !licenseType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      const listing = await storage.createMarketplaceListing({
+        sellerId,
+        workId,
+        title,
+        description,
+        price,
+        currency,
+        licenseType,
+        tags,
+      });
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error creating marketplace listing:", error);
+      res.status(500).json({ error: "Failed to create marketplace listing" });
+    }
+  });
+
+  app.get("/api/marketplace/listings", async (req, res) => {
+    try {
+      const { category, priceMin, priceMax, limit = 20, offset = 0 } = req.query;
+      
+      const options: any = {
+        limit: Number(limit),
+        offset: Number(offset),
+      };
+      
+      if (category) options.category = category;
+      if (priceMin || priceMax) {
+        options.priceRange = [
+          Number(priceMin || 0),
+          Number(priceMax || 999999999)
+        ];
+      }
+      
+      const listings = await storage.getMarketplaceListings(options);
+      
+      res.json(listings);
+    } catch (error) {
+      console.error("Error getting marketplace listings:", error);
+      res.status(500).json({ error: "Failed to get marketplace listings" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      
+      const listing = await storage.getMarketplaceListing(listingId);
+      
+      if (!listing) {
+        return res.status(404).json({ error: "Listing not found" });
+      }
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error getting marketplace listing:", error);
+      res.status(500).json({ error: "Failed to get marketplace listing" });
+    }
+  });
+
+  app.put("/api/marketplace/listings/:id", requireAuth, async (req: any, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      const sellerId = req.session.userId;
+      const updates = req.body;
+      
+      const updatedListing = await storage.updateMarketplaceListing(listingId, updates);
+      
+      res.json(updatedListing);
+    } catch (error) {
+      console.error("Error updating marketplace listing:", error);
+      res.status(500).json({ error: "Failed to update marketplace listing" });
+    }
+  });
+
+  app.delete("/api/marketplace/listings/:id", requireAuth, async (req: any, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      const sellerId = req.session.userId;
+      
+      await storage.deleteMarketplaceListing(listingId, sellerId);
+      
+      res.json({ message: "Listing deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting marketplace listing:", error);
+      res.status(500).json({ error: "Failed to delete marketplace listing" });
+    }
+  });
+
+  // Collaboration API
+  app.post("/api/collaboration/projects", requireAuth, async (req: any, res) => {
+    try {
+      const ownerId = req.session.userId;
+      const { title, description, type, maxCollaborators, deadline, budget, tags, requirements } = req.body;
+      
+      if (!title || !type) {
+        return res.status(400).json({ error: "Title and type are required" });
+      }
+      
+      const project = await storage.createCollaborationProject({
+        ownerId,
+        title,
+        description,
+        type,
+        maxCollaborators,
+        deadline,
+        budget,
+        tags,
+        requirements,
+      });
+      
+      res.json(project);
+    } catch (error) {
+      console.error("Error creating collaboration project:", error);
+      res.status(500).json({ error: "Failed to create collaboration project" });
+    }
+  });
+
+  app.get("/api/collaboration/projects", async (req, res) => {
+    try {
+      const { userId, status, limit = 20, offset = 0 } = req.query;
+      
+      const projects = await storage.getCollaborationProjects({
+        userId: userId ? Number(userId) : undefined,
+        status: status as string,
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(projects);
+    } catch (error) {
+      console.error("Error getting collaboration projects:", error);
+      res.status(500).json({ error: "Failed to get collaboration projects" });
+    }
+  });
+
+  app.get("/api/collaboration/projects/:id", async (req, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      
+      const project = await storage.getCollaborationProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      res.json(project);
+    } catch (error) {
+      console.error("Error getting collaboration project:", error);
+      res.status(500).json({ error: "Failed to get collaboration project" });
+    }
+  });
+
+  app.post("/api/collaboration/projects/:id/join", requireAuth, async (req: any, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      const userId = req.session.userId;
+      const { role = 'collaborator' } = req.body;
+      
+      const collaborator = await storage.joinCollaborationProject(projectId, userId, role);
+      
+      res.json(collaborator);
+    } catch (error) {
+      console.error("Error joining collaboration project:", error);
+      res.status(500).json({ error: "Failed to join collaboration project" });
+    }
+  });
+
+  app.post("/api/collaboration/projects/:id/leave", requireAuth, async (req: any, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.leaveCollaborationProject(projectId, userId);
+      
+      res.json({ message: "Left collaboration project successfully" });
+    } catch (error) {
+      console.error("Error leaving collaboration project:", error);
+      res.status(500).json({ error: "Failed to leave collaboration project" });
+    }
+  });
+
+  // Content categories API
+  app.get("/api/content/categories", async (req, res) => {
+    try {
+      const categories = await storage.getContentCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error getting content categories:", error);
+      res.status(500).json({ error: "Failed to get content categories" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

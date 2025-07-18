@@ -15,7 +15,10 @@ import {
   Edit,
   Trash2,
   BookmarkPlus,
-  Flag
+  Flag,
+  TrendingUp,
+  Bell,
+  ShoppingCart
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -27,6 +30,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CommentsSection from "@/components/CommentsSection";
+import SearchBar from "@/components/SearchBar";
+import NotificationCenter from "@/components/NotificationCenter";
+import TrendingSection from "@/components/TrendingSection";
+import MarketplaceSection from "@/components/MarketplaceSection";
+import FollowButton from "@/components/FollowButton";
+import PostCard from "@/components/PostCard";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,6 +75,7 @@ export default function Social() {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("feed");
   const [newPost, setNewPost] = useState({
     content: "",
     file: null as File | null,
@@ -71,69 +83,49 @@ export default function Social() {
   });
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [searchResults, setSearchResults] = useState<Post[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Mock data for the social feed
-  const mockPosts: Post[] = [
-    {
-      id: "1",
-      userId: "user1",
-      username: "artisan_creator",
-      userImage: undefined,
-      content: "Just finished this digital artwork! Inspired by the cosmic energy of liquid glass. What do you think? 🎨✨",
-      imageUrl: "/api/placeholder/600/400",
-      fileType: "image",
-      createdAt: "2024-07-18T10:30:00Z",
-      likes: 42,
-      comments: 8,
-      shares: 3,
-      isLiked: false,
-      tags: ["digital-art", "cosmic", "liquid-glass"]
-    },
-    {
-      id: "2", 
-      userId: "user2",
-      username: "visual_poet",
-      userImage: undefined,
-      content: "Protecting my latest photography series with Loggin! Each image tells a story of urban landscapes and human connection.",
-      imageUrl: "/api/placeholder/600/600",
-      fileType: "image",
-      createdAt: "2024-07-18T08:15:00Z",
-      likes: 67,
-      comments: 12,
-      shares: 5,
-      isLiked: true,
-      tags: ["photography", "urban", "series"]
-    },
-    {
-      id: "3",
-      userId: "user3", 
-      username: "sound_architect",
-      userImage: undefined,
-      content: "New ambient track now protected and ready to share! This piece explores the intersection of technology and nature.",
-      fileType: "audio",
-      createdAt: "2024-07-18T06:45:00Z",
-      likes: 28,
-      comments: 4,
-      shares: 7,
-      isLiked: false,
-      tags: ["music", "ambient", "electronic"]
-    }
-  ];
-
-  const { data: posts = [] } = useQuery({
-    queryKey: ['/api/social/posts'],
-    queryFn: async () => {
-      const response = await fetch('/api/social/posts');
-      if (!response.ok) {
-        throw new Error('Failed to fetch posts');
-      }
-      return response.json();
-    },
+  // Real data from API
+  const { data: posts, isLoading: postsLoading } = useQuery({
+    queryKey: ["/api/social/posts"],
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  const { data: userFollowStats } = useQuery({
+    queryKey: [`/api/social/users/${user?.id}/follow-stats`],
+    enabled: !!user?.id,
+  });
+
+  // Search functionality
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    try {
+      const response = await apiRequest(`/api/social/posts/search?q=${encodeURIComponent(query)}`);
+      setSearchResults(response);
+      setShowSearchResults(true);
+    } catch (error) {
+      toast({
+        title: "Search Error",
+        description: "Failed to search posts",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowSearchResults(false);
+  };
+
+  const handleTrendingClick = () => {
+    setActiveTab("trending");
+  };
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: { content: string; tags?: string[] }) => {
@@ -252,6 +244,10 @@ export default function Social() {
     }
   };
 
+
+
+
+
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -291,44 +287,146 @@ export default function Social() {
             </Button>
           </motion.div>
 
-          {/* Search and Filters Section */}
+          {/* Enhanced Search Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <GlassCard className="p-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search posts, creators, or tags..."
-                    className="glass-input pl-12 py-3 text-lg"
-                  />
-                </div>
-                
-                <div className="flex gap-2 flex-wrap">
-                  {["all", "images", "audio", "following"].map((filter) => (
-                    <Button
-                      key={filter}
-                      variant={selectedFilter === filter ? "default" : "outline"}
-                      size="lg"
-                      onClick={() => setSelectedFilter(filter)}
-                      className={`capitalize px-6 py-3 ${
-                        selectedFilter === filter 
-                          ? "bg-purple-600 text-white shadow-lg" 
-                          : "border-gray-600 text-gray-300 hover:bg-white/5 hover:border-purple-500"
-                      }`}
-                    >
-                      {filter}
-                    </Button>
-                  ))}
-                </div>
+            <div className="flex items-center justify-between mb-4">
+              <SearchBar 
+                onSearch={handleSearch}
+                onClear={handleClearSearch}
+                onTrendingClick={handleTrendingClick}
+                currentQuery={searchQuery}
+                placeholder="Search posts, creators, content, and marketplace..."
+              />
+              <div className="flex items-center gap-2 ml-4">
+                <NotificationCenter />
+                {user && userFollowStats && (
+                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                    <span>{userFollowStats.followingCount} Following</span>
+                    <span>{userFollowStats.followersCount} Followers</span>
+                  </div>
+                )}
               </div>
-            </GlassCard>
+            </div>
+          </motion.div>
+
+          {/* Enhanced Tabs Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-8"
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 backdrop-blur-xl bg-white/5 border-white/10">
+                <TabsTrigger value="feed" className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Feed
+                </TabsTrigger>
+                <TabsTrigger value="trending" className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Trending
+                </TabsTrigger>
+                <TabsTrigger value="marketplace" className="flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4" />
+                  Marketplace
+                </TabsTrigger>
+                <TabsTrigger value="following" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Following
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="feed" className="mt-6">
+                {showSearchResults ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-white">
+                        Search Results for "{searchQuery}"
+                      </h3>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearSearch}
+                        className="border-white/10 text-white hover:bg-white/5"
+                      >
+                        Clear Search
+                      </Button>
+                    </div>
+                    {searchResults.length > 0 ? (
+                      <div className="space-y-6">
+                        {searchResults.map((post) => (
+                          <PostCard key={post.id} post={post} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <Search className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+                        <p className="text-gray-400">No posts found matching your search.</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {posts && posts.length > 0 ? (
+                      posts.map((post) => (
+                        <PostCard key={post.id} post={post} />
+                      ))
+                    ) : (
+                      <div className="text-center py-12">
+                        <GlassCard className="p-12">
+                          <Users className="mx-auto h-16 w-16 text-purple-400 mb-6" />
+                          <h3 className="text-xl font-semibold text-white mb-2">Welcome to the Community</h3>
+                          <p className="text-gray-400 mb-4">
+                            Share your protected artwork and connect with fellow creators
+                          </p>
+                          <Button
+                            onClick={() => setShowCreatePost(true)}
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create First Post
+                          </Button>
+                        </GlassCard>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="trending" className="mt-6">
+                <TrendingSection />
+              </TabsContent>
+              
+              <TabsContent value="marketplace" className="mt-6">
+                <MarketplaceSection />
+              </TabsContent>
+              
+              <TabsContent value="following" className="mt-6">
+                <div className="space-y-6">
+                  <div className="text-center py-12">
+                    <GlassCard className="p-12">
+                      <Users className="mx-auto h-16 w-16 text-green-400 mb-6" />
+                      <h3 className="text-xl font-semibold text-white mb-2">Follow Creators</h3>
+                      <p className="text-gray-400 mb-4">
+                        Discover and follow talented creators to see their latest work
+                      </p>
+                      <Button
+                        onClick={() => setActiveTab("feed")}
+                        className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
+                      >
+                        <Search className="mr-2 h-4 w-4" />
+                        Explore Community
+                      </Button>
+                    </GlassCard>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </motion.div>
 
 

@@ -202,6 +202,219 @@ export const insertPostSchema = createInsertSchema(posts).pick({
 export type Post = typeof posts.$inferSelect;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 
+// Post comments table
+export const postComments = pgTable("post_comments", {
+  id: serial("id").primaryKey(),
+  postId: text("post_id").references(() => posts.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  parentId: integer("parent_id").references(() => postComments.id), // For reply threads
+  content: text("content").notNull(),
+  mentionedUsers: text("mentioned_users").array().default([]),
+  likes: integer("likes").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Post reactions table (for different reaction types)
+export const postReactions = pgTable("post_reactions", {
+  id: serial("id").primaryKey(),
+  postId: text("post_id").references(() => posts.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // 'like', 'love', 'fire', 'star', etc.
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User following relationships
+export const userFollows = pgTable("user_follows", {
+  id: serial("id").primaryKey(),
+  followerId: integer("follower_id").references(() => users.id).notNull(),
+  followingId: integer("following_id").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Enhanced notifications system
+export const userNotifications = pgTable("user_notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // 'like', 'comment', 'follow', 'mention', 'post_share', 'work_featured'
+  fromUserId: integer("from_user_id").references(() => users.id),
+  postId: text("post_id").references(() => posts.id),
+  workId: integer("work_id").references(() => works.id),
+  commentId: integer("comment_id").references(() => postComments.id),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false),
+  actionUrl: text("action_url"), // Link to relevant content
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Content categories and tags
+export const contentCategories = pgTable("content_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  icon: text("icon"), // Icon identifier
+  color: text("color"), // Color code
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User preferences and settings
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  emailNotifications: boolean("email_notifications").default(true),
+  pushNotifications: boolean("push_notifications").default(true),
+  publicProfile: boolean("public_profile").default(true),
+  showEmail: boolean("show_email").default(false),
+  allowMessages: boolean("allow_messages").default(true),
+  contentFilters: text("content_filters").array().default([]),
+  preferredCategories: text("preferred_categories").array().default([]),
+  language: text("language").default("en"),
+  timezone: text("timezone").default("UTC"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User analytics and metrics
+export const userAnalytics = pgTable("user_analytics", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  date: timestamp("date").defaultNow(),
+  profileViews: integer("profile_views").default(0),
+  postViews: integer("post_views").default(0),
+  workViews: integer("work_views").default(0),
+  newFollowers: integer("new_followers").default(0),
+  totalEngagement: integer("total_engagement").default(0), // likes + comments + shares
+  revenue: integer("revenue").default(0), // in cents
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketplace for selling protected works
+export const marketplace = pgTable("marketplace", {
+  id: serial("id").primaryKey(),
+  workId: integer("work_id").references(() => works.id).notNull(),
+  sellerId: integer("seller_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  price: integer("price").notNull(), // in cents
+  currency: text("currency").default("USD"),
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  licenseType: text("license_type").notNull(), // 'personal', 'commercial', 'exclusive'
+  tags: text("tags").array().default([]),
+  views: integer("views").default(0),
+  favorites: integer("favorites").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Purchase history
+export const purchases = pgTable("purchases", {
+  id: serial("id").primaryKey(),
+  buyerId: integer("buyer_id").references(() => users.id).notNull(),
+  sellerId: integer("seller_id").references(() => users.id).notNull(),
+  listingId: integer("listing_id").references(() => marketplace.id).notNull(),
+  workId: integer("work_id").references(() => works.id).notNull(),
+  amount: integer("amount").notNull(), // in cents
+  currency: text("currency").default("USD"),
+  status: text("status").notNull().default("completed"), // 'pending', 'completed', 'refunded'
+  transactionId: text("transaction_id"),
+  licenseGranted: text("license_granted").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Collaboration projects
+export const collaborationProjects = pgTable("collaboration_projects", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  ownerId: integer("owner_id").references(() => users.id).notNull(),
+  status: text("status").notNull().default("active"), // 'active', 'completed', 'cancelled'
+  type: text("type").notNull(), // 'music', 'art', 'video', 'mixed'
+  maxCollaborators: integer("max_collaborators").default(10),
+  deadline: timestamp("deadline"),
+  budget: integer("budget"), // in cents
+  tags: text("tags").array().default([]),
+  requirements: text("requirements"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Project collaborators
+export const projectCollaborators = pgTable("project_collaborators", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => collaborationProjects.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull(), // 'owner', 'collaborator', 'reviewer'
+  permissions: text("permissions").array().default([]), // 'edit', 'comment', 'share', 'export'
+  joinedAt: timestamp("joined_at").defaultNow(),
+  contribution: text("contribution"), // Description of their contribution
+  status: text("status").notNull().default("active"), // 'active', 'left', 'removed'
+});
+
+// Insert schemas for new tables
+export const insertPostCommentSchema = createInsertSchema(postComments).pick({
+  postId: true,
+  content: true,
+  parentId: true,
+  mentionedUsers: true,
+});
+
+export const insertUserFollowSchema = createInsertSchema(userFollows).pick({
+  followerId: true,
+  followingId: true,
+});
+
+export const insertUserNotificationSchema = createInsertSchema(userNotifications).pick({
+  userId: true,
+  type: true,
+  fromUserId: true,
+  postId: true,
+  workId: true,
+  commentId: true,
+  title: true,
+  message: true,
+  actionUrl: true,
+});
+
+export const insertMarketplaceSchema = createInsertSchema(marketplace).pick({
+  workId: true,
+  title: true,
+  description: true,
+  price: true,
+  currency: true,
+  licenseType: true,
+  tags: true,
+});
+
+export const insertCollaborationProjectSchema = createInsertSchema(collaborationProjects).pick({
+  title: true,
+  description: true,
+  type: true,
+  maxCollaborators: true,
+  deadline: true,
+  budget: true,
+  tags: true,
+  requirements: true,
+});
+
+// Type exports
+export type PostComment = typeof postComments.$inferSelect;
+export type InsertPostComment = z.infer<typeof insertPostCommentSchema>;
+export type UserFollow = typeof userFollows.$inferSelect;
+export type InsertUserFollow = z.infer<typeof insertUserFollowSchema>;
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type InsertUserNotification = z.infer<typeof insertUserNotificationSchema>;
+export type ContentCategory = typeof contentCategories.$inferSelect;
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type UserAnalytic = typeof userAnalytics.$inferSelect;
+export type MarketplaceListing = typeof marketplace.$inferSelect;
+export type InsertMarketplaceListing = z.infer<typeof insertMarketplaceSchema>;
+export type Purchase = typeof purchases.$inferSelect;
+export type CollaborationProject = typeof collaborationProjects.$inferSelect;
+export type InsertCollaborationProject = z.infer<typeof insertCollaborationProjectSchema>;
+export type ProjectCollaborator = typeof projectCollaborators.$inferSelect;
+
 // Social media tables
 export const follows = pgTable("follows", {
   id: serial("id").primaryKey(),

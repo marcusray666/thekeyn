@@ -1,6 +1,17 @@
-import { users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, type Post, type InsertPost, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, type Share, type InsertShare, type Notification, type InsertNotification } from "@shared/schema";
+import { 
+  users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications,
+  postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
+  marketplace, purchases, collaborationProjects, projectCollaborators,
+  type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
+  type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, 
+  type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
+  type UserNotification, type InsertUserNotification, type ContentCategory, type UserPreference, type UserAnalytic,
+  type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
+  type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
+  type Share, type InsertShare, type Notification, type InsertNotification 
+} from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -53,12 +64,61 @@ export interface IStorage {
   
   // Posts functionality
   createPost(post: InsertPost & { userId: number }): Promise<Post>;
-  getPosts(options?: { userId?: number; limit?: number; offset?: number }): Promise<(Post & { username: string })[]>;
+  getPosts(options?: { userId?: number; limit?: number; offset?: number; category?: string; following?: boolean }): Promise<(Post & { username: string; userImage?: string; isFollowing?: boolean })[]>;
   getPost(id: string): Promise<Post | undefined>;
   updatePost(id: string, updates: Partial<Post>): Promise<Post>;
   likePost(userId: number, postId: string): Promise<void>;
   unlikePost(userId: number, postId: string): Promise<void>;
   deletePost(id: string, userId: number): Promise<void>;
+  searchPosts(query: string, options?: { limit?: number; offset?: number }): Promise<(Post & { username: string })[]>;
+  getTrendingPosts(limit?: number): Promise<(Post & { username: string })[]>;
+  
+  // Comments functionality
+  createComment(comment: InsertPostComment & { userId: number }): Promise<PostComment>;
+  getPostComments(postId: string, options?: { limit?: number; offset?: number }): Promise<(PostComment & { username: string; userImage?: string })[]>;
+  updateComment(id: number, updates: Partial<PostComment>): Promise<PostComment>;
+  deleteComment(id: number, userId: number): Promise<void>;
+  likeComment(userId: number, commentId: number): Promise<void>;
+  
+  // Following functionality
+  followUser(followerId: number, followingId: number): Promise<UserFollow>;
+  unfollowUser(followerId: number, followingId: number): Promise<void>;
+  isFollowing(followerId: number, followingId: number): Promise<boolean>;
+  getFollowers(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
+  getFollowing(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
+  getFollowStats(userId: number): Promise<{ followers: number; following: number }>;
+  
+  // Notifications functionality
+  createNotification(notification: InsertUserNotification): Promise<UserNotification>;
+  getUserNotifications(userId: number, options?: { unreadOnly?: boolean; limit?: number; offset?: number }): Promise<UserNotification[]>;
+  markNotificationRead(notificationId: number): Promise<void>;
+  markAllNotificationsRead(userId: number): Promise<void>;
+  getUnreadNotificationCount(userId: number): Promise<number>;
+  
+  // User preferences
+  getUserPreferences(userId: number): Promise<UserPreference | undefined>;
+  updateUserPreferences(userId: number, preferences: Partial<UserPreference>): Promise<UserPreference>;
+  
+  // Analytics
+  getUserAnalytics(userId: number, days?: number): Promise<UserAnalytic[]>;
+  recordUserActivity(userId: number, activity: Partial<UserAnalytic>): Promise<void>;
+  
+  // Marketplace
+  createMarketplaceListing(listing: InsertMarketplaceListing & { sellerId: number }): Promise<MarketplaceListing>;
+  getMarketplaceListings(options?: { category?: string; priceRange?: [number, number]; limit?: number; offset?: number }): Promise<(MarketplaceListing & { sellerName: string })[]>;
+  getMarketplaceListing(id: number): Promise<MarketplaceListing | undefined>;
+  updateMarketplaceListing(id: number, updates: Partial<MarketplaceListing>): Promise<MarketplaceListing>;
+  deleteMarketplaceListing(id: number, sellerId: number): Promise<void>;
+  
+  // Collaboration
+  createCollaborationProject(project: InsertCollaborationProject & { ownerId: number }): Promise<CollaborationProject>;
+  getCollaborationProjects(options?: { userId?: number; status?: string; limit?: number; offset?: number }): Promise<(CollaborationProject & { ownerName: string })[]>;
+  getCollaborationProject(id: number): Promise<CollaborationProject | undefined>;
+  joinCollaborationProject(projectId: number, userId: number, role: string): Promise<ProjectCollaborator>;
+  leaveCollaborationProject(projectId: number, userId: number): Promise<void>;
+  
+  // Content categories
+  getContentCategories(): Promise<ContentCategory[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -474,6 +534,548 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(posts)
       .where(eq(posts.id, id));
+  }
+
+  async searchPosts(query: string, options: { limit?: number; offset?: number } = {}): Promise<(Post & { username: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    // Simple text search in content and tags
+    const searchResults = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        fileType: posts.fileType,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(
+        // Search in content or tags
+        sql`${posts.content} ILIKE ${`%${query}%`} OR ${posts.tags}::text ILIKE ${`%${query}%`}`
+      )
+      .orderBy(desc(posts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return searchResults;
+  }
+
+  async getTrendingPosts(limit = 10): Promise<(Post & { username: string })[]> {
+    // Get posts with high engagement in the last 7 days
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const trendingPosts = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        fileType: posts.fileType,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(gte(posts.createdAt, weekAgo))
+      .orderBy(desc(sql`${posts.likes} + ${posts.comments} + ${posts.shares}`))
+      .limit(limit);
+
+    return trendingPosts;
+  }
+
+  // Comments functionality
+  async createComment(commentData: InsertPostComment & { userId: number }): Promise<PostComment> {
+    const [comment] = await db
+      .insert(postComments)
+      .values({
+        postId: commentData.postId,
+        userId: commentData.userId,
+        content: commentData.content,
+        parentId: commentData.parentId,
+        mentionedUsers: commentData.mentionedUsers || [],
+      })
+      .returning();
+    
+    // Increment comment count on post
+    await db
+      .update(posts)
+      .set({ 
+        comments: sql`${posts.comments} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, commentData.postId));
+    
+    return comment;
+  }
+
+  async getPostComments(postId: string, options: { limit?: number; offset?: number } = {}): Promise<(PostComment & { username: string; userImage?: string })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const comments = await db
+      .select({
+        id: postComments.id,
+        postId: postComments.postId,
+        userId: postComments.userId,
+        parentId: postComments.parentId,
+        content: postComments.content,
+        mentionedUsers: postComments.mentionedUsers,
+        likes: postComments.likes,
+        createdAt: postComments.createdAt,
+        updatedAt: postComments.updatedAt,
+        username: users.username,
+        userImage: users.profileImageUrl,
+      })
+      .from(postComments)
+      .innerJoin(users, eq(postComments.userId, users.id))
+      .where(eq(postComments.postId, postId))
+      .orderBy(desc(postComments.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return comments;
+  }
+
+  async updateComment(id: number, updates: Partial<PostComment>): Promise<PostComment> {
+    const [updatedComment] = await db
+      .update(postComments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(postComments.id, id))
+      .returning();
+    
+    return updatedComment;
+  }
+
+  async deleteComment(id: number, userId: number): Promise<void> {
+    await db
+      .delete(postComments)
+      .where(eq(postComments.id, id));
+  }
+
+  async likeComment(userId: number, commentId: number): Promise<void> {
+    await db
+      .update(postComments)
+      .set({ 
+        likes: sql`${postComments.likes} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(postComments.id, commentId));
+  }
+
+  // Following functionality
+  async followUser(followerId: number, followingId: number): Promise<UserFollow> {
+    const [follow] = await db
+      .insert(userFollows)
+      .values({ followerId, followingId })
+      .returning();
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`${users.followingCount} + 1` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`${users.followerCount} + 1` })
+      .where(eq(users.id, followingId));
+    
+    return follow;
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    await db
+      .delete(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ));
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`GREATEST(${users.followingCount} - 1, 0)` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`GREATEST(${users.followerCount} - 1, 0)` })
+      .where(eq(users.id, followingId));
+  }
+
+  async isFollowing(followerId: number, followingId: number): Promise<boolean> {
+    const [follow] = await db
+      .select()
+      .from(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ))
+      .limit(1);
+    
+    return !!follow;
+  }
+
+  async getFollowers(userId: number, options: { limit?: number; offset?: number } = {}): Promise<(User & { isFollowing?: boolean })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const followers = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        passwordHash: users.passwordHash,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionExpiresAt: users.subscriptionExpiresAt,
+        walletAddress: users.walletAddress,
+        displayName: users.displayName,
+        bio: users.bio,
+        profileImageUrl: users.profileImageUrl,
+        website: users.website,
+        location: users.location,
+        isVerified: users.isVerified,
+        followerCount: users.followerCount,
+        followingCount: users.followingCount,
+        totalLikes: users.totalLikes,
+        themePreference: users.themePreference,
+        settings: users.settings,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .innerJoin(userFollows, eq(users.id, userFollows.followerId))
+      .where(eq(userFollows.followingId, userId))
+      .orderBy(desc(userFollows.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return followers;
+  }
+
+  async getFollowing(userId: number, options: { limit?: number; offset?: number } = {}): Promise<(User & { isFollowing?: boolean })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const following = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        passwordHash: users.passwordHash,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionExpiresAt: users.subscriptionExpiresAt,
+        walletAddress: users.walletAddress,
+        displayName: users.displayName,
+        bio: users.bio,
+        profileImageUrl: users.profileImageUrl,
+        website: users.website,
+        location: users.location,
+        isVerified: users.isVerified,
+        followerCount: users.followerCount,
+        followingCount: users.followingCount,
+        totalLikes: users.totalLikes,
+        themePreference: users.themePreference,
+        settings: users.settings,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .innerJoin(userFollows, eq(users.id, userFollows.followingId))
+      .where(eq(userFollows.followerId, userId))
+      .orderBy(desc(userFollows.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return following;
+  }
+
+  async getFollowStats(userId: number): Promise<{ followers: number; following: number }> {
+    const user = await this.getUser(userId);
+    return {
+      followers: user?.followerCount || 0,
+      following: user?.followingCount || 0
+    };
+  }
+
+  // Notifications functionality
+  async createNotification(notification: InsertUserNotification): Promise<UserNotification> {
+    const [newNotification] = await db
+      .insert(userNotifications)
+      .values(notification)
+      .returning();
+    
+    return newNotification;
+  }
+
+  async getUserNotifications(userId: number, options: { unreadOnly?: boolean; limit?: number; offset?: number } = {}): Promise<UserNotification[]> {
+    const { unreadOnly = false, limit = 50, offset = 0 } = options;
+    
+    let query = db
+      .select()
+      .from(userNotifications)
+      .where(eq(userNotifications.userId, userId));
+    
+    if (unreadOnly) {
+      query = query.where(eq(userNotifications.isRead, false));
+    }
+    
+    return await query
+      .orderBy(desc(userNotifications.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async markNotificationRead(notificationId: number): Promise<void> {
+    await db
+      .update(userNotifications)
+      .set({ isRead: true })
+      .where(eq(userNotifications.id, notificationId));
+  }
+
+  async markAllNotificationsRead(userId: number): Promise<void> {
+    await db
+      .update(userNotifications)
+      .set({ isRead: true })
+      .where(eq(userNotifications.userId, userId));
+  }
+
+  async getUnreadNotificationCount(userId: number): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(userNotifications)
+      .where(and(
+        eq(userNotifications.userId, userId),
+        eq(userNotifications.isRead, false)
+      ));
+    
+    return result[0]?.count || 0;
+  }
+
+  // User preferences
+  async getUserPreferences(userId: number): Promise<UserPreference | undefined> {
+    const [preferences] = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, userId))
+      .limit(1);
+    
+    return preferences;
+  }
+
+  async updateUserPreferences(userId: number, preferences: Partial<UserPreference>): Promise<UserPreference> {
+    const [updatedPreferences] = await db
+      .insert(userPreferences)
+      .values({ userId, ...preferences })
+      .onConflictDoUpdate({
+        target: [userPreferences.userId],
+        set: { ...preferences, updatedAt: new Date() }
+      })
+      .returning();
+    
+    return updatedPreferences;
+  }
+
+  // Analytics
+  async getUserAnalytics(userId: number, days = 30): Promise<UserAnalytic[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const analytics = await db
+      .select()
+      .from(userAnalytics)
+      .where(and(
+        eq(userAnalytics.userId, userId),
+        gte(userAnalytics.date, startDate)
+      ))
+      .orderBy(desc(userAnalytics.date));
+    
+    return analytics;
+  }
+
+  async recordUserActivity(userId: number, activity: Partial<UserAnalytic>): Promise<void> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    await db
+      .insert(userAnalytics)
+      .values({ userId, date: today, ...activity })
+      .onConflictDoUpdate({
+        target: [userAnalytics.userId, userAnalytics.date],
+        set: {
+          profileViews: sql`${userAnalytics.profileViews} + ${activity.profileViews || 0}`,
+          postViews: sql`${userAnalytics.postViews} + ${activity.postViews || 0}`,
+          workViews: sql`${userAnalytics.workViews} + ${activity.workViews || 0}`,
+          newFollowers: sql`${userAnalytics.newFollowers} + ${activity.newFollowers || 0}`,
+          totalEngagement: sql`${userAnalytics.totalEngagement} + ${activity.totalEngagement || 0}`,
+          revenue: sql`${userAnalytics.revenue} + ${activity.revenue || 0}`,
+        }
+      });
+  }
+
+  // Marketplace
+  async createMarketplaceListing(listing: InsertMarketplaceListing & { sellerId: number }): Promise<MarketplaceListing> {
+    const [newListing] = await db
+      .insert(marketplace)
+      .values(listing)
+      .returning();
+    
+    return newListing;
+  }
+
+  async getMarketplaceListings(options: { category?: string; priceRange?: [number, number]; limit?: number; offset?: number } = {}): Promise<(MarketplaceListing & { sellerName: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    let query = db
+      .select({
+        id: marketplace.id,
+        workId: marketplace.workId,
+        sellerId: marketplace.sellerId,
+        title: marketplace.title,
+        description: marketplace.description,
+        price: marketplace.price,
+        currency: marketplace.currency,
+        isActive: marketplace.isActive,
+        isFeatured: marketplace.isFeatured,
+        licenseType: marketplace.licenseType,
+        tags: marketplace.tags,
+        views: marketplace.views,
+        favorites: marketplace.favorites,
+        createdAt: marketplace.createdAt,
+        updatedAt: marketplace.updatedAt,
+        sellerName: users.username,
+      })
+      .from(marketplace)
+      .innerJoin(users, eq(marketplace.sellerId, users.id))
+      .where(eq(marketplace.isActive, true))
+      .orderBy(desc(marketplace.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return await query;
+  }
+
+  async getMarketplaceListing(id: number): Promise<MarketplaceListing | undefined> {
+    const [listing] = await db
+      .select()
+      .from(marketplace)
+      .where(eq(marketplace.id, id))
+      .limit(1);
+    
+    return listing;
+  }
+
+  async updateMarketplaceListing(id: number, updates: Partial<MarketplaceListing>): Promise<MarketplaceListing> {
+    const [updatedListing] = await db
+      .update(marketplace)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(marketplace.id, id))
+      .returning();
+    
+    return updatedListing;
+  }
+
+  async deleteMarketplaceListing(id: number, sellerId: number): Promise<void> {
+    await db
+      .delete(marketplace)
+      .where(and(
+        eq(marketplace.id, id),
+        eq(marketplace.sellerId, sellerId)
+      ));
+  }
+
+  // Collaboration
+  async createCollaborationProject(project: InsertCollaborationProject & { ownerId: number }): Promise<CollaborationProject> {
+    const [newProject] = await db
+      .insert(collaborationProjects)
+      .values(project)
+      .returning();
+    
+    return newProject;
+  }
+
+  async getCollaborationProjects(options: { userId?: number; status?: string; limit?: number; offset?: number } = {}): Promise<(CollaborationProject & { ownerName: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    let query = db
+      .select({
+        id: collaborationProjects.id,
+        title: collaborationProjects.title,
+        description: collaborationProjects.description,
+        ownerId: collaborationProjects.ownerId,
+        status: collaborationProjects.status,
+        type: collaborationProjects.type,
+        maxCollaborators: collaborationProjects.maxCollaborators,
+        deadline: collaborationProjects.deadline,
+        budget: collaborationProjects.budget,
+        tags: collaborationProjects.tags,
+        requirements: collaborationProjects.requirements,
+        createdAt: collaborationProjects.createdAt,
+        updatedAt: collaborationProjects.updatedAt,
+        ownerName: users.username,
+      })
+      .from(collaborationProjects)
+      .innerJoin(users, eq(collaborationProjects.ownerId, users.id))
+      .orderBy(desc(collaborationProjects.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return await query;
+  }
+
+  async getCollaborationProject(id: number): Promise<CollaborationProject | undefined> {
+    const [project] = await db
+      .select()
+      .from(collaborationProjects)
+      .where(eq(collaborationProjects.id, id))
+      .limit(1);
+    
+    return project;
+  }
+
+  async joinCollaborationProject(projectId: number, userId: number, role: string): Promise<ProjectCollaborator> {
+    const [collaborator] = await db
+      .insert(projectCollaborators)
+      .values({
+        projectId,
+        userId,
+        role,
+        permissions: ['edit', 'comment'],
+        status: 'active'
+      })
+      .returning();
+    
+    return collaborator;
+  }
+
+  async leaveCollaborationProject(projectId: number, userId: number): Promise<void> {
+    await db
+      .update(projectCollaborators)
+      .set({ status: 'left' })
+      .where(and(
+        eq(projectCollaborators.projectId, projectId),
+        eq(projectCollaborators.userId, userId)
+      ));
+  }
+
+  // Content categories
+  async getContentCategories(): Promise<ContentCategory[]> {
+    const categories = await db
+      .select()
+      .from(contentCategories)
+      .where(eq(contentCategories.isActive, true))
+      .orderBy(contentCategories.name);
+    
+    return categories;
   }
 }
 
