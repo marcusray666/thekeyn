@@ -134,7 +134,7 @@ body::before {
     transparent 50%);
   animation: liquidFloat 20s ease-in-out infinite;
   pointer-events: none;
-  z-index: -10;
+  z-index: -1;
 }
 
 @keyframes liquidFloat {
@@ -156,10 +156,10 @@ body::before {
 
 /* Navigation glass effect */
 nav, .nav-glass {
-  background: rgba(17, 24, 39, 0.95);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 100;
-  position: relative;
 }
 
 /* Card hover effects */
