@@ -118,20 +118,11 @@ export default function Welcome() {
               Join thousands of creators who trust Loggin' to secure their digital assets with blockchain technology.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <div className="flex justify-center items-center mb-8">
               <Link href="/register">
                 <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
                   <Plus className="mr-2 h-5 w-5" />
                   Get Started Free
-                </Button>
-              </Link>
-              <Link href="/upload">
-                <Button
-                  variant="outline"
-                  className="glass-morphism px-8 py-4 rounded-2xl font-semibold text-white text-lg hover:bg-opacity-80 transition-all"
-                >
-                  <Tag className="mr-2 h-5 w-5" />
-                  Try Demo
                 </Button>
               </Link>
             </div>
