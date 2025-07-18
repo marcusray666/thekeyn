@@ -5,6 +5,14 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 18, 2025):**
+- ✅ DATABASE ERROR RESOLUTION: Fixed PostgreSQL errors caused by invalid ID parameters in marketplace and social routes
+- ✅ PARAMETER VALIDATION: Added comprehensive validation for all numeric route parameters to prevent "NaN" database errors
+- ✅ CERTIFICATE IMAGE DISPLAY: Fixed My Certificates page to show actual uploaded images instead of placeholder text
+- ✅ WORK PREVIEW FUNCTIONALITY: Updated WorkImage component to use correct API endpoint for file serving
+- ✅ PROGRESS BAR ALIGNMENT: Fixed Creative Studio progress bar layout with centered step indicators and proper spacing
+- ✅ SUBSCRIPTION ROUTE FIX: Added missing subscription route to prevent 404 errors on upgrade buttons
+- ✅ API ERROR HANDLING: Improved error responses with proper HTTP status codes and clear messages
+- ✅ FILE SERVING ENDPOINT: Added `/api/files/:filename` endpoint for serving uploaded work previews
 - ✅ NATIVE MOBILE APP CONVERSION: Complete Capacitor integration for iOS and Android native apps
 - ✅ CAPACITOR SETUP: Full configuration with 11 native plugins (Camera, Haptics, Notifications, etc.)
 - ✅ NATIVE FEATURES SERVICE: Comprehensive mobile service layer with device integration
