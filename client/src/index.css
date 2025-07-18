@@ -155,7 +155,7 @@ body::before {
 }
 
 /* Navigation glass effect */
-nav {
+nav, .nav-glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
