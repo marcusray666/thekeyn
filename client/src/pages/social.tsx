@@ -11,7 +11,11 @@ import {
   Calendar,
   Eye,
   MoreHorizontal,
-  Upload
+  Upload,
+  Edit,
+  Trash2,
+  BookmarkPlus,
+  Flag
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -23,16 +27,31 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Post {
   id: string;
-  userId: string;
+  userId: number;
   username: string;
   userImage?: string;
   content: string;
   imageUrl?: string;
   fileType?: string;
   createdAt: string;
+  updatedAt?: string;
   likes: number;
   comments: number;
   shares: number;
@@ -50,6 +69,8 @@ export default function Social() {
     file: null as File | null,
     tags: [] as string[],
   });
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -143,6 +164,39 @@ export default function Social() {
     },
   });
 
+  const updatePostMutation = useMutation({
+    mutationFn: async ({ postId, content, tags }: { postId: string; content: string; tags: string[] }) => {
+      return await apiRequest(`/api/social/posts/${postId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content, tags }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      setShowEditDialog(false);
+      setEditingPost(null);
+      toast({
+        title: "Post updated!",
+        description: "Your post has been updated successfully.",
+      });
+    },
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      return await apiRequest(`/api/social/posts/${postId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      toast({
+        title: "Post deleted!",
+        description: "Your post has been deleted successfully.",
+      });
+    },
+  });
+
   const handleCreatePost = () => {
     if (!newPost.content.trim()) {
       toast({
@@ -168,6 +222,34 @@ export default function Social() {
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays}d ago`;
+  };
+
+  const handleEditPost = (post: Post) => {
+    setEditingPost(post);
+    setShowEditDialog(true);
+  };
+
+  const handleUpdatePost = () => {
+    if (!editingPost || !editingPost.content.trim()) {
+      toast({
+        title: "Content required",
+        description: "Please add some content to your post.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updatePostMutation.mutate({
+      postId: editingPost.id,
+      content: editingPost.content,
+      tags: editingPost.tags || [],
+    });
+  };
+
+  const handleDeletePost = (postId: string) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      deletePostMutation.mutate(postId);
+    }
   };
 
   const filteredPosts = posts.filter(post => {
@@ -336,9 +418,43 @@ export default function Social() {
                         </div>
                       </div>
                       
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          {post.userId === user?.id && (
+                            <>
+                              <DropdownMenuItem onClick={() => handleEditPost(post)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeletePost(post.id)}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                            </>
+                          )}
+                          <DropdownMenuItem>
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Share
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Flag className="w-4 h-4 mr-2" />
+                            Report
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <BookmarkPlus className="w-4 h-4 mr-2" />
+                            Save
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {/* Post Content */}
@@ -438,6 +554,39 @@ export default function Social() {
           </motion.div>
         </div>
       </div>
+
+      {/* Edit Post Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Post</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="What's on your mind?"
+              value={editingPost?.content || ""}
+              onChange={(e) => setEditingPost(prev => prev ? { ...prev, content: e.target.value } : null)}
+              className="min-h-[100px] resize-none"
+            />
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowEditDialog(false)}
+                className="text-gray-300 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdatePost}
+                disabled={updatePostMutation.isPending}
+                className="btn-glass"
+              >
+                {updatePostMutation.isPending ? "Updating..." : "Update Post"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

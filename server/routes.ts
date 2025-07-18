@@ -1283,6 +1283,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/social/posts/:postId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+      const { content, tags } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ message: "Post content is required" });
+      }
+
+      // Check if post exists and belongs to user
+      const existingPost = await storage.getPost(postId);
+      if (!existingPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ message: "You can only edit your own posts" });
+      }
+
+      const updatedPost = await storage.updatePost(postId, {
+        content: content.trim(),
+        tags: tags || [],
+        updatedAt: new Date()
+      });
+
+      res.json(updatedPost);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      res.status(500).json({ message: "Failed to update post" });
+    }
+  });
+
+  app.delete("/api/social/posts/:postId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Check if post exists and belongs to user
+      const existingPost = await storage.getPost(postId);
+      if (!existingPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ message: "You can only delete your own posts" });
+      }
+
+      await storage.deletePost(postId, userId);
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ message: "Failed to delete post" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

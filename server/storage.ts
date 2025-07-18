@@ -55,6 +55,7 @@ export interface IStorage {
   createPost(post: InsertPost & { userId: number }): Promise<Post>;
   getPosts(options?: { userId?: number; limit?: number; offset?: number }): Promise<(Post & { username: string })[]>;
   getPost(id: string): Promise<Post | undefined>;
+  updatePost(id: string, updates: Partial<Post>): Promise<Post>;
   likePost(userId: number, postId: string): Promise<void>;
   unlikePost(userId: number, postId: string): Promise<void>;
   deletePost(id: string, userId: number): Promise<void>;
@@ -457,6 +458,16 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(posts.id, postId));
+  }
+
+  async updatePost(id: string, updates: Partial<Post>): Promise<Post> {
+    const [updatedPost] = await db
+      .update(posts)
+      .set(updates)
+      .where(eq(posts.id, id))
+      .returning();
+    
+    return updatedPost;
   }
 
   async deletePost(id: string, userId: number): Promise<void> {
