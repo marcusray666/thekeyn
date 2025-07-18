@@ -133,18 +133,18 @@ export function Navigation() {
         
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 glass-morphism rounded-lg mt-2">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700">
+            <div className="px-4 py-3 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    location === item.href
-                      ? "text-white bg-white bg-opacity-10"
-                      : "text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5"
-                  }`}
                   onClick={() => setIsMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                    location === item.href
+                      ? "text-white bg-purple-600/20 border border-purple-500/30"
+                      : "text-gray-300 hover:text-white hover:bg-white/5"
+                  }`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>

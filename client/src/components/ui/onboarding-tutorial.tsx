@@ -140,31 +140,43 @@ export function OnboardingTutorial({ isOpen, onClose, onComplete }: OnboardingTu
     if (!targetPosition || !step.position) return {};
     
     const tooltipOffset = 20;
+    const isMobile = window.innerWidth < 768;
+    
+    // On mobile, always center the tooltip to avoid cutoff
+    if (isMobile) {
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        maxHeight: '80vh',
+        overflowY: 'auto',
+      };
+    }
     
     switch (step.position) {
       case 'bottom':
         return {
-          top: targetPosition.top + targetPosition.height + tooltipOffset,
-          left: targetPosition.left + (targetPosition.width / 2),
+          top: Math.min(targetPosition.top + targetPosition.height + tooltipOffset, window.innerHeight - 400),
+          left: Math.max(20, Math.min(targetPosition.left + (targetPosition.width / 2), window.innerWidth - 400)),
           transform: 'translateX(-50%)',
         };
       case 'top':
         return {
-          top: targetPosition.top - tooltipOffset,
-          left: targetPosition.left + (targetPosition.width / 2),
-          transform: 'translateX(-50%) translateY(-100%)',
+          top: Math.max(20, targetPosition.top - tooltipOffset - 300),
+          left: Math.max(20, Math.min(targetPosition.left + (targetPosition.width / 2), window.innerWidth - 400)),
+          transform: 'translateX(-50%)',
         };
       case 'right':
         return {
-          top: targetPosition.top + (targetPosition.height / 2),
-          left: targetPosition.left + targetPosition.width + tooltipOffset,
+          top: Math.max(20, Math.min(targetPosition.top + (targetPosition.height / 2), window.innerHeight - 200)),
+          left: Math.min(targetPosition.left + targetPosition.width + tooltipOffset, window.innerWidth - 420),
           transform: 'translateY(-50%)',
         };
       case 'left':
         return {
-          top: targetPosition.top + (targetPosition.height / 2),
-          left: targetPosition.left - tooltipOffset,
-          transform: 'translateY(-50%) translateX(-100%)',
+          top: Math.max(20, Math.min(targetPosition.top + (targetPosition.height / 2), window.innerHeight - 200)),
+          left: Math.max(20, targetPosition.left - tooltipOffset - 400),
+          transform: 'translateY(-50%)',
         };
       default:
         return {};
@@ -200,11 +212,13 @@ export function OnboardingTutorial({ isOpen, onClose, onComplete }: OnboardingTu
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }
         }
       >
-        <GlassCard className="w-96 max-w-[90vw]">
-          <div className="p-6">
+        <GlassCard className="w-96 max-w-[95vw] mx-4">
+          <div className="p-4 lg:p-6">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center">
