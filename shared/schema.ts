@@ -177,6 +177,31 @@ export const insertNftMintSchema = createInsertSchema(nftMints).pick({
 export type NftMint = typeof nftMints.$inferSelect;
 export type InsertNftMint = z.infer<typeof insertNftMintSchema>;
 
+// Social posts table for Community feed
+export const posts = pgTable("posts", {
+  id: text("id").primaryKey().notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  fileType: text("file_type"), // 'image', 'audio', 'video', etc.
+  tags: text("tags").array().default([]),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPostSchema = createInsertSchema(posts).pick({
+  content: true,
+  imageUrl: true,
+  fileType: true,
+  tags: true,
+});
+
+export type Post = typeof posts.$inferSelect;
+export type InsertPost = z.infer<typeof insertPostSchema>;
+
 // Social media tables
 export const follows = pgTable("follows", {
   id: serial("id").primaryKey(),

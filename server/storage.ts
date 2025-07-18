@@ -1,4 +1,4 @@
-import { users, works, certificates, copyrightApplications, nftMints, follows, likes, comments, shares, notifications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, type Share, type InsertShare, type Notification, type InsertNotification } from "@shared/schema";
+import { users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications, type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, type Post, type InsertPost, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, type Share, type InsertShare, type Notification, type InsertNotification } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -50,6 +50,14 @@ export interface IStorage {
   markNotificationRead(notificationId: number): Promise<void>;
   incrementWorkViews(workId: number): Promise<void>;
   getTrendingTags(limit?: number): Promise<string[]>;
+  
+  // Posts functionality
+  createPost(post: InsertPost & { userId: number }): Promise<Post>;
+  getPosts(options?: { userId?: number; limit?: number; offset?: number }): Promise<(Post & { username: string })[]>;
+  getPost(id: string): Promise<Post | undefined>;
+  likePost(userId: number, postId: string): Promise<void>;
+  unlikePost(userId: number, postId: string): Promise<void>;
+  deletePost(id: string, userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -372,6 +380,89 @@ export class DatabaseStorage implements IStorage {
 
   async getUserWorks(userId: number): Promise<Work[]> {
     return await db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt));
+  }
+
+  // Posts functionality implementation
+  async createPost(postData: InsertPost & { userId: number }): Promise<Post> {
+    const postId = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const [post] = await db
+      .insert(posts)
+      .values({
+        id: postId,
+        userId: postData.userId,
+        content: postData.content,
+        imageUrl: postData.imageUrl,
+        fileType: postData.fileType,
+        tags: postData.tags || [],
+      })
+      .returning();
+    
+    return post;
+  }
+
+  async getPosts(options: { userId?: number; limit?: number; offset?: number } = {}): Promise<(Post & { username: string })[]> {
+    const { limit = 20, offset = 0, userId } = options;
+    
+    let query = db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        fileType: posts.fileType,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .orderBy(desc(posts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    if (userId) {
+      query = query.where(eq(posts.userId, userId));
+    }
+
+    return await query;
+  }
+
+  async getPost(id: string): Promise<Post | undefined> {
+    const [post] = await db.select().from(posts).where(eq(posts.id, id));
+    return post || undefined;
+  }
+
+  async likePost(userId: number, postId: string): Promise<void> {
+    // For now, just increment the counter (in production, track individual likes)
+    await db
+      .update(posts)
+      .set({ 
+        likes: posts.likes + 1,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId));
+  }
+
+  async unlikePost(userId: number, postId: string): Promise<void> {
+    // For now, just decrement the counter (in production, track individual likes)
+    await db
+      .update(posts)
+      .set({ 
+        likes: Math.max(posts.likes - 1, 0),
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId));
+  }
+
+  async deletePost(id: string, userId: number): Promise<void> {
+    await db
+      .delete(posts)
+      .where(eq(posts.id, id));
   }
 }
 

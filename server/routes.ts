@@ -1205,6 +1205,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Posts endpoints
+  app.get("/api/social/posts", requireAuth, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = 20;
+      const offset = (page - 1) * limit;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+
+      const posts = await storage.getPosts({ limit, offset, userId });
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).json({ message: "Failed to fetch posts" });
+    }
+  });
+
+  app.post("/api/social/posts", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { content, imageUrl, fileType, tags } = req.body;
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ message: "Post content is required" });
+      }
+
+      const post = await storage.createPost({
+        userId,
+        content: content.trim(),
+        imageUrl,
+        fileType,
+        tags: tags || []
+      });
+
+      res.status(201).json(post);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
+
+  app.post("/api/social/posts/:postId/like", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      await storage.likePost(userId, postId);
+      res.json({ message: "Post liked successfully" });
+    } catch (error) {
+      console.error("Error liking post:", error);
+      res.status(500).json({ message: "Failed to like post" });
+    }
+  });
+
+  app.delete("/api/social/posts/:postId/like", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      await storage.unlikePost(userId, postId);
+      res.json({ message: "Post unliked successfully" });
+    } catch (error) {
+      console.error("Error unliking post:", error);
+      res.status(500).json({ message: "Failed to unlike post" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

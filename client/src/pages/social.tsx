@@ -103,16 +103,23 @@ export default function Social() {
     }
   ];
 
-  const { data: posts = mockPosts } = useQuery({
+  const { data: posts = [] } = useQuery({
     queryKey: ['/api/social/posts'],
-    // Using mock data for now
-    queryFn: () => Promise.resolve(mockPosts),
+    queryFn: async () => {
+      const response = await fetch('/api/social/posts');
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts');
+      }
+      return response.json();
+    },
   });
 
   const createPostMutation = useMutation({
-    mutationFn: async (postData: any) => {
-      // Mock API call
-      return Promise.resolve({ id: Date.now().toString(), ...postData });
+    mutationFn: async (postData: { content: string; tags?: string[] }) => {
+      return await apiRequest('/api/social/posts', {
+        method: 'POST',
+        body: JSON.stringify(postData),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
@@ -127,8 +134,9 @@ export default function Social() {
 
   const likePostMutation = useMutation({
     mutationFn: async (postId: string) => {
-      // Mock API call
-      return Promise.resolve({ postId, liked: true });
+      return await apiRequest(`/api/social/posts/${postId}/like`, {
+        method: 'POST',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
@@ -147,10 +155,7 @@ export default function Social() {
 
     createPostMutation.mutate({
       content: newPost.content,
-      file: newPost.file,
       tags: newPost.tags,
-      userId: user?.id,
-      username: user?.username,
     });
   };
 
