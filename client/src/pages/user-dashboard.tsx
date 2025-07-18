@@ -276,8 +276,8 @@ export default function UserDashboard() {
           </div>
         </GlassCard>
 
-        {/* Stats Overview - Removed "Certificates Issued" */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <GlassCard className="text-center py-6">
             <Shield className="mx-auto h-8 w-8 text-purple-400 mb-3" />
             <div className="text-3xl font-bold text-purple-400 mb-1">
@@ -292,14 +292,6 @@ export default function UserDashboard() {
               {dashboardStats.totalViews}
             </div>
             <div className="text-gray-400 text-sm">Total Views</div>
-          </GlassCard>
-          
-          <GlassCard className="text-center py-6">
-            <Calendar className="mx-auto h-8 w-8 text-orange-400 mb-3" />
-            <div className="text-3xl font-bold text-orange-400 mb-1">
-              {dashboardStats.thisMonth}
-            </div>
-            <div className="text-gray-400 text-sm">This Month</div>
           </GlassCard>
         </div>
 

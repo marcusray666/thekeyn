@@ -107,7 +107,7 @@ export default function DashboardRedesigned() {
         </div>
 
         {/* Stats Cards - Now Clickable */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Button
             onClick={() => setLocation('/certificates')}
             className="h-auto p-0 bg-transparent hover:bg-transparent"
@@ -131,19 +131,6 @@ export default function DashboardRedesigned() {
               </div>
               <div className="text-gray-300 font-medium">Total Views</div>
               <Eye className="h-6 w-6 text-emerald-400 mx-auto mt-2" />
-            </GlassCard>
-          </Button>
-
-          <Button
-            onClick={() => setLocation('/analytics')}
-            className="h-auto p-0 bg-transparent hover:bg-transparent"
-          >
-            <GlassCard className="w-full p-6 text-center hover:scale-105 transition-transform">
-              <div className="text-3xl font-bold text-blue-400 mb-2">
-                {stats?.thisMonth || 0}
-              </div>
-              <div className="text-gray-300 font-medium">This Month</div>
-              <Calendar className="h-6 w-6 text-blue-400 mx-auto mt-2" />
             </GlassCard>
           </Button>
         </div>
