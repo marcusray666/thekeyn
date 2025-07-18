@@ -239,9 +239,35 @@ export default function Studio() {
     setIsProcessing(false);
   };
 
-  const downloadCertificate = () => {
-    if (createdCertificate?.pdfPath) {
-      window.open(createdCertificate.pdfPath, '_blank');
+  const downloadCertificate = async () => {
+    if (createdCertificate?.certificateId) {
+      try {
+        // Generate and download PDF certificate
+        const response = await fetch(`/api/certificates/${createdCertificate.certificateId}/pdf`);
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `certificate-${createdCertificate.certificateId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } else {
+          toast({
+            title: "Download failed",
+            description: "Could not generate certificate PDF",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Download failed", 
+          description: "Error downloading certificate",
+          variant: "destructive",
+        });
+      }
     }
   };
 

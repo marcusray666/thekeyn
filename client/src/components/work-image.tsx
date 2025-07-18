@@ -24,7 +24,7 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     return (
       <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50`}>
         <img
-          src={`/uploads/${filename}`}
+          src={`/api/files/${filename}`}
           alt={title}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}

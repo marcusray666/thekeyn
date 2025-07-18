@@ -375,6 +375,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Serve uploaded files
+  app.get("/api/files/:filename", async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const filePath = path.join("uploads", filename);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File not found" });
+      }
+
+      // Set appropriate headers
+      const stat = fs.statSync(filePath);
+      res.setHeader('Content-Length', stat.size);
+      
+      // Set content type based on file extension
+      const ext = path.extname(filename).toLowerCase();
+      const contentTypeMap: { [key: string]: string } = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.pdf': 'application/pdf',
+        '.mp4': 'video/mp4',
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav',
+      };
+      
+      if (contentTypeMap[ext]) {
+        res.setHeader('Content-Type', contentTypeMap[ext]);
+      }
+      
+      // Stream the file
+      const readStream = fs.createReadStream(filePath);
+      readStream.pipe(res);
+    } catch (error) {
+      console.error("Error serving file:", error);
+      res.status(500).json({ error: "Failed to serve file" });
+    }
+  });
+
+  // Generate and download certificate PDF
+  app.get("/api/certificates/:id/pdf", async (req, res) => {
+    try {
+      const certificateId = req.params.id;
+      
+      // Find work by certificate ID
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      // Find certificate by work ID
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+      
+      // Generate PDF content
+      const pdfContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+              .header { text-align: center; margin-bottom: 40px; }
+              .title { color: #8B5CF6; font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+              .subtitle { color: #666; font-size: 18px; }
+              .content { max-width: 600px; margin: 0 auto; }
+              .section { margin-bottom: 30px; }
+              .label { font-weight: bold; color: #4A5568; }
+              .value { margin-top: 5px; color: #2D3748; }
+              .blockchain { background: #F7FAFC; padding: 20px; border-left: 4px solid #8B5CF6; margin: 20px 0; }
+              .footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="title">Loggin'</div>
+              <div class="subtitle">Digital Work Protection Certificate</div>
+            </div>
+            
+            <div class="content">
+              <div class="section">
+                <div class="label">Certificate ID:</div>
+                <div class="value">${certificate.certificateId}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Work Title:</div>
+                <div class="value">${work.title}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Creator:</div>
+                <div class="value">${work.creatorName}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Name:</div>
+                <div class="value">${work.originalName}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Type:</div>
+                <div class="value">${work.mimeType}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Size:</div>
+                <div class="value">${Math.round(work.fileSize / 1024)} KB</div>
+              </div>
+              
+              <div class="blockchain">
+                <div class="label">Blockchain Verification:</div>
+                <div class="value">${work.blockchainHash}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Protected On:</div>
+                <div class="value">${new Date(work.createdAt).toLocaleDateString()}</div>
+              </div>
+            </div>
+            
+            <div class="footer">
+              <p>This certificate serves as proof of digital work ownership and timestamp verification.</p>
+              <p>Certificate URL: ${certificate.shareableLink}</p>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="certificate-${certificateId}.pdf"`);
+      
+      // For now, return HTML that will be converted to PDF by the browser
+      res.setHeader('Content-Type', 'text/html');
+      res.send(pdfContent);
+      
+    } catch (error) {
+      console.error("Error generating certificate PDF:", error);
+      res.status(500).json({ error: "Failed to generate certificate PDF" });
+    }
+  });
+
   // Get dashboard stats
   app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

@@ -36,6 +36,7 @@ interface CertificateData {
     creatorName: string;
     collaborators?: string[];
     originalName: string;
+    filename: string;
     mimeType: string;
     fileSize: number;
     fileHash: string;

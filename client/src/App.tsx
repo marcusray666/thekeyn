@@ -71,6 +71,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
+      <Route path="/subscription" component={Subscription} />
       
       {/* Protected routes */}
       {isAuthenticated && (
