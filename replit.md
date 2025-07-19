@@ -4,7 +4,14 @@
 
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
-**Recent Updates (July 18, 2025):**
+**Recent Updates (July 19, 2025):**
+- ✅ POST DELETION FUNCTIONALITY: Fixed community post deletion with enhanced error handling and user ID validation
+- ✅ CUSTOM AUDIO PLAYER: Implemented professional audio player with play/pause, progress bar, volume control, and mute functionality
+- ✅ COMPREHENSIVE FILE FORMAT SUPPORT: Added support for all popular formats including .mov videos and extended audio/document formats
+- ✅ ENHANCED FILE TYPE DETECTION: Improved MIME type handling and backend validation for all media types
+- ✅ DATABASE CLEANUP: Removed problematic empty posts from community feed for better user experience
+
+**Previous Updates (July 18, 2025):**
 - ✅ DATABASE ERROR RESOLUTION: Fixed PostgreSQL errors caused by invalid ID parameters in marketplace and social routes
 - ✅ PARAMETER VALIDATION: Added comprehensive validation for all numeric route parameters to prevent "NaN" database errors
 - ✅ CERTIFICATE IMAGE DISPLAY: Fixed My Certificates page to show actual uploaded images instead of placeholder text
