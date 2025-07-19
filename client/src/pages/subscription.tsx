@@ -11,25 +11,18 @@ import { useLocation } from "wouter";
 import { Check, Crown, Sparkles, Users, Zap, Upload, Download, Palette, Cloud, Code } from "lucide-react";
 
 interface SubscriptionData {
-  subscription: any;
-  limits: {
-    tier: string;
-    uploadLimit: number;
-    hasDownloadableCertificates: boolean;
-    hasCustomBranding: boolean;
-    hasIPFSStorage: boolean;
-    hasAPIAccess: boolean;
-    teamSize: number;
-  };
-  usage: {
-    uploads: {
-      canUpload: boolean;
-      remainingUploads: number;
-      limit: number;
-    };
-    storage: number;
-    apiCalls: number;
-  };
+  tier: string;
+  uploadLimit: number;
+  uploadsUsed: number;
+  remainingUploads: number;
+  canUpload: boolean;
+  hasDownloadableCertificates: boolean;
+  hasCustomBranding: boolean;
+  hasIPFSStorage: boolean;
+  hasAPIAccess: boolean;
+  teamSize: number;
+  expiresAt?: string;
+  isActive: boolean;
 }
 
 const tierInfo = {
@@ -300,48 +293,26 @@ export default function Subscription() {
                   </Badge>
                 </div>
                 
-                {subscriptionData.subscription && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span>Status:</span>
-                      <Badge 
-                        variant={subscriptionData.subscription.status === 'active' ? 'default' : 'destructive'}
-                        className={subscriptionData.subscription.status === 'active' ? 'bg-green-500/20 text-green-100' : ''}
-                      >
-                        {subscriptionData.subscription.status}
-                      </Badge>
-                    </div>
-                    
-                    {subscriptionData.subscription.currentPeriodEnd && (
-                      <div className="flex items-center justify-between">
-                        <span>Next billing:</span>
-                        <span className="text-sm text-white/70">
-                          {new Date(subscriptionData.subscription.currentPeriodEnd).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-2 pt-2">
-                      {subscriptionData.subscription.cancelAtPeriodEnd ? (
-                        <Button
-                          onClick={() => reactivateSubscriptionMutation.mutate()}
-                          disabled={reactivateSubscriptionMutation.isPending}
-                          className="bg-green-500 hover:bg-green-600"
-                        >
-                          Reactivate Subscription
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => cancelSubscriptionMutation.mutate()}
-                          disabled={cancelSubscriptionMutation.isPending}
-                          variant="destructive"
-                        >
-                          Cancel Subscription
-                        </Button>
-                      )}
-                    </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span>Status:</span>
+                    <Badge 
+                      variant={subscriptionData.isActive ? 'default' : 'destructive'}
+                      className={subscriptionData.isActive ? 'bg-green-500/20 text-green-100' : ''}
+                    >
+                      {subscriptionData.isActive ? 'active' : 'inactive'}
+                    </Badge>
                   </div>
-                )}
+                  
+                  {subscriptionData.expiresAt && (
+                    <div className="flex items-center justify-between">
+                      <span>Expires:</span>
+                      <span className="text-sm text-white/70">
+                        {new Date(subscriptionData.expiresAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -361,12 +332,12 @@ export default function Subscription() {
                   <div className="flex items-center justify-between">
                     <span>Uploads</span>
                     <span className="text-sm">
-                      {subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads} / {subscriptionData.usage.uploads.limit === -1 ? '∞' : subscriptionData.usage.uploads.limit}
+                      {subscriptionData.uploadsUsed} / {subscriptionData.uploadLimit === -1 ? '∞' : subscriptionData.uploadLimit}
                     </span>
                   </div>
                   <Progress 
-                    value={subscriptionData.usage.uploads.limit === -1 ? 0 : 
-                      ((subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads) / subscriptionData.usage.uploads.limit) * 100
+                    value={subscriptionData.uploadLimit === -1 ? 0 : 
+                      (subscriptionData.uploadsUsed / subscriptionData.uploadLimit) * 100
                     } 
                     className="h-2"
                   />
@@ -374,15 +345,22 @@ export default function Subscription() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span>Storage Used</span>
-                    <span className="text-sm">{formatBytes(subscriptionData.usage.storage)}</span>
+                    <span>Can Upload</span>
+                    <Badge 
+                      variant={subscriptionData.canUpload ? 'default' : 'destructive'}
+                      className={subscriptionData.canUpload ? 'bg-green-500/20 text-green-100' : ''}
+                    >
+                      {subscriptionData.canUpload ? 'Yes' : 'No'}
+                    </Badge>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span>API Calls</span>
-                    <span className="text-sm">{subscriptionData.usage.apiCalls}</span>
+                    <span>Remaining Uploads</span>
+                    <span className="text-sm">
+                      {subscriptionData.remainingUploads === Infinity ? '∞' : subscriptionData.remainingUploads}
+                    </span>
                   </div>
                 </div>
               </CardContent>
