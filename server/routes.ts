@@ -1513,8 +1513,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = 20;
       const offset = (page - 1) * limit;
       const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      const currentUserId = req.session.userId;
 
-      const posts = await storage.getPosts({ limit, offset, userId });
+      const posts = await storage.getPosts({ limit, offset, userId, currentUserId });
       res.json(posts);
     } catch (error) {
       console.error("Error fetching posts:", error);

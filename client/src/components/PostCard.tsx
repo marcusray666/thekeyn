@@ -69,8 +69,10 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
 
   const likePostMutation = useMutation({
     mutationFn: async (postId: string) => {
+      // Toggle like/unlike based on current state
+      const method = post.isLiked ? 'DELETE' : 'POST';
       return await apiRequest(`/api/social/posts/${postId}/like`, {
-        method: 'POST',
+        method: method,
       });
     },
     onSuccess: () => {
@@ -78,6 +80,13 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
       toast({
         title: post.isLiked ? "Unliked" : "Liked!",
         description: post.isLiked ? "Removed from your likes" : "Added to your likes",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update like status",
+        variant: "destructive",
       });
     },
   });

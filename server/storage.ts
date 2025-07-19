@@ -67,7 +67,7 @@ export interface IStorage {
   
   // Posts functionality
   createPost(post: InsertPost & { userId: number }): Promise<Post>;
-  getPosts(options?: { userId?: number; limit?: number; offset?: number; category?: string; following?: boolean }): Promise<(Post & { username: string; userImage?: string; isFollowing?: boolean })[]>;
+  getPosts(options?: { userId?: number; limit?: number; offset?: number; category?: string; following?: boolean; currentUserId?: number }): Promise<(Post & { username: string; userImage?: string; isFollowing?: boolean })[]>;
   getPost(id: string): Promise<Post | undefined>;
   updatePost(id: string, updates: Partial<Post>): Promise<Post>;
   likePost(userId: number, postId: string): Promise<void>;
@@ -449,8 +449,8 @@ export class DatabaseStorage implements IStorage {
     return post;
   }
 
-  async getPosts(options: { userId?: number; limit?: number; offset?: number } = {}): Promise<(Post & { username: string })[]> {
-    const { limit = 20, offset = 0, userId } = options;
+  async getPosts(options: { userId?: number; limit?: number; offset?: number; currentUserId?: number } = {}): Promise<(Post & { username: string })[]> {
+    const { limit = 20, offset = 0, userId, currentUserId } = options;
     
     let query = db
       .select({
@@ -458,7 +458,10 @@ export class DatabaseStorage implements IStorage {
         userId: posts.userId,
         content: posts.content,
         imageUrl: posts.imageUrl,
+        filename: posts.filename,
         fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
         tags: posts.tags,
         likes: posts.likes,
         comments: posts.comments,
@@ -466,6 +469,12 @@ export class DatabaseStorage implements IStorage {
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         username: users.username,
+        isLiked: sql<boolean>`EXISTS (
+          SELECT 1 FROM ${postReactions} 
+          WHERE ${postReactions.postId} = ${posts.id} 
+          AND ${postReactions.userId} = ${currentUserId || -1}
+          AND ${postReactions.type} = 'like'
+        )`.as('isLiked'),
       })
       .from(posts)
       .innerJoin(users, eq(posts.userId, users.id))
@@ -486,22 +495,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async likePost(userId: number, postId: string): Promise<void> {
-    // For now, just increment the counter (in production, track individual likes)
+    // Check if user already liked this post
+    const [existingLike] = await db
+      .select()
+      .from(postReactions)
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+
+    if (existingLike) {
+      // User already liked this post, so this is an unlike action
+      await this.unlikePost(userId, postId);
+      return;
+    }
+
+    // Add like reaction
+    await db.insert(postReactions).values({
+      postId,
+      userId,
+      type: 'like'
+    });
+
+    // Increment the likes counter
     await db
       .update(posts)
       .set({ 
-        likes: posts.likes + 1,
+        likes: sql`${posts.likes} + 1`,
         updatedAt: new Date()
       })
       .where(eq(posts.id, postId));
   }
 
   async unlikePost(userId: number, postId: string): Promise<void> {
-    // For now, just decrement the counter (in production, track individual likes)
+    // Remove like reaction
+    await db
+      .delete(postReactions)
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+
+    // Decrement the likes counter
     await db
       .update(posts)
       .set({ 
-        likes: Math.max(posts.likes - 1, 0),
+        likes: sql`GREATEST(${posts.likes} - 1, 0)`,
         updatedAt: new Date()
       })
       .where(eq(posts.id, postId));
