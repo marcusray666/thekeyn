@@ -665,6 +665,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's works endpoint
+  app.get("/api/works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      const works = await storage.getUserWorks(userId);
+      res.json(works);
+    } catch (error) {
+      console.error("Error fetching user works:", error);
+      res.status(500).json({ error: "Failed to fetch works" });
+    }
+  });
+
   // Upload work endpoint
   app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
