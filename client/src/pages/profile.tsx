@@ -14,6 +14,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface ProfileData {
   id: number;
@@ -51,6 +59,11 @@ export default function Profile() {
   const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'carousel' | 'timeline'>('grid');
   const [sortBy, setSortBy] = useState('recent');
   const [showProfileActions, setShowProfileActions] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [newPost, setNewPost] = useState({
+    content: "",
+    file: null as File | null,
+  });
 
   const profileUsername = params?.username || currentUser?.username;
   const isOwnProfile = currentUser?.username === profileUsername;
@@ -111,6 +124,85 @@ export default function Profile() {
       });
     },
   });
+
+  // Post creation mutation for community posts
+  const createPostMutation = useMutation({
+    mutationFn: async (postData: { content: string; file?: File | null }) => {
+      if (postData.file) {
+        // Use FormData for file uploads
+        const formData = new FormData();
+        formData.append('content', postData.content);
+        formData.append('file', postData.file);
+        
+        const response = await fetch('/api/social/posts', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to create post');
+        }
+        
+        return response.json();
+      } else {
+        // Regular JSON request for text-only posts
+        return await apiRequest('/api/social/posts', {
+          method: 'POST',
+          body: JSON.stringify({ content: postData.content }),
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername, 'works'] });
+      setShowUploadDialog(false);
+      setNewPost({ content: "", file: null });
+      toast({
+        title: "Work shared!",
+        description: "Your creative work has been shared with the community.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to share your work",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreatePost = () => {
+    if (!newPost.content.trim() && !newPost.file) {
+      toast({
+        title: "Missing content",
+        description: "Please add some text or upload a file to share.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    createPostMutation.mutate({
+      content: newPost.content,
+      file: newPost.file,
+    });
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (limit to 50MB for large creative works)
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 50MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setNewPost(prev => ({ ...prev, file }));
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -638,7 +730,10 @@ export default function Profile() {
                       }
                     </p>
                     {isOwnProfile && (
-                      <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                      <Button 
+                        onClick={() => setShowUploadDialog(true)}
+                        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                      >
                         <Upload className="mr-2 h-4 w-4" />
                         Upload Your First Work
                       </Button>
@@ -652,6 +747,83 @@ export default function Profile() {
 
         </div>
       </div>
+
+      {/* Upload Dialog */}
+      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <DialogContent className="sm:max-w-lg glass-morphism border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white">Share Your Creative Work</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="content" className="text-gray-300">Description</Label>
+              <Textarea
+                id="content"
+                placeholder="Tell the community about your creative work..."
+                value={newPost.content}
+                onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))}
+                className="glass-input min-h-[100px] resize-none"
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-300">Attach File (Optional)</Label>
+              <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center hover:border-purple-500 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <div className="text-gray-400 mb-2">
+                    <Upload className="w-8 h-8 mx-auto mb-2" />
+                    <p>Click to upload your creative work</p>
+                    <p className="text-sm text-gray-500">Images, videos, audio, or documents (max 50MB)</p>
+                  </div>
+                </label>
+                
+                {newPost.file && (
+                  <div className="mt-3 p-2 bg-purple-500/20 rounded flex items-center justify-between">
+                    <span className="text-sm text-purple-300">{newPost.file.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setNewPost(prev => ({ ...prev, file: null }))}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowUploadDialog(false);
+                  setNewPost({ content: "", file: null });
+                }}
+                className="flex-1 glass-input"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreatePost}
+                disabled={createPostMutation.isPending}
+                className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+              >
+                {createPostMutation.isPending ? "Sharing..." : "Share to Community"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
