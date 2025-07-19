@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Building2, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -51,7 +51,7 @@ export function Navigation() {
     { href: "/certificates", label: "My Certificates", icon: Award },
     { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    { href: "/copyright-registration", label: "Copyright Registration", icon: Building2 },
+
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;

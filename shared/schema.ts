@@ -97,22 +97,7 @@ export const subscriptionUsage = pgTable("subscription_usage", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const copyrightApplications = pgTable("copyright_applications", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  workId: integer("work_id").references(() => works.id).notNull(),
-  officeId: text("office_id").notNull(), // Copyright office identifier
-  status: text("status").notNull().default("draft"), // draft, submitted, processing, approved, rejected
-  applicationData: text("application_data").notNull(), // JSON string of application details
-  submissionDate: timestamp("submission_date").defaultNow().notNull(),
-  registrationNumber: text("registration_number"), // Assigned by copyright office
-  estimatedCompletion: timestamp("estimated_completion"),
-  fee: text("fee").notNull(),
-  documents: text("documents").array().default([]), // Array of document paths/URLs
-  notes: text("notes"), // Internal notes or feedback from copyright office
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -171,19 +156,7 @@ export const nftMints = pgTable("nft_mints", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertCopyrightApplicationSchema = createInsertSchema(copyrightApplications).pick({
-  userId: true,
-  workId: true,
-  officeId: true,
-  status: true,
-  applicationData: true,
-  submissionDate: true,
-  registrationNumber: true,
-  estimatedCompletion: true,
-  fee: true,
-  documents: true,
-  notes: true,
-});
+
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -191,8 +164,7 @@ export type InsertWork = z.infer<typeof insertWorkSchema>;
 export type Work = typeof works.$inferSelect;
 export type InsertCertificate = z.infer<typeof insertCertificateSchema>;
 export type Certificate = typeof certificates.$inferSelect;
-export type CopyrightApplication = typeof copyrightApplications.$inferSelect;
-export type InsertCopyrightApplication = z.infer<typeof insertCopyrightApplicationSchema>;
+
 
 export const insertNftMintSchema = createInsertSchema(nftMints).pick({
   userId: true,

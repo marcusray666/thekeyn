@@ -23,7 +23,7 @@ import Analytics from "@/pages/analytics";
 import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
 import Profile from "@/pages/profile";
-import CopyrightRegistration from "@/pages/copyright-registration";
+
 import NFTMinting from "@/pages/nft-minting";
 import NFTStudio from "@/pages/nft-studio";
 import SimplifiedNFT from "@/pages/simplified-nft";
@@ -83,7 +83,7 @@ function Router() {
           <Route path="/upload-work" component={AuthenticatedUpload} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/bulk-operations" component={BulkOperations} />
-          <Route path="/copyright-registration" component={CopyrightRegistration} />
+
           <Route path="/nft-minting" component={NFTMinting} />
           <Route path="/nft-studio" component={NFTStudio} />
           <Route path="/nft-simple" component={SimplifiedNFT} />

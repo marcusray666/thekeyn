@@ -1,11 +1,11 @@
 import { 
-  users, works, certificates, copyrightApplications, nftMints, posts, follows, likes, comments, shares, notifications,
+  users, works, certificates, nftMints, posts, follows, likes, comments, shares, notifications,
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
   blockchainVerifications, verificationAuditLog,
   conversations, conversationParticipants, messages, messageReadStatus,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
-  type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, 
+  type NftMint, type InsertNftMint, 
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
   type UserNotification, type InsertUserNotification, type ContentCategory, type UserPreference, type UserAnalytic,
   type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
@@ -40,10 +40,7 @@ export interface IStorage {
   getAllCertificates(): Promise<Certificate[]>;
   deleteCertificate(id: number): Promise<void>;
   
-  createCopyrightApplication(application: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication>;
-  getCopyrightApplication(id: string, userId: number): Promise<CopyrightApplication | undefined>;
-  getCopyrightApplications(userId: number): Promise<CopyrightApplication[]>;
-  updateCopyrightApplication(id: string, updates: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication>;
+
   
   createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint>;
   getNftMint(id: number): Promise<NftMint | undefined>;
@@ -262,60 +259,13 @@ export class DatabaseStorage implements IStorage {
     await db.delete(certificates).where(eq(certificates.id, id));
   }
 
-  async createCopyrightApplication(application: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication> {
-    const appData = {
-      ...application,
-      applicationData: typeof application.applicationData === 'string' 
-        ? application.applicationData 
-        : JSON.stringify(application.applicationData || {}),
-      submissionDate: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
 
-    const [copyrightApp] = await db
-      .insert(copyrightApplications)
-      .values(appData as any)
-      .returning();
-    return copyrightApp;
-  }
 
-  async getCopyrightApplication(id: string, userId: number): Promise<CopyrightApplication | undefined> {
-    const [application] = await db
-      .select()
-      .from(copyrightApplications)
-      .where(eq(copyrightApplications.id, parseInt(id)));
-    
-    if (application && application.userId === userId) {
-      return application;
-    }
-    return undefined;
-  }
 
-  async getCopyrightApplications(userId: number): Promise<CopyrightApplication[]> {
-    return await db
-      .select()
-      .from(copyrightApplications)
-      .where(eq(copyrightApplications.userId, userId))
-      .orderBy(desc(copyrightApplications.createdAt));
-  }
 
-  async updateCopyrightApplication(id: string, updates: Partial<InsertCopyrightApplication>): Promise<CopyrightApplication> {
-    const updateData = {
-      ...updates,
-      applicationData: typeof updates.applicationData === 'string' 
-        ? updates.applicationData 
-        : JSON.stringify(updates.applicationData || {}),
-      updatedAt: new Date()
-    };
 
-    const [application] = await db
-      .update(copyrightApplications)
-      .set(updateData as any)
-      .where(eq(copyrightApplications.id, parseInt(id)))
-      .returning();
-    return application;
-  }
+
+
 
   async createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint> {
     const mintData = {
