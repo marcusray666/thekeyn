@@ -408,7 +408,12 @@ export default function Social() {
                     {searchResults.length > 0 ? (
                       <div className="space-y-6">
                         {searchResults.map((post) => (
-                          <PostCard key={post.id} post={post} />
+                          <PostCard 
+                            key={post.id} 
+                            post={post} 
+                            onEdit={handleEditPost}
+                            onDelete={handleDeletePost}
+                          />
                         ))}
                       </div>
                     ) : (
@@ -422,7 +427,12 @@ export default function Social() {
                   <div className="space-y-6">
                     {posts && posts.length > 0 ? (
                       posts.map((post) => (
-                        <PostCard key={post.id} post={post} />
+                        <PostCard 
+                          key={post.id} 
+                          post={post} 
+                          onEdit={handleEditPost}
+                          onDelete={handleDeletePost}
+                        />
                       ))
                     ) : (
                       <div className="text-center py-12">
@@ -592,202 +602,7 @@ export default function Social() {
           </motion.div>
         )}
 
-          {/* Posts Feed */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-6"
-          >
-            {filteredPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <GlassCard>
-                  <div className="p-6">
-                    {/* Post Header */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-white">{post.username}</h4>
-                          <div className="flex items-center text-sm text-gray-400">
-                            <Calendar className="mr-1 h-3 w-3" />
-                            {formatTimeAgo(post.createdAt)}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          {post.userId === user?.id && (
-                            <>
-                              <DropdownMenuItem onClick={() => handleEditPost(post)}>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDeletePost(post.id)}
-                                className="text-red-600 focus:text-red-600"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                            </>
-                          )}
-                          <DropdownMenuItem>
-                            <Share2 className="w-4 h-4 mr-2" />
-                            Share
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Flag className="w-4 h-4 mr-2" />
-                            Report
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <BookmarkPlus className="w-4 h-4 mr-2" />
-                            Save
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
 
-                    {/* Post Content */}
-                    <div className="mb-4">
-                      <p className="text-gray-300 leading-relaxed">{post.content}</p>
-                    </div>
-
-                    {/* Post Media */}
-                    {post.imageUrl && (
-                      <div className="mb-4 rounded-lg overflow-hidden">
-                        {post.fileType === "image" ? (
-                          <img 
-                            src={`/api/files/${post.imageUrl}`}
-                            alt="Post content"
-                            className="w-full max-h-96 object-cover rounded-lg"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : post.fileType === "video" ? (
-                          <video 
-                            src={`/api/files/${post.imageUrl}`}
-                            controls
-                            className="w-full max-h-96 rounded-lg"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : post.fileType === "audio" ? (
-                          <AudioPlayer 
-                            src={`/api/files/${post.imageUrl}`}
-                            className="mb-0"
-                          />
-                        ) : (
-                          <div className="p-4 bg-gray-800/50 rounded-lg">
-                            <div className="flex items-center space-x-4">
-                              <FileText className="h-8 w-8 text-orange-400" />
-                              <div className="flex-1">
-                                <p className="text-sm text-white">Document attached</p>
-                                <a 
-                                  href={`/api/files/${post.imageUrl}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-purple-400 hover:text-purple-300 text-sm"
-                                >
-                                  Download file
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        {/* Fallback error display */}
-                        <div className="w-full h-64 bg-gray-700 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
-                          <div className="text-center text-gray-400">
-                            <FileText className="mx-auto h-8 w-8 mb-2" />
-                            <p className="text-sm">File not available</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Tags */}
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="mb-4 flex flex-wrap gap-2">
-                        {post.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="bg-purple-900/30 text-purple-300">
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Post Actions */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                      <div className="flex items-center space-x-6">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => likePostMutation.mutate(post.id)}
-                          className={`flex items-center space-x-2 ${
-                            post.isLiked ? "text-red-400" : "text-gray-400"
-                          } hover:text-red-300`}
-                        >
-                          <Heart className={`h-4 w-4 ${post.isLiked ? "fill-current" : ""}`} />
-                          <span>{post.likes}</span>
-                        </Button>
-                        
-                        <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-blue-300">
-                          <MessageCircle className="h-4 w-4" />
-                          <span>{post.comments}</span>
-                        </Button>
-                        
-                        <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-400 hover:text-green-300">
-                          <Share2 className="h-4 w-4" />
-                          <span>{post.shares}</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            ))}
-
-            {/* Empty State */}
-            {filteredPosts.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-center py-12"
-              >
-                <GlassCard className="p-12">
-                  <div className="text-gray-400">
-                    <User className="mx-auto h-16 w-16 mb-6 text-purple-400" />
-                    <h3 className="text-xl font-semibold text-white mb-2">No posts found</h3>
-                    <p className="text-gray-400">
-                      {searchQuery 
-                        ? "Try adjusting your search or filters" 
-                        : "Be the first to share your protected artwork with the community!"
-                      }
-                    </p>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            )}
-          </motion.div>
         </div>
       </div>
 
