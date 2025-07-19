@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* Dark theme colors (default) */
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
     --card: 224 71.4% 4.1%;
@@ -30,22 +31,59 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .light {
+    /* Light theme colors */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 215.4 16.3% 46.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 263.4 70% 50.4%;
+  }
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-  body {
+
+  /* Dark theme styling */
+  .dark-theme,
+  .dark-theme body,
+  .dark-theme #root {
     background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
     color: white !important;
     min-height: 100vh;
   }
-  
-  /* Force all pages to use dark background */
-  html, body, #root, [data-theme] {
+
+  /* Light theme styling */
+  .light-theme,
+  .light-theme body,
+  .light-theme #root {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0, #f1f5f9) !important;
+    color: #0f172a !important;
+    min-height: 100vh;
+  }
+
+  /* Default to dark theme */
+  body {
     background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
     color: white !important;
+    min-height: 100vh;
   }
   
   /* Mobile responsive improvements */
@@ -71,6 +109,19 @@
 
 /* Glass morphism components */
 .glass-morphism {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+/* Light theme glass morphism */
+.light-theme .glass-morphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme glass morphism */
+.dark-theme .glass-morphism {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);

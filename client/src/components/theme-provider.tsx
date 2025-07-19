@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "liquid-glass";
+type Theme = "dark" | "light";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "liquid-glass",
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -22,8 +22,8 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "liquid-glass",
-  storageKey = "vite-ui-theme",
+  defaultTheme = "dark",
+  storageKey = "loggin-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
@@ -33,8 +33,11 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-    // Always use the liquid glass theme
-    document.body.classList.add("liquid-glass");
+    root.classList.add(theme);
+    
+    // Remove liquid-glass class and apply theme-specific classes
+    document.body.classList.remove("liquid-glass", "light-theme", "dark-theme");
+    document.body.classList.add(`${theme}-theme`);
   }, [theme]);
 
   const value = {

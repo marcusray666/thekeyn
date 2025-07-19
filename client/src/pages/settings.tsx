@@ -8,7 +8,8 @@ import {
   Save,
   Eye,
   EyeOff,
-  Shield
+  Shield,
+  Palette
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -23,11 +24,13 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTheme } from "@/components/theme-provider";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const { theme, setTheme } = useTheme();
   
   const [profileSettings, setProfileSettings] = useState({
     username: "",
@@ -260,7 +263,7 @@ export default function Settings() {
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-2">
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 gap-2">
                 <Button
                   variant={activeTab === "profile" ? "default" : "ghost"}
                   onClick={() => setActiveTab("profile")}
@@ -308,6 +311,18 @@ export default function Settings() {
                 >
                   <Lock className="h-4 w-4" />
                   Security
+                </Button>
+                <Button
+                  variant={activeTab === "appearance" ? "default" : "ghost"}
+                  onClick={() => setActiveTab("appearance")}
+                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                    activeTab === "appearance" 
+                      ? "bg-purple-600 text-white shadow-lg" 
+                      : "text-gray-300 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Palette className="h-4 w-4" />
+                  Appearance
                 </Button>
               </div>
             </div>
@@ -643,6 +658,76 @@ export default function Settings() {
                     <Button onClick={() => handleSaveSettings('security', securitySettings)} variant="outline" className="glass-input">
                       Save Security Settings
                     </Button>
+                  </div>
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Appearance Tab */}
+            {activeTab === "appearance" && (
+              <GlassCard>
+                <div className="p-6 space-y-8">
+                  <h3 className="text-xl font-semibold text-white mb-6">Appearance</h3>
+                  
+                  {/* Theme Selection */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Theme</h4>
+                    <p className="text-gray-400 text-sm">Choose how Loggin' looks to you. Select a single theme, or sync with your system and automatically switch between day and night themes.</p>
+                    
+                    <div className="grid grid-cols-2 gap-4 max-w-md">
+                      {/* Light Theme Option */}
+                      <div 
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          theme === "light" 
+                            ? "border-purple-500 bg-purple-500/10" 
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                        onClick={() => setTheme("light")}
+                      >
+                        <div className="w-full h-16 rounded-lg bg-gradient-to-br from-gray-50 to-gray-200 mb-3 border border-gray-300 relative overflow-hidden">
+                          {/* Light theme preview */}
+                          <div className="absolute top-2 left-2 w-3 h-3 bg-purple-500 rounded-full"></div>
+                          <div className="absolute top-2 right-2 w-8 h-1 bg-gray-400 rounded"></div>
+                          <div className="absolute bottom-2 left-2 w-12 h-1 bg-gray-600 rounded"></div>
+                          <div className="absolute bottom-2 right-2 w-6 h-1 bg-gray-400 rounded"></div>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white font-medium text-sm">Light</p>
+                          <p className="text-gray-400 text-xs">Clean and bright</p>
+                        </div>
+                      </div>
+
+                      {/* Dark Theme Option */}
+                      <div 
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          theme === "dark" 
+                            ? "border-purple-500 bg-purple-500/10" 
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                        onClick={() => setTheme("dark")}
+                      >
+                        <div className="w-full h-16 rounded-lg bg-gradient-to-br from-gray-900 to-gray-800 mb-3 border border-gray-700 relative overflow-hidden">
+                          {/* Dark theme preview */}
+                          <div className="absolute top-2 left-2 w-3 h-3 bg-purple-400 rounded-full"></div>
+                          <div className="absolute top-2 right-2 w-8 h-1 bg-gray-300 rounded"></div>
+                          <div className="absolute bottom-2 left-2 w-12 h-1 bg-gray-200 rounded"></div>
+                          <div className="absolute bottom-2 right-2 w-6 h-1 bg-gray-400 rounded"></div>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white font-medium text-sm">Dark</p>
+                          <p className="text-gray-400 text-xs">Easy on the eyes</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <p className="text-blue-300 text-sm">
+                          Your theme preference is saved locally and will be remembered across sessions.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </GlassCard>
