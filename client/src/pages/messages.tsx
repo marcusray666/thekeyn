@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { MessageCircle, Plus, Send, Search, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 interface User {
   id: number;
@@ -48,6 +49,11 @@ interface Message {
 }
 
 export default function MessagesPage() {
+  const { user, isAuthenticated } = useAuth();
+  
+  // Debug authentication state
+  console.log("Messages page - Authentication state:", { user, isAuthenticated });
+  
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageContent, setMessageContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,20 +109,23 @@ export default function MessagesPage() {
   // Create conversation mutation
   const createConversationMutation = useMutation({
     mutationFn: async ({ participants, title }: { participants: number[]; title?: string }) => {
+      console.log("Creating conversation with participants:", participants, "title:", title);
       return apiRequest("/api/conversations", {
         method: "POST",
-        body: { participants, title },
+        body: JSON.stringify({ participants, title }),
       });
     },
     onSuccess: (conversation) => {
+      console.log("Conversation created successfully:", conversation);
       queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
       setSelectedConversation(conversation.id);
       setIsNewChatOpen(false);
       setSelectedUsers([]);
       setUserSearchQuery("");
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to create conversation", variant: "destructive" });
+    onError: (error) => {
+      console.error("Failed to create conversation:", error);
+      toast({ title: "Error", description: `Failed to create conversation: ${error.message}`, variant: "destructive" });
     },
   });
 
@@ -170,6 +179,10 @@ export default function MessagesPage() {
     const participantIds = selectedUsers.map(user => user.id);
     const title = selectedUsers.length > 1 ? 
       selectedUsers.map(u => u.displayName || u.username).join(", ") : undefined;
+    
+    console.log("About to create conversation. User authentication check...");
+    console.log("Current user from useAuth:", user);
+    console.log("Is authenticated:", isAuthenticated);
     
     createConversationMutation.mutate({ participants: participantIds, title });
   };

@@ -45,6 +45,9 @@ export async function apiRequest(
       ...options.headers,
     },
     ...options,
+    body: options.body instanceof FormData ? options.body : 
+          options.body ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : 
+          undefined,
   });
 
   await throwIfResNotOk(res);
