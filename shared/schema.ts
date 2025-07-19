@@ -600,3 +600,79 @@ export type Share = typeof shares.$inferSelect;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+// Messaging System Tables
+export const conversations = pgTable("conversations", {
+  id: text("id").primaryKey().notNull(),
+  title: text("title"), // Optional title for group conversations
+  type: text("type").notNull().default("direct"), // 'direct' or 'group'
+  isArchived: boolean("is_archived").default(false),
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const conversationParticipants = pgTable("conversation_participants", {
+  id: serial("id").primaryKey(),
+  conversationId: text("conversation_id").references(() => conversations.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull().default("member"), // 'member', 'admin'
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+  lastSeenAt: timestamp("last_seen_at").defaultNow(),
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+  isActive: boolean("is_active").default(true), // For soft leaving conversations
+});
+
+export const messages = pgTable("messages", {
+  id: text("id").primaryKey().notNull(),
+  conversationId: text("conversation_id").references(() => conversations.id).notNull(),
+  senderId: integer("sender_id").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  messageType: text("message_type").notNull().default("text"), // 'text', 'image', 'file', 'work_share'
+  attachmentUrl: text("attachment_url"), // For files, images, shared works
+  attachmentMetadata: text("attachment_metadata"), // JSON metadata for attachments
+  isEdited: boolean("is_edited").default(false),
+  editedAt: timestamp("edited_at"),
+  isDeleted: boolean("is_deleted").default(false),
+  deletedAt: timestamp("deleted_at"),
+  replyToMessageId: text("reply_to_message_id").references(() => messages.id), // For threaded conversations
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const messageReadStatus = pgTable("message_read_status", {
+  id: serial("id").primaryKey(),
+  messageId: text("message_id").references(() => messages.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  readAt: timestamp("read_at").defaultNow().notNull(),
+});
+
+// Messaging Schema Definitions
+export const insertConversationSchema = createInsertSchema(conversations).pick({
+  title: true,
+  type: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).pick({
+  conversationId: true,
+  senderId: true,
+  content: true,
+  messageType: true,
+  attachmentUrl: true,
+  attachmentMetadata: true,
+  replyToMessageId: true,
+});
+
+export const insertConversationParticipantSchema = createInsertSchema(conversationParticipants).pick({
+  conversationId: true,
+  userId: true,
+  role: true,
+});
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type ConversationParticipant = typeof conversationParticipants.$inferSelect;
+export type InsertConversationParticipant = z.infer<typeof insertConversationParticipantSchema>;
+export type MessageReadStatus = typeof messageReadStatus.$inferSelect;

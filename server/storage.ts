@@ -3,6 +3,7 @@ import {
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
   blockchainVerifications, verificationAuditLog,
+  conversations, conversationParticipants, messages, messageReadStatus,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
   type CopyrightApplication, type InsertCopyrightApplication, type NftMint, type InsertNftMint, 
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
@@ -11,10 +12,12 @@ import {
   type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
   type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
   type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
-  type VerificationAuditLog, type InsertVerificationAuditLog
+  type VerificationAuditLog, type InsertVerificationAuditLog,
+  type Conversation, type InsertConversation, type Message, type InsertMessage
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, sql } from "drizzle-orm";
+import { eq, desc, and, gte, sql, ne, isNull, ilike } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -1273,6 +1276,251 @@ export class DatabaseStorage implements IStorage {
       tier,
       ...tierLimits[tier as keyof typeof tierLimits] || tierLimits.free
     };
+  }
+
+  // Messaging System Methods
+  async createConversation(participants: number[], title?: string): Promise<Conversation> {
+    const conversationId = nanoid();
+    
+    // Create conversation
+    const [conversation] = await db
+      .insert(conversations)
+      .values({
+        id: conversationId,
+        title,
+        type: participants.length > 2 ? "group" : "direct",
+      })
+      .returning();
+
+    // Add participants
+    const participantData = participants.map(userId => ({
+      conversationId,
+      userId,
+    }));
+
+    await db.insert(conversationParticipants).values(participantData);
+
+    return conversation;
+  }
+
+  async getUserConversations(userId: number): Promise<(Conversation & { 
+    participants: { userId: number; username: string }[]; 
+    lastMessage?: { content: string; createdAt: Date; senderName: string };
+    unreadCount: number;
+  })[]> {
+    const userConversations = await db
+      .select({
+        id: conversations.id,
+        title: conversations.title,
+        type: conversations.type,
+        isArchived: conversations.isArchived,
+        lastMessageAt: conversations.lastMessageAt,
+        createdAt: conversations.createdAt,
+        updatedAt: conversations.updatedAt,
+      })
+      .from(conversations)
+      .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+      .where(
+        and(
+          eq(conversationParticipants.userId, userId),
+          eq(conversationParticipants.isActive, true)
+        )
+      )
+      .orderBy(desc(conversations.lastMessageAt));
+
+    // Enrich with participants and last message for each conversation
+    const enrichedConversations = await Promise.all(
+      userConversations.map(async (conv) => {
+        // Get participants
+        const participants = await db
+          .select({
+            userId: users.id,
+            username: users.username,
+          })
+          .from(conversationParticipants)
+          .innerJoin(users, eq(conversationParticipants.userId, users.id))
+          .where(eq(conversationParticipants.conversationId, conv.id));
+
+        // Get last message
+        const lastMessage = await db
+          .select({
+            content: messages.content,
+            createdAt: messages.createdAt,
+            senderName: users.username,
+          })
+          .from(messages)
+          .innerJoin(users, eq(messages.senderId, users.id))
+          .where(eq(messages.conversationId, conv.id))
+          .orderBy(desc(messages.createdAt))
+          .limit(1);
+
+        // Count unread messages
+        const unreadCount = await this.getUnreadMessageCount(userId, conv.id);
+
+        return {
+          ...conv,
+          participants,
+          lastMessage: lastMessage[0],
+          unreadCount,
+        };
+      })
+    );
+
+    return enrichedConversations;
+  }
+
+  async getConversationMessages(conversationId: string, userId: number, limit = 50, offset = 0): Promise<(Message & { senderName: string; senderAvatar?: string })[]> {
+    // Verify user is participant
+    const participant = await db
+      .select()
+      .from(conversationParticipants)
+      .where(
+        and(
+          eq(conversationParticipants.conversationId, conversationId),
+          eq(conversationParticipants.userId, userId),
+          eq(conversationParticipants.isActive, true)
+        )
+      )
+      .limit(1);
+
+    if (!participant.length) {
+      throw new Error("User not authorized to view this conversation");
+    }
+
+    const messageList = await db
+      .select({
+        id: messages.id,
+        conversationId: messages.conversationId,
+        senderId: messages.senderId,
+        content: messages.content,
+        messageType: messages.messageType,
+        attachmentUrl: messages.attachmentUrl,
+        attachmentMetadata: messages.attachmentMetadata,
+        isEdited: messages.isEdited,
+        editedAt: messages.editedAt,
+        isDeleted: messages.isDeleted,
+        deletedAt: messages.deletedAt,
+        replyToMessageId: messages.replyToMessageId,
+        createdAt: messages.createdAt,
+        updatedAt: messages.updatedAt,
+        senderName: users.username,
+        senderAvatar: users.profileImageUrl,
+      })
+      .from(messages)
+      .innerJoin(users, eq(messages.senderId, users.id))
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          eq(messages.isDeleted, false)
+        )
+      )
+      .orderBy(desc(messages.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return messageList.reverse(); // Return in chronological order
+  }
+
+  async sendMessage(data: InsertMessage): Promise<Message> {
+    const messageId = nanoid();
+    
+    const [message] = await db
+      .insert(messages)
+      .values({
+        ...data,
+        id: messageId,
+      })
+      .returning();
+
+    // Update conversation last message timestamp
+    await db
+      .update(conversations)
+      .set({ lastMessageAt: new Date() })
+      .where(eq(conversations.id, data.conversationId));
+
+    return message;
+  }
+
+  async markMessagesAsRead(userId: number, conversationId: string): Promise<void> {
+    // Get all unread messages in the conversation
+    const unreadMessages = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .leftJoin(
+        messageReadStatus,
+        and(
+          eq(messageReadStatus.messageId, messages.id),
+          eq(messageReadStatus.userId, userId)
+        )
+      )
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          isNull(messageReadStatus.id)
+        )
+      );
+
+    if (unreadMessages.length > 0) {
+      const readStatusData = unreadMessages.map(msg => ({
+        messageId: msg.id,
+        userId,
+      }));
+
+      await db.insert(messageReadStatus).values(readStatusData);
+    }
+
+    // Update participant's last seen timestamp
+    await db
+      .update(conversationParticipants)
+      .set({ lastSeenAt: new Date() })
+      .where(
+        and(
+          eq(conversationParticipants.conversationId, conversationId),
+          eq(conversationParticipants.userId, userId)
+        )
+      );
+  }
+
+  async getUnreadMessageCount(userId: number, conversationId: string): Promise<number> {
+    const unreadCount = await db
+      .select({ count: sql`count(*)`.as('count') })
+      .from(messages)
+      .leftJoin(
+        messageReadStatus,
+        and(
+          eq(messageReadStatus.messageId, messages.id),
+          eq(messageReadStatus.userId, userId)
+        )
+      )
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          ne(messages.senderId, userId), // Don't count own messages
+          isNull(messageReadStatus.id)
+        )
+      );
+
+    return parseInt(unreadCount[0]?.count as string) || 0;
+  }
+
+  async searchUsers(query: string, excludeUserId?: number): Promise<User[]> {
+    let whereClause = ilike(users.username, `%${query}%`);
+    
+    if (excludeUserId) {
+      whereClause = and(whereClause, ne(users.id, excludeUserId));
+    }
+
+    return await db
+      .select({
+        id: users.id,
+        username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
+        isVerified: users.isVerified,
+      })
+      .from(users)
+      .where(whereClause)
+      .limit(10);
   }
 
   // Blockchain verification methods

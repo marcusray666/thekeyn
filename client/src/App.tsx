@@ -33,6 +33,7 @@ import SubscriptionSuccess from "@/pages/subscription-success";
 import SubscriptionCancelled from "@/pages/subscription-cancelled";
 import BlockchainVerification from "@/pages/blockchain-verification";
 import Social from "@/pages/social";
+import Messages from "@/pages/messages";
 
 import Studio from "@/pages/studio";
 
@@ -88,6 +89,7 @@ function Router() {
           <Route path="/nft-simple" component={SimplifiedNFT} />
           <Route path="/blockchain-verification" component={BlockchainVerification} />
           <Route path="/social" component={Social} />
+          <Route path="/messages" component={Messages} />
           <Route path="/settings" component={Settings} />
           <Route path="/profile/:username" component={Profile} />
         </>
