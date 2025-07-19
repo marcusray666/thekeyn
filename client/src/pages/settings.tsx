@@ -263,11 +263,11 @@ export default function Settings() {
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-2">
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 <Button
                   variant={activeTab === "profile" ? "default" : "ghost"}
                   onClick={() => setActiveTab("profile")}
-                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-1 md:gap-2 justify-center py-3 rounded-xl transition-all text-sm md:text-base ${
                     activeTab === "profile" 
                       ? "bg-purple-600 text-white shadow-lg" 
                       : "text-gray-300 hover:text-white hover:bg-white/5"
@@ -279,7 +279,7 @@ export default function Settings() {
                 <Button
                   variant={activeTab === "notifications" ? "default" : "ghost"}
                   onClick={() => setActiveTab("notifications")}
-                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-1 md:gap-2 justify-center py-3 rounded-xl transition-all text-sm md:text-base ${
                     activeTab === "notifications" 
                       ? "bg-purple-600 text-white shadow-lg" 
                       : "text-gray-300 hover:text-white hover:bg-white/5"
@@ -291,7 +291,7 @@ export default function Settings() {
                 <Button
                   variant={activeTab === "privacy" ? "default" : "ghost"}
                   onClick={() => setActiveTab("privacy")}
-                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-1 md:gap-2 justify-center py-3 rounded-xl transition-all text-sm md:text-base ${
                     activeTab === "privacy" 
                       ? "bg-purple-600 text-white shadow-lg" 
                       : "text-gray-300 hover:text-white hover:bg-white/5"
@@ -303,7 +303,7 @@ export default function Settings() {
                 <Button
                   variant={activeTab === "security" ? "default" : "ghost"}
                   onClick={() => setActiveTab("security")}
-                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-1 md:gap-2 justify-center py-3 rounded-xl transition-all text-sm md:text-base ${
                     activeTab === "security" 
                       ? "bg-purple-600 text-white shadow-lg" 
                       : "text-gray-300 hover:text-white hover:bg-white/5"
@@ -315,7 +315,7 @@ export default function Settings() {
                 <Button
                   variant={activeTab === "appearance" ? "default" : "ghost"}
                   onClick={() => setActiveTab("appearance")}
-                  className={`flex items-center gap-2 justify-center py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-1 md:gap-2 justify-center py-3 rounded-xl transition-all text-sm md:text-base ${
                     activeTab === "appearance" 
                       ? "bg-purple-600 text-white shadow-lg" 
                       : "text-gray-300 hover:text-white hover:bg-white/5"
