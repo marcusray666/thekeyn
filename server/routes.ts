@@ -2221,10 +2221,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
+      console.log("Checkout session created successfully:", session.id);
       res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      res.status(500).json({ error: "Failed to create checkout session" });
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+      res.status(500).json({ 
+        error: "Failed to create checkout session",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

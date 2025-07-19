@@ -105,16 +105,28 @@ export default function Subscription() {
       if (!isAuthenticated) {
         throw new Error("Authentication required");
       }
+      console.log("Creating checkout session for tier:", tier);
       const response = await apiRequest("POST", "/api/subscription/create-checkout", { tier });
+      console.log("Checkout response:", response);
       return response;
     },
     onSuccess: (data) => {
+      console.log("Checkout success, redirecting to:", data.url);
+      setLoading(null); // Clear loading state before redirect
       // Redirect to Stripe checkout
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast({
+          title: "Error",
+          description: "No checkout URL received",
+          variant: "destructive",
+        });
       }
     },
     onError: (error: any) => {
+      console.error("Checkout error:", error);
+      setLoading(null); // Clear loading state on error
       if (error.message.includes("Authentication required") || error.message.includes("401")) {
         toast({
           title: "Login Required",
@@ -129,7 +141,6 @@ export default function Subscription() {
           variant: "destructive",
         });
       }
-      setLoading(null);
     },
   });
 
@@ -174,8 +185,25 @@ export default function Subscription() {
   });
 
   const handleUpgrade = (tier: string) => {
+    console.log("Starting upgrade process for tier:", tier);
     setLoading(tier);
-    createCheckoutMutation.mutate(tier);
+    
+    // Add timeout fallback to clear loading state if something goes wrong
+    const timeoutId = setTimeout(() => {
+      console.warn("Checkout process timed out, clearing loading state");
+      setLoading(null);
+      toast({
+        title: "Request Timeout",
+        description: "The request took too long. Please try again.",
+        variant: "destructive",
+      });
+    }, 30000); // 30 second timeout
+    
+    createCheckoutMutation.mutate(tier, {
+      onSettled: () => {
+        clearTimeout(timeoutId);
+      }
+    });
   };
 
   const formatBytes = (bytes: number) => {
