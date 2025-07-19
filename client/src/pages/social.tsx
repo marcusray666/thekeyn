@@ -109,17 +109,25 @@ export default function Social() {
     enabled: !!user?.id,
   });
 
-  // Search functionality
+  // Search functionality for both posts and users
+  const [userSearchResults, setUserSearchResults] = useState<any[]>([]);
+  
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     try {
-      const response = await apiRequest(`/api/social/posts/search?q=${encodeURIComponent(query)}`);
-      setSearchResults(response);
+      // Search both posts and users simultaneously
+      const [postsResponse, usersResponse] = await Promise.all([
+        apiRequest(`/api/social/posts/search?q=${encodeURIComponent(query)}`).catch(() => []),
+        apiRequest(`/api/search/users?q=${encodeURIComponent(query)}`).catch(() => [])
+      ]);
+      
+      setSearchResults(postsResponse);
+      setUserSearchResults(usersResponse);
       setShowSearchResults(true);
     } catch (error) {
       toast({
         title: "Search Error",
-        description: "Failed to search posts",
+        description: "Failed to search content",
         variant: "destructive",
       });
     }
@@ -128,6 +136,7 @@ export default function Social() {
   const handleClearSearch = () => {
     setSearchQuery("");
     setSearchResults([]);
+    setUserSearchResults([]);
     setShowSearchResults(false);
   };
 
@@ -405,21 +414,67 @@ export default function Social() {
                         Clear Search
                       </Button>
                     </div>
-                    {searchResults.length > 0 ? (
-                      <div className="space-y-6">
-                        {searchResults.map((post) => (
-                          <PostCard 
-                            key={post.id} 
-                            post={post} 
-                            onEdit={handleEditPost}
-                            onDelete={handleDeletePost}
-                          />
-                        ))}
+                    
+                    {/* Users Results Section */}
+                    {userSearchResults.length > 0 && (
+                      <div className="space-y-4">
+                        <h4 className="text-md font-medium text-white flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          Users ({userSearchResults.length})
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {userSearchResults.map((user: any) => (
+                            <GlassCard key={user.id} className="p-4 hover:bg-white/10 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                                  {user.username[0].toUpperCase()}
+                                </div>
+                                <div className="flex-1">
+                                  <h5 className="text-white font-medium">{user.displayName || user.username}</h5>
+                                  <p className="text-gray-400 text-sm">@{user.username}</p>
+                                  {user.bio && (
+                                    <p className="text-gray-500 text-xs mt-1 truncate">{user.bio}</p>
+                                  )}
+                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() => setLocation(`/profile/${user.username}`)}
+                                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                                >
+                                  View Profile
+                                </Button>
+                              </div>
+                            </GlassCard>
+                          ))}
+                        </div>
                       </div>
-                    ) : (
+                    )}
+                    
+                    {/* Posts Results Section */}
+                    {searchResults.length > 0 && (
+                      <div className="space-y-4">
+                        <h4 className="text-md font-medium text-white flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4" />
+                          Posts ({searchResults.length})
+                        </h4>
+                        <div className="space-y-6">
+                          {searchResults.map((post) => (
+                            <PostCard 
+                              key={post.id} 
+                              post={post} 
+                              onEdit={handleEditPost}
+                              onDelete={handleDeletePost}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {searchResults.length === 0 && userSearchResults.length === 0 && (
                       <div className="text-center py-12">
                         <Search className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                        <p className="text-gray-400">No posts found matching your search.</p>
+                        <p className="text-gray-400">No users or posts found matching your search.</p>
+                        <p className="text-gray-500 text-sm mt-2">Try different keywords or check spelling.</p>
                       </div>
                     )}
                   </div>
