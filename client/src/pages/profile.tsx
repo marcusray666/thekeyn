@@ -64,6 +64,8 @@ export default function Profile() {
     content: "",
     file: null as File | null,
   });
+  const [selectedWork, setSelectedWork] = useState<any>(null);
+  const [showWorkViewer, setShowWorkViewer] = useState(false);
 
   const profileUsername = params?.username || currentUser?.username;
   const isOwnProfile = currentUser?.username === profileUsername;
@@ -223,6 +225,87 @@ export default function Profile() {
     updateProfileMutation.mutate({ displayName: editedProfile.displayName });
   };
 
+  // Like/Share handlers
+  const handleLikeWork = async (work: any) => {
+    try {
+      if (work.isPost) {
+        // Handle social post like
+        await apiRequest(`/api/social/posts/${work.id}/like`, {
+          method: 'POST',
+        });
+      } else {
+        // Handle protected work like (if implemented)
+        toast({
+          title: "Coming soon",
+          description: "Liking protected works will be available soon!",
+        });
+        return;
+      }
+      
+      // Refresh the data
+      queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername, 'works'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      
+      toast({
+        title: "Liked!",
+        description: "Added to your likes",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to like this work",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleShareWork = async (work: any) => {
+    try {
+      if (work.isPost) {
+        // Handle social post share
+        await apiRequest(`/api/social/posts/${work.id}/share`, {
+          method: 'POST',
+        });
+        
+        toast({
+          title: "Shared!",
+          description: "Post shared with your followers",
+        });
+      } else {
+        // Handle protected work share - copy certificate link
+        if (navigator.share && work.certificateId) {
+          await navigator.share({
+            title: work.title,
+            text: `Check out this protected creative work: ${work.title}`,
+            url: `${window.location.origin}/certificate/${work.certificateId}`,
+          });
+        } else {
+          // Fallback - copy to clipboard
+          const shareUrl = work.certificateId 
+            ? `${window.location.origin}/certificate/${work.certificateId}`
+            : `${window.location.origin}/profile/${profileUsername}`;
+          await navigator.clipboard.writeText(shareUrl);
+          toast({
+            title: "Copied!",
+            description: "Link copied to clipboard",
+          });
+        }
+      }
+      
+      // Refresh the data for social posts
+      if (work.isPost) {
+        queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername, 'works'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to share this work",
+        variant: "destructive",
+      });
+    }
+  };
+
   const uploadAvatarMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
@@ -336,13 +419,38 @@ export default function Profile() {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="bg-white/20 backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedWork(work);
+                setShowWorkViewer(true);
+              }}
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="bg-white/20 backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLikeWork(work);
+              }}
+            >
               <Heart className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="bg-white/20 backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShareWork(work);
+              }}
+            >
               <Share2 className="h-4 w-4" />
             </Button>
           </div>
@@ -830,6 +938,148 @@ export default function Profile() {
                 {createPostMutation.isPending ? "Sharing..." : "Share to Community"}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Work Viewer Dialog */}
+      <Dialog open={showWorkViewer} onOpenChange={setShowWorkViewer}>
+        <DialogContent className="max-w-4xl max-h-[90vh] bg-gray-900 border border-purple-500/30 text-white overflow-hidden"
+          style={{ 
+            background: 'rgba(17, 24, 39, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(168, 85, 247, 0.3)'
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white flex items-center justify-between">
+              <span>{selectedWork?.title || 'Creative Work'}</span>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={() => handleLikeWork(selectedWork)}
+                  className="bg-white/10 hover:bg-white/20"
+                >
+                  <Heart className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={() => handleShareWork(selectedWork)}
+                  className="bg-white/10 hover:bg-white/20"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+            {selectedWork && (
+              <div className="space-y-4">
+                {/* Media Display */}
+                <div className="bg-black/20 rounded-lg overflow-hidden">
+                  {selectedWork.fileType === 'image' && selectedWork.fileUrl && (
+                    <img
+                      src={selectedWork.fileUrl}
+                      alt={selectedWork.title}
+                      className="w-full h-auto max-h-96 object-contain"
+                    />
+                  )}
+                  
+                  {selectedWork.fileType === 'video' && selectedWork.fileUrl && (
+                    <video
+                      src={selectedWork.fileUrl}
+                      controls
+                      className="w-full h-auto max-h-96"
+                      style={{ backgroundColor: 'black' }}
+                    >
+                      Your browser doesn't support video playback.
+                    </video>
+                  )}
+                  
+                  {selectedWork.fileType === 'audio' && selectedWork.fileUrl && (
+                    <div className="p-8 text-center">
+                      <div className="text-6xl mb-4">🎵</div>
+                      <p className="text-gray-300 mb-4">{selectedWork.title}</p>
+                      <audio
+                        src={selectedWork.fileUrl}
+                        controls
+                        className="w-full max-w-md mx-auto"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                      >
+                        Your browser doesn't support audio playback.
+                      </audio>
+                    </div>
+                  )}
+                  
+                  {selectedWork.fileType === 'document' && selectedWork.fileUrl && (
+                    <div className="p-8 text-center">
+                      <div className="text-6xl mb-4">📄</div>
+                      <p className="text-gray-300 mb-4">{selectedWork.title}</p>
+                      {selectedWork.mimeType === 'application/pdf' ? (
+                        <div className="space-y-4">
+                          <iframe
+                            src={selectedWork.fileUrl}
+                            className="w-full h-96 rounded border"
+                            title={selectedWork.title}
+                          />
+                          <Button
+                            onClick={() => window.open(selectedWork.fileUrl, '_blank')}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Open PDF
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={() => window.open(selectedWork.fileUrl, '_blank')}
+                          className="bg-purple-600 hover:bg-purple-700"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Document
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(!selectedWork.fileUrl || selectedWork.fileType === 'text') && (
+                    <div className="p-8 text-center">
+                      <div className="text-6xl mb-4">📝</div>
+                      <p className="text-gray-300">Text Content</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Work Details */}
+                <div className="space-y-3">
+                  <p className="text-gray-300">{selectedWork.description}</p>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-400">
+                    <div className="flex items-center space-x-4">
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-4 w-4" />
+                        {selectedWork.likes || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-4 w-4" />
+                        {selectedWork.views || 0}
+                      </span>
+                    </div>
+                    <span>{new Date(selectedWork.createdAt).toLocaleDateString()}</span>
+                  </div>
+
+                  {selectedWork.isProtected && (
+                    <div className="flex items-center gap-2 text-green-400">
+                      <Shield className="h-4 w-4" />
+                      <span className="text-sm">Protected Work - Certificate ID: {selectedWork.certificateId}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
