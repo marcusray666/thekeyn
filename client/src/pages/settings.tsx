@@ -226,11 +226,11 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 pt-20 px-6 relative overflow-hidden">
+    <div className="min-h-screen cosmic-bg pt-20 px-6 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20"></div>
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-500/30 via-blue-500/20 to-transparent blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-indigo-500/30 via-purple-500/20 to-transparent blur-3xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-black/40 to-blue-900/20"></div>
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-600/10 via-transparent to-blue-600/10 blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-600/10 via-transparent to-purple-600/10 blur-3xl"></div>
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -259,7 +259,7 @@ export default function Settings() {
           transition={{ delay: 0.1 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="glass-morphism rounded-2xl p-2">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-2">
               <div className="grid grid-cols-4 gap-2">
                 <Button
                   variant={activeTab === "profile" ? "default" : "ghost"}
