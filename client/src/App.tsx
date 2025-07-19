@@ -34,6 +34,7 @@ import SubscriptionCancelled from "@/pages/subscription-cancelled";
 import BlockchainVerification from "@/pages/blockchain-verification";
 import Social from "@/pages/social";
 import Messages from "@/pages/messages";
+import Followers from "@/pages/followers";
 
 import Studio from "@/pages/studio";
 
@@ -90,6 +91,7 @@ function Router() {
           <Route path="/blockchain-verification" component={BlockchainVerification} />
           <Route path="/social" component={Social} />
           <Route path="/messages" component={Messages} />
+          <Route path="/followers" component={Followers} />
           <Route path="/settings" component={Settings} />
           <Route path="/profile/:username" component={Profile} />
         </>

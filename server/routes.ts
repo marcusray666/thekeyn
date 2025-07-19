@@ -1377,6 +1377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: userId,
         type: 'follow',
         fromUserId: req.userId!,
+        title: 'New Follower',
         message: 'started following you'
       });
       
@@ -1417,6 +1418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           type: 'share',
           fromUserId: req.userId!,
           workId: workId,
+          title: 'Work Shared',
           message: 'shared your work'
         });
       }
@@ -1464,8 +1466,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         website: user.website,
         location: user.location,
         isVerified: user.isVerified,
-        followerCount: user.followerCount || 0,
-        followingCount: user.followingCount || 0,
+        // Hide follower/following counts for privacy
+        // followerCount: user.followerCount || 0,
+        // followingCount: user.followingCount || 0,
         totalLikes: user.totalLikes || 0,
         createdAt: user.createdAt,
         isFollowing
@@ -1903,13 +1906,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/social/users/:id/following", async (req, res) => {
+  app.get("/api/social/users/:id/following", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = Number(req.params.id);
+      const currentUserId = req.userId!;
       const { limit = 50, offset = 0 } = req.query;
       
       if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
         return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      // Only allow users to see their own following list
+      if (userId !== currentUserId) {
+        return res.status(403).json({ error: "You can only view your own following list" });
       }
       
       const following = await storage.getFollowing(userId, {
@@ -1924,13 +1933,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/social/users/:id/followers", async (req, res) => {
+  app.get("/api/social/users/:id/followers", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = Number(req.params.id);
+      const currentUserId = req.userId!;
       const { limit = 50, offset = 0 } = req.query;
       
       if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
         return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      // Only allow users to see their own followers list
+      if (userId !== currentUserId) {
+        return res.status(403).json({ error: "You can only view your own followers list" });
       }
       
       const followers = await storage.getFollowers(userId, {

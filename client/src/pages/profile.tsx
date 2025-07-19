@@ -706,14 +706,12 @@ export default function Profile() {
                       <div className="text-xl font-bold text-white">{works.length}</div>
                       <div className="text-sm text-gray-400">Works</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-white">{profile.followerCount}</div>
-                      <div className="text-sm text-gray-400">Followers</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-white">{profile.followingCount}</div>
-                      <div className="text-sm text-gray-400">Following</div>
-                    </div>
+                    {isOwnProfile && (
+                      <Link href="/followers" className="text-center hover:bg-white/5 rounded p-2 transition-colors">
+                        <div className="text-xl font-bold text-white">My Connections</div>
+                        <div className="text-sm text-gray-400">Followers & Following</div>
+                      </Link>
+                    )}
                     <div className="text-center">
                       <div className="text-xl font-bold text-white">{profile.totalLikes}</div>
                       <div className="text-sm text-gray-400">Total Likes</div>
