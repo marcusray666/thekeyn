@@ -5,6 +5,10 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 19, 2025):**
+- ✅ USER SEARCH FUNCTIONALITY: Complete community search now includes both posts and users with separate result sections
+- ✅ COMMUNITY USER DISCOVERY: Added user profile cards with "View Profile" buttons for easy community navigation and connection
+- ✅ ENHANCED SEARCH API: Implemented `/api/search/users` endpoint with username and display name search capabilities
+- ✅ SIMPLIFIED USER DROPDOWN: Removed all menu items except Logout option for cleaner, streamlined navigation
 - ✅ IPHONE-STYLE LIGHT/DARK THEME SYSTEM: Complete theme implementation with iOS-inspired appearance settings
 - ✅ APPEARANCE SETTINGS TAB: New dedicated settings section with visual theme previews and smooth transitions
 - ✅ AUTOMATIC THEME PERSISTENCE: Theme preferences saved locally and remembered across sessions

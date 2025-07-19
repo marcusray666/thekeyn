@@ -135,26 +135,7 @@ export function Navigation() {
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/showcase/${user?.username}`} className="flex items-center w-full">
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Portfolio Showcase
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
-                        <User className="mr-2 h-4 w-4" />
-                        View Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center w-full">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuContent align="end" className="w-32 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
                     <DropdownMenuItem
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
