@@ -175,12 +175,12 @@ export default function MessagesPage() {
   const selectedConv = conversations.find((conv: Conversation) => conv.id === selectedConversation);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900/90 via-purple-900/80 to-slate-900/90 relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 relative">
       {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-75"></div>
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-150"></div>
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-75"></div>
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-500/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-150"></div>
       </div>
       
       <div className="container mx-auto px-4 py-6 relative z-10">
@@ -194,17 +194,17 @@ export default function MessagesPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           {/* Conversations List */}
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20 lg:col-span-1">
+          <Card className="backdrop-blur-xl bg-black/40 border-white/10 shadow-2xl lg:col-span-1">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-white">Conversations</CardTitle>
+                <CardTitle className="text-white font-semibold">Conversations</CardTitle>
                 <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                    <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-lg">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="backdrop-blur-xl bg-slate-900/95 border-white/20">
+                  <DialogContent className="backdrop-blur-xl bg-black/40 border-white/10 shadow-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-white">Start New Conversation</DialogTitle>
                     </DialogHeader>
@@ -215,7 +215,7 @@ export default function MessagesPage() {
                           placeholder="Search by username..."
                           value={userSearchQuery}
                           onChange={(e) => setUserSearchQuery(e.target.value)}
-                          className="bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
                         />
                       </div>
                       
@@ -294,7 +294,7 @@ export default function MessagesPage() {
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
                 />
               </div>
             </CardHeader>
@@ -354,7 +354,7 @@ export default function MessagesPage() {
           </Card>
 
           {/* Messages Area */}
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20 lg:col-span-2">
+          <Card className="backdrop-blur-xl bg-black/40 border-white/10 shadow-2xl lg:col-span-2">
             {selectedConversation ? (
               <>
                 {/* Header */}
@@ -383,7 +383,7 @@ export default function MessagesPage() {
                   </div>
                 </CardHeader>
 
-                <Separator className="bg-white/20" />
+                <Separator className="bg-white/10" />
 
                 {/* Messages */}
                 <CardContent className="flex-1 p-0">
@@ -428,20 +428,20 @@ export default function MessagesPage() {
                 </CardContent>
 
                 {/* Message Input */}
-                <div className="p-4 border-t border-white/20">
+                <div className="p-4 border-t border-white/10">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Type a message..."
                       value={messageContent}
                       onChange={(e) => setMessageContent(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+                      className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
                       disabled={sendMessageMutation.isPending}
                     />
                     <Button
                       onClick={handleSendMessage}
                       disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-lg"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
