@@ -85,19 +85,6 @@ export function Navigation() {
                 </Link>
               ))}
 
-              {/* Logout Button */}
-              {isAuthenticated && (
-                <Button
-                  onClick={handleLogout}
-                  disabled={logoutMutation.isPending}
-                  variant="ghost"
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-red-900/20 transition-all"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
-                </Button>
-              )}
-
               {/* User Section */}
               {isAuthenticated ? (
                 <div className="relative">
