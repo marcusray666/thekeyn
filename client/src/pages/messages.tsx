@@ -175,9 +175,16 @@ export default function MessagesPage() {
   const selectedConv = conversations.find((conv: Conversation) => conv.id === selectedConversation);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900/90 via-purple-900/80 to-slate-900/90 relative">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-75"></div>
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-150"></div>
+      </div>
+      
+      <div className="container mx-auto px-4 py-6 relative z-10">
+        <div className="mb-6">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
             <MessageCircle className="h-10 w-10 text-purple-400" />
             Messages
