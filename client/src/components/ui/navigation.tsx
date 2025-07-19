@@ -69,79 +69,116 @@ export function Navigation() {
               <h1 className="text-2xl font-bold text-white">Loggin'</h1>
             </Link>
             
-            <div className="hidden md:flex items-center space-x-6">
+            {/* Extra Large screen navigation - full text */}
+            <div className="hidden xl:flex items-center space-x-3">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-all text-sm ${
                     location === item.href
                       ? "text-white bg-purple-600/30 border border-purple-500/50"
                       : "text-gray-300 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  <item.icon className="h-4 w-4" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className="h-3.5 w-3.5" />
+                  <span className="font-medium whitespace-nowrap">{item.label}</span>
                 </Link>
               ))}
-
-              {/* User Section */}
-              {isAuthenticated ? (
-                <div className="relative">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5">
-                        <User className="h-4 w-4" />
-                        <span className="text-sm">{user?.username}</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/showcase/${user?.username}`} className="flex items-center w-full">
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          Portfolio Showcase
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
-                          <User className="mr-2 h-4 w-4" />
-                          View Profile
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/settings" className="flex items-center w-full">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-gray-700" />
-                      <DropdownMenuItem
-                        onClick={handleLogout}
-                        disabled={logoutMutation.isPending}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        {logoutMutation.isPending ? "Logging out..." : "Logout"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="btn-glass">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
             </div>
+
+            {/* Large screen navigation - compact text */}
+            <div className="hidden lg:flex xl:hidden items-center space-x-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center space-x-1 px-1.5 py-1 rounded-md transition-all text-xs ${
+                    location === item.href
+                      ? "text-white bg-purple-600/30 border border-purple-500/50"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <item.icon className="h-3 w-3" />
+                  <span className="font-medium">{item.label.replace('My ', '').replace('Blockchain ', '')}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Medium screen navigation - icons only */}
+            <div className="hidden md:flex lg:hidden items-center space-x-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center p-1.5 rounded-md transition-all ${
+                    location === item.href
+                      ? "text-white bg-purple-600/30 border border-purple-500/50"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                  }`}
+                  title={item.label}
+                >
+                  <item.icon className="h-3.5 w-3.5" />
+                </Link>
+              ))}
+            </div>
+
+            {/* User Section */}
+            {isAuthenticated ? (
+              <div className="relative ml-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center space-x-1 text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5 px-2 py-1.5">
+                      <User className="h-3.5 w-3.5" />
+                      <span className="text-sm hidden sm:inline">{user?.username}</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/showcase/${user?.username}`} className="flex items-center w-full">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Portfolio Showcase
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        View Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center w-full">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2 ml-4">
+                <Link href="/login">
+                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5 text-sm px-3 py-1.5">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="bg-purple-600 text-white hover:bg-purple-700 text-sm px-3 py-1.5">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
             
             <button
               className="md:hidden text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
