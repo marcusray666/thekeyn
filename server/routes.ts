@@ -669,7 +669,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.session!.userId;
+      console.log("Fetching works for user ID:", userId);
       const works = await storage.getUserWorks(userId);
+      console.log("Found works:", works.length, works.map(w => ({ id: w.id, title: w.title, userId: w.userId })));
       res.json(works);
     } catch (error) {
       console.error("Error fetching user works:", error);
