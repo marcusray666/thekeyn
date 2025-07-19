@@ -1241,8 +1241,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const works = await storage.getUserWorks(user.id);
-      res.json(works);
+      // Get both protected works and social posts for a unified portfolio
+      const [protectedWorks, socialPosts] = await Promise.all([
+        storage.getUserWorks(user.id),
+        storage.getUserPosts(user.id)
+      ]);
+      
+      // Transform social posts to match work format for portfolio display
+      const transformedPosts = socialPosts.map(post => ({
+        id: `post_${post.id}`,
+        userId: post.userId,
+        title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '') || 'Untitled',
+        description: post.content,
+        filename: post.filename,
+        fileType: post.fileType || 'text',
+        mimeType: post.mimeType,
+        fileUrl: post.filename ? `/api/files/${post.filename}` : null,
+        fileSize: post.fileSize || 0,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        likes: post.likes,
+        views: post.views || 0,
+        tags: post.tags || [],
+        isProtected: false,
+        isPost: true // Flag to identify this as a social post
+      }));
+      
+      // Combine and sort by creation date
+      const allWorks = [...protectedWorks.map(w => ({ ...w, isProtected: true, isPost: false })), ...transformedPosts]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      res.json(allWorks);
     } catch (error) {
       console.error("Error fetching user works:", error);
       res.status(500).json({ message: "Failed to fetch user works" });
