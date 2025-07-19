@@ -224,11 +224,11 @@ export default function Settings() {
         >
           <Button 
             variant="ghost"
-            onClick={() => setLocation('/dashboard')}
+            onClick={() => setLocation(`/profile/${user?.username}`)}
             className="text-gray-300 hover:text-white"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to Dashboard
+            Back to Profile
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-white">Settings</h1>
