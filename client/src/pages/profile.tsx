@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { SettingsPanel } from "@/components/settings-panel";
+import { useLocation } from "wouter";
 
 interface ProfileData {
   id: number;
@@ -33,6 +33,7 @@ interface ProfileData {
 
 export default function Profile() {
   const [, params] = useRoute("/profile/:username");
+  const [, setLocation] = useLocation();
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -312,10 +313,24 @@ export default function Profile() {
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-500/30 via-blue-500/20 to-transparent blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-indigo-500/30 via-purple-500/20 to-transparent blur-3xl"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-4xl mx-auto">
           {/* Profile Section */}
-          <div className="lg:col-span-2">
-            <Card className="glass-morphism p-8">
+          <div className="w-full">
+            <Card className="glass-morphism p-8 relative">
+              {/* Settings Button - Only show for own profile */}
+              {isOwnProfile && (
+                <div className="absolute top-4 right-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLocation('/settings')}
+                    className="text-gray-400 hover:text-white hover:bg-purple-500/20 transition-all duration-200"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </div>
+              )}
+              
               <div className="flex items-start gap-6">
                 {/* Profile Image */}
                 <div className="relative group">
@@ -634,12 +649,7 @@ export default function Profile() {
             </Card>
           </div>
 
-          {/* Settings Panel - Only show for own profile */}
-          {isOwnProfile && (
-            <div className="lg:col-span-1">
-              <SettingsPanel />
-            </div>
-          )}
+
         </div>
       </div>
     </div>

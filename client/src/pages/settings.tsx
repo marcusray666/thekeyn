@@ -49,15 +49,27 @@ export default function Settings() {
     theftReports: true,
     socialInteractions: true,
     marketingEmails: false,
+    likes: true,
+    comments: true,
+    follows: true,
+    mentions: true,
+    workViews: false,
+    weeklyDigest: true,
+    newFeatures: true,
   });
   
   const [privacySettings, setPrivacySettings] = useState({
-    publicProfile: false,
+    publicProfile: true,
     showStatistics: true,
     allowIndexing: false,
     showFollowers: true,
     showFollowing: true,
     allowDirectMessages: true,
+    showOnlineStatus: true,
+    showLastSeen: false,
+    allowTagging: true,
+    allowMentions: true,
+    requireApprovalForTags: false,
   });
   
   const [securitySettings, setSecuritySettings] = useState({
@@ -214,8 +226,12 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 pt-20 px-6 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20"></div>
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-500/30 via-blue-500/20 to-transparent blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-indigo-500/30 via-purple-500/20 to-transparent blur-3xl"></div>
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -346,30 +362,288 @@ export default function Settings() {
               </GlassCard>
             )}
 
-            {/* Other tabs content simplified for now */}
+            {/* Notifications Tab */}
             {activeTab === "notifications" && (
               <GlassCard>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-white mb-4">Notification Preferences</h3>
-                  <p className="text-gray-400">Notification settings coming soon...</p>
+                <div className="p-6 space-y-8">
+                  <h3 className="text-xl font-semibold text-white mb-6">Notification Preferences</h3>
+                  
+                  {/* Email Notifications */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Email Notifications</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Likes on your posts</Label>
+                          <p className="text-sm text-gray-500">Get notified when someone likes your work</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.likes}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, likes: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Comments</Label>
+                          <p className="text-sm text-gray-500">Get notified when someone comments on your work</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.comments}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, comments: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">New followers</Label>
+                          <p className="text-sm text-gray-500">Get notified when someone follows you</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.follows}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, follows: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Mentions</Label>
+                          <p className="text-sm text-gray-500">Get notified when someone mentions you</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.mentions}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, mentions: checked }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* System Notifications */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">System & Security</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Certificate alerts</Label>
+                          <p className="text-sm text-gray-500">Security alerts for your protected works</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.certificateAlerts}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, certificateAlerts: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Weekly digest</Label>
+                          <p className="text-sm text-gray-500">Weekly summary of your activity</p>
+                        </div>
+                        <Switch 
+                          checked={notificationSettings.weeklyDigest}
+                          onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, weeklyDigest: checked }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={() => handleSaveSettings('notifications', notificationSettings)} className="btn-glass">
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Notification Settings
+                    </Button>
+                  </div>
                 </div>
               </GlassCard>
             )}
 
+            {/* Privacy Tab */}
             {activeTab === "privacy" && (
               <GlassCard>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-white mb-4">Privacy Settings</h3>
-                  <p className="text-gray-400">Privacy settings coming soon...</p>
+                <div className="p-6 space-y-8">
+                  <h3 className="text-xl font-semibold text-white mb-6">Privacy & Visibility</h3>
+                  
+                  {/* Profile Visibility */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Profile Visibility</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Public Profile</Label>
+                          <p className="text-sm text-gray-500">Make your profile visible to everyone</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.publicProfile}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, publicProfile: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Show statistics</Label>
+                          <p className="text-sm text-gray-500">Display follower count, likes, etc.</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.showStatistics}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, showStatistics: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Show followers</Label>
+                          <p className="text-sm text-gray-500">Let others see who follows you</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.showFollowers}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, showFollowers: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Show following</Label>
+                          <p className="text-sm text-gray-500">Let others see who you follow</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.showFollowing}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, showFollowing: checked }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Interaction Settings */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Interactions</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Allow direct messages</Label>
+                          <p className="text-sm text-gray-500">Let others send you private messages</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.allowDirectMessages}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, allowDirectMessages: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Allow tagging</Label>
+                          <p className="text-sm text-gray-500">Let others tag you in posts</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.allowTagging}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, allowTagging: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Show online status</Label>
+                          <p className="text-sm text-gray-500">Let others see when you're online</p>
+                        </div>
+                        <Switch 
+                          checked={privacySettings.showOnlineStatus}
+                          onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, showOnlineStatus: checked }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={() => handleSaveSettings('privacy', privacySettings)} className="btn-glass">
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Privacy Settings
+                    </Button>
+                  </div>
                 </div>
               </GlassCard>
             )}
 
+            {/* Security Tab */}
             {activeTab === "security" && (
               <GlassCard>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-white mb-4">Security Settings</h3>
-                  <p className="text-gray-400">Security settings coming soon...</p>
+                <div className="p-6 space-y-8">
+                  <h3 className="text-xl font-semibold text-white mb-6">Security & Password</h3>
+                  
+                  {/* Change Password */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Change Password</h4>
+                    <div className="space-y-4 max-w-md">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentPassword" className="text-gray-300">Current Password</Label>
+                        <div className="relative">
+                          <Input
+                            id="currentPassword"
+                            type={showPassword ? "text" : "password"}
+                            value={profileSettings.currentPassword}
+                            onChange={(e) => setProfileSettings(prev => ({ ...prev, currentPassword: e.target.value }))}
+                            className="glass-input pr-12"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword" className="text-gray-300">New Password</Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          value={profileSettings.newPassword}
+                          onChange={(e) => setProfileSettings(prev => ({ ...prev, newPassword: e.target.value }))}
+                          className="glass-input"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword" className="text-gray-300">Confirm New Password</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={profileSettings.confirmPassword}
+                          onChange={(e) => setProfileSettings(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          className="glass-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Security Settings */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-white">Security Options</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Two-factor authentication</Label>
+                          <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
+                        </div>
+                        <Switch 
+                          checked={securitySettings.twoFactorAuth}
+                          onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, twoFactorAuth: checked }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-gray-300">Login notifications</Label>
+                          <p className="text-sm text-gray-500">Get notified of new login attempts</p>
+                        </div>
+                        <Switch 
+                          checked={securitySettings.loginNotifications}
+                          onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, loginNotifications: checked }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button onClick={handleChangePassword} className="btn-glass">
+                      <Save className="mr-2 h-4 w-4" />
+                      Change Password
+                    </Button>
+                    <Button onClick={() => handleSaveSettings('security', securitySettings)} variant="outline" className="glass-input">
+                      Save Security Settings
+                    </Button>
+                  </div>
                 </div>
               </GlassCard>
             )}
