@@ -73,7 +73,7 @@ export default function SocialFeed() {
 
   // Fetch public works feed
   const { data: feed, isLoading } = useQuery({
-    queryKey: ["/api/social/feed", filter, searchQuery, selectedTags],
+    queryKey: ["/api/social/posts", filter, searchQuery, selectedTags],
     queryParams: { filter, search: searchQuery, tags: selectedTags.join(',') }
   });
 
@@ -90,7 +90,7 @@ export default function SocialFeed() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
     },
     onError: (error: any) => {
       toast({
@@ -109,7 +109,7 @@ export default function SocialFeed() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
       toast({
         title: "Success",
         description: "Follow status updated",
@@ -133,7 +133,7 @@ export default function SocialFeed() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
       setShareText('');
       setSelectedWork(null);
       toast({

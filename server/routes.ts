@@ -571,39 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Social feed endpoint
-  app.get("/api/social/feed", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      // Get recent public works from all users (simulated social feed)
-      const allWorks = await storage.getAllWorks();
-      const socialPosts = allWorks.slice(0, 10).map(work => ({
-        id: work.id,
-        user: {
-          id: work.userId || 1,
-          username: work.creatorName,
-          email: `${work.creatorName}@example.com`
-        },
-        work: {
-          id: work.id,
-          title: work.title,
-          description: work.description,
-          filename: work.filename,
-          mimeType: work.mimeType,
-          certificateId: work.certificateId
-        },
-        caption: `Check out my latest work: ${work.title}`,
-        likes: Math.floor(Math.random() * 100) + 5,
-        comments: Math.floor(Math.random() * 20) + 1,
-        isLiked: Math.random() > 0.5,
-        createdAt: work.createdAt
-      }));
-
-      res.json(socialPosts);
-    } catch (error) {
-      console.error("Error fetching social feed:", error);
-      res.status(500).json({ error: "Failed to fetch social feed" });
-    }
-  });
+  // Old social feed endpoint removed to prevent duplicate posts
 
   // Get recent works
   app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
