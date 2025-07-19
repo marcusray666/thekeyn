@@ -27,6 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import CommentsSection from "./CommentsSection";
 import FollowButton from "./FollowButton";
+import { AudioPlayer } from "./AudioPlayer";
 
 interface Post {
   id: string;
@@ -253,23 +254,25 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
             </div>
           )}
 
-          {post.fileType === "audio" && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-              </div>
-              <p className="text-sm text-center text-purple-300">Protected Audio Track</p>
+          {post.fileType === "audio" && post.imageUrl && (
+            <div className="mb-4">
+              <AudioPlayer 
+                src={`/api/files/${post.imageUrl}`}
+                className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20"
+              />
             </div>
           )}
 
-          {post.fileType === "video" && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-500/10 to-green-500/10 rounded-lg border border-blue-500/20">
-              <div className="text-center">
-                <Eye className="mx-auto h-8 w-8 text-blue-400 mb-2" />
-                <p className="text-sm text-blue-300">Protected Video Content</p>
-              </div>
+          {post.fileType === "video" && post.imageUrl && (
+            <div className="mb-4">
+              <video 
+                src={`/api/files/${post.imageUrl}`}
+                controls
+                className="w-full max-h-96 rounded-lg border border-white/10 hover:border-blue-500/30 transition-colors bg-gradient-to-r from-blue-500/10 to-green-500/10"
+                preload="metadata"
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           )}
 
