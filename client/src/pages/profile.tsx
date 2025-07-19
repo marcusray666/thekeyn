@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useRoute } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera, Upload } from "lucide-react";
+import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera, Upload, Eye, Heart, MessageCircle, Share2, ExternalLink, MoreHorizontal, UserPlus, Shield, Users, TrendingUp, Verified, BarChart3, Sparkles, ChevronLeft, Download, AlertTriangle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -45,6 +47,9 @@ export default function Profile() {
   });
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'carousel' | 'timeline'>('grid');
+  const [sortBy, setSortBy] = useState('recent');
+  const [showProfileActions, setShowProfileActions] = useState(false);
 
   const profileUsername = params?.username || currentUser?.username;
   const isOwnProfile = currentUser?.username === profileUsername;
@@ -194,6 +199,92 @@ export default function Profile() {
       uploadAvatarMutation.mutate(file);
     }
   };
+
+  // Portfolio helper functions
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.startsWith('image/')) return '🖼️';
+    if (mimeType.startsWith('video/')) return '🎥';
+    if (mimeType.startsWith('audio/')) return '🎵';
+    if (mimeType.includes('pdf')) return '📄';
+    return '📁';
+  };
+
+  const renderWork = (work: any) => (
+    <motion.div
+      key={work.id}
+      layout
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      className="group relative bg-gray-800/40 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:transform hover:scale-105"
+    >
+      <div className="aspect-square relative overflow-hidden">
+        {work.filename && work.mimeType.startsWith('image/') ? (
+          <img
+            src={`/api/files/${work.filename}`}
+            alt={work.title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-blue-500/20">
+            <div className="text-center">
+              <div className="text-4xl mb-2">{getFileIcon(work.mimeType)}</div>
+              <div className="text-sm text-gray-400 capitalize">{work.mimeType.split('/')[0]}</div>
+            </div>
+          </div>
+        )}
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="flex gap-2">
+            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+              <Heart className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="secondary" className="bg-white/20 backdrop-blur-sm">
+              <Share2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Certificate Badge */}
+        <div className="absolute top-2 right-2">
+          <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+            <Shield className="h-3 w-3 mr-1" />
+            Protected
+          </Badge>
+        </div>
+      </div>
+
+      {/* Work Info */}
+      <div className="p-4">
+        <h3 className="text-white font-medium truncate">{work.title}</h3>
+        <p className="text-gray-400 text-sm mt-1 line-clamp-2">{work.description}</p>
+        
+        <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+          <span>{new Date(work.createdAt).toLocaleDateString()}</span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              {formatNumber(work.viewCount || 0)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Heart className="h-3 w-3" />
+              {formatNumber(work.likeCount || 0)}
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 
   if (isLoading) {
     return (
@@ -417,76 +508,129 @@ export default function Profile() {
               </div>
             </Card>
 
-            {/* Portfolio View Options */}
+            {/* Portfolio Section */}
             <Card className="glass-morphism p-6 mt-6">
-              <Tabs defaultValue="grid" className="w-full">
-                <div className="flex items-center justify-between mb-6">
-                  <TabsList className="glass-input">
-                    <TabsTrigger value="grid">Grid</TabsTrigger>
-                    <TabsTrigger value="masonry">Masonry</TabsTrigger>
-                    <TabsTrigger value="carousel">Carousel</TabsTrigger>
-                    <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                  </TabsList>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-white">Portfolio</h2>
+                  {works.length > 0 && (
+                    <Badge variant="secondary" className="bg-purple-500/20 text-purple-400">
+                      {works.length} {works.length === 1 ? 'work' : 'works'}
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="w-auto">
+                    <TabsList className="glass-input h-9">
+                      <TabsTrigger value="grid" className="data-[state=active]:bg-purple-500/20">Grid</TabsTrigger>
+                      <TabsTrigger value="masonry" className="data-[state=active]:bg-purple-500/20">Masonry</TabsTrigger>
+                      <TabsTrigger value="carousel" className="data-[state=active]:bg-purple-500/20">Carousel</TabsTrigger>
+                      <TabsTrigger value="timeline" className="data-[state=active]:bg-purple-500/20">Timeline</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                   
-                  <select className="glass-input text-sm px-3 py-2 rounded-md">
+                  <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="glass-input text-sm px-3 py-2 rounded-md h-9 bg-gray-800/50 border-gray-700 text-white"
+                  >
                     <option value="recent">Recent</option>
                     <option value="popular">Most Popular</option>
                     <option value="liked">Most Liked</option>
+                    <option value="viewed">Most Viewed</option>
                   </select>
                 </div>
+              </div>
 
-                <TabsContent value="grid">
-                  {works.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {works.map((work: any) => (
-                        <div key={work.id} className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-gray-400">
-                          <span className="text-sm">{work.title}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-muted-foreground mb-4">
-                        <svg className="w-16 h-16 mx-auto mb-4 opacity-40" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                        </svg>
+              {/* Portfolio Content */}
+              <AnimatePresence mode="wait">
+                {works.length > 0 ? (
+                  <motion.div
+                    key={viewMode}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {viewMode === 'grid' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {works.map(renderWork)}
                       </div>
-                      <h3 className="text-lg font-medium text-white mb-2">
-                        {isOwnProfile ? "Start building your portfolio" : "No works yet"}
-                      </h3>
-                      <p className="text-gray-400">
-                        {isOwnProfile 
-                          ? "Start building your portfolio by uploading your first work!"
-                          : "This user hasn't uploaded any works yet."
-                        }
-                      </p>
-                      {isOwnProfile && (
-                        <Button className="mt-4">
-                          Upload Your First Work
-                        </Button>
-                      )}
+                    )}
+                    
+                    {viewMode === 'masonry' && (
+                      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                        {works.map((work: any, index: number) => (
+                          <div key={work.id} className="break-inside-avoid mb-6">
+                            {renderWork(work)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {viewMode === 'carousel' && (
+                      <div className="relative">
+                        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+                          {works.map((work: any) => (
+                            <div key={work.id} className="flex-none w-80">
+                              {renderWork(work)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {viewMode === 'timeline' && (
+                      <div className="space-y-8">
+                        {works.map((work: any, index: number) => (
+                          <div key={work.id} className="flex gap-6 items-start">
+                            <div className="flex-none w-24 text-center">
+                              <div className="text-sm text-gray-400">
+                                {new Date(work.createdAt).toLocaleDateString('en-US', { 
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </div>
+                              <div className="w-px h-16 bg-gradient-to-b from-purple-500 to-blue-500 mx-auto mt-2"></div>
+                            </div>
+                            <div className="flex-1">
+                              {renderWork(work)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-16"
+                  >
+                    <div className="text-muted-foreground mb-6">
+                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                        <Sparkles className="w-12 h-12 text-purple-400" />
+                      </div>
                     </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="masonry">
-                  <div className="text-center py-8 text-gray-400">
-                    Masonry view coming soon
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="carousel">
-                  <div className="text-center py-8 text-gray-400">
-                    Carousel view coming soon
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="timeline">
-                  <div className="text-center py-8 text-gray-400">
-                    Timeline view coming soon
-                  </div>
-                </TabsContent>
-              </Tabs>
+                    <h3 className="text-xl font-medium text-white mb-3">
+                      {isOwnProfile ? "Build Your Creative Portfolio" : "No Works Yet"}
+                    </h3>
+                    <p className="text-gray-400 mb-6 max-w-md mx-auto">
+                      {isOwnProfile 
+                        ? "Start showcasing your creative works and building your digital presence. Upload your first piece to get started!"
+                        : "This creator hasn't shared any works yet. Check back later for amazing content!"
+                      }
+                    </p>
+                    {isOwnProfile && (
+                      <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Your First Work
+                      </Button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Card>
           </div>
 

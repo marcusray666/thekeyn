@@ -33,7 +33,7 @@ import SubscriptionSuccess from "@/pages/subscription-success";
 import SubscriptionCancelled from "@/pages/subscription-cancelled";
 import BlockchainVerification from "@/pages/blockchain-verification";
 import Social from "@/pages/social";
-import ProfileShowcase from "@/pages/profile-showcase";
+
 import Studio from "@/pages/studio";
 import MobileFeatures from "@/pages/mobile-features";
 import NotFound from "@/pages/not-found";
@@ -49,8 +49,8 @@ function AuthenticatedHome() {
     return <Welcome />;
   }
   
-  // For authenticated users, show the profile showcase
-  return <ProfileShowcase />;
+  // For authenticated users, show their profile
+  return <Profile />;
 }
 
 function Router() {
@@ -103,9 +103,13 @@ function Router() {
       <Route path="/subscription/success" component={SubscriptionSuccess} />
       <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
       
-      {/* Profile showcase routes */}
-      <Route path="/showcase/:username" component={ProfileShowcase} />
-      <Route path="/portfolio/:username" component={ProfileShowcase} />
+      {/* Legacy profile showcase routes - redirect to main profile */}
+      <Route path="/showcase/:username">
+        {({ username }) => <Profile />}
+      </Route>
+      <Route path="/portfolio/:username">
+        {({ username }) => <Profile />}
+      </Route>
       
       <Route component={NotFound} />
     </Switch>
