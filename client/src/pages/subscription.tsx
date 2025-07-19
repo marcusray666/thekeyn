@@ -189,7 +189,7 @@ export default function Subscription() {
   // Show loading only if authenticated user is loading their data
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 pt-24 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
             <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
@@ -203,7 +203,7 @@ export default function Subscription() {
   // Show loading only if authenticated and fetching subscription data
   if (isAuthenticated && isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 pt-24 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
             <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
@@ -218,7 +218,7 @@ export default function Subscription() {
   const currentTierInfo = tierInfo[currentTier as keyof typeof tierInfo];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 pt-24 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
