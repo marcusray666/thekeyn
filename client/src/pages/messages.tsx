@@ -411,31 +411,48 @@ export default function MessagesPage() {
                     {messagesLoading ? (
                       <div className="text-center text-slate-400 py-8">Loading messages...</div>
                     ) : messages.length > 0 ? (
-                      messages.map((message: Message) => (
-                        <div key={message.id} className="flex gap-3">
-                          <Avatar className="h-8 w-8 flex-shrink-0">
-                            <AvatarImage src={message.senderAvatar} />
-                            <AvatarFallback className="bg-purple-600 text-white text-xs">
-                              {message.senderName[0].toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-white font-medium text-sm">
-                                {message.senderName}
-                              </span>
-                              <span className="text-slate-400 text-xs">
-                                {new Date(message.createdAt).toLocaleTimeString()}
-                              </span>
+                      messages.map((message: Message) => {
+                        const isOwnMessage = user && message.senderId === user.id;
+                        return (
+                          <div key={message.id} className={`flex gap-3 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                            {!isOwnMessage && (
+                              <Avatar className="h-8 w-8 flex-shrink-0">
+                                <AvatarImage src={message.senderAvatar} />
+                                <AvatarFallback className="bg-purple-600 text-white text-xs">
+                                  {message.senderName[0].toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            <div className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'} max-w-md`}>
+                              <div className={`flex items-center gap-2 mb-1 ${isOwnMessage ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <span className="text-white font-medium text-sm">
+                                  {isOwnMessage ? 'You' : message.senderName}
+                                </span>
+                                <span className="text-slate-400 text-xs">
+                                  {new Date(message.createdAt).toLocaleTimeString()}
+                                </span>
+                              </div>
+                              <div className={`rounded-lg px-3 py-2 ${
+                                isOwnMessage 
+                                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' 
+                                  : 'bg-white/10 text-white'
+                              }`}>
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {message.content}
+                                </p>
+                              </div>
                             </div>
-                            <div className="bg-white/10 rounded-lg px-3 py-2 max-w-md">
-                              <p className="text-white text-sm whitespace-pre-wrap">
-                                {message.content}
-                              </p>
-                            </div>
+                            {isOwnMessage && (
+                              <Avatar className="h-8 w-8 flex-shrink-0">
+                                <AvatarImage src={user.profileImageUrl} />
+                                <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs">
+                                  {(user.displayName || user.username)[0].toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="text-center text-slate-400 py-8">
                         <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
