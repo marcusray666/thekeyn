@@ -5,6 +5,10 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 19, 2025):**
+- ✅ IMAGE UPLOAD FIX: Fixed broken image display by correcting API endpoint path in PostCard component
+- ✅ VIDEO UPLOAD SUPPORT: Added comprehensive video format support including MOV, AVI, QuickTime with proper MIME type detection
+- ✅ PDF DOCUMENT DISPLAY: Implemented professional document viewer with download/open buttons for PDF files
+- ✅ DUPLICATE POSTS RESOLVED: Removed conflicting inline post rendering that caused duplicate feed entries
 - ✅ POST DELETION FUNCTIONALITY: Fixed community post deletion with enhanced error handling and user ID validation
 - ✅ CUSTOM AUDIO PLAYER: Implemented professional audio player with play/pause, progress bar, volume control, and mute functionality
 - ✅ COMPREHENSIVE FILE FORMAT SUPPORT: Added support for all popular formats including .mov videos and extended audio/document formats

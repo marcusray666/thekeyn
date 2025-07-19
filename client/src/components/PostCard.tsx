@@ -250,9 +250,13 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {post.imageUrl && post.fileType === "image" && (
             <div className="mb-4">
               <img 
-                src={post.imageUrl} 
+                src={`/api/files/${post.imageUrl}`} 
                 alt="Post content"
                 className="w-full max-h-96 object-cover rounded-lg border border-white/10 hover:border-purple-500/30 transition-colors"
+                onError={(e) => {
+                  console.error("Image failed to load:", post.imageUrl);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             </div>
           )}
