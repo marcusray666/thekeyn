@@ -301,30 +301,30 @@ export default function Studio() {
                     <div className="flex items-center gap-2">
                       <Crown className="w-4 h-4 text-purple-400" />
                       <span className="text-sm font-medium text-white">
-                        {subscriptionData.limits.tier.charAt(0).toUpperCase() + subscriptionData.limits.tier.slice(1)} Plan
+                        {subscriptionData.tier.charAt(0).toUpperCase() + subscriptionData.tier.slice(1)} Plan
                       </span>
                     </div>
                     <Badge variant="secondary" className="bg-purple-500/20 text-purple-100">
-                      {subscriptionData.usage.uploads.remainingUploads === Infinity ? '∞' : subscriptionData.usage.uploads.remainingUploads} remaining
+                      {subscriptionData.remainingUploads === Infinity ? '∞' : subscriptionData.remainingUploads} remaining
                     </Badge>
                   </div>
                   
-                  {subscriptionData.usage.uploads.limit !== -1 && (
+                  {subscriptionData.uploadLimit !== -1 && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs text-gray-300">
                         <span>Monthly uploads</span>
                         <span>
-                          {subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads} / {subscriptionData.usage.uploads.limit}
+                          {subscriptionData.uploadsUsed} / {subscriptionData.uploadLimit}
                         </span>
                       </div>
                       <Progress 
-                        value={((subscriptionData.usage.uploads.limit - subscriptionData.usage.uploads.remainingUploads) / subscriptionData.usage.uploads.limit) * 100} 
+                        value={subscriptionData.uploadLimit > 0 ? (subscriptionData.uploadsUsed / subscriptionData.uploadLimit) * 100 : 0} 
                         className="h-2"
                       />
                     </div>
                   )}
                   
-                  {subscriptionData.usage.uploads.remainingUploads <= 1 && subscriptionData.limits.tier === 'free' && (
+                  {subscriptionData.remainingUploads <= 1 && subscriptionData.tier === 'free' && (
                     <div className="mt-3 pt-3 border-t border-white/10">
                       <p className="text-xs text-yellow-300 mb-2">
                         You're running low on uploads. Upgrade for unlimited access!

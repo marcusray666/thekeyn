@@ -1046,6 +1046,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Main subscription endpoint with limits and usage
+  app.get('/api/subscription', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const limits = await storage.getUserSubscriptionLimits(userId);
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const usage = await storage.getSubscriptionUsage(userId, currentMonth);
+      const uploadLimit = await storage.checkUploadLimit(userId);
+
+      res.json({
+        tier: limits.tier,
+        uploadLimit: limits.uploadLimit,
+        uploadsUsed: usage?.uploadsUsed || 0,
+        remainingUploads: uploadLimit.remainingUploads,
+        canUpload: uploadLimit.canUpload,
+        hasDownloadableCertificates: limits.hasDownloadableCertificates,
+        hasCustomBranding: limits.hasCustomBranding,
+        hasIPFSStorage: limits.hasIPFSStorage,
+        hasAPIAccess: limits.hasAPIAccess,
+        teamSize: limits.teamSize,
+        expiresAt: user.subscriptionExpiresAt,
+        isActive: !user.subscriptionExpiresAt || user.subscriptionExpiresAt > new Date()
+      });
+    } catch (error) {
+      console.error('Error fetching subscription data:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription data' });
+    }
+  });
+
   app.get('/api/subscription/status', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const user = await storage.getUser(req.userId!);
