@@ -27,6 +27,8 @@ export function Navigation() {
         description: "You've been logged out successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      // Redirect to home page after logout
+      setLocation('/');
     },
     onError: (error: Error) => {
       toast({
