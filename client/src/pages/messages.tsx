@@ -184,8 +184,8 @@ export default function MessagesPage() {
       </div>
       
       <div className="container mx-auto px-4 py-6 relative z-10">
-        <div className="mb-6">
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+        <div className="mb-6 text-center pt-16">
+          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
             <MessageCircle className="h-10 w-10 text-purple-400" />
             Messages
           </h1>
