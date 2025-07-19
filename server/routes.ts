@@ -173,8 +173,15 @@ const upload = multer({
       "audio/mpeg",
       "audio/wav",
       "audio/ogg",
+      "audio/mp4",
+      "audio/aac",
+      "audio/flac",
       "video/mp4",
       "video/webm",
+      "video/quicktime",
+      "video/x-msvideo",
+      "video/avi",
+      "video/mov",
       "application/pdf",
       "text/plain",
     ];
@@ -218,7 +225,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (path.endsWith('.webp')) {
         res.setHeader('Content-Type', 'image/webp');
       }
-      // Allow CORS for images
+      // Set proper MIME type for videos
+      else if (path.endsWith('.mp4')) {
+        res.setHeader('Content-Type', 'video/mp4');
+      } else if (path.endsWith('.webm')) {
+        res.setHeader('Content-Type', 'video/webm');
+      } else if (path.endsWith('.mov') || path.endsWith('.quicktime')) {
+        res.setHeader('Content-Type', 'video/quicktime');
+      } else if (path.endsWith('.avi')) {
+        res.setHeader('Content-Type', 'video/x-msvideo');
+      }
+      // Set proper MIME type for audio
+      else if (path.endsWith('.mp3')) {
+        res.setHeader('Content-Type', 'audio/mpeg');
+      } else if (path.endsWith('.wav')) {
+        res.setHeader('Content-Type', 'audio/wav');
+      } else if (path.endsWith('.ogg')) {
+        res.setHeader('Content-Type', 'audio/ogg');
+      } else if (path.endsWith('.m4a')) {
+        res.setHeader('Content-Type', 'audio/mp4');
+      }
+      // Allow CORS for all media files
       res.setHeader('Access-Control-Allow-Origin', '*');
     }
   }));
@@ -1460,19 +1487,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle file upload
       if (file) {
+        console.log("File upload details:", {
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size
+        });
+        
         imageUrl = file.filename;
         const mimeType = file.mimetype.toLowerCase();
         
         // More specific file type detection
         if (mimeType.startsWith('image/')) {
           fileType = 'image';
-        } else if (mimeType.startsWith('video/') || mimeType === 'video/quicktime') {
+        } else if (mimeType.startsWith('video/') || 
+                   mimeType === 'video/quicktime' || 
+                   mimeType === 'video/x-msvideo' ||
+                   mimeType === 'video/avi' ||
+                   mimeType === 'video/mov') {
           fileType = 'video';
+          console.log("Detected video file:", mimeType);
         } else if (mimeType.startsWith('audio/')) {
           fileType = 'audio';
+        } else if (mimeType === 'application/pdf') {
+          fileType = 'document';
         } else {
           fileType = 'document';
         }
+        
+        console.log("Detected file type:", fileType);
       }
 
       const parsedTags = tags ? JSON.parse(tags) : [];
