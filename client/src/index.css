@@ -499,6 +499,96 @@
   background: rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Light theme messages page specific styling */
+.light-theme .bg-gradient-to-br.from-slate-900 {
+  background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
+}
+
+.light-theme .via-purple-900\/20 {
+  background: transparent !important;
+}
+
+.light-theme .to-slate-900 {
+  background: transparent !important;
+}
+
+.light-theme .bg-black\/40 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.light-theme .backdrop-blur-xl {
+  backdrop-filter: blur(20px) !important;
+}
+
+.light-theme .text-slate-300 {
+  color: #4b5563 !important;
+}
+
+.light-theme .text-slate-200 {
+  color: #374151 !important;
+}
+
+.light-theme .text-slate-400 {
+  color: #6b7280 !important;
+}
+
+.light-theme .placeholder\:text-slate-400::placeholder {
+  color: #9ca3af !important;
+}
+
+.light-theme .bg-white\/5 {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light-theme .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light-theme .bg-white\/10 {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .hover\:bg-white\/10:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Light theme message bubbles */
+.light-theme .bg-purple-600\/20 {
+  background: rgba(124, 58, 237, 0.1) !important;
+  border: 1px solid rgba(124, 58, 237, 0.2) !important;
+}
+
+.light-theme .text-purple-200 {
+  color: #7c3aed !important;
+}
+
+.light-theme .bg-purple-600 {
+  background: #7c3aed !important;
+}
+
+.light-theme .hover\:bg-purple-700:hover {
+  background: #6d28d9 !important;
+}
+
+/* Light theme conversation cards */
+.light-theme .bg-slate-800\/50 {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.light-theme .hover\:bg-slate-700:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.light-theme .text-slate-100 {
+  color: #1a1a1a !important;
+}
+
+.light-theme .text-purple-400 {
+  color: #7c3aed !important;
+}
+
 .glass-button {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
