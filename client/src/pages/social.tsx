@@ -214,6 +214,7 @@ export default function Social() {
 
   const deletePostMutation = useMutation({
     mutationFn: async (postId: string) => {
+      console.log("Deleting post with ID:", postId);
       return await apiRequest(`/api/social/posts/${postId}`, {
         method: 'DELETE',
       });
@@ -223,6 +224,14 @@ export default function Social() {
       toast({
         title: "Post deleted!",
         description: "Your post has been deleted successfully.",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Delete post error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete post",
+        variant: "destructive",
       });
     },
   });

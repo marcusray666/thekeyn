@@ -1600,21 +1600,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.userId;
       const { postId } = req.params;
 
+      console.log("Delete request - User ID:", userId, "Post ID:", postId);
+
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
+      // Validate postId parameter
+      if (!postId || postId.trim() === '') {
+        return res.status(400).json({ message: "Invalid post ID" });
+      }
+
       // Check if post exists and belongs to user
-      const existingPost = await storage.getPost(postId);
+      const existingPost = await storage.getPost(postId.trim());
+      console.log("Found post:", existingPost);
+      
       if (!existingPost) {
         return res.status(404).json({ message: "Post not found" });
       }
+
+      // Compare userId (both should be integers)
+      console.log("User ID comparison:", userId, "vs Post User ID:", existingPost.userId);
 
       if (existingPost.userId !== userId) {
         return res.status(403).json({ message: "You can only delete your own posts" });
       }
 
-      await storage.deletePost(postId, userId);
+      await storage.deletePost(postId.trim(), userId);
+      console.log("Post deleted successfully");
       res.json({ message: "Post deleted successfully" });
     } catch (error) {
       console.error("Error deleting post:", error);

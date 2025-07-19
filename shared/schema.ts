@@ -234,7 +234,11 @@ export const insertPostSchema = createInsertSchema(posts).pick({
   tags: true,
 });
 
-export type Post = typeof posts.$inferSelect;
+export type Post = typeof posts.$inferSelect & {
+  username: string;
+  userEmail?: string;
+  isLiked?: boolean;
+};
 export type InsertPost = z.infer<typeof insertPostSchema>;
 
 // Post comments table
