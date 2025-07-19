@@ -71,7 +71,6 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
-      <Route path="/subscription" component={Subscription} />
       
       {/* Protected routes */}
       {isAuthenticated && (
@@ -87,9 +86,6 @@ function Router() {
           <Route path="/nft-minting" component={NFTMinting} />
           <Route path="/nft-studio" component={NFTStudio} />
           <Route path="/nft-simple" component={SimplifiedNFT} />
-          <Route path="/subscription" component={Subscription} />
-          <Route path="/subscription/success" component={SubscriptionSuccess} />
-          <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
           <Route path="/blockchain-verification" component={BlockchainVerification} />
           <Route path="/social" component={Social} />
           <Route path="/mobile" component={MobileFeatures} />
@@ -101,6 +97,11 @@ function Router() {
       {/* Public certificate routes */}
       <Route path="/certificate/:id" component={CertificateDetail} />
       <Route path="/report-theft/:id" component={ReportTheft} />
+      
+      {/* Subscription routes - accessible to all users */}
+      <Route path="/subscription" component={Subscription} />
+      <Route path="/subscription/success" component={SubscriptionSuccess} />
+      <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
       
       {/* Profile showcase routes */}
       <Route path="/showcase/:username" component={ProfileShowcase} />

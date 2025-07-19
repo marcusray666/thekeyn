@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Check, Crown, Sparkles, Users, Zap, Upload, Download, Palette, Cloud, Code } from "lucide-react";
 
 interface SubscriptionData {
@@ -90,26 +92,43 @@ export default function Subscription() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState<string | null>(null);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
   const { data: subscriptionData, isLoading } = useQuery<SubscriptionData>({
     queryKey: ["/api/subscription"],
+    enabled: isAuthenticated, // Only fetch if authenticated
   });
 
   const createCheckoutMutation = useMutation({
     mutationFn: async (tier: string) => {
+      if (!isAuthenticated) {
+        throw new Error("Authentication required");
+      }
       const response = await apiRequest("POST", "/api/subscription/create-checkout", { tier });
       return response;
     },
     onSuccess: (data) => {
       // Redirect to Stripe checkout
-      window.location.href = data.url;
+      if (data.url) {
+        window.location.href = data.url;
+      }
     },
     onError: (error: any) => {
-      toast({
-        title: "Payment Error",
-        description: error.message || "Failed to create checkout session",
-        variant: "destructive",
-      });
+      if (error.message.includes("Authentication required") || error.message.includes("401")) {
+        toast({
+          title: "Login Required",
+          description: "Please log in to subscribe to a plan.",
+          variant: "destructive",
+        });
+        setLocation("/login");
+      } else {
+        toast({
+          title: "Payment Error",
+          description: error.message || "Failed to create checkout session",
+          variant: "destructive",
+        });
+      }
       setLoading(null);
     },
   });
@@ -167,7 +186,22 @@ export default function Subscription() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  if (isLoading) {
+  // Show loading only if authenticated user is loading their data
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+            <p className="mt-4 text-white/70">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading only if authenticated and fetching subscription data
+  if (isAuthenticated && isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 p-6">
         <div className="max-w-7xl mx-auto">
@@ -188,12 +222,36 @@ export default function Subscription() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-white">Subscription Management</h1>
-          <p className="text-xl text-white/70">Choose the perfect plan for your creative protection needs</p>
+          <h1 className="text-4xl font-bold text-white">
+            {isAuthenticated ? "Subscription Management" : "Choose Your Plan"}
+          </h1>
+          <p className="text-xl text-white/70">
+            {isAuthenticated 
+              ? "Manage your subscription and view usage statistics" 
+              : "Choose the perfect plan for your creative protection needs"
+            }
+          </p>
+          {!isAuthenticated && (
+            <div className="flex gap-4 justify-center">
+              <Button 
+                onClick={() => setLocation("/login")}
+                variant="outline" 
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                Login
+              </Button>
+              <Button 
+                onClick={() => setLocation("/register")}
+                className="bg-purple-500 hover:bg-purple-600 text-white"
+              >
+                Sign Up
+              </Button>
+            </div>
+          )}
         </div>
 
-        {/* Current Plan & Usage */}
-        {subscriptionData && (
+        {/* Current Plan & Usage - Only for authenticated users */}
+        {isAuthenticated && subscriptionData && (
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Current Plan */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
