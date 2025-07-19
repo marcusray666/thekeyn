@@ -48,7 +48,6 @@ export function Navigation() {
     { href: "/certificates", label: "My Certificates", icon: Award },
     { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    { href: "/mobile", label: "Mobile App", icon: Smartphone },
     { href: "/copyright-registration", label: "Copyright Registration", icon: Building2 },
   ];
 
@@ -83,6 +82,19 @@ export function Navigation() {
                   <span className="font-medium">{item.label}</span>
                 </Link>
               ))}
+
+              {/* Logout Button */}
+              {isAuthenticated && (
+                <Button
+                  onClick={handleLogout}
+                  disabled={logoutMutation.isPending}
+                  variant="ghost"
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-red-900/20 transition-all"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="font-medium">{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+                </Button>
+              )}
 
               {/* User Section */}
               {isAuthenticated ? (

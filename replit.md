@@ -5,12 +5,18 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 19, 2025):**
+- ✅ MOBILE APP REMOVAL: Completely removed mobile app features and replaced with logout button in navigation
+- ✅ NAVIGATION SIMPLIFICATION: Added prominent logout button to main navigation for easier access
+- ✅ COLOR PALETTE CONSISTENCY: Updated portfolio page to match dark theme used throughout the app
+- ✅ LOADING STATE FIX: Centered loading logo on My Certificates page for better UX
+- ✅ PORTFOLIO MEDIA VIEWER: Added comprehensive media viewer with eye button functionality for audio, video, images, and PDFs
+- ✅ LIKE AND SHARE FUNCTIONALITY: Implemented working like and share buttons with real-time feedback and API integration
+- ✅ PORTFOLIO SYNCHRONIZATION: Fixed portfolio to show both protected works and social posts chronologically
+- ✅ DATABASE ENHANCEMENT: Added filename, mimeType, and fileSize columns to posts table for unified media handling
 - ✅ PORTFOLIO & PROFILE MERGE: Unified portfolio and profile screens into single comprehensive profile page with advanced portfolio functionality
 - ✅ ENHANCED PORTFOLIO DISPLAY: Added 4 viewing modes (Grid, Masonry, Carousel, Timeline) with smooth animations and professional work cards
 - ✅ INTERACTIVE WORK CARDS: Implemented hover effects, action buttons, certificate badges, and engagement statistics for all uploaded works
 - ✅ AVATAR UPLOAD FUNCTIONALITY: Added interactive avatar change feature with file upload, validation, and hover effects
-- ✅ SMOOTH BACKGROUND BLEND: Implemented beautiful purple-to-blue gradient background matching user design requirements
-- ✅ ENHANCED AVATAR STYLING: Added ring animations, upload overlays, and visual feedback for profile picture changes
 - ✅ BACKEND AVATAR ENDPOINT: Created `/api/user/avatar` route with image validation and database updates
 - ✅ SETTINGS NAVIGATION FIX: Fixed "Back to Dashboard" button to correctly return users to their profile page instead of dashboard
 - ✅ ROUTE CONSOLIDATION: Removed separate portfolio showcase routes, now all portfolio functionality is in unified profile page
