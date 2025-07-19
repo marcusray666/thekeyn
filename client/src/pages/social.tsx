@@ -19,7 +19,13 @@ import {
   Flag,
   TrendingUp,
   Bell,
-  ShoppingCart
+  ShoppingCart,
+  X,
+  Image,
+  Video,
+  FileText,
+  Music,
+  Paperclip
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -129,11 +135,34 @@ export default function Social() {
   };
 
   const createPostMutation = useMutation({
-    mutationFn: async (postData: { content: string; tags?: string[] }) => {
-      return await apiRequest('/api/social/posts', {
-        method: 'POST',
-        body: JSON.stringify(postData),
-      });
+    mutationFn: async (postData: { content: string; file?: File | null; tags?: string[] }) => {
+      if (postData.file) {
+        // Use FormData for file uploads
+        const formData = new FormData();
+        formData.append('content', postData.content);
+        formData.append('file', postData.file);
+        if (postData.tags) {
+          formData.append('tags', JSON.stringify(postData.tags));
+        }
+        
+        const response = await fetch('/api/social/posts', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to create post');
+        }
+        
+        return response.json();
+      } else {
+        // Regular JSON request for text-only posts
+        return await apiRequest('/api/social/posts', {
+          method: 'POST',
+          body: JSON.stringify({ content: postData.content, tags: postData.tags }),
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
@@ -142,6 +171,13 @@ export default function Social() {
       toast({
         title: "Post shared!",
         description: "Your artwork has been shared with the community.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create post",
+        variant: "destructive",
       });
     },
   });
@@ -202,6 +238,7 @@ export default function Social() {
 
     createPostMutation.mutate({
       content: newPost.content,
+      file: newPost.file,
       tags: newPost.tags,
     });
   };
@@ -453,6 +490,65 @@ export default function Social() {
                     rows={4}
                   />
                   
+                  {/* File Upload Section */}
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="file-upload"
+                        className="hidden"
+                        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setNewPost(prev => ({ ...prev, file }));
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="file-upload"
+                        className="flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-purple-500 transition-colors cursor-pointer glass-card"
+                      >
+                        <div className="text-center">
+                          <Paperclip className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-400">
+                            {newPost.file ? newPost.file.name : "Attach your work (image, video, audio, document)"}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Max 500MB • JPG, PNG, MP4, MP3, PDF, DOC
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                    
+                    {/* File Preview */}
+                    {newPost.file && (
+                      <div className="relative p-3 bg-white/5 rounded-lg border border-gray-600">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {newPost.file.type.startsWith('image/') && <Image className="h-5 w-5 text-blue-400" />}
+                            {newPost.file.type.startsWith('video/') && <Video className="h-5 w-5 text-red-400" />}
+                            {newPost.file.type.startsWith('audio/') && <Music className="h-5 w-5 text-green-400" />}
+                            {newPost.file.type.includes('pdf') && <FileText className="h-5 w-5 text-orange-400" />}
+                            {!newPost.file.type.match(/^(image|video|audio)\//) && !newPost.file.type.includes('pdf') && <FileText className="h-5 w-5 text-gray-400" />}
+                            <div>
+                              <p className="text-sm text-white font-medium">{newPost.file.name}</p>
+                              <p className="text-xs text-gray-400">{(newPost.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setNewPost(prev => ({ ...prev, file: null }))}
+                            className="text-gray-400 hover:text-white"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <Button
@@ -564,24 +660,63 @@ export default function Social() {
                     {/* Post Media */}
                     {post.imageUrl && (
                       <div className="mb-4 rounded-lg overflow-hidden">
-                        <div className="w-full h-64 bg-gray-700 rounded-lg flex items-center justify-center">
+                        {post.fileType === "image" ? (
+                          <img 
+                            src={`/api/files/${post.imageUrl}`}
+                            alt="Post content"
+                            className="w-full max-h-96 object-cover rounded-lg"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : post.fileType === "video" ? (
+                          <video 
+                            src={`/api/files/${post.imageUrl}`}
+                            controls
+                            className="w-full max-h-96 rounded-lg"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : post.fileType === "audio" ? (
+                          <div className="p-4 bg-gray-800/50 rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <Music className="h-8 w-8 text-green-400" />
+                              <div className="flex-1">
+                                <audio 
+                                  src={`/api/files/${post.imageUrl}`}
+                                  controls
+                                  className="w-full"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 bg-gray-800/50 rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <FileText className="h-8 w-8 text-orange-400" />
+                              <div className="flex-1">
+                                <p className="text-sm text-white">Document attached</p>
+                                <a 
+                                  href={`/api/files/${post.imageUrl}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-purple-400 hover:text-purple-300 text-sm"
+                                >
+                                  Download file
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {/* Fallback error display */}
+                        <div className="w-full h-64 bg-gray-700 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
                           <div className="text-center text-gray-400">
-                            <Eye className="mx-auto h-8 w-8 mb-2" />
-                            <p className="text-sm">Protected Artwork Preview</p>
+                            <FileText className="mx-auto h-8 w-8 mb-2" />
+                            <p className="text-sm">File not available</p>
                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {post.fileType === "audio" && (
-                      <div className="mb-4 p-4 bg-gray-800/50 rounded-lg">
-                        <div className="text-center text-gray-400">
-                          <div className="flex items-center justify-center space-x-2 mb-2">
-                            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                          </div>
-                          <p className="text-sm">Protected Audio Track</p>
                         </div>
                       </div>
                     )}

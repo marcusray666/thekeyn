@@ -1442,25 +1442,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/social/posts", requireAuth, async (req, res) => {
+  app.post("/api/social/posts", requireAuth, upload.single('file'), async (req, res) => {
     try {
       const userId = req.session.userId;
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      const { content, imageUrl, fileType, tags } = req.body;
+      const { content, tags } = req.body;
+      const file = req.file;
 
       if (!content || content.trim().length === 0) {
         return res.status(400).json({ message: "Post content is required" });
       }
+
+      let imageUrl = null;
+      let fileType = null;
+
+      // Handle file upload
+      if (file) {
+        imageUrl = file.filename;
+        fileType = file.mimetype.split('/')[0]; // 'image', 'video', 'audio', etc.
+      }
+
+      const parsedTags = tags ? JSON.parse(tags) : [];
 
       const post = await storage.createPost({
         userId,
         content: content.trim(),
         imageUrl,
         fileType,
-        tags: tags || []
+        tags: parsedTags
       });
 
       res.status(201).json(post);
