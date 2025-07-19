@@ -454,31 +454,31 @@ export default function Social() {
                   />
                   
                   <div className="space-y-3">
-                    <Button
-                      variant="outline"
-                      onClick={() => setLocation('/upload-work')}
-                      className="w-full border-gray-600 text-gray-300 hover:bg-white/5 justify-start"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload & Protect First
-                    </Button>
-                    
-                    <div className="flex gap-3 w-full">
-                      <Button
-                        variant="ghost"
-                        onClick={() => setShowCreatePost(false)}
-                        className="flex-1 text-gray-300 hover:text-white hover:bg-white/5"
-                      >
-                        Cancel
-                      </Button>
+                    <div className="grid grid-cols-2 gap-3">
                       <Button
                         onClick={handleCreatePost}
                         disabled={createPostMutation.isPending}
-                        className="flex-1 btn-glass"
+                        className="btn-glass"
                       >
-                        {createPostMutation.isPending ? "Sharing..." : "Share"}
+                        {createPostMutation.isPending ? "Posting..." : "Post Only"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setLocation('/upload-work')}
+                        className="border-gray-600 text-gray-300 hover:bg-white/5"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload & Protect
                       </Button>
                     </div>
+                    
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowCreatePost(false)}
+                      className="w-full text-gray-300 hover:text-white hover:bg-white/5"
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 </div>
               </div>
