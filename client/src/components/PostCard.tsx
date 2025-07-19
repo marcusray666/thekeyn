@@ -19,7 +19,10 @@ import {
   BookmarkPlus,
   Flag,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  FileText,
+  Download,
+  ExternalLink
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
@@ -273,6 +276,44 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
               >
                 Your browser does not support the video tag.
               </video>
+            </div>
+          )}
+
+          {post.fileType === "document" && post.imageUrl && (
+            <div className="mb-4">
+              <div className="p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg hover:border-orange-500/40 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <FileText className="h-12 w-12 text-orange-400" />
+                  <div className="flex-1">
+                    <p className="text-white font-medium mb-1">Document attached</p>
+                    <p className="text-gray-400 text-sm mb-2">
+                      {post.imageUrl.endsWith('.pdf') ? 'PDF Document' : 'Document'}
+                    </p>
+                    <div className="flex gap-2">
+                      <a 
+                        href={`/api/files/${post.imageUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-1 bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 hover:text-orange-200 rounded text-sm transition-colors"
+                      >
+                        <Download className="mr-1 h-3 w-3" />
+                        Download
+                      </a>
+                      {post.imageUrl.endsWith('.pdf') && (
+                        <a 
+                          href={`/api/files/${post.imageUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-200 rounded text-sm transition-colors"
+                        >
+                          <ExternalLink className="mr-1 h-3 w-3" />
+                          Open PDF
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
