@@ -59,6 +59,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { AudioPlayer } from "@/components/AudioPlayer";
 
 interface Post {
   id: string;
@@ -497,7 +498,7 @@ export default function Social() {
                         type="file"
                         id="file-upload"
                         className="hidden"
-                        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.7z,.mov,.avi,.mkv,.webm,.flv,.wmv,.m4v,.3gp,.mp2,.m4a,.aac,.ogg,.wav,.wma,.flac"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
@@ -515,7 +516,7 @@ export default function Social() {
                             {newPost.file ? newPost.file.name : "Attach your work (image, video, audio, document)"}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            Max 500MB • JPG, PNG, MP4, MP3, PDF, DOC
+                            Max 500MB • Images, Videos, Audio, Documents
                           </p>
                         </div>
                       </label>
@@ -681,18 +682,10 @@ export default function Social() {
                             }}
                           />
                         ) : post.fileType === "audio" ? (
-                          <div className="p-4 bg-gray-800/50 rounded-lg">
-                            <div className="flex items-center space-x-4">
-                              <Music className="h-8 w-8 text-green-400" />
-                              <div className="flex-1">
-                                <audio 
-                                  src={`/api/files/${post.imageUrl}`}
-                                  controls
-                                  className="w-full"
-                                />
-                              </div>
-                            </div>
-                          </div>
+                          <AudioPlayer 
+                            src={`/api/files/${post.imageUrl}`}
+                            className="mb-0"
+                          />
                         ) : (
                           <div className="p-4 bg-gray-800/50 rounded-lg">
                             <div className="flex items-center space-x-4">

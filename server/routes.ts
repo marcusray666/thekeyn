@@ -392,14 +392,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set content type based on file extension
       const ext = path.extname(filename).toLowerCase();
       const contentTypeMap: { [key: string]: string } = {
+        // Images
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
         '.png': 'image/png',
         '.gif': 'image/gif',
-        '.pdf': 'application/pdf',
+        '.webp': 'image/webp',
+        '.bmp': 'image/bmp',
+        '.svg': 'image/svg+xml',
+        // Videos
         '.mp4': 'video/mp4',
+        '.mov': 'video/quicktime',
+        '.avi': 'video/x-msvideo',
+        '.mkv': 'video/x-matroska',
+        '.webm': 'video/webm',
+        '.flv': 'video/x-flv',
+        '.wmv': 'video/x-ms-wmv',
+        '.m4v': 'video/x-m4v',
+        '.3gp': 'video/3gpp',
+        // Audio
         '.mp3': 'audio/mpeg',
         '.wav': 'audio/wav',
+        '.m4a': 'audio/mp4',
+        '.aac': 'audio/aac',
+        '.ogg': 'audio/ogg',
+        '.wma': 'audio/x-ms-wma',
+        '.flac': 'audio/flac',
+        '.mp2': 'audio/mpeg',
+        // Documents
+        '.pdf': 'application/pdf',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.ppt': 'application/vnd.ms-powerpoint',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.txt': 'text/plain',
+        '.zip': 'application/zip',
+        '.rar': 'application/x-rar-compressed',
+        '.7z': 'application/x-7z-compressed',
       };
       
       if (contentTypeMap[ext]) {
@@ -1462,7 +1493,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle file upload
       if (file) {
         imageUrl = file.filename;
-        fileType = file.mimetype.split('/')[0]; // 'image', 'video', 'audio', etc.
+        const mimeType = file.mimetype.toLowerCase();
+        
+        // More specific file type detection
+        if (mimeType.startsWith('image/')) {
+          fileType = 'image';
+        } else if (mimeType.startsWith('video/') || mimeType === 'video/quicktime') {
+          fileType = 'video';
+        } else if (mimeType.startsWith('audio/')) {
+          fileType = 'audio';
+        } else {
+          fileType = 'document';
+        }
       }
 
       const parsedTags = tags ? JSON.parse(tags) : [];
