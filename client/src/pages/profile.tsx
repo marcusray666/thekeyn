@@ -731,7 +731,10 @@ export default function Profile() {
                     </p>
                     {isOwnProfile && (
                       <Button 
-                        onClick={() => setShowUploadDialog(true)}
+                        onClick={() => {
+                          console.log('Upload button clicked, opening dialog');
+                          setShowUploadDialog(true);
+                        }}
                         className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                       >
                         <Upload className="mr-2 h-4 w-4" />
@@ -750,7 +753,13 @@ export default function Profile() {
 
       {/* Upload Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-lg glass-morphism border-white/10">
+        <DialogContent className="sm:max-w-lg bg-gray-900 border border-purple-500/30 text-white"
+          style={{ 
+            background: 'rgba(17, 24, 39, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(168, 85, 247, 0.3)'
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-white">Share Your Creative Work</DialogTitle>
           </DialogHeader>
@@ -763,7 +772,7 @@ export default function Profile() {
                 placeholder="Tell the community about your creative work..."
                 value={newPost.content}
                 onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))}
-                className="glass-input min-h-[100px] resize-none"
+                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[100px] resize-none"
                 rows={4}
               />
             </div>
@@ -809,7 +818,7 @@ export default function Profile() {
                   setShowUploadDialog(false);
                   setNewPost({ content: "", file: null });
                 }}
-                className="flex-1 glass-input"
+                className="flex-1 bg-white/10 border border-white/20 text-white hover:bg-white/20"
               >
                 Cancel
               </Button>
