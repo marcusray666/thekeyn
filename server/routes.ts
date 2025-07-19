@@ -374,20 +374,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all certificates for authenticated user
   app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const certificates = await storage.getAllCertificates();
+      const userId = req.session!.userId;
+      // Only get the user's own works and their associated certificates
+      const userWorks = await storage.getUserWorks(userId);
       
-      // Transform certificates to include work data
+      // Get certificates for user's works only
       const certificatesWithWorks = await Promise.all(
-        certificates.map(async (cert) => {
-          const work = await storage.getWork(cert.workId);
-          return {
-            ...cert,
-            work: work || null,
-          };
+        userWorks.map(async (work) => {
+          const cert = await storage.getCertificateByWorkId(work.id);
+          if (cert) {
+            return {
+              ...cert,
+              work: work,
+            };
+          }
+          return null;
         })
       );
 
-      res.json(certificatesWithWorks);
+      // Filter out null entries (works without certificates)
+      const validCertificates = certificatesWithWorks.filter(cert => cert !== null);
+
+      res.json(validCertificates);
     } catch (error) {
       console.error("Error fetching certificates:", error);
       res.status(500).json({ error: "Failed to fetch certificates" });
@@ -569,18 +577,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get dashboard stats
+  // Get dashboard stats - user specific only
   app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const works = await storage.getAllWorks();
-      const certificates = await storage.getAllCertificates();
+      const userId = req.session!.userId;
+      // Only get the user's own works and certificates
+      const userWorks = await storage.getUserWorks(userId);
+      
+      // Get user's certificates by checking their works
+      let userCertificates = 0;
+      for (const work of userWorks) {
+        const cert = await storage.getCertificateByWorkId(work.id);
+        if (cert) userCertificates++;
+      }
 
       const stats = {
-        protected: works.length,
-        certificates: certificates.length,
+        protected: userWorks.length,
+        certificates: userCertificates,
         reports: 0, // Placeholder for future implementation
-        totalViews: Math.floor(Math.random() * 5000) + 1000, // Mock data for now
-        thisMonth: Math.floor(Math.random() * 500) + 50, // Mock data for now
+        totalViews: userWorks.reduce((total, work) => total + (work.viewCount || 0), 0),
+        thisMonth: userWorks.filter(work => {
+          const workDate = new Date(work.createdAt);
+          const now = new Date();
+          return workDate.getMonth() === now.getMonth() && workDate.getFullYear() === now.getFullYear();
+        }).length,
       };
 
       res.json(stats);
@@ -592,10 +612,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Old social feed endpoint removed to prevent duplicate posts
 
-  // Get recent works
+  // Get recent works - user specific only
   app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const recentWorks = await storage.getRecentWorks(10);
+      const userId = req.session!.userId;
+      // Only return the user's own works
+      const userWorks = await storage.getUserWorks(userId);
+      // Sort by creation date and limit to 10 most recent
+      const recentWorks = userWorks
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10);
       res.json(recentWorks);
     } catch (error) {
       console.error("Error fetching recent works:", error);
