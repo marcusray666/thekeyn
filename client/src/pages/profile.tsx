@@ -507,11 +507,11 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 pt-20 pb-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-8 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20"></div>
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-500/30 via-blue-500/20 to-transparent blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-indigo-500/30 via-purple-500/20 to-transparent blur-3xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-gray-600/10 via-gray-700/10 to-gray-600/10"></div>
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-gray-700/20 via-gray-600/10 to-transparent blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-700/20 via-gray-600/10 to-transparent blur-3xl"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Profile Section */}
@@ -535,7 +535,7 @@ export default function Profile() {
                 {/* Profile Image */}
                 <div className="relative group">
                   <div 
-                    className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-xl ring-4 ring-purple-500/20 cursor-pointer transition-all duration-300 hover:scale-105 hover:ring-purple-500/40"
+                    className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-2xl font-bold text-white shadow-xl ring-4 ring-gray-500/20 cursor-pointer transition-all duration-300 hover:scale-105 hover:ring-gray-500/40"
                     onClick={handleAvatarClick}
                   >
                     {profile.profileImageUrl ? (
@@ -572,7 +572,7 @@ export default function Profile() {
                   {/* Upload hint for own profile */}
                   {isOwnProfile && (
                     <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <div className="bg-purple-600/90 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                      <div className="bg-gray-600/90 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
                         Click to change avatar
                       </div>
                     </div>
@@ -729,7 +729,7 @@ export default function Profile() {
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold text-white">Portfolio</h2>
                   {works.length > 0 && (
-                    <Badge variant="secondary" className="bg-purple-500/20 text-purple-400">
+                    <Badge variant="secondary" className="bg-gray-500/20 text-gray-400">
                       {works.length} {works.length === 1 ? 'work' : 'works'}
                     </Badge>
                   )}
@@ -738,10 +738,10 @@ export default function Profile() {
                 <div className="flex items-center gap-3">
                   <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="w-auto">
                     <TabsList className="glass-input h-9">
-                      <TabsTrigger value="grid" className="data-[state=active]:bg-purple-500/20">Grid</TabsTrigger>
-                      <TabsTrigger value="masonry" className="data-[state=active]:bg-purple-500/20">Masonry</TabsTrigger>
-                      <TabsTrigger value="carousel" className="data-[state=active]:bg-purple-500/20">Carousel</TabsTrigger>
-                      <TabsTrigger value="timeline" className="data-[state=active]:bg-purple-500/20">Timeline</TabsTrigger>
+                      <TabsTrigger value="grid" className="data-[state=active]:bg-gray-500/20">Grid</TabsTrigger>
+                      <TabsTrigger value="masonry" className="data-[state=active]:bg-gray-500/20">Masonry</TabsTrigger>
+                      <TabsTrigger value="carousel" className="data-[state=active]:bg-gray-500/20">Carousel</TabsTrigger>
+                      <TabsTrigger value="timeline" className="data-[state=active]:bg-gray-500/20">Timeline</TabsTrigger>
                     </TabsList>
                   </Tabs>
                   
@@ -861,11 +861,11 @@ export default function Profile() {
 
       {/* Upload Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-lg bg-gray-900 border border-purple-500/30 text-white"
+        <DialogContent className="sm:max-w-lg bg-gray-900 border border-gray-500/30 text-white"
           style={{ 
             background: 'rgba(17, 24, 39, 0.95)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(168, 85, 247, 0.3)'
+            border: '1px solid rgba(107, 114, 128, 0.3)'
           }}
         >
           <DialogHeader>
@@ -933,7 +933,7 @@ export default function Profile() {
               <Button
                 onClick={handleCreatePost}
                 disabled={createPostMutation.isPending}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
               >
                 {createPostMutation.isPending ? "Sharing..." : "Share to Community"}
               </Button>
@@ -944,11 +944,11 @@ export default function Profile() {
 
       {/* Work Viewer Dialog */}
       <Dialog open={showWorkViewer} onOpenChange={setShowWorkViewer}>
-        <DialogContent className="max-w-4xl max-h-[90vh] bg-gray-900 border border-purple-500/30 text-white overflow-hidden"
+        <DialogContent className="max-w-4xl max-h-[90vh] bg-gray-900 border border-gray-500/30 text-white overflow-hidden"
           style={{ 
             background: 'rgba(17, 24, 39, 0.95)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(168, 85, 247, 0.3)'
+            border: '1px solid rgba(107, 114, 128, 0.3)'
           }}
         >
           <DialogHeader>
@@ -1027,7 +1027,7 @@ export default function Profile() {
                           />
                           <Button
                             onClick={() => window.open(selectedWork.fileUrl, '_blank')}
-                            className="bg-purple-600 hover:bg-purple-700"
+                            className="bg-gray-600 hover:bg-gray-700"
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
                             Open PDF
@@ -1036,7 +1036,7 @@ export default function Profile() {
                       ) : (
                         <Button
                           onClick={() => window.open(selectedWork.fileUrl, '_blank')}
-                          className="bg-purple-600 hover:bg-purple-700"
+                          className="bg-gray-600 hover:bg-gray-700"
                         >
                           <Download className="h-4 w-4 mr-2" />
                           Download Document
