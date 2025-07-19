@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRoute } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera } from "lucide-react";
+import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +43,8 @@ export default function Profile() {
     website: "",
     location: "",
   });
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileUsername = params?.username || currentUser?.username;
   const isOwnProfile = currentUser?.username === profileUsername;
@@ -123,6 +125,76 @@ export default function Profile() {
     updateProfileMutation.mutate({ displayName: editedProfile.displayName });
   };
 
+  const uploadAvatarMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await fetch('/api/user/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload avatar');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Avatar updated",
+        description: "Your profile picture has been updated successfully.",
+      });
+      
+      // Update the cache
+      queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername] });
+      setIsUploadingAvatar(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Upload failed",
+        description: "Failed to update your avatar. Please try again.",
+        variant: "destructive",
+      });
+      setIsUploadingAvatar(false);
+    },
+  });
+
+  const handleAvatarClick = () => {
+    if (isOwnProfile && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setIsUploadingAvatar(true);
+      uploadAvatarMutation.mutate(file);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -143,16 +215,23 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 pt-20 pb-8 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20"></div>
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-500/30 via-blue-500/20 to-transparent blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-indigo-500/30 via-purple-500/20 to-transparent blur-3xl"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
           <div className="lg:col-span-2">
             <Card className="glass-morphism p-8">
               <div className="flex items-start gap-6">
                 {/* Profile Image */}
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-2xl font-bold text-primary-foreground">
+                <div className="relative group">
+                  <div 
+                    className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-xl ring-4 ring-purple-500/20 cursor-pointer transition-all duration-300 hover:scale-105 hover:ring-purple-500/40"
+                    onClick={handleAvatarClick}
+                  >
                     {profile.profileImageUrl ? (
                       <img
                         src={profile.profileImageUrl}
@@ -162,15 +241,35 @@ export default function Profile() {
                     ) : (
                       profile.username.charAt(0).toUpperCase()
                     )}
+                    
+                    {/* Upload Overlay */}
+                    {isOwnProfile && (
+                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        {isUploadingAvatar ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Camera className="h-5 w-5 text-white" />
+                        )}
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  
+                  {/* Upload hint for own profile */}
                   {isOwnProfile && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 glass-input"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="bg-purple-600/90 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                        Click to change avatar
+                      </div>
+                    </div>
                   )}
                 </div>
 

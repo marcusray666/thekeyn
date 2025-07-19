@@ -1103,6 +1103,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Avatar upload endpoint
+  app.post('/api/user/avatar', requireAuth, upload.single('avatar'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ message: "No file provided" });
+      }
+
+      // Validate file type
+      if (!file.mimetype.startsWith('image/')) {
+        return res.status(400).json({ message: "File must be an image" });
+      }
+
+      console.log('Avatar upload:', {
+        userId,
+        filename: file.filename,
+        originalname: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size
+      });
+
+      // Update user profile with new avatar URL
+      const profileImageUrl = `/api/files/${file.filename}`;
+      await storage.updateUser(userId, { profileImageUrl });
+
+      // Return updated user data
+      const updatedUser = await storage.getUser(userId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { passwordHash, ...userWithoutPassword } = updatedUser;
+      
+      res.json({
+        message: "Avatar updated successfully",
+        user: userWithoutPassword,
+        avatarUrl: profileImageUrl
+      });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      res.status(500).json({ message: "Failed to upload avatar" });
+    }
+  });
+
   app.patch('/api/user/password', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
