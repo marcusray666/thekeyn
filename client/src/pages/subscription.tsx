@@ -242,7 +242,7 @@ export default function Subscription() {
     );
   }
 
-  const currentTier = subscriptionData?.limits.tier || 'free';
+  const currentTier = subscriptionData?.tier || 'free';
   const currentTierInfo = tierInfo[currentTier as keyof typeof tierInfo];
 
   return (
