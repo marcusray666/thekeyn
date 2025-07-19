@@ -218,7 +218,10 @@ export const posts = pgTable("posts", {
   userId: integer("user_id").references(() => users.id).notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
+  filename: text("filename"),
   fileType: text("file_type"), // 'image', 'audio', 'video', etc.
+  mimeType: text("mime_type"),
+  fileSize: integer("file_size"),
   tags: text("tags").array().default([]),
   likes: integer("likes").default(0),
   comments: integer("comments").default(0),
@@ -230,7 +233,10 @@ export const posts = pgTable("posts", {
 export const insertPostSchema = createInsertSchema(posts).pick({
   content: true,
   imageUrl: true,
+  filename: true,
   fileType: true,
+  mimeType: true,
+  fileSize: true,
   tags: true,
 });
 

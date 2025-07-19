@@ -482,7 +482,10 @@ export class DatabaseStorage implements IStorage {
         userId: postData.userId,
         content: postData.content,
         imageUrl: postData.imageUrl,
+        filename: postData.filename,
         fileType: postData.fileType,
+        mimeType: postData.mimeType,
+        fileSize: postData.fileSize,
         tags: postData.tags || [],
       })
       .returning();
@@ -627,23 +630,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserPosts(userId: number): Promise<Post[]> {
     const userPosts = await db
-      .select({
-        id: posts.id,
-        userId: posts.userId,
-        content: posts.content,
-        filename: posts.filename,
-        fileType: posts.fileType,
-        mimeType: posts.mimeType,
-        fileSize: posts.fileSize,
-        imageUrl: posts.imageUrl,
-        tags: posts.tags,
-        likes: posts.likes,
-        comments: posts.comments,
-        shares: posts.shares,
-        views: posts.views,
-        createdAt: posts.createdAt,
-        updatedAt: posts.updatedAt,
-      })
+      .select()
       .from(posts)
       .where(eq(posts.userId, userId))
       .orderBy(desc(posts.createdAt));

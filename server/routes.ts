@@ -1249,19 +1249,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Transform social posts to match work format for portfolio display
       const transformedPosts = socialPosts.map(post => ({
-        id: `post_${post.id}`,
+        id: post.id, // Use original post ID without prefix
         userId: post.userId,
         title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '') || 'Untitled',
         description: post.content,
-        filename: post.filename,
+        filename: post.filename || (post.imageUrl ? post.imageUrl.split('/').pop() : null),
         fileType: post.fileType || 'text',
-        mimeType: post.mimeType,
-        fileUrl: post.filename ? `/api/files/${post.filename}` : null,
+        mimeType: post.mimeType || 'text/plain',
+        fileUrl: post.filename ? `/api/files/${post.filename}` : (post.imageUrl ? `/api/files/${post.imageUrl}` : null),
         fileSize: post.fileSize || 0,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
-        likes: post.likes,
-        views: post.views || 0,
+        likes: post.likes || 0,
+        views: 0,
         tags: post.tags || [],
         isProtected: false,
         isPost: true // Flag to identify this as a social post
@@ -1599,7 +1599,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         content: content.trim(),
         imageUrl,
+        filename: file ? file.filename : null,
         fileType,
+        mimeType: file ? file.mimetype : null,
+        fileSize: file ? file.size : null,
         tags: parsedTags
       });
 
