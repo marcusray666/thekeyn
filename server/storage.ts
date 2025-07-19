@@ -16,7 +16,7 @@ import {
   type Conversation, type InsertConversation, type Message, type InsertMessage
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, sql, ne, isNull, ilike } from "drizzle-orm";
+import { eq, desc, and, gte, sql, ne, isNull, ilike, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export interface IStorage {
@@ -147,6 +147,9 @@ export interface IStorage {
   getBlockchainVerificationByFileHash(fileHash: string): Promise<BlockchainVerification | undefined>;
   updateBlockchainVerification(id: string, updates: Partial<InsertBlockchainVerification>): Promise<BlockchainVerification>;
   logVerificationAttempt(log: InsertVerificationAuditLog): Promise<VerificationAuditLog>;
+
+  // User search for messaging
+  searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1453,12 +1456,14 @@ export class DatabaseStorage implements IStorage {
     return parseInt(unreadCount[0]?.count as string) || 0;
   }
 
-  async searchUsers(query: string, excludeUserId?: number): Promise<User[]> {
-    let whereClause = ilike(users.username, `%${query}%`);
-    
-    if (excludeUserId) {
-      whereClause = and(whereClause, ne(users.id, excludeUserId));
-    }
+  async searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]> {
+    const whereClause = and(
+      or(
+        ilike(users.username, `%${query}%`),
+        ilike(users.displayName, `%${query}%`)
+      ),
+      ne(users.id, currentUserId)
+    );
 
     return await db
       .select({

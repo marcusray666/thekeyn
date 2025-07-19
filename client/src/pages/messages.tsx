@@ -72,6 +72,13 @@ export default function MessagesPage() {
   const { data: searchResults = [], isLoading: searchLoading } = useQuery({
     queryKey: ["/api/search/users", userSearchQuery],
     enabled: userSearchQuery.length > 0,
+    queryFn: async () => {
+      const response = await fetch(`/api/search/users?q=${encodeURIComponent(userSearchQuery)}`);
+      if (!response.ok) {
+        throw new Error('Failed to search users');
+      }
+      return response.json();
+    },
   });
 
   // Send message mutation
