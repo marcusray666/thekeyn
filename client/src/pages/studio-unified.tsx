@@ -537,7 +537,8 @@ export default function StudioUnified() {
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
                         <WorkImage
                           filename={certificate.work.filename}
-                          alt={certificate.work.title}
+                          mimeType={certificate.work.mimeType}
+                          title={certificate.work.title}
                           className="w-full h-full object-cover"
                         />
                       </div>
