@@ -79,12 +79,19 @@ export default function BlockchainVerification() {
   // Generate verification mutation
   const generateVerification = useMutation({
     mutationFn: async ({ workId, level }: { workId: number; level: string }) => {
-      return await apiRequest("POST", "/api/verification/generate", { 
-        workId, 
-        verificationLevel: level 
+      console.log('Making API request to /api/verification/generate with:', { workId, verificationLevel: level });
+      const response = await apiRequest("/api/verification/generate", {
+        method: "POST",
+        body: { 
+          workId, 
+          verificationLevel: level 
+        }
       });
+      console.log('Verification API response:', response);
+      return response;
     },
     onSuccess: (data) => {
+      console.log('Verification generation successful:', data);
       setVerificationProof(data.proof);
       toast({
         title: "Verification Generated",
@@ -93,6 +100,7 @@ export default function BlockchainVerification() {
       queryClient.invalidateQueries({ queryKey: ["/api/works"] });
     },
     onError: (error) => {
+      console.error('Verification generation failed:', error);
       toast({
         title: "Verification Failed",
         description: error instanceof Error ? error.message : "Failed to generate verification",
@@ -132,6 +140,8 @@ export default function BlockchainVerification() {
   });
 
   const handleGenerateVerification = () => {
+    console.log('Generate verification clicked', { selectedWork, verificationLevel });
+    
     if (!selectedWork) {
       toast({
         title: "No Work Selected",
@@ -141,6 +151,7 @@ export default function BlockchainVerification() {
       return;
     }
 
+    console.log('Making verification request for work:', selectedWork);
     generateVerification.mutate({ workId: selectedWork, level: verificationLevel });
   };
 
