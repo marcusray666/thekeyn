@@ -1122,6 +1122,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cancel subscription
+  app.post('/api/subscription/cancel', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.subscriptionTier === 'free') {
+        return res.status(400).json({ message: 'No active subscription to cancel' });
+      }
+
+      // Set subscription to cancel at period end
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // Expire at end of current billing period
+      
+      await storage.updateUser(userId, { 
+        subscriptionStatus: 'cancelled',
+        subscriptionExpiresAt: expiresAt
+      });
+
+      res.json({ 
+        message: 'Subscription cancelled successfully. Access will continue until the end of your billing period.',
+        expiresAt: expiresAt.toISOString()
+      });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      res.status(500).json({ message: 'Failed to cancel subscription' });
+    }
+  });
+
+  // Reactivate subscription
+  app.post('/api/subscription/reactivate', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.subscriptionStatus !== 'cancelled') {
+        return res.status(400).json({ message: 'No cancelled subscription to reactivate' });
+      }
+
+      // Reactivate subscription
+      await storage.updateUser(userId, { 
+        subscriptionStatus: 'active',
+        subscriptionExpiresAt: null // Remove expiration date
+      });
+
+      res.json({ 
+        message: 'Subscription reactivated successfully.'
+      });
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
+      res.status(500).json({ message: 'Failed to reactivate subscription' });
+    }
+  });
+
   // User settings routes
   app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

@@ -311,6 +311,38 @@ export default function Subscription() {
                     </div>
                   )}
                 </div>
+                
+                {/* Subscription Management */}
+                {currentTier !== 'free' && (
+                  <div className="pt-4 space-y-2">
+                    {subscriptionData.isActive ? (
+                      <Button
+                        onClick={() => cancelSubscriptionMutation.mutate()}
+                        disabled={cancelSubscriptionMutation.isPending}
+                        variant="destructive"
+                        className="w-full"
+                      >
+                        {cancelSubscriptionMutation.isPending ? (
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                        ) : (
+                          "Cancel Subscription"
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => reactivateSubscriptionMutation.mutate()}
+                        disabled={reactivateSubscriptionMutation.isPending}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        {reactivateSubscriptionMutation.isPending ? (
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                        ) : (
+                          "Reactivate Subscription"
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

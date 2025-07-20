@@ -11,7 +11,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  subscriptionTier: text("subscription_tier").notNull().default("free"), // free, starter, pro, agency
+  subscriptionTier: text("subscription_tier").notNull().default("free"), // free, starter, pro
+  subscriptionStatus: text("subscription_status").default("active"), // active, cancelled, expired
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   monthlyUploads: integer("monthly_uploads").default(0), // Current month upload count
   monthlyUploadLimit: integer("monthly_upload_limit").default(3), // Monthly upload limit based on tier
