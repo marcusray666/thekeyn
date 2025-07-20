@@ -838,16 +838,18 @@ export default function StudioUnified() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Preview */}
-                <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] flex items-center justify-center">
-                    <WorkImage
-                      filename={showPreview.certificate.work.filename}
-                      mimeType={showPreview.certificate.work.mimeType}
-                      title={showPreview.certificate.work.title}
-                      className="max-w-full max-h-[400px] object-contain rounded-lg"
-                    />
+                <div className="space-y-4 flex flex-col items-center">
+                  <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
+                    <div className="flex items-center justify-center w-full h-full">
+                      <WorkImage
+                        filename={showPreview.certificate.work.filename}
+                        mimeType={showPreview.certificate.work.mimeType}
+                        title={showPreview.certificate.work.title}
+                        className="max-w-full max-h-[400px] object-contain rounded-lg mx-auto"
+                      />
+                    </div>
                   </div>
-                  <div className="text-center">
+                  <div className="text-center w-full">
                     <p className="text-sm text-gray-400">
                       Original Name: {showPreview.certificate.work.originalName}
                     </p>

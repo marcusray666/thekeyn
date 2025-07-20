@@ -23,11 +23,11 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
   // If it's an image and we have a filename, try to display it
   if (mimeType && mimeType.startsWith('image/') && filename && !imageError) {
     return (
-      <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50`}>
+      <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex items-center justify-center`}>
         <img
           src={`/api/files/${filename}`}
           alt={title}
-          className="w-full h-full object-cover"
+          className="max-w-full max-h-full object-contain"
           onError={() => setImageError(true)}
           onLoad={() => setImageError(false)}
         />
