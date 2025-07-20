@@ -2443,6 +2443,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       console.log("Checkout session created successfully:", session.id);
+      console.log("Checkout URL:", session.url);
       res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
       console.error("Error creating checkout session:", error);
