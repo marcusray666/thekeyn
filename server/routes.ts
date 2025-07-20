@@ -15,6 +15,7 @@ import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import blockchainRoutes from "./routes/blockchain-routes";
 import { blockchainVerification } from "./blockchain-verification";
+import { openTimestampsService } from "./opentimestamps-service";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -833,8 +834,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Generating file hash for:', req.file.filename);
       const fileHash = generateFileHash(req.file.path);
       const certificateId = generateCertificateId();
-      const blockchainHash = await generateBlockchainHash();
-      console.log('Generated IDs:', { fileHash, certificateId, blockchainHash });
+      
+      // Create REAL blockchain timestamp using OpenTimestamps
+      console.log('Creating real blockchain timestamp...');
+      const timestampData = await openTimestampsService.createTimestamp(fileHash);
+      const blockchainHash = timestampData.commitment;
+      
+      console.log('Generated IDs:', { 
+        fileHash, 
+        certificateId, 
+        blockchainHash,
+        verificationUrls: timestampData.calendarUrls,
+        isRealBlockchain: !timestampData.pendingAttestation
+      });
 
       // Create work record
       console.log('Creating work record...');
@@ -863,22 +875,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Read file buffer for verification proof
       const fileBuffer = fs.readFileSync(req.file.path);
       
-      // Generate verification proof automatically during upload
-      console.log('Generating verification proof...');
-      const verificationProof = await blockchainVerification.generateVerificationProof(
-        fileBuffer,
-        {
-          title: work.title,
-          creator: work.creatorName,
-          certificateId: work.certificateId,
-          collaborators: work.collaborators
-        },
-        {
-          verificationLevel: 'basic', // Free tier gets basic verification
-          networkId: 'ethereum',
-          includeIPFS: false
-        }
-      );
+      // Generate verification proof with real blockchain data
+      console.log('Generating verification proof with OpenTimestamps...');
+      const verificationProof = {
+        fileHash: work.fileHash,
+        timestamp: Date.now(),
+        creator: work.creatorName,
+        certificateId: work.certificateId,
+        blockchainAnchor: timestampData.commitment,
+        verificationUrl: openTimestampsService.getVerificationUrl(timestampData.commitment, timestampData.ots),
+        otsProof: timestampData.ots,
+        calendarServers: timestampData.calendarUrls,
+        isRealBlockchain: !timestampData.pendingAttestation,
+        verificationInstructions: timestampData.pendingAttestation 
+          ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
+          : 'This timestamp is anchored to Ethereum blockchain and can be verified immediately.'
+      };
 
       // Create certificate with verification proof
       console.log('Creating certificate with verification proof...');

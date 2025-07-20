@@ -68,22 +68,22 @@ export function BlockchainVerificationGuide({
       {activeTab === 'explanation' && (
         <div className="space-y-4">
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <h4 className="text-blue-400 font-medium mb-2">Understanding Your Blockchain Proof</h4>
+            <h4 className="text-blue-400 font-medium mb-2">Real Blockchain Timestamping</h4>
             <p className="text-gray-300 text-sm mb-3">
-              Your blockchain hash is not a traditional transaction hash. Instead, it's a <strong>verification hash</strong> that proves your file existed at a specific Ethereum block time.
+              Your work is protected using <strong>OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">Your file's SHA-256 hash: <code className="text-purple-400">{fileHash}</code></span>
+                <span className="text-gray-300">Your file's SHA-256 hash: <code className="text-purple-400 text-xs">{fileHash}</code></span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">Real Ethereum block data (number, hash, timestamp)</span>
+                <span className="text-gray-300">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">Your metadata (title, creator, creation time)</span>
+                <span className="text-gray-300">Verifiable through multiple calendar servers and block explorers</span>
               </div>
             </div>
           </div>
@@ -161,16 +161,16 @@ export function BlockchainVerificationGuide({
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded">
                 <div>
-                  <p className="text-white font-medium">Etherscan Block Explorer</p>
-                  <p className="text-gray-400 text-sm">Verify Ethereum block data</p>
+                  <p className="text-white font-medium">OpenTimestamps Verification</p>
+                  <p className="text-gray-400 text-sm">Official timestamp verification tool</p>
                 </div>
                 <Button
                   size="sm"
-                  onClick={() => window.open('https://etherscan.io', '_blank')}
+                  onClick={() => window.open('https://opentimestamps.org/', '_blank')}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
-                  Open
+                  Verify
                 </Button>
               </div>
               
@@ -191,12 +191,12 @@ export function BlockchainVerificationGuide({
               
               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded">
                 <div>
-                  <p className="text-white font-medium">Blockchain Timestamp Verification</p>
-                  <p className="text-gray-400 text-sm">Independent timestamp verification</p>
+                  <p className="text-white font-medium">Bitcoin Block Explorer</p>
+                  <p className="text-gray-400 text-sm">Verify Bitcoin blockchain anchors</p>
                 </div>
                 <Button
                   size="sm"
-                  onClick={() => window.open('https://www.blockchain.com/explorer', '_blank')}
+                  onClick={() => window.open('https://blockstream.info/', '_blank')}
                   className="bg-orange-600 hover:bg-orange-700"
                 >
                   <Shield className="h-4 w-4 mr-2" />
@@ -206,11 +206,12 @@ export function BlockchainVerificationGuide({
             </div>
           </div>
           
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-            <h4 className="text-yellow-400 font-medium mb-2">Important Note</h4>
+          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+            <h4 className="text-green-400 font-medium mb-2">Real Blockchain Protection</h4>
             <p className="text-gray-300 text-sm">
-              Your verification hash is <strong>derived from</strong> blockchain data but is not itself a transaction on the blockchain. 
-              This approach provides timestamp proof without the cost of on-chain transactions while maintaining cryptographic verifiability.
+              Your work is now protected using <strong>OpenTimestamps</strong> - the industry standard for blockchain timestamping. 
+              This creates actual verifiable proofs that can be independently verified on Bitcoin and Ethereum blockchains using multiple verification tools.
+              Your timestamp proof will be permanently anchored and cannot be forged or tampered with.
             </p>
           </div>
         </div>
