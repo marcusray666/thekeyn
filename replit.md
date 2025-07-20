@@ -5,6 +5,8 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 20, 2025):**
+- ✅ SUBSCRIPTION CANCELLATION SYSTEM: Added cancel/reactivate functionality with graceful billing period management
+- ✅ DATABASE SCHEMA ENHANCED: Added subscription_status column to track active/cancelled/expired states
 - ✅ SUBSCRIPTION TIER SYSTEM FIXED: Resolved authentication middleware to properly fetch and display subscription tiers
 - ✅ PRO SUBSCRIPTION DISPLAY WORKING: Fixed frontend caching issues - Pro users now see unlimited uploads (∞ remaining)
 - ✅ SUBSCRIPTION TIERS FINALIZED: Free (3 uploads, 3 PDF certificates), Starter ($9.99 - 10 uploads, 10 certificates), Pro ($19.99 - unlimited everything + team features)
