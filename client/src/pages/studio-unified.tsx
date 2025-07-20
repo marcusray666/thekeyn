@@ -59,6 +59,8 @@ interface Certificate {
   certificateId: string;
   shareableLink: string;
   qrCode: string;
+  verificationProof?: string;
+  verificationLevel?: string;
   createdAt: string;
   work: {
     id: number;
@@ -97,6 +99,7 @@ export default function StudioUnified() {
   });
   const [createdWork, setCreatedWork] = useState<Work | null>(null);
   const [createdCertificate, setCreatedCertificate] = useState<Certificate | null>(null);
+  const [verificationProof, setVerificationProof] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -184,6 +187,7 @@ export default function StudioUnified() {
       console.log('Upload response:', response);
       setCreatedWork(response.work);
       setCreatedCertificate(response.certificate);
+      setVerificationProof(response.verificationProof);
       setProgress(100);
       setCurrentStep('complete');
       setIsProcessing(false);
@@ -195,10 +199,10 @@ export default function StudioUnified() {
       // Reset the upload form after successful upload
       setTimeout(() => {
         handleStartOver();
-      }, 2000); // Wait 2 seconds to show success state, then reset
+      }, 3000); // Wait 3 seconds to show success state, then reset
       toast({
-        title: "Work uploaded successfully!",
-        description: "Your creative work has been secured with blockchain verification.",
+        title: "Work uploaded and verified!",
+        description: "Your creative work has been secured with certificate and blockchain verification proof.",
       });
     },
     onError: (error) => {
@@ -264,6 +268,7 @@ export default function StudioUnified() {
     setWorkData({ title: "", description: "", collaborators: [] });
     setCreatedWork(null);
     setCreatedCertificate(null);
+    setVerificationProof(null);
     setProgress(0);
     setIsProcessing(false);
     // Reset file input
@@ -585,7 +590,7 @@ export default function StudioUnified() {
                             size="sm"
                             onClick={() => handleDownloadCertificate(certificate)}
                             className="bg-purple-600 hover:bg-purple-700 px-2 py-2 h-8 w-8 flex items-center justify-center"
-                            title="Download Certificate"
+                            title="Download Certificate PDF"
                           >
                             <Download className="h-4 w-4" />
                           </Button>
@@ -598,6 +603,23 @@ export default function StudioUnified() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {certificate.verificationProof && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                navigator.clipboard.writeText(certificate.verificationProof!);
+                                toast({
+                                  title: "Verification Proof Copied",
+                                  description: "Blockchain verification proof copied to clipboard.",
+                                });
+                              }}
+                              className="border-green-600 text-green-300 hover:bg-green-700/20 px-2 py-2 h-8 w-8 flex items-center justify-center"
+                              title="Copy Verification Proof"
+                            >
+                              <Shield className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -633,7 +655,7 @@ export default function StudioUnified() {
                 <div className="mt-4">
                   <Progress value={progress} className="w-full" />
                   <p className="text-gray-400 mt-2">
-                    {progress < 50 ? 'Uploading file...' : 'Generating certificate...'}
+                    {progress < 30 ? 'Uploading file...' : progress < 70 ? 'Generating certificate...' : 'Creating verification proof...'}
                   </p>
                 </div>
               </div>

@@ -65,6 +65,8 @@ export const certificates = pgTable("certificates", {
   shareableLink: text("shareable_link"),
   isDownloadable: boolean("is_downloadable").default(false), // Based on subscription tier
   hasCustomBranding: boolean("has_custom_branding").default(false), // Pro+ feature
+  verificationProof: text("verification_proof"), // JSON string of verification proof
+  verificationLevel: text("verification_level").default("basic"), // basic, enhanced, premium
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

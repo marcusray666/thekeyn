@@ -807,8 +807,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limits = await storage.getUserSubscriptionLimits(userId);
       console.log('Subscription limits:', limits);
       
-      // Create certificate
-      console.log('Creating certificate...');
+      // Generate verification proof automatically during upload
+      console.log('Generating verification proof...');
+      const verificationProof = await blockchainVerification.generateVerificationProof(
+        fileBuffer,
+        {
+          title: work.title,
+          creator: work.creatorName,
+          certificateId: work.certificateId,
+          collaborators: work.collaborators
+        },
+        {
+          verificationLevel: 'basic', // Free tier gets basic verification
+          networkId: 'ethereum',
+          includeIPFS: false
+        }
+      );
+
+      // Create certificate with verification proof
+      console.log('Creating certificate with verification proof...');
       const certificate = await storage.createCertificate({
         workId: work.id,
         certificateId,
@@ -816,6 +833,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         qrCode: `data:image/svg+xml;base64,${Buffer.from(`<svg></svg>`).toString("base64")}`,
         isDownloadable: limits.hasDownloadableCertificates,
         hasCustomBranding: limits.hasCustomBranding,
+        verificationProof: JSON.stringify(verificationProof),
+        verificationLevel: 'basic',
       });
 
       // Update usage counter
@@ -835,7 +854,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         work,
         certificate,
-        message: "Work uploaded and protected successfully",
+        verificationProof,
+        message: "Work uploaded, certified, and verified successfully",
         remainingUploads: uploadCheck.remainingUploads - 1,
       });
     } catch (error) {

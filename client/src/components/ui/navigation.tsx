@@ -48,7 +48,6 @@ export function Navigation() {
     { href: "/social", label: "Community", icon: Users },
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/studio", label: "Studio", icon: Upload },
-    { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
     { href: "/subscription", label: "Subscription", icon: Crown },
 
   ];

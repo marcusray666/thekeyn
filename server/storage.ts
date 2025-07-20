@@ -221,6 +221,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCertificate(insertCertificate: InsertCertificate): Promise<Certificate> {
+    // Check if verification proof already exists to ensure uniqueness
+    if (insertCertificate.verificationProof) {
+      const existingCert = await db
+        .select()
+        .from(certificates)
+        .where(eq(certificates.verificationProof, insertCertificate.verificationProof))
+        .limit(1);
+      
+      if (existingCert.length > 0) {
+        throw new Error("Verification proof already exists for another work");
+      }
+    }
+
     const [certificate] = await db
       .insert(certificates)
       .values(insertCertificate)
