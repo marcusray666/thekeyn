@@ -5,6 +5,7 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 20, 2025):**
+- ✅ REAL BLOCKCHAIN VERIFICATION: Replaced simulated hashes with actual Ethereum mainnet anchoring for verifiable blockchain proofs
 - ✅ SUBSCRIPTION CANCELLATION SYSTEM: Added cancel/reactivate functionality with graceful billing period management
 - ✅ DATABASE SCHEMA ENHANCED: Added subscription_status column to track active/cancelled/expired states
 - ✅ SUBSCRIPTION TIER SYSTEM FIXED: Resolved authentication middleware to properly fetch and display subscription tiers

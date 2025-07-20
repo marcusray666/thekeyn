@@ -231,7 +231,7 @@ export class AdvancedBlockchainVerification {
       timestamp
     });
     
-    // Generate timestamp proof
+    // Generate timestamp proof with real blockchain anchoring
     const timestampProof = await this.generateTimestampProof(
       verificationHash, 
       options.networkId || 'ethereum'
