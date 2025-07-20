@@ -121,6 +121,16 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       id: user.id,
       username: user.username,
       email: user.email,
+      subscriptionTier: user.subscriptionTier,
+      monthlyUploads: user.monthlyUploads,
+      monthlyUploadLimit: user.monthlyUploadLimit,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+      displayName: user.displayName,
+      bio: user.bio,
+      profileImageUrl: user.profileImageUrl,
+      isVerified: user.isVerified,
+      followerCount: user.followerCount,
+      followingCount: user.followingCount
     };
     
     // CRITICAL FIX: Set userId for profile updates
@@ -1052,22 +1062,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/subscription', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.userId!;
+      console.log('Subscription API - userId from auth:', userId);
+      
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
+      
+      console.log('Subscription API - user from DB:', { id: user.id, tier: user.subscriptionTier, uploads: user.monthlyUploads });
 
       const limits = await storage.getUserSubscriptionLimits(userId);
+      console.log('Subscription API - limits calculated:', limits);
+      
       const currentMonth = new Date().toISOString().slice(0, 7);
       const usage = await storage.getSubscriptionUsage(userId, currentMonth);
       const uploadLimit = await storage.checkUploadLimit(userId);
 
-      res.json({
-        tier: limits.tier,
+      const subscriptionData = {
+        tier: user.subscriptionTier || 'free', // Use direct DB value first
         uploadLimit: limits.uploadLimit,
-        uploadsUsed: usage?.uploadsUsed || 0,
-        remainingUploads: uploadLimit.remainingUploads,
-        canUpload: uploadLimit.canUpload,
+        uploadsUsed: user.monthlyUploads || 0, // Use direct DB value
+        remainingUploads: user.subscriptionTier === 'pro' || user.subscriptionTier === 'agency' ? -1 : Math.max(0, 3 - (user.monthlyUploads || 0)),
+        canUpload: user.subscriptionTier === 'pro' || user.subscriptionTier === 'agency' || (user.monthlyUploads || 0) < 3,
         hasDownloadableCertificates: limits.hasDownloadableCertificates,
         hasCustomBranding: limits.hasCustomBranding,
         hasIPFSStorage: limits.hasIPFSStorage,
@@ -1075,7 +1091,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teamSize: limits.teamSize,
         expiresAt: user.subscriptionExpiresAt,
         isActive: !user.subscriptionExpiresAt || user.subscriptionExpiresAt > new Date()
-      });
+      };
+      
+      console.log('Subscription API - sending response:', subscriptionData);
+      res.json(subscriptionData);
     } catch (error) {
       console.error('Error fetching subscription data:', error);
       res.status(500).json({ message: 'Failed to fetch subscription data' });
