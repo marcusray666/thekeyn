@@ -855,6 +855,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limits = await storage.getUserSubscriptionLimits(userId);
       console.log('Subscription limits:', limits);
       
+      // Read file buffer for verification proof
+      const fileBuffer = fs.readFileSync(req.file.path);
+      
       // Generate verification proof automatically during upload
       console.log('Generating verification proof...');
       const verificationProof = await blockchainVerification.generateVerificationProof(
