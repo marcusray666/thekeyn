@@ -991,11 +991,12 @@ export default function Profile() {
 
       {/* Work Viewer Dialog */}
       <Dialog open={showWorkViewer} onOpenChange={setShowWorkViewer}>
-        <DialogContent className="max-w-4xl max-h-[90vh] bg-gray-900 border border-gray-500/30 text-white overflow-hidden"
+        <DialogContent className="max-w-4xl max-h-[85vh] bg-gray-900 border border-gray-500/30 text-white overflow-hidden"
           style={{ 
             background: 'rgba(17, 24, 39, 0.95)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(107, 114, 128, 0.3)'
+            border: '1px solid rgba(107, 114, 128, 0.3)',
+            marginTop: '2rem'
           }}
         >
           <DialogHeader>
@@ -1028,11 +1029,13 @@ export default function Profile() {
                 {/* Media Display */}
                 <div className="bg-black/20 rounded-lg overflow-hidden">
                   {selectedWork.fileType === 'image' && selectedWork.fileUrl && (
-                    <img
-                      src={selectedWork.fileUrl}
-                      alt={selectedWork.title}
-                      className="w-full h-auto max-h-96 object-contain"
-                    />
+                    <div className="flex items-center justify-center p-4">
+                      <img
+                        src={selectedWork.fileUrl}
+                        alt={selectedWork.title}
+                        className="max-w-full max-h-96 object-contain mx-auto"
+                      />
+                    </div>
                   )}
                   
                   {selectedWork.fileType === 'video' && selectedWork.fileUrl && (
