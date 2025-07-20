@@ -561,11 +561,11 @@ export default function Profile() {
       <div className="absolute inset-0 bg-gradient-to-r from-gray-600/10 via-gray-700/10 to-gray-600/10"></div>
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-gray-700/20 via-gray-600/10 to-transparent blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-700/20 via-gray-600/10 to-transparent blur-3xl"></div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-4xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
+        <div className="w-full max-w-4xl mx-auto">
           {/* Profile Section */}
           <div className="w-full">
-            <Card className="glass-morphism p-8 relative">
+            <Card className="glass-morphism p-4 sm:p-6 md:p-8 relative">
               {/* Settings Button - Only show for own profile */}
               {isOwnProfile && (
                 <div className="absolute top-4 right-4">
@@ -580,7 +580,7 @@ export default function Profile() {
                 </div>
               )}
               
-              <div className="flex items-start gap-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                 {/* Profile Image */}
                 <div className="relative group">
                   <div 
@@ -771,8 +771,8 @@ export default function Profile() {
             </Card>
 
             {/* Portfolio Section */}
-            <Card className="glass-morphism p-6 mt-6">
-              <div className="flex items-center justify-between mb-6">
+            <Card className="glass-morphism p-4 sm:p-6 mt-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold text-white">Portfolio</h2>
                   {works.length > 0 && (
@@ -782,20 +782,20 @@ export default function Profile() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="w-auto">
-                    <TabsList className="glass-input h-9">
-                      <TabsTrigger value="grid" className="data-[state=active]:bg-gray-500/20">Grid</TabsTrigger>
-                      <TabsTrigger value="masonry" className="data-[state=active]:bg-gray-500/20">Masonry</TabsTrigger>
-                      <TabsTrigger value="carousel" className="data-[state=active]:bg-gray-500/20">Carousel</TabsTrigger>
-                      <TabsTrigger value="timeline" className="data-[state=active]:bg-gray-500/20">Timeline</TabsTrigger>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                  <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="w-full sm:w-auto">
+                    <TabsList className="glass-input h-9 w-full sm:w-auto grid grid-cols-4 sm:flex">
+                      <TabsTrigger value="grid" className="data-[state=active]:bg-gray-500/20 text-xs sm:text-sm">Grid</TabsTrigger>
+                      <TabsTrigger value="masonry" className="data-[state=active]:bg-gray-500/20 text-xs sm:text-sm">Masonry</TabsTrigger>
+                      <TabsTrigger value="carousel" className="data-[state=active]:bg-gray-500/20 text-xs sm:text-sm">Carousel</TabsTrigger>
+                      <TabsTrigger value="timeline" className="data-[state=active]:bg-gray-500/20 text-xs sm:text-sm">Timeline</TabsTrigger>
                     </TabsList>
                   </Tabs>
                   
                   <select 
                     value={sortBy} 
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="glass-input text-sm px-3 py-2 rounded-md h-9 bg-gray-800/50 border-gray-700 text-white"
+                    className="glass-input text-sm px-3 py-2 rounded-md h-9 bg-gray-800/50 border-gray-700 text-white w-full sm:w-auto"
                   >
                     <option value="recent">Recent</option>
                     <option value="popular">Most Popular</option>
