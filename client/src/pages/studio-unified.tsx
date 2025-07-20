@@ -44,6 +44,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { WorkImage } from "@/components/work-image";
+import { BlockchainVerificationGuide } from "@/components/blockchain-verification-guide";
 
 interface Work {
   id: number;
@@ -882,31 +883,11 @@ export default function StudioUnified() {
                     </div>
                   </div>
 
-                  <div className="glass-morphism p-4 rounded-lg">
-                    <h4 className="text-lg font-semibold text-white mb-3">Blockchain Verification</h4>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="text-gray-400">File Hash (SHA-256):</span>
-                        <p className="text-white font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
-                          {showPreview.certificate.work.fileHash}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-gray-400">Blockchain Hash:</span>
-                        <p className="text-green-400 font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
-                          {showPreview.certificate.work.blockchainHash}
-                        </p>
-                      </div>
-                      {showPreview.certificate.verificationProof && (
-                        <div>
-                          <span className="text-gray-400">Verification Proof:</span>
-                          <p className="text-blue-400 font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
-                            {showPreview.certificate.verificationProof}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <BlockchainVerificationGuide
+                    blockchainHash={showPreview.certificate.work.blockchainHash || ''}
+                    fileHash={showPreview.certificate.work.fileHash}
+                    verificationProof={showPreview.certificate.verificationProof}
+                  />
                 </div>
               </div>
             </motion.div>

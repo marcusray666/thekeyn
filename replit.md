@@ -18,6 +18,7 @@ Loggin' is a comprehensive social media platform for creators that combines digi
 - ✅ PORTFOLIO DELETE FUNCTIONALITY: Added complete work deletion system to Portfolio page with delete buttons and confirmation dialog
 - ✅ DELETE SYSTEM FIXES: Fixed file deletion errors (ES module __dirname issue) and foreign key constraint violations with copyright applications
 - ✅ WORK PREVIEW CENTERING: Fixed Work Preview modal centering issues - images and content now perfectly centered in all modals
+- ✅ BLOCKCHAIN VERIFICATION GUIDE: Added comprehensive guide explaining how verification hashes work with real Ethereum block anchoring
 - ✅ SUBSCRIPTION TIERS FINALIZED: Free (3 uploads, 3 PDF certificates), Starter ($9.99 - 5 uploads, 5 certificates), Pro ($19.99 - unlimited everything + team features)
 - ✅ AGENCY TIER REMOVED: Pro is now the top tier with all team collaboration features including 10-user access
 - ✅ DATABASE INTEGRATION COMPLETE: User mark123 confirmed as Pro tier with proper limits and features
