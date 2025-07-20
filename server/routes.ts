@@ -157,25 +157,48 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
+      // Images
       "image/jpeg",
+      "image/jpg", 
       "image/png",
       "image/gif",
       "image/webp",
       "image/svg+xml",
+      "image/bmp",
+      "image/tiff",
+      // Audio
       "audio/mpeg",
       "audio/wav",
       "audio/ogg",
       "audio/mp4",
+      "audio/m4a",
       "audio/aac",
       "audio/flac",
+      "audio/x-wav",
+      "audio/webm",
+      // Video
       "video/mp4",
       "video/webm",
       "video/quicktime",
-      "video/x-msvideo",
       "video/avi",
       "video/mov",
+      "video/x-msvideo",
+      "video/mkv",
+      "video/x-matroska",
+      // Documents
       "application/pdf",
       "text/plain",
+      "text/csv",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      // Archives
+      "application/zip",
+      "application/x-rar-compressed",
+      "application/x-7z-compressed",
     ];
 
     if (allowedTypes.includes(file.mimetype)) {

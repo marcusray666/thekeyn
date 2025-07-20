@@ -244,6 +244,7 @@ export default function StudioUnified() {
     formData.append('file', selectedFile);
     formData.append('title', workData.title);
     formData.append('description', workData.description);
+    formData.append('creatorName', user?.username || 'Anonymous');
     formData.append('collaborators', JSON.stringify(workData.collaborators));
 
     uploadMutation.mutate(formData);
