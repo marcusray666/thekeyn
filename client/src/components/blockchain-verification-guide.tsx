@@ -121,22 +121,34 @@ export function BlockchainVerificationGuide({
             <h4 className="text-green-400 font-medium mb-4">Verification Details</h4>
             <div className="space-y-4 text-sm">
               <div>
-                <span className="text-gray-400 block mb-2">Block Number:</span>
-                <div className="flex items-center gap-2">
-                  <code className="text-white bg-gray-800 px-3 py-2 rounded flex-1 font-mono text-xs">{proofData.blockchainAnchor}</code>
+                <span className="text-gray-400 block mb-2">OpenTimestamps Commitment:</span>
+                <div className="relative">
+                  <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.blockchainAnchor}</div>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => window.open(`https://etherscan.io/block/${proofData.blockchainAnchor}`, '_blank')}
-                    className="p-2 h-8 w-8 hover:bg-gray-700"
+                    onClick={() => copyToClipboard(proofData.blockchainAnchor, 'OpenTimestamps commitment')}
+                    className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
                   >
-                    <ExternalLink className="h-3 w-3" />
+                    <Copy className="h-3 w-3" />
                   </Button>
                 </div>
+                <p className="text-gray-500 text-xs mt-1">This commitment will be anchored to Bitcoin blockchain within 1-6 hours</p>
               </div>
               <div>
-                <span className="text-gray-400 block mb-2">Timestamp:</span>
+                <span className="text-gray-400 block mb-2">Timestamp Created:</span>
                 <p className="text-white bg-gray-800 px-3 py-2 rounded">{new Date(proofData.timestamp).toLocaleString()}</p>
+                <p className="text-gray-500 text-xs mt-1">When your file was first timestamped</p>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-2">Verification Status:</span>
+                <div className="bg-gray-800 px-3 py-2 rounded">
+                  {proofData.isRealBlockchain ? (
+                    <span className="text-green-400">✓ Anchored to blockchain - fully verifiable</span>
+                  ) : (
+                    <span className="text-yellow-400">⏳ Pending blockchain anchor (1-6 hours)</span>
+                  )}
+                </div>
               </div>
               <div>
                 <span className="text-gray-400 block mb-2">Creator:</span>
