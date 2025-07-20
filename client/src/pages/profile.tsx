@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRoute } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera, Upload, Eye, Heart, MessageCircle, Share2, ExternalLink, MoreHorizontal, UserPlus, Shield, Users, TrendingUp, Verified, BarChart3, Sparkles, ChevronLeft, Download, AlertTriangle } from "lucide-react";
+import { Edit3, Calendar, MapPin, Globe, Settings, Save, X, Camera, Upload, Eye, Heart, MessageCircle, Share2, ExternalLink, MoreHorizontal, UserPlus, Shield, Users, TrendingUp, Verified, BarChart3, Sparkles, ChevronLeft, Download, AlertTriangle, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +66,7 @@ export default function Profile() {
   });
   const [selectedWork, setSelectedWork] = useState<any>(null);
   const [showWorkViewer, setShowWorkViewer] = useState(false);
+  const [deletingWorkId, setDeletingWorkId] = useState<number | null>(null);
 
   const profileUsername = params?.username || currentUser?.username;
   const isOwnProfile = currentUser?.username === profileUsername;
@@ -223,6 +224,40 @@ export default function Profile() {
 
   const handleSaveDisplayName = () => {
     updateProfileMutation.mutate({ displayName: editedProfile.displayName });
+  };
+
+  // Delete work mutation
+  const deleteWorkMutation = useMutation({
+    mutationFn: async (workId: number) => {
+      const response = await apiRequest(`/api/works/${workId}`, {
+        method: 'DELETE',
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profile', profileUsername, 'works'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/works'] });
+      setDeletingWorkId(null);
+      toast({
+        title: "Work deleted",
+        description: "Your work has been permanently deleted from your portfolio.",
+      });
+    },
+    onError: (error: any) => {
+      setDeletingWorkId(null);
+      toast({
+        title: "Delete failed",
+        description: error.message || "Failed to delete work",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteWork = (workId: number) => {
+    if (confirm("Are you sure you want to permanently delete this work? This action cannot be undone.")) {
+      setDeletingWorkId(workId);
+      deleteWorkMutation.mutate(workId);
+    }
   };
 
   // Like/Share handlers
@@ -453,6 +488,20 @@ export default function Profile() {
             >
               <Share2 className="h-4 w-4" />
             </Button>
+            {isOwnProfile && (
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                className="bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteWork(work.id);
+                }}
+                disabled={deletingWorkId === work.id}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
 
