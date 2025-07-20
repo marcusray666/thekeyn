@@ -125,9 +125,13 @@ export default function StudioUnified() {
   // Force subscription refresh when component mounts
   useEffect(() => {
     if (isAuthenticated) {
+      console.log('Force refetching subscription data...');
       refetchSubscription();
+      // Also invalidate cache
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
     }
-  }, [isAuthenticated, refetchSubscription]);
+  }, [isAuthenticated, refetchSubscription, queryClient]);
 
   // Fetch certificates
   const { data: certificates, isLoading: certificatesLoading } = useQuery({
@@ -333,6 +337,10 @@ export default function StudioUnified() {
                     <Crown className="w-4 h-4 text-purple-400" />
                     <span className="text-sm font-medium text-white">
                       {subscriptionData.tier.charAt(0).toUpperCase() + subscriptionData.tier.slice(1)} Plan
+                    </span>
+                    {/* Debug info */}
+                    <span className="text-xs text-gray-500">
+                      (DB: {user?.subscriptionTier || 'unknown'})
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-purple-500/20 text-purple-100">

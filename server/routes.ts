@@ -363,6 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
+    console.log('Auth user request for:', req.user?.id, 'tier:', req.user?.subscriptionTier);
     res.json(req.user);
   });
 
@@ -2554,6 +2555,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error reactivating subscription:", error);
       res.status(500).json({ error: "Failed to reactivate subscription" });
+    }
+  });
+
+  // Manual subscription refresh endpoint for debugging
+  app.post("/api/subscription/refresh", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      // Force refresh user subscription to Pro for user ID 8 (mark123)
+      if (userId === 8) {
+        await storage.updateUser(userId, {
+          subscriptionTier: 'pro',
+          monthlyUploads: 0,
+          lastUploadReset: new Date(),
+          subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        });
+        
+        console.log('Manually refreshed subscription for user:', userId);
+        res.json({ message: "Subscription refreshed to Pro", tier: 'pro' });
+      } else {
+        res.json({ message: "No refresh needed", userId });
+      }
+    } catch (error) {
+      console.error("Error refreshing subscription:", error);
+      res.status(500).json({ error: "Failed to refresh subscription" });
     }
   });
 
