@@ -33,7 +33,8 @@ const tierInfo = {
     icon: Sparkles,
     features: [
       "3 uploads per month",
-      "Basic certificate generation",
+      "3 downloadable PDF certificates",
+      "Blockchain verification",
       "Community support",
       "Web app access"
     ]
@@ -45,7 +46,8 @@ const tierInfo = {
     icon: Zap,
     features: [
       "10 uploads per month",
-      "Downloadable PDF certificates",
+      "10 downloadable PDF certificates",
+      "Blockchain verification",
       "Priority support",
       "Mobile app access",
       "Basic analytics"
@@ -58,6 +60,8 @@ const tierInfo = {
     icon: Crown,
     features: [
       "Unlimited uploads",
+      "Unlimited downloadable PDF certificates",
+      "Blockchain verification",
       "Custom branding on certificates",
       "IPFS storage integration",
       "API access",
@@ -362,7 +366,7 @@ export default function Subscription() {
                   <div className="flex items-center justify-between">
                     <span>Remaining Uploads</span>
                     <span className="text-sm">
-                      {subscriptionData.remainingUploads === Infinity ? '∞' : subscriptionData.remainingUploads}
+                      {subscriptionData.remainingUploads === -1 ? '∞' : subscriptionData.remainingUploads}
                     </span>
                   </div>
                 </div>
