@@ -1247,8 +1247,8 @@ export class DatabaseStorage implements IStorage {
         teamSize: 1
       },
       starter: {
-        uploadLimit: 10,
-        hasDownloadableCertificates: true, // 10 PDF certificates per month
+        uploadLimit: 5,
+        hasDownloadableCertificates: true, // 5 PDF certificates per month
         hasCustomBranding: false,
         hasIPFSStorage: false,
         hasAPIAccess: false,

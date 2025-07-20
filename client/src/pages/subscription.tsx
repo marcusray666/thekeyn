@@ -47,8 +47,8 @@ const tierInfo = {
     description: "Great for individual creators",
     icon: Zap,
     features: [
-      "10 uploads per month",
-      "10 downloadable PDF certificates",
+      "5 uploads per month",
+      "5 downloadable PDF certificates",
       "Blockchain verification",
       "Priority support",
       "Mobile app access",
