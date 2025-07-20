@@ -1078,12 +1078,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const usage = await storage.getSubscriptionUsage(userId, currentMonth);
       const uploadLimit = await storage.checkUploadLimit(userId);
 
+      const tier = user.subscriptionTier || 'free';
+      const isPro = tier === 'pro' || tier === 'agency';
+      
       const subscriptionData = {
-        tier: user.subscriptionTier || 'free', // Use direct DB value first
-        uploadLimit: limits.uploadLimit,
-        uploadsUsed: user.monthlyUploads || 0, // Use direct DB value
-        remainingUploads: user.subscriptionTier === 'pro' || user.subscriptionTier === 'agency' ? -1 : Math.max(0, 3 - (user.monthlyUploads || 0)),
-        canUpload: user.subscriptionTier === 'pro' || user.subscriptionTier === 'agency' || (user.monthlyUploads || 0) < 3,
+        tier,
+        uploadLimit: isPro ? -1 : limits.uploadLimit, // Use proper unlimited for pro
+        uploadsUsed: user.monthlyUploads || 0,
+        remainingUploads: isPro ? -1 : Math.max(0, limits.uploadLimit - (user.monthlyUploads || 0)),
+        canUpload: isPro || (user.monthlyUploads || 0) < limits.uploadLimit,
         hasDownloadableCertificates: limits.hasDownloadableCertificates,
         hasCustomBranding: limits.hasCustomBranding,
         hasIPFSStorage: limits.hasIPFSStorage,

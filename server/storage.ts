@@ -1232,14 +1232,15 @@ export class DatabaseStorage implements IStorage {
     teamSize: number;
   }> {
     const user = await this.getUser(userId);
-    const subscription = await this.getUserSubscription(userId);
     
-    const tier = subscription?.tier || user?.subscriptionTier || 'free';
+    // Use direct user subscription tier from database, prioritize it
+    const tier = user?.subscriptionTier || 'free';
+    console.log('getUserSubscriptionLimits - detected tier:', tier, 'for user:', userId);
     
     const tierLimits = {
       free: {
         uploadLimit: 3,
-        hasDownloadableCertificates: false,
+        hasDownloadableCertificates: true, // 3 PDF certificates per month
         hasCustomBranding: false,
         hasIPFSStorage: false,
         hasAPIAccess: false,
@@ -1247,23 +1248,23 @@ export class DatabaseStorage implements IStorage {
       },
       starter: {
         uploadLimit: 10,
-        hasDownloadableCertificates: true,
+        hasDownloadableCertificates: true, // 10 PDF certificates per month
         hasCustomBranding: false,
         hasIPFSStorage: false,
         hasAPIAccess: false,
         teamSize: 1
       },
       pro: {
-        uploadLimit: -1, // unlimited
-        hasDownloadableCertificates: true,
+        uploadLimit: -1, // unlimited uploads
+        hasDownloadableCertificates: true, // unlimited PDF certificates
         hasCustomBranding: true,
         hasIPFSStorage: true,
         hasAPIAccess: true,
         teamSize: 1
       },
       agency: {
-        uploadLimit: -1, // unlimited
-        hasDownloadableCertificates: true,
+        uploadLimit: -1, // unlimited uploads
+        hasDownloadableCertificates: true, // unlimited PDF certificates
         hasCustomBranding: true,
         hasIPFSStorage: true,
         hasAPIAccess: true,
@@ -1271,9 +1272,12 @@ export class DatabaseStorage implements IStorage {
       }
     };
     
+    const limits = tierLimits[tier as keyof typeof tierLimits] || tierLimits.free;
+    console.log('getUserSubscriptionLimits - returning limits:', { tier, ...limits });
+    
     return {
       tier,
-      ...tierLimits[tier as keyof typeof tierLimits] || tierLimits.free
+      ...limits
     };
   }
 
