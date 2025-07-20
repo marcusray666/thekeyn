@@ -2372,6 +2372,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.userId;
       const { tier } = req.body;
       
+      console.log("Creating checkout session:", { userId, tier, body: req.body });
+      
+      if (!tier) {
+        return res.status(400).json({ error: "Tier is required" });
+      }
+      
       if (!['starter', 'pro', 'agency'].includes(tier)) {
         return res.status(400).json({ error: "Invalid subscription tier" });
       }
@@ -2444,6 +2450,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Checkout session created successfully:", session.id);
       console.log("Checkout URL:", session.url);
+      
+      if (!session.url) {
+        console.error("No URL in session object:", session);
+        return res.status(500).json({ error: "Failed to create checkout URL" });
+      }
+      
       res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
       console.error("Error creating checkout session:", error);
