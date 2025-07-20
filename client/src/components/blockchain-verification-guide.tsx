@@ -72,10 +72,15 @@ export function BlockchainVerificationGuide({
             <p className="text-gray-300 text-sm mb-3">
               Your work is protected using <strong>OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
             </p>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">Your file's SHA-256 hash: <code className="text-purple-400 text-xs">{fileHash}</code></span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-gray-300">Your file's SHA-256 hash:</span>
+                  <div className="mt-1 p-2 bg-gray-800 rounded text-xs font-mono break-all">
+                    <span className="text-purple-400">{fileHash}</span>
+                  </div>
+                </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
@@ -89,20 +94,22 @@ export function BlockchainVerificationGuide({
           </div>
 
           <div className="bg-gray-800/50 rounded-lg p-4">
-            <h4 className="text-white font-medium mb-2">Your Blockchain Verification Hash</h4>
-            <div className="flex items-center gap-2 bg-gray-900 p-3 rounded font-mono text-sm">
-              <span className="text-green-400 break-all">{blockchainHash}</span>
+            <h4 className="text-white font-medium mb-3">Your Blockchain Verification Hash</h4>
+            <div className="relative">
+              <div className="bg-gray-900 p-3 rounded font-mono text-xs break-all pr-10">
+                <span className="text-green-400">{blockchainHash}</span>
+              </div>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => copyToClipboard(blockchainHash, 'Blockchain hash')}
-                className="p-1 h-6 w-6"
+                className="absolute top-2 right-2 p-1 h-6 w-6 hover:bg-gray-700"
               >
                 <Copy className="h-3 w-3" />
               </Button>
             </div>
-            <p className="text-gray-400 text-xs mt-2">
-              This hash combines your file data with real Ethereum blockchain information to create a tamper-proof timestamp.
+            <p className="text-gray-400 text-xs mt-3 leading-relaxed">
+              This hash combines your file data with real blockchain information to create a tamper-proof timestamp.
             </p>
           </div>
         </div>
@@ -111,39 +118,39 @@ export function BlockchainVerificationGuide({
       {activeTab === 'verification' && proofData && (
         <div className="space-y-4">
           <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-            <h4 className="text-green-400 font-medium mb-2">Verification Details</h4>
-            <div className="grid gap-3 text-sm">
+            <h4 className="text-green-400 font-medium mb-4">Verification Details</h4>
+            <div className="space-y-4 text-sm">
               <div>
-                <span className="text-gray-400">Block Number:</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <code className="text-white bg-gray-800 px-2 py-1 rounded">{proofData.blockchainAnchor}</code>
+                <span className="text-gray-400 block mb-2">Block Number:</span>
+                <div className="flex items-center gap-2">
+                  <code className="text-white bg-gray-800 px-3 py-2 rounded flex-1 font-mono text-xs">{proofData.blockchainAnchor}</code>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => window.open(`https://etherscan.io/block/${proofData.blockchainAnchor}`, '_blank')}
-                    className="p-1 h-6 w-6"
+                    className="p-2 h-8 w-8 hover:bg-gray-700"
                   >
                     <ExternalLink className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
               <div>
-                <span className="text-gray-400">Timestamp:</span>
-                <p className="text-white">{new Date(proofData.timestamp).toLocaleString()}</p>
+                <span className="text-gray-400 block mb-2">Timestamp:</span>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded">{new Date(proofData.timestamp).toLocaleString()}</p>
               </div>
               <div>
-                <span className="text-gray-400">Creator:</span>
-                <p className="text-white">{proofData.creator}</p>
+                <span className="text-gray-400 block mb-2">Creator:</span>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded">{proofData.creator}</p>
               </div>
               <div>
-                <span className="text-gray-400">File Hash:</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <code className="text-purple-400 bg-gray-800 px-2 py-1 rounded text-xs break-all">{proofData.fileHash}</code>
+                <span className="text-gray-400 block mb-2">File Hash:</span>
+                <div className="relative">
+                  <div className="text-purple-400 bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.fileHash}</div>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => copyToClipboard(proofData.fileHash, 'File hash')}
-                    className="p-1 h-6 w-6"
+                    className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
                   >
                     <Copy className="h-3 w-3" />
                   </Button>
