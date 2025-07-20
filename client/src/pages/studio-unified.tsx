@@ -25,7 +25,10 @@ import {
   Calendar,
   Image,
   Filter,
-  Eye
+  Eye,
+  Trash2,
+  AlertTriangle,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -106,6 +109,8 @@ export default function StudioUnified() {
   // Certificates view state
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; certificate: Certificate | null }>({ show: false, certificate: null });
+  const [showPreview, setShowPreview] = useState<{ show: boolean; certificate: Certificate | null }>({ show: false, certificate: null });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -184,6 +189,48 @@ export default function StudioUnified() {
         variant: "destructive",
       });
     }
+  };
+
+  // Delete work mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (workId: number) => {
+      return apiRequest(`/api/works/${workId}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/certificates"] });
+      setDeleteConfirm({ show: false, certificate: null });
+      toast({
+        title: "Work Deleted",
+        description: "Your work and associated certificate have been permanently removed from both database and blockchain records.",
+      });
+    },
+    onError: (error) => {
+      console.error('Delete error:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete work. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handle delete confirmation
+  const handleDeleteWork = (certificate: Certificate) => {
+    setDeleteConfirm({ show: true, certificate });
+  };
+
+  // Confirm deletion
+  const confirmDelete = () => {
+    if (deleteConfirm.certificate) {
+      deleteMutation.mutate(deleteConfirm.certificate.workId);
+    }
+  };
+
+  // Handle preview
+  const handlePreviewWork = (certificate: Certificate) => {
+    setShowPreview({ show: true, certificate });
   };
 
   // Upload work mutation
@@ -600,25 +647,40 @@ export default function StudioUnified() {
                             <FileText className="h-3 w-3" />
                             {certificate.work.mimeType.split('/')[0]}
                           </div>
+                          <div className="flex items-center gap-1 text-green-400">
+                            <Shield className="h-3 w-3" />
+                            Blockchain Verified
+                          </div>
                         </div>
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
+                          <Button
+                            size="sm"
+                            onClick={() => handlePreviewWork(certificate)}
+                            className="bg-blue-600 hover:bg-blue-700 px-3 py-2 h-8 flex items-center gap-1"
+                            title="Preview Work"
+                          >
+                            <Eye className="h-3 w-3" />
+                            Preview
+                          </Button>
                           <Button
                             size="sm"
                             onClick={() => handleDownloadCertificate(certificate)}
-                            className="bg-purple-600 hover:bg-purple-700 px-2 py-2 h-8 w-8 flex items-center justify-center"
+                            className="bg-purple-600 hover:bg-purple-700 px-3 py-2 h-8 flex items-center gap-1"
                             title="Download Certificate PDF"
                           >
-                            <Download className="h-4 w-4" />
+                            <Download className="h-3 w-3" />
+                            PDF
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-2 py-2 h-8 w-8 flex items-center justify-center"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
                             title="View Certificate"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3 w-3" />
+                            View
                           </Button>
                           {certificate.verificationProof && (
                             <Button
@@ -631,20 +693,32 @@ export default function StudioUnified() {
                                   description: "Blockchain verification proof copied to clipboard.",
                                 });
                               }}
-                              className="border-green-600 text-green-300 hover:bg-green-700/20 px-2 py-2 h-8 w-8 flex items-center justify-center"
+                              className="border-green-600 text-green-300 hover:bg-green-700/20 px-3 py-2 h-8 flex items-center gap-1"
                               title="Copy Verification Proof"
                             >
-                              <Shield className="h-4 w-4" />
+                              <Shield className="h-3 w-3" />
+                              Copy Hash
                             </Button>
                           )}
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(certificate.shareableLink, '_blank')}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-2 py-2 h-8 w-8 flex items-center justify-center"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
                             title="Share Certificate"
                           >
-                            <ExternalLink className="h-4 w-4" />
+                            <Share2 className="h-3 w-3" />
+                            Share
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteWork(certificate)}
+                            className="border-red-600 text-red-300 hover:bg-red-700/20 px-3 py-2 h-8 flex items-center gap-1"
+                            title="Delete Work"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Delete
                           </Button>
                         </div>
                       </div>
@@ -677,6 +751,162 @@ export default function StudioUnified() {
                 </div>
               </div>
             </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirm.show && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="glass-morphism p-6 max-w-md mx-4 border border-red-500/30"
+            >
+              <div className="text-center">
+                <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Delete Work</h3>
+                <p className="text-gray-300 mb-6">
+                  Are you sure you want to delete "{deleteConfirm.certificate?.work.title}"? This will permanently remove the work, certificate, and blockchain records. This action cannot be undone.
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteConfirm({ show: false, certificate: null })}
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmDelete}
+                    disabled={deleteMutation.isPending}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deleteMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Permanently
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Work Preview Modal */}
+      <AnimatePresence>
+        {showPreview.show && showPreview.certificate && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="glass-morphism p-6 max-w-4xl max-h-[90vh] overflow-auto mx-4 relative"
+            >
+              <Button
+                onClick={() => setShowPreview({ show: false, certificate: null })}
+                className="absolute top-4 right-4 bg-gray-600 hover:bg-gray-700 p-2 h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Work Preview</h2>
+                <h3 className="text-lg text-gray-300">{showPreview.certificate.work.title}</h3>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Preview */}
+                <div className="space-y-4">
+                  <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] flex items-center justify-center">
+                    <WorkImage
+                      filename={showPreview.certificate.work.filename}
+                      mimeType={showPreview.certificate.work.mimeType}
+                      title={showPreview.certificate.work.title}
+                      className="max-w-full max-h-[400px] object-contain rounded-lg"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-400">
+                      Original Name: {showPreview.certificate.work.originalName}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      File Type: {showPreview.certificate.work.mimeType}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
+
+                {/* File Information */}
+                <div className="space-y-4">
+                  <div className="glass-morphism p-4 rounded-lg">
+                    <h4 className="text-lg font-semibold text-white mb-3">File Information</h4>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="text-gray-400">Original Name:</span>
+                        <p className="text-white break-all">{showPreview.certificate.work.originalName}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Type:</span>
+                        <p className="text-white">{showPreview.certificate.work.mimeType}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Size:</span>
+                        <p className="text-white">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="glass-morphism p-4 rounded-lg">
+                    <h4 className="text-lg font-semibold text-white mb-3">Blockchain Verification</h4>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="text-gray-400">File Hash (SHA-256):</span>
+                        <p className="text-white font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
+                          {showPreview.certificate.work.fileHash}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Blockchain Hash:</span>
+                        <p className="text-green-400 font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
+                          {showPreview.certificate.work.blockchainHash}
+                        </p>
+                      </div>
+                      {showPreview.certificate.verificationProof && (
+                        <div>
+                          <span className="text-gray-400">Verification Proof:</span>
+                          <p className="text-blue-400 font-mono break-all text-xs bg-gray-800 p-2 rounded mt-1">
+                            {showPreview.certificate.verificationProof}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

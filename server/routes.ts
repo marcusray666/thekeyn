@@ -958,10 +958,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const workId = parseInt(req.params.id);
+      const userId = req.session!.userId;
+      
+      if (isNaN(workId)) {
+        return res.status(400).json({ error: "Invalid work ID" });
+      }
 
+      console.log(`Delete request for work ${workId} by user ${userId}`);
+
+      // Get the work to verify ownership and get file info
       const work = await storage.getWork(workId);
       if (!work) {
         return res.status(404).json({ error: "Work not found" });
+      }
+
+      // Verify ownership
+      if (work.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized to delete this work" });
+      }
+
+      console.log(`Deleting work: ${work.title} (${work.filename})`);
+
+      // Delete the physical file
+      try {
+        const filePath = path.join(__dirname, "../uploads", work.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file: ${filePath}`);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file:', fileError);
+        // Continue with database deletion even if file deletion fails
       }
 
       // Delete associated certificate first
@@ -970,19 +997,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.deleteCertificate(certificate.id);
       }
 
-      // Delete the work
+      // Delete the work from database
       await storage.deleteWork(workId);
 
-      // Delete file from filesystem
-      if (work.filename) {
-        const filePath = path.join("uploads", work.filename);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      }
+      // Log the deletion for audit purposes
+      console.log(`Work deletion completed:`, {
+        workId,
+        title: work.title,
+        filename: work.filename,
+        fileHash: work.fileHash,
+        blockchainHash: work.blockchainHash,
+        deletedAt: new Date().toISOString(),
+        deletedBy: userId
+      });
 
-      res.json({
-        message: "Work deleted successfully",
+      res.json({ 
+        success: true, 
+        message: "Work and associated records deleted successfully",
+        deletedWork: {
+          id: workId,
+          title: work.title,
+          filename: work.filename,
+          blockchainHash: work.blockchainHash
+        }
       });
     } catch (error) {
       console.error("Error deleting work:", error);
