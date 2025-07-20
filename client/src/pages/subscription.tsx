@@ -478,13 +478,23 @@ export default function Subscription() {
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
-                      <Download className="w-4 h-4" />
-                      Downloadable Certificates
+                      <Check className="w-4 h-4" />
+                      Blockchain Verification
                     </td>
-                    <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
+                    <td className="text-center py-2 px-4">✅</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-4 flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Downloadable PDF Certificates
+                    </td>
+                    <td className="text-center py-2 px-4">3</td>
+                    <td className="text-center py-2 px-4">10</td>
+                    <td className="text-center py-2 px-4">Unlimited</td>
+                    <td className="text-center py-2 px-4">Unlimited</td>
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
