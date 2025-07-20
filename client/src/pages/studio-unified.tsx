@@ -192,6 +192,10 @@ export default function StudioUnified() {
       queryClient.refetchQueries({ queryKey: ['/api/certificates'] });
       // Switch to certificates tab to show the new certificate
       setActiveTab('certificates');
+      // Reset the upload form after successful upload
+      setTimeout(() => {
+        handleStartOver();
+      }, 2000); // Wait 2 seconds to show success state, then reset
       toast({
         title: "Work uploaded successfully!",
         description: "Your creative work has been secured with blockchain verification.",
@@ -211,10 +215,10 @@ export default function StudioUnified() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 500 * 1024 * 1024) { // 500MB limit
+      if (file.size > 2 * 1024 * 1024 * 1024) { // 2GB limit
         toast({
           title: "File too large",
-          description: "Please select a file smaller than 500MB.",
+          description: "Please select a file smaller than 2GB.",
           variant: "destructive",
         });
         return;
@@ -262,6 +266,10 @@ export default function StudioUnified() {
     setCreatedCertificate(null);
     setProgress(0);
     setIsProcessing(false);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   if (!isAuthenticated) {
