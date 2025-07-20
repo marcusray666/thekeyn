@@ -139,7 +139,7 @@ export default function Subscription() {
 
   const cancelSubscriptionMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/subscription/cancel");
+      return await apiRequest("/api/subscription/cancel", { method: "POST" });
     },
     onSuccess: () => {
       toast({
@@ -159,7 +159,7 @@ export default function Subscription() {
 
   const reactivateSubscriptionMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/subscription/reactivate");
+      return await apiRequest("/api/subscription/reactivate", { method: "POST" });
     },
     onSuccess: () => {
       toast({
