@@ -797,6 +797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileHash,
         certificateId,
         blockchainHash,
+        userId: userId, // Add userId to properly associate work with user
       });
 
       console.log('Work created successfully:', work.id);

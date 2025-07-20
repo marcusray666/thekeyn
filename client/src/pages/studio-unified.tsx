@@ -187,7 +187,11 @@ export default function StudioUnified() {
       setProgress(100);
       setCurrentStep('complete');
       setIsProcessing(false);
+      // Invalidate and refetch certificates
       queryClient.invalidateQueries({ queryKey: ['/api/certificates'] });
+      queryClient.refetchQueries({ queryKey: ['/api/certificates'] });
+      // Switch to certificates tab to show the new certificate
+      setActiveTab('certificates');
       toast({
         title: "Work uploaded successfully!",
         description: "Your creative work has been secured with blockchain verification.",
