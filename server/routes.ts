@@ -2345,6 +2345,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.userId;
+      
+      // Get fresh user data
+      const user = await storage.getUser(userId);
       const subscription = await storage.getUserSubscription(userId);
       const limits = await storage.getUserSubscriptionLimits(userId);
       const uploadCheck = await storage.checkUploadLimit(userId);
@@ -2352,7 +2355,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentMonth = new Date().toISOString().slice(0, 7);
       const usage = await storage.getSubscriptionUsage(userId, currentMonth);
       
+      // Return subscription data based on user's current tier
+      const tier = user?.subscriptionTier || 'free';
+      const tierInfo = {
+        free: { uploadLimit: 3, features: ['Basic certificates', 'Community support'] },
+        starter: { uploadLimit: 10, features: ['PDF certificates', 'Priority support'] },
+        pro: { uploadLimit: -1, features: ['Unlimited uploads', 'Custom branding', 'IPFS storage', 'API access'] },
+        agency: { uploadLimit: -1, features: ['Everything in Pro', 'Multi-seat access', 'Team tools'] }
+      };
+      
       res.json({
+        tier: tier,
+        uploadLimit: tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3,
+        uploadsUsed: user?.monthlyUploads || 0,
+        remainingUploads: tier === 'pro' || tier === 'agency' ? -1 : Math.max(0, (tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3) - (user?.monthlyUploads || 0)),
+        canUpload: tier === 'pro' || tier === 'agency' || (user?.monthlyUploads || 0) < (tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3),
+        hasDownloadableCertificates: tier !== 'free',
+        hasCustomBranding: tier === 'pro' || tier === 'agency',
+        hasIPFSStorage: tier === 'pro' || tier === 'agency',
+        hasAPIAccess: tier === 'pro' || tier === 'agency',
+        teamSize: tier === 'agency' ? 10 : 1,
+        expiresAt: user?.subscriptionExpiresAt?.toISOString(),
+        isActive: tier !== 'free',
         subscription,
         limits,
         usage: {
@@ -2543,28 +2567,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const userId = parseInt(session.metadata?.userId || '0');
           const tier = session.metadata?.tier;
           
+          console.log('Processing checkout session completed:', { userId, tier, sessionId: session.id });
+          
           if (userId && tier && session.subscription) {
             const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
             
-            // Create or update subscription in our database
-            await storage.createSubscription({
-              userId,
-              tier,
-              status: 'active',
-              stripeSubscriptionId: stripeSubscription.id,
-              stripeCustomerId: session.customer as string,
-              priceId: stripeSubscription.items.data[0].price.id,
-              currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
-              features: JSON.stringify({}),
-              teamSize: tier === 'agency' ? 10 : 1
-            });
+            try {
+              // Create or update subscription in our database
+              await storage.createSubscription({
+                userId,
+                tier,
+                status: 'active',
+                stripeSubscriptionId: stripeSubscription.id,
+                stripeCustomerId: session.customer as string,
+                priceId: stripeSubscription.items.data[0].price.id,
+                currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+                currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+                features: JSON.stringify({}),
+                teamSize: tier === 'agency' ? 10 : 1
+              });
+            } catch (subError) {
+              console.log('Subscription creation failed, trying update:', subError);
+              // If creation fails, try to update existing subscription
+              const existingSub = await storage.getUserSubscription(userId);
+              if (existingSub) {
+                await storage.updateSubscription(existingSub.id, {
+                  tier,
+                  status: 'active',
+                  stripeSubscriptionId: stripeSubscription.id,
+                  currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000)
+                });
+              }
+            }
             
-            // Update user's subscription tier
+            // Update user's subscription tier and reset upload limit
             await storage.updateUser(userId, {
               subscriptionTier: tier,
-              subscriptionExpiresAt: new Date(stripeSubscription.current_period_end * 1000)
+              subscriptionExpiresAt: new Date(stripeSubscription.current_period_end * 1000),
+              monthlyUploads: 0, // Reset upload count for new subscription
+              lastUploadReset: new Date()
             });
+            
+            console.log('Successfully updated user subscription to:', tier);
           }
           break;
           
