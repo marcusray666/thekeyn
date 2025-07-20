@@ -6,7 +6,7 @@ export function useAuth() {
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 0, // Always fresh
-    cacheTime: 0, // Don't cache
+    gcTime: 0, // Don't cache (updated from cacheTime in v5)
   });
 
   return {

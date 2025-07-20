@@ -2364,12 +2364,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         agency: { uploadLimit: -1, features: ['Everything in Pro', 'Multi-seat access', 'Team tools'] }
       };
       
-      res.json({
+      console.log('Subscription API - User tier:', tier, 'User data:', { id: user?.id, tier: user?.subscriptionTier, uploads: user?.monthlyUploads });
+      
+      const currentTierInfo = tierInfo[tier as keyof typeof tierInfo];
+      const uploadLimit = currentTierInfo?.uploadLimit || 3;
+      const uploadsUsed = user?.monthlyUploads || 0;
+      const remainingUploads = tier === 'pro' || tier === 'agency' ? -1 : Math.max(0, uploadLimit - uploadsUsed);
+      
+      const responseData = {
         tier: tier,
-        uploadLimit: tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3,
-        uploadsUsed: user?.monthlyUploads || 0,
-        remainingUploads: tier === 'pro' || tier === 'agency' ? -1 : Math.max(0, (tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3) - (user?.monthlyUploads || 0)),
-        canUpload: tier === 'pro' || tier === 'agency' || (user?.monthlyUploads || 0) < (tierInfo[tier as keyof typeof tierInfo]?.uploadLimit || 3),
+        uploadLimit: uploadLimit,
+        uploadsUsed: uploadsUsed,
+        remainingUploads: remainingUploads,
+        canUpload: tier === 'pro' || tier === 'agency' || uploadsUsed < uploadLimit,
         hasDownloadableCertificates: tier !== 'free',
         hasCustomBranding: tier === 'pro' || tier === 'agency',
         hasIPFSStorage: tier === 'pro' || tier === 'agency',
@@ -2384,7 +2391,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           storage: usage?.storageUsed || 0,
           apiCalls: usage?.apiCallsUsed || 0
         }
-      });
+      };
+      
+      console.log('Subscription API Response:', responseData);
+      res.json(responseData);
     } catch (error) {
       console.error("Error getting subscription:", error);
       res.status(500).json({ error: "Failed to get subscription" });

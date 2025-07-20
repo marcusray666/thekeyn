@@ -115,10 +115,19 @@ export default function StudioUnified() {
   }, [isAuthenticated, authLoading, setLocation]);
 
   // Fetch subscription data
-  const { data: subscriptionData } = useQuery({
+  const { data: subscriptionData, refetch: refetchSubscription } = useQuery({
     queryKey: ["/api/subscription"],
     enabled: isAuthenticated,
+    staleTime: 0, // Always fresh
+    gcTime: 0, // Don't cache
   });
+
+  // Force subscription refresh when component mounts
+  useEffect(() => {
+    if (isAuthenticated) {
+      refetchSubscription();
+    }
+  }, [isAuthenticated, refetchSubscription]);
 
   // Fetch certificates
   const { data: certificates, isLoading: certificatesLoading } = useQuery({
@@ -327,7 +336,7 @@ export default function StudioUnified() {
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-purple-500/20 text-purple-100">
-                    {subscriptionData.remainingUploads === Infinity ? '∞' : subscriptionData.remainingUploads} remaining
+                    {subscriptionData.remainingUploads === -1 ? '∞' : subscriptionData.remainingUploads} remaining
                   </Badge>
                 </div>
                 
