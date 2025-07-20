@@ -41,7 +41,7 @@ const tierInfo = {
   },
   starter: {
     name: "Starter",
-    price: 7.99,
+    price: 9.99,
     description: "Great for individual creators",
     icon: Zap,
     features: [
@@ -56,7 +56,7 @@ const tierInfo = {
   pro: {
     name: "Pro",
     price: 19.99,
-    description: "Perfect for professional creators",
+    description: "Perfect for professional creators and teams",
     icon: Crown,
     features: [
       "Unlimited uploads",
@@ -66,16 +66,7 @@ const tierInfo = {
       "IPFS storage integration",
       "API access",
       "Advanced analytics",
-      "NFT minting capabilities"
-    ]
-  },
-  agency: {
-    name: "Agency",
-    price: 49.99,
-    description: "Built for teams and agencies",
-    icon: Users,
-    features: [
-      "Everything in Pro",
+      "NFT minting capabilities",
       "Multi-seat access (up to 10 users)",
       "Team collaboration tools",
       "White-label options",
@@ -376,7 +367,7 @@ export default function Subscription() {
         )}
 
         {/* Pricing Plans */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {Object.entries(tierInfo).map(([tier, info]) => {
             const isCurrentPlan = tier === currentTier;
             const Icon = info.icon;
@@ -462,7 +453,6 @@ export default function Subscription() {
                     <th className="text-center py-2 px-4">Free</th>
                     <th className="text-center py-2 px-4">Starter</th>
                     <th className="text-center py-2 px-4">Pro</th>
-                    <th className="text-center py-2 px-4">Agency</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
@@ -474,14 +464,12 @@ export default function Subscription() {
                     <td className="text-center py-2 px-4">3</td>
                     <td className="text-center py-2 px-4">10</td>
                     <td className="text-center py-2 px-4">Unlimited</td>
-                    <td className="text-center py-2 px-4">Unlimited</td>
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
                       <Check className="w-4 h-4" />
                       Blockchain Verification
                     </td>
-                    <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
@@ -494,7 +482,6 @@ export default function Subscription() {
                     <td className="text-center py-2 px-4">3</td>
                     <td className="text-center py-2 px-4">10</td>
                     <td className="text-center py-2 px-4">Unlimited</td>
-                    <td className="text-center py-2 px-4">Unlimited</td>
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
@@ -503,7 +490,6 @@ export default function Subscription() {
                     </td>
                     <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">❌</td>
-                    <td className="text-center py-2 px-4">✅</td>
                     <td className="text-center py-2 px-4">✅</td>
                   </tr>
                   <tr>
@@ -514,7 +500,6 @@ export default function Subscription() {
                     <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">✅</td>
-                    <td className="text-center py-2 px-4">✅</td>
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
@@ -524,14 +509,12 @@ export default function Subscription() {
                     <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">❌</td>
                     <td className="text-center py-2 px-4">✅</td>
-                    <td className="text-center py-2 px-4">✅</td>
                   </tr>
                   <tr>
                     <td className="py-2 px-4 flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       Team Size
                     </td>
-                    <td className="text-center py-2 px-4">1</td>
                     <td className="text-center py-2 px-4">1</td>
                     <td className="text-center py-2 px-4">1</td>
                     <td className="text-center py-2 px-4">10</td>

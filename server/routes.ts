@@ -1079,7 +1079,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uploadLimit = await storage.checkUploadLimit(userId);
 
       const tier = user.subscriptionTier || 'free';
-      const isPro = tier === 'pro' || tier === 'agency';
+      const isPro = tier === 'pro';
       
       const subscriptionData = {
         tier,

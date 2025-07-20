@@ -1260,15 +1260,7 @@ export class DatabaseStorage implements IStorage {
         hasCustomBranding: true,
         hasIPFSStorage: true,
         hasAPIAccess: true,
-        teamSize: 1
-      },
-      agency: {
-        uploadLimit: -1, // unlimited uploads
-        hasDownloadableCertificates: true, // unlimited PDF certificates
-        hasCustomBranding: true,
-        hasIPFSStorage: true,
-        hasAPIAccess: true,
-        teamSize: 10
+        teamSize: 10 // Pro now supports teams up to 10 users
       }
     };
     
