@@ -23,6 +23,8 @@ interface SubscriptionData {
   teamSize: number;
   expiresAt?: string;
   isActive: boolean;
+  isCancelled?: boolean;
+  status?: string;
 }
 
 const tierInfo = {
@@ -295,10 +297,10 @@ export default function Subscription() {
                   <div className="flex items-center justify-between">
                     <span>Status:</span>
                     <Badge 
-                      variant={subscriptionData.isActive ? 'default' : 'destructive'}
-                      className={subscriptionData.isActive ? 'bg-green-500/20 text-green-100' : ''}
+                      variant={subscriptionData.isCancelled ? 'destructive' : (subscriptionData.isActive ? 'default' : 'secondary')}
+                      className={subscriptionData.isCancelled ? 'bg-orange-500/20 text-orange-100' : (subscriptionData.isActive ? 'bg-green-500/20 text-green-100' : '')}
                     >
-                      {subscriptionData.isActive ? 'active' : 'inactive'}
+                      {subscriptionData.isCancelled ? 'Cancelled' : (subscriptionData.isActive ? 'Active' : 'Inactive')}
                     </Badge>
                   </div>
                   
@@ -315,7 +317,30 @@ export default function Subscription() {
                 {/* Subscription Management */}
                 {currentTier !== 'free' && (
                   <div className="pt-4 space-y-2">
-                    {subscriptionData.isActive ? (
+                    {subscriptionData.isCancelled ? (
+                      <div className="space-y-2">
+                        <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                          <p className="text-sm text-orange-200">
+                            Subscription Cancelled
+                          </p>
+                          <p className="text-xs text-orange-300 mt-1">
+                            Your subscription will expire at the end of the current billing period. 
+                            All features remain available until then.
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => reactivateSubscriptionMutation.mutate()}
+                          disabled={reactivateSubscriptionMutation.isPending}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          {reactivateSubscriptionMutation.isPending ? (
+                            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                          ) : (
+                            "Reactivate Subscription"
+                          )}
+                        </Button>
+                      </div>
+                    ) : subscriptionData.isActive ? (
                       <Button
                         onClick={() => cancelSubscriptionMutation.mutate()}
                         disabled={cancelSubscriptionMutation.isPending}
@@ -328,19 +353,7 @@ export default function Subscription() {
                           "Cancel Subscription"
                         )}
                       </Button>
-                    ) : (
-                      <Button
-                        onClick={() => reactivateSubscriptionMutation.mutate()}
-                        disabled={reactivateSubscriptionMutation.isPending}
-                        className="w-full bg-green-600 hover:bg-green-700"
-                      >
-                        {reactivateSubscriptionMutation.isPending ? (
-                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                        ) : (
-                          "Reactivate Subscription"
-                        )}
-                      </Button>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </CardContent>

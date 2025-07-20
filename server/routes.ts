@@ -1081,6 +1081,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tier = user.subscriptionTier || 'free';
       const isPro = tier === 'pro';
       
+      const now = new Date();
+      const isActive = user.subscriptionStatus === 'active' && (!user.subscriptionExpiresAt || user.subscriptionExpiresAt > now);
+      const isCancelled = user.subscriptionStatus === 'cancelled';
+      
       const subscriptionData = {
         tier,
         uploadLimit: isPro ? -1 : limits.uploadLimit, // Use proper unlimited for pro
@@ -1093,7 +1097,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasAPIAccess: limits.hasAPIAccess,
         teamSize: limits.teamSize,
         expiresAt: user.subscriptionExpiresAt,
-        isActive: !user.subscriptionExpiresAt || user.subscriptionExpiresAt > new Date()
+        isActive: isActive,
+        isCancelled: isCancelled,
+        status: user.subscriptionStatus || 'active'
       };
       
       console.log('Subscription API - sending response:', subscriptionData);
