@@ -268,6 +268,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteWork(id: number): Promise<void> {
+    // Delete related records first to avoid foreign key constraints
+    // For now, we'll handle this with raw SQL since the table structure may vary
+    
+    try {
+      // Delete copyright applications if they exist
+      await db.execute(sql`DELETE FROM copyright_applications WHERE work_id = ${id}`);
+    } catch (error) {
+      // Table might not exist, continue
+      console.log('Note: copyright_applications table cleanup skipped');
+    }
+    
+    // Delete any other related records that might reference this work
+    // Add other deletions here as needed
+    
+    // Finally delete the work
     await db.delete(works).where(eq(works.id, id));
   }
 

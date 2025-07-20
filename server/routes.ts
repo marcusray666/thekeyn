@@ -10,10 +10,15 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import { z } from "zod";
 import Stripe from "stripe";
+import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import blockchainRoutes from "./routes/blockchain-routes";
 import { blockchainVerification } from "./blockchain-verification";
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
