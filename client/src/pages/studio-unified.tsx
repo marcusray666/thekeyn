@@ -303,7 +303,8 @@ export default function StudioUnified() {
       return;
     }
 
-    if (subscriptionData?.remainingUploads <= 0) {
+    // Check upload limits - Pro tier has remainingUploads = -1 (unlimited)
+    if (subscriptionData?.remainingUploads === 0) {
       toast({
         title: "Upload limit reached",
         description: "You've reached your upload limit. Please upgrade your plan.",

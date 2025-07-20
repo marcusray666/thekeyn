@@ -1203,11 +1203,21 @@ export class DatabaseStorage implements IStorage {
     const usage = await this.getSubscriptionUsage(userId, currentMonth);
     
     const uploadsUsed = usage?.uploadsUsed || 0;
+    
+    // For unlimited plans (uploadLimit = -1), return -1 as remainingUploads
+    if (limits.uploadLimit === -1) {
+      return {
+        canUpload: true,
+        remainingUploads: -1,
+        limit: -1
+      };
+    }
+    
     const remainingUploads = Math.max(0, limits.uploadLimit - uploadsUsed);
     
     return {
-      canUpload: remainingUploads > 0 || limits.uploadLimit === -1, // -1 means unlimited
-      remainingUploads: limits.uploadLimit === -1 ? Infinity : remainingUploads,
+      canUpload: remainingUploads > 0,
+      remainingUploads,
       limit: limits.uploadLimit
     };
   }
