@@ -99,7 +99,10 @@ export default function Subscription() {
         throw new Error("Authentication required");
       }
       console.log("Creating checkout session for tier:", tier);
-      const response = await apiRequest("POST", "/api/subscription/create-checkout", { tier });
+      const response = await apiRequest("/api/subscription/create-checkout", {
+        method: "POST",
+        body: { tier }
+      });
       console.log("Checkout response:", response);
       return response;
     },
