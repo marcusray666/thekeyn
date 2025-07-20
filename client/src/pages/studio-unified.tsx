@@ -567,32 +567,35 @@ export default function StudioUnified() {
                           </div>
                         </div>
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           <Button
                             size="sm"
                             onClick={() => handleDownloadCertificate(certificate)}
-                            className="bg-purple-600 hover:bg-purple-700 text-xs"
+                            className="bg-purple-600 hover:bg-purple-700 text-xs px-2 py-1.5 h-7 min-w-0 flex-1"
                           >
                             <Download className="h-3 w-3 mr-1" />
-                            Download
+                            <span className="hidden sm:inline">Download</span>
+                            <span className="sm:hidden">DL</span>
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 text-xs"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-700 text-xs px-2 py-1.5 h-7 min-w-0 flex-1"
                           >
                             <Eye className="h-3 w-3 mr-1" />
-                            View
+                            <span className="hidden sm:inline">View</span>
+                            <span className="sm:hidden">VW</span>
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(certificate.shareableLink, '_blank')}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 text-xs"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-700 text-xs px-2 py-1.5 h-7 min-w-0 flex-1"
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
-                            Share
+                            <span className="hidden sm:inline">Share</span>
+                            <span className="sm:hidden">SH</span>
                           </Button>
                         </div>
                       </div>
