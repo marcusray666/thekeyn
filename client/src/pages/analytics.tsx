@@ -107,11 +107,12 @@ export default function Analytics() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-8 relative overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+        <div className="space-y-4 mb-8">
+          {/* Back Button */}
+          <div className="flex items-center">
             <Button
               onClick={() => setLocation('/dashboard')}
               variant="outline"
@@ -121,15 +122,18 @@ export default function Analytics() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
-              <p className="text-gray-400">Track your creative work performance and engagement</p>
-            </div>
           </div>
           
-          <div className="flex items-center space-x-3">
+          {/* Title Section */}
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Analytics Dashboard</h1>
+            <p className="text-gray-400 text-sm sm:text-base">Track your creative work performance and engagement</p>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:justify-end">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32 glass-morphism border-gray-600 text-white">
+              <SelectTrigger className="w-full sm:w-32 glass-morphism border-gray-600 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600">
@@ -140,66 +144,69 @@ export default function Analytics() {
               </SelectContent>
             </Select>
             
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              size="sm"
-              className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button>
-            
-            <Button
-              onClick={exportAnalytics}
-              className="btn-glass px-4 py-2 rounded-2xl font-semibold text-white"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export Data
-            </Button>
+            <div className="flex gap-3 w-full sm:w-auto">
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 flex-1 sm:flex-none"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+              
+              <Button
+                onClick={exportAnalytics}
+                className="btn-glass px-4 py-2 rounded-2xl font-semibold text-white flex-1 sm:flex-none"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Export Data</span>
+                <span className="sm:hidden">Export</span>
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <GlassCard className="text-center py-6">
-            <Eye className="mx-auto h-8 w-8 text-cyan-400 mb-3" />
-            <div className="text-3xl font-bold text-cyan-400 mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <GlassCard className="text-center py-4 sm:py-6">
+            <Eye className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-cyan-400 mb-2 sm:mb-3" />
+            <div className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-1">
               {analytics.totalViews.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-sm">Total Views</div>
+            <div className="text-gray-400 text-xs sm:text-sm">Total Views</div>
           </GlassCard>
           
-          <GlassCard className="text-center py-6">
-            <Share2 className="mx-auto h-8 w-8 text-purple-400 mb-3" />
-            <div className="text-3xl font-bold text-purple-400 mb-1">
+          <GlassCard className="text-center py-4 sm:py-6">
+            <Share2 className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-purple-400 mb-2 sm:mb-3" />
+            <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-1">
               {analytics.totalShares.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-sm">Total Shares</div>
+            <div className="text-gray-400 text-xs sm:text-sm">Total Shares</div>
           </GlassCard>
           
-          <GlassCard className="text-center py-6">
-            <Download className="mx-auto h-8 w-8 text-emerald-400 mb-3" />
-            <div className="text-3xl font-bold text-emerald-400 mb-1">
+          <GlassCard className="text-center py-4 sm:py-6">
+            <Download className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-emerald-400 mb-2 sm:mb-3" />
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-400 mb-1">
               {analytics.totalDownloads.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-sm">Downloads</div>
+            <div className="text-gray-400 text-xs sm:text-sm">Downloads</div>
           </GlassCard>
           
-          <GlassCard className="text-center py-6">
-            <TrendingUp className="mx-auto h-8 w-8 text-orange-400 mb-3" />
-            <div className="text-3xl font-bold text-orange-400 mb-1">
+          <GlassCard className="text-center py-4 sm:py-6">
+            <TrendingUp className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-orange-400 mb-2 sm:mb-3" />
+            <div className="text-2xl sm:text-3xl font-bold text-orange-400 mb-1">
               +{analytics.growthRate}%
             </div>
-            <div className="text-gray-400 text-sm">Growth Rate</div>
+            <div className="text-gray-400 text-xs sm:text-sm">Growth Rate</div>
           </GlassCard>
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
           <GlassCard>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Views & Shares Over Time</h3>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Views & Shares Over Time</h3>
               <AnalyticsChart
                 type="line"
                 data={analytics.monthlyViews}
@@ -212,8 +219,8 @@ export default function Analytics() {
           </GlassCard>
 
           <GlassCard>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Device Types</h3>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Device Types</h3>
               <AnalyticsChart
                 type="pie"
                 data={analytics.deviceTypes}
@@ -225,11 +232,11 @@ export default function Analytics() {
           </GlassCard>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Top Performing Works */}
           <GlassCard>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Top Performing Works</h3>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Top Performing Works</h3>
               <div className="space-y-4">
                 {analytics.topWorks.map((work, index) => (
                   <div key={work.certificateId} className="flex items-center justify-between">
@@ -253,8 +260,8 @@ export default function Analytics() {
 
           {/* Geographic Data */}
           <GlassCard>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Geographic Distribution</h3>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Geographic Distribution</h3>
               <div className="space-y-4">
                 {analytics.geographicData.map((country, index) => (
                   <div key={country.country} className="flex items-center justify-between">
