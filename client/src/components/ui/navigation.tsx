@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle, BarChart3, AlertTriangle, Eye } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -133,13 +133,75 @@ export function Navigation() {
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-32 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
+                    {/* Account Section */}
+                    <div className="px-3 py-2 border-b border-gray-700">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Account</div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                          {user?.profileImageUrl ? (
+                            <img
+                              src={user.profileImageUrl}
+                              alt={user.displayName || user.username}
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            user?.username?.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-medium text-sm truncate">{user?.username}</div>
+                          <div className="text-gray-400 text-xs truncate">{user?.email || `${user?.username}@loggin.app`}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    
+                    {/* Navigation Items */}
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <Sparkles className="mr-3 h-4 w-4" />
+                        Portfolio Showcase
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <Eye className="mr-3 h-4 w-4" />
+                        View Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <Settings className="mr-3 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href="/report-theft" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <AlertTriangle className="mr-3 h-4 w-4" />
+                        Report Theft
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <Link href="/analytics" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <BarChart3 className="mr-3 h-4 w-4" />
+                        Analytics
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    
                     <DropdownMenuItem
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
                       className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-3 h-4 w-4" />
                       {logoutMutation.isPending ? "Logging out..." : "Logout"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -180,7 +242,31 @@ export function Navigation() {
           
           <div className="fixed top-16 left-0 right-0 bottom-0 bg-gray-900 z-50 overflow-y-auto">
             <div className="p-6 space-y-6">
-              <div className="text-green-400 text-xl font-bold">Mobile Menu</div>
+              {isAuthenticated && (
+                <>
+                  {/* Account Section */}
+                  <div className="space-y-4">
+                    <div className="text-xs text-gray-500 uppercase tracking-wide">Account</div>
+                    <div className="flex items-center space-x-3 p-4 bg-gray-800/50 rounded-lg">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        {user?.profileImageUrl ? (
+                          <img
+                            src={user.profileImageUrl}
+                            alt={user.displayName || user.username}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          user?.username?.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-medium truncate">{user?.username}</div>
+                        <div className="text-gray-400 text-sm truncate">{user?.email || `${user?.username}@loggin.app`}</div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
               
               {/* Navigation Links */}
               <div className="space-y-4">
@@ -202,65 +288,51 @@ export function Navigation() {
                 ))}
               </div>
 
-              {/* User Section */}
-              {isAuthenticated ? (
-                <div className="border-t border-gray-700 pt-6 space-y-4">
-                  <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider">Account</h3>
-                  
-                  <div className="bg-purple-600/20 rounded-xl p-4 border border-purple-500/30">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold text-lg">{user?.username}</p>
-                        <p className="text-gray-300 text-sm">{user?.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
+              {/* Additional User Options */}
+              {isAuthenticated && (
+                <div className="space-y-3">
                   <Link 
-                    href={`/showcase/${user?.username}`}
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
+                    href={`/profile/${user?.username}`}
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Sparkles className="h-6 w-6" />
+                    <Sparkles className="h-5 w-5" />
                     <span>Portfolio Showcase</span>
                   </Link>
                   
                   <Link 
                     href={`/profile/${user?.username}`}
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <User className="h-6 w-6" />
+                    <Eye className="h-5 w-5" />
                     <span>View Profile</span>
                   </Link>
                   
                   <Link
                     href="/settings"
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Settings className="h-6 w-6" />
+                    <Settings className="h-5 w-5" />
                     <span>Settings</span>
                   </Link>
 
                   <Link
                     href="/report-theft"
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Award className="h-6 w-6" />
+                    <AlertTriangle className="h-5 w-5" />
                     <span>Report Theft</span>
                   </Link>
 
                   <Link
                     href="/analytics"
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Sparkles className="h-6 w-6" />
+                    <BarChart3 className="h-5 w-5" />
                     <span>Analytics</span>
                   </Link>
                   
@@ -268,13 +340,16 @@ export function Navigation() {
                     variant="ghost"
                     onClick={handleLogout}
                     disabled={logoutMutation.isPending}
-                    className="w-full flex items-center space-x-4 px-4 py-4 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-all justify-start text-lg"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all justify-start"
                   >
-                    <LogOut className="h-6 w-6" />
+                    <LogOut className="h-5 w-5" />
                     <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
                   </Button>
                 </div>
-              ) : (
+              )}
+              
+              {/* Auth Section for Non-Authenticated Users */}
+              {!isAuthenticated && (
                 <div className="border-t border-gray-700 pt-6 space-y-4">
                   <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider">Account</h3>
                   <Link
