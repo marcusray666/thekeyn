@@ -40,12 +40,11 @@ interface TheftReport {
 }
 
 export default function ReportTheft() {
-  const [, params] = useRoute("/report-theft/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const certificateId = params?.id || '';
 
   const [formData, setFormData] = useState({
+    certificateId: '',
     platform: '',
     infringingUrl: '',
     description: '',
@@ -61,7 +60,10 @@ export default function ReportTheft() {
     mutationFn: async (data: TheftReport) => {
       return await apiRequest('/api/report-theft', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          certificateId: formData.certificateId || 'general-report'
+        }),
       });
     },
     onSuccess: (data) => {
@@ -95,7 +97,7 @@ export default function ReportTheft() {
     }
 
     reportMutation.mutate({
-      certificateId,
+      certificateId: formData.certificateId || 'general-report',
       ...formData,
     });
   };
@@ -140,11 +142,11 @@ export default function ReportTheft() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => setLocation(`/certificate/${certificateId}`)}
+            onClick={() => setLocation(formData.certificateId ? `/certificate/${formData.certificateId}` : '/')}
             className="text-gray-400 hover:text-gray-300 hover:bg-white hover:bg-opacity-5 mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Certificate
+            {formData.certificateId ? 'Back to Certificate' : 'Back to Dashboard'}
           </Button>
           
           <div className="flex items-center mb-4">
@@ -159,7 +161,7 @@ export default function ReportTheft() {
           
           <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-4">
             <p className="text-red-300 text-sm">
-              <strong>Certificate ID:</strong> {certificateId}
+              <strong>Certificate ID:</strong> {formData.certificateId || 'None (General Report)'}
             </p>
             <p className="text-red-300 text-sm mt-1">
               This tool generates DMCA-compliant takedown notices for intellectual property theft.
@@ -199,6 +201,21 @@ export default function ReportTheft() {
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* Certificate ID (Optional) */}
+                  <div>
+                    <Label htmlFor="certificateId" className="text-white">
+                      Certificate ID (Optional)
+                    </Label>
+                    <Input
+                      id="certificateId"
+                      type="text"
+                      value={formData.certificateId}
+                      onChange={(e) => setFormData(prev => ({ ...prev, certificateId: e.target.value }))}
+                      className="mt-2 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                      placeholder="Enter certificate ID if reporting theft of certified work"
+                    />
                   </div>
 
                   {/* Infringing URL */}

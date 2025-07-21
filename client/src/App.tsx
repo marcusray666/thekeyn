@@ -93,6 +93,7 @@ function Router() {
           <Route path="/messages" component={Messages} />
           <Route path="/followers" component={Followers} />
           <Route path="/settings" component={Settings} />
+          <Route path="/report-theft" component={ReportTheft} />
           <Route path="/profile/:username" component={Profile} />
         </>
       )}
