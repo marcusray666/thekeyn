@@ -1028,19 +1028,23 @@ export default function Profile() {
               <div className="space-y-4">
                 {/* Media Display */}
                 <div className="bg-black/20 rounded-lg overflow-hidden">
-                  {selectedWork.fileType === 'image' && selectedWork.fileUrl && (
+                  {selectedWork.mimeType && selectedWork.mimeType.startsWith('image/') && (
                     <div className="flex items-center justify-center p-4">
                       <img
-                        src={selectedWork.fileUrl}
+                        src={`/api/files/${selectedWork.filename}`}
                         alt={selectedWork.title}
                         className="max-w-full max-h-96 object-contain mx-auto"
+                        onError={(e) => {
+                          console.error('Image failed to load:', selectedWork.filename);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     </div>
                   )}
                   
-                  {selectedWork.fileType === 'video' && selectedWork.fileUrl && (
+                  {selectedWork.mimeType && selectedWork.mimeType.startsWith('video/') && (
                     <video
-                      src={selectedWork.fileUrl}
+                      src={`/api/files/${selectedWork.filename}`}
                       controls
                       className="w-full h-auto max-h-96"
                       style={{ backgroundColor: 'black' }}
@@ -1049,12 +1053,12 @@ export default function Profile() {
                     </video>
                   )}
                   
-                  {selectedWork.fileType === 'audio' && selectedWork.fileUrl && (
+                  {selectedWork.mimeType && selectedWork.mimeType.startsWith('audio/') && (
                     <div className="p-8 text-center">
                       <div className="text-6xl mb-4">🎵</div>
                       <p className="text-gray-300 mb-4">{selectedWork.title}</p>
                       <audio
-                        src={selectedWork.fileUrl}
+                        src={`/api/files/${selectedWork.filename}`}
                         controls
                         className="w-full max-w-md mx-auto"
                         style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
@@ -1064,19 +1068,19 @@ export default function Profile() {
                     </div>
                   )}
                   
-                  {selectedWork.fileType === 'document' && selectedWork.fileUrl && (
+                  {selectedWork.mimeType && (selectedWork.mimeType.includes('pdf') || selectedWork.mimeType.includes('document') || selectedWork.mimeType.includes('text')) && (
                     <div className="p-8 text-center">
                       <div className="text-6xl mb-4">📄</div>
                       <p className="text-gray-300 mb-4">{selectedWork.title}</p>
                       {selectedWork.mimeType === 'application/pdf' ? (
                         <div className="space-y-4">
                           <iframe
-                            src={selectedWork.fileUrl}
+                            src={`/api/files/${selectedWork.filename}`}
                             className="w-full h-96 rounded border"
                             title={selectedWork.title}
                           />
                           <Button
-                            onClick={() => window.open(selectedWork.fileUrl, '_blank')}
+                            onClick={() => window.open(`/api/files/${selectedWork.filename}`, '_blank')}
                             className="bg-gray-600 hover:bg-gray-700"
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
@@ -1085,7 +1089,7 @@ export default function Profile() {
                         </div>
                       ) : (
                         <Button
-                          onClick={() => window.open(selectedWork.fileUrl, '_blank')}
+                          onClick={() => window.open(`/api/files/${selectedWork.filename}`, '_blank')}
                           className="bg-gray-600 hover:bg-gray-700"
                         >
                           <Download className="h-4 w-4 mr-2" />
@@ -1095,10 +1099,16 @@ export default function Profile() {
                     </div>
                   )}
                   
-                  {(!selectedWork.fileUrl || selectedWork.fileType === 'text') && (
+                  {(!selectedWork.mimeType || 
+                    (!selectedWork.mimeType.startsWith('image/') && 
+                     !selectedWork.mimeType.startsWith('video/') && 
+                     !selectedWork.mimeType.startsWith('audio/') && 
+                     !selectedWork.mimeType.includes('pdf') && 
+                     !selectedWork.mimeType.includes('document'))) && (
                     <div className="p-8 text-center">
                       <div className="text-6xl mb-4">📝</div>
-                      <p className="text-gray-300">Text Content</p>
+                      <p className="text-gray-300">Unknown File Type</p>
+                      <p className="text-gray-500 text-sm mt-2">MIME Type: {selectedWork.mimeType || 'Unknown'}</p>
                     </div>
                   )}
                 </div>
