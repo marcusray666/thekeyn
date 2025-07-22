@@ -1435,7 +1435,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const settings = user.settings ? JSON.parse(user.settings) : {};
+      // Handle settings parsing (both object and string formats)
+      let settings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            settings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            settings = {};
+          }
+        } else {
+          settings = user.settings;
+        }
+      }
       res.json(settings);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -1453,7 +1466,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const currentSettings = user.settings ? JSON.parse(user.settings) : {};
+      // Handle settings parsing (both object and string formats)
+      let currentSettings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            currentSettings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            currentSettings = {};
+          }
+        } else {
+          currentSettings = user.settings;
+        }
+      }
       const updatedSettings = {
         ...currentSettings,
         [type]: settings
@@ -1477,8 +1503,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Parse privacy settings
-      const settings = user.settings ? JSON.parse(user.settings) : {};
+      // Parse privacy settings (handle both object and string format)
+      let settings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            settings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            settings = {};
+          }
+        } else {
+          settings = user.settings;
+        }
+      }
       const privacySettings = settings.privacy || {};
 
       // Check if profile is public
