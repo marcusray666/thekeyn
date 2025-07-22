@@ -234,16 +234,38 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                     <>
                       <DropdownMenuItem 
                         onClick={handleBookmark} 
-                        className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
-                        style={{ color: 'rgb(229, 231, 235)' }}
+                        className="!text-white hover:!bg-purple-600/40 hover:!text-white focus:!bg-purple-600/40 focus:!text-white cursor-pointer"
+                        style={{ 
+                          color: 'white',
+                          backgroundColor: 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.4)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'white';
+                        }}
                       >
                         <BookmarkPlus className="mr-2 h-4 w-4" />
                         {post.isBookmarked ? "Remove Bookmark" : "Bookmark"}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={handleReport} 
-                        className="!text-yellow-400 hover:!bg-yellow-500/20 hover:!text-yellow-300 focus:!bg-yellow-500/20 focus:!text-yellow-300"
-                        style={{ color: 'rgb(251, 191, 36)' }}
+                        className="!text-yellow-300 hover:!bg-yellow-500/30 hover:!text-yellow-200 focus:!bg-yellow-500/30 focus:!text-yellow-200 cursor-pointer"
+                        style={{ 
+                          color: 'rgb(253, 224, 71)',
+                          backgroundColor: 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.3)';
+                          e.currentTarget.style.color = 'rgb(254, 240, 138)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(253, 224, 71)';
+                        }}
                       >
                         <Flag className="mr-2 h-4 w-4" />
                         Report Content
