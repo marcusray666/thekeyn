@@ -112,11 +112,19 @@ export default function AdminDashboard() {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  // Fetch users
-  const { data: users, isLoading: usersLoading, refetch: refetchUsers } = useQuery<AdminUser[]>({
+  // Fetch users (always enabled to show metrics)
+  const { data: users, isLoading: usersLoading, refetch: refetchUsers, error: usersError } = useQuery<AdminUser[]>({
     queryKey: ["/api/admin/users", userFilter, searchTerm],
-    enabled: selectedTab === "users",
     retry: 3,
+  });
+
+  // Debug logging
+  console.log('Admin Dashboard Debug:', {
+    selectedTab,
+    usersLoading,
+    usersData: users,
+    usersError,
+    usersCount: users?.length
   });
 
   // Fetch content reports
@@ -613,6 +621,7 @@ export default function AdminDashboard() {
 
                 {usersLoading ? (
                   <div className="space-y-3">
+                    <div className="text-center py-4 text-yellow-300">Loading users...</div>
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="h-16 bg-gray-700/50 rounded animate-pulse"></div>
                     ))}
