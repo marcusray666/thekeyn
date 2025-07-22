@@ -115,6 +115,29 @@ export default function AdminDashboard() {
   // Fetch users (always enabled to show metrics)
   const { data: users, isLoading: usersLoading, refetch: refetchUsers, error: usersError } = useQuery<AdminUser[]>({
     queryKey: ["/api/admin/users", userFilter, searchTerm],
+    queryFn: async () => {
+      const url = new URL('/api/admin/users', window.location.origin);
+      if (userFilter && userFilter !== 'all') {
+        url.searchParams.set('filter', userFilter);
+      }
+      if (searchTerm) {
+        url.searchParams.set('search', searchTerm);
+      }
+      
+      const response = await fetch(url.toString(), {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch users: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     retry: 3,
   });
 
@@ -122,9 +145,9 @@ export default function AdminDashboard() {
   console.log('Admin Dashboard Debug:', {
     selectedTab,
     usersLoading,
-    usersData: users,
-    usersError,
-    usersCount: users?.length
+    usersCount: users?.length,
+    userFilter,
+    searchTerm
   });
 
   // Fetch content reports
