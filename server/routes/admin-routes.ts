@@ -201,6 +201,69 @@ export default function setupAdminRoutes(app: Express) {
     }
   });
 
+  // Get pending moderation works
+  app.get("/api/admin/moderation/pending", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const pendingWorks = await storage.getPendingModerationWorks();
+      res.json(pendingWorks);
+    } catch (error) {
+      console.error("Failed to get pending moderation works:", error);
+      res.status(500).json({ error: "Failed to get pending moderation works" });
+    }
+  });
+
+  // Approve work
+  app.post("/api/admin/moderation/:workId/approve", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const { resolution } = req.body;
+
+      const work = await storage.updateWorkModerationStatus(workId, 'approved', req.session!.userId!, resolution);
+      
+      // Log admin action
+      await storage.createAdminAuditLog({
+        adminId: req.session!.userId!,
+        action: 'work_approved',
+        targetType: 'work',
+        targetId: workId.toString(),
+        details: JSON.stringify({ resolution }),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      res.json(work);
+    } catch (error) {
+      console.error("Failed to approve work:", error);
+      res.status(500).json({ error: "Failed to approve work" });
+    }
+  });
+
+  // Reject work
+  app.post("/api/admin/moderation/:workId/reject", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const { resolution } = req.body;
+
+      const work = await storage.updateWorkModerationStatus(workId, 'rejected', req.session!.userId!, resolution);
+      
+      // Log admin action
+      await storage.createAdminAuditLog({
+        adminId: req.session!.userId!,
+        action: 'work_rejected',
+        targetType: 'work',
+        targetId: workId.toString(),
+        details: JSON.stringify({ resolution }),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      res.json(work);
+    } catch (error) {
+      console.error("Failed to reject work:", error);
+      res.status(500).json({ error: "Failed to reject work" });
+    }
+  });
+
   // Create content report (for users to report content)
   app.post("/api/content/report", async (req: Request, res: Response) => {
     try {

@@ -25,7 +25,9 @@ import {
   BarChart3,
   Settings,
   Database,
-  Globe
+  Globe,
+  Check,
+  X,
 } from "lucide-react";
 
 interface SystemMetrics {
@@ -53,6 +55,17 @@ interface AdminUser {
   totalLikes: number;
   createdAt: string;
   lastLoginAt?: string;
+}
+
+interface PendingWork {
+  id: number;
+  title: string;
+  creatorName: string;
+  moderationFlags: string[];
+  moderationScore: number;
+  filename: string;
+  mimeType: string;
+  createdAt: string;
 }
 
 interface ContentReport {
@@ -104,6 +117,12 @@ export default function AdminDashboard() {
     enabled: selectedTab === "moderation",
   });
 
+  // Fetch pending moderation works
+  const { data: pendingWorks, isLoading: pendingWorksLoading, refetch: refetchPendingWorks } = useQuery<PendingWork[]>({
+    queryKey: ["/api/admin/moderation/pending"],
+    enabled: selectedTab === "moderation",
+  });
+
   // Fetch audit logs
   const { data: auditLogs, isLoading: auditLoading } = useQuery<AuditLog[]>({
     queryKey: ["/api/admin/audit-logs"],
@@ -139,6 +158,22 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error(`Failed to ${action} report:`, error);
+    }
+  };
+
+  const handleModerationAction = async (workId: number, action: string, resolution?: string) => {
+    try {
+      const response = await fetch(`/api/admin/moderation/${workId}/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resolution }),
+      });
+
+      if (response.ok) {
+        refetchPendingWorks();
+      }
+    } catch (error) {
+      console.error(`Failed to ${action} work:`, error);
     }
   };
 
@@ -455,10 +490,102 @@ export default function AdminDashboard() {
 
           {/* Moderation Tab */}
           <TabsContent value="moderation" className="space-y-6">
+            {/* Pending AI Moderation Section */}
             <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
               <CardHeader>
-                <CardTitle>Content Moderation</CardTitle>
-                <CardDescription>Review and manage content reports</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                      AI Content Moderation
+                    </CardTitle>
+                    <CardDescription>Review content flagged by AI moderation system</CardDescription>
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    {pendingWorks?.length || 0} works awaiting review
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pendingWorksLoading ? (
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-24 bg-gray-700/50 rounded animate-pulse"></div>
+                    ))}
+                  </div>
+                ) : pendingWorks && pendingWorks.length > 0 ? (
+                  <div className="space-y-3">
+                    {pendingWorks.map((work) => (
+                      <div key={work.id} className="p-4 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h4 className="font-medium text-white">{work.title}</h4>
+                              <div className="flex items-center gap-1">
+                                <div className={`h-2 w-2 rounded-full ${
+                                  work.moderationScore > 0.7 ? 'bg-red-400' : 
+                                  work.moderationScore > 0.5 ? 'bg-yellow-400' : 'bg-green-400'
+                                }`}></div>
+                                <span className="text-xs text-gray-400">
+                                  Risk: {Math.round(work.moderationScore * 100)}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-400 space-y-1">
+                              <div>Creator: {work.creatorName}</div>
+                              <div>File: {work.filename} ({work.mimeType})</div>
+                              <div>Submitted: {new Date(work.createdAt).toLocaleDateString()}</div>
+                              {work.moderationFlags.length > 0 && (
+                                <div className="flex items-center gap-1 mt-2">
+                                  <span className="text-xs text-orange-400">AI Flags:</span>
+                                  {work.moderationFlags.map((flag, i) => (
+                                    <Badge key={i} variant="destructive" className="text-xs">
+                                      {flag.replace(/_/g, ' ')}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-green-900/20 border-green-700 text-green-300 hover:bg-green-800/30"
+                              onClick={() => handleModerationAction(work.id, 'approve', 'Manual review: Content approved')}
+                            >
+                              <Check className="h-4 w-4" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-red-900/20 border-red-700 text-red-300 hover:bg-red-800/30"
+                              onClick={() => handleModerationAction(work.id, 'reject', 'Manual review: Content rejected')}
+                            >
+                              <X className="h-4 w-4" />
+                              Reject
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
+                    <p className="text-gray-400">No content pending moderation review</p>
+                    <p className="text-sm text-gray-500 mt-1">All uploaded works have been automatically approved</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* User Reports Section */}
+            <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+              <CardHeader>
+                <CardTitle>User Content Reports</CardTitle>
+                <CardDescription>Review and manage user-submitted content reports</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Select value={reportFilter} onValueChange={setReportFilter}>

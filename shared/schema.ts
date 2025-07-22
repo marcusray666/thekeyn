@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, decimal, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { nanoid } from "nanoid";
@@ -57,6 +57,12 @@ export const works = pgTable("works", {
   commentCount: integer("comment_count").default(0),
   shareCount: integer("share_count").default(0),
   viewCount: integer("view_count").default(0),
+  // Content moderation
+  moderationStatus: text("moderation_status").default("pending"),
+  moderationFlags: text("moderation_flags").array().default([]),
+  moderationScore: real("moderation_score").default(0),
+  reviewedBy: integer("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

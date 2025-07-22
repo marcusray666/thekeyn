@@ -162,6 +162,9 @@ export interface IStorage {
   updateContentReport(reportId: number, updates: any): Promise<any>;
   createAdminAuditLog(log: any): Promise<any>;
   getAdminAuditLogs(): Promise<any[]>;
+  getAllFileHashes(): Promise<string[]>;
+  getPendingModerationWorks(): Promise<Work[]>;
+  updateWorkModerationStatus(workId: number, status: string, reviewedBy: number, resolution?: string): Promise<Work>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1765,6 +1768,33 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(users, eq(adminAuditLogs.adminId, users.id))
       .orderBy(desc(adminAuditLogs.createdAt))
       .limit(100);
+  }
+
+  // Additional moderation methods
+  async getAllFileHashes(): Promise<string[]> {
+    const result = await db.select({ fileHash: works.fileHash }).from(works);
+    return result.map(r => r.fileHash);
+  }
+
+  async getPendingModerationWorks(): Promise<Work[]> {
+    return await db
+      .select()
+      .from(works)
+      .where(eq(works.moderationStatus, 'pending'))
+      .orderBy(desc(works.createdAt));
+  }
+
+  async updateWorkModerationStatus(workId: number, status: string, reviewedBy: number, resolution?: string): Promise<Work> {
+    const [work] = await db
+      .update(works)
+      .set({ 
+        moderationStatus: status,
+        reviewedBy,
+        reviewedAt: new Date()
+      })
+      .where(eq(works.id, workId))
+      .returning();
+    return work;
   }
 }
 

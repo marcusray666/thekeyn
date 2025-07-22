@@ -17,6 +17,7 @@ import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
+import { contentModerationService } from "./services/content-moderation";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -840,6 +841,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Generating file hash for:', req.file.filename);
       const fileHash = generateFileHash(req.file.path);
       const certificateId = generateCertificateId();
+
+      // AI Content Moderation Analysis
+      console.log('Running AI content moderation analysis...');
+      const existingHashes = await storage.getAllFileHashes();
+      const contentAnalysis = await contentModerationService.analyzeContent(
+        description || '',
+        title,
+        req.file.path,
+        fileHash,
+        existingHashes
+      );
+      
+      console.log('Content moderation result:', {
+        decision: contentAnalysis.overallDecision,
+        textFlags: contentAnalysis.textModeration?.flags,
+        imageFlags: contentAnalysis.imageModeration?.flags,
+        plagiarismFlags: contentAnalysis.plagiarismCheck?.flags
+      });
+
+      // Handle moderation decision
+      if (contentAnalysis.overallDecision === 'rejected') {
+        // Delete uploaded file
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({
+          error: "Content rejected by AI moderation",
+          reason: "Your content was flagged for inappropriate material",
+          flags: [
+            ...(contentAnalysis.textModeration?.flags || []),
+            ...(contentAnalysis.imageModeration?.flags || []),
+            ...(contentAnalysis.plagiarismCheck?.flags || [])
+          ]
+        });
+      }
       
       // Create REAL blockchain timestamp using OpenTimestamps
       console.log('Creating real blockchain timestamp...');
@@ -853,6 +887,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verificationUrls: timestampData.calendarUrls,
         isRealBlockchain: !timestampData.pendingAttestation
       });
+
+      // Determine moderation status
+      const moderationStatus = contentAnalysis.overallDecision === 'pending_review' ? 'pending' : 'approved';
+      const moderationFlags = [
+        ...(contentAnalysis.textModeration?.flags || []),
+        ...(contentAnalysis.imageModeration?.flags || []),
+        ...(contentAnalysis.plagiarismCheck?.flags || [])
+      ];
+      const moderationScore = Math.max(
+        contentAnalysis.textModeration?.confidence || 0,
+        contentAnalysis.imageModeration?.confidence || 0,
+        contentAnalysis.plagiarismCheck?.confidence || 0
+      );
 
       // Create work record
       console.log('Creating work record...');
@@ -869,6 +916,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         certificateId,
         blockchainHash,
         userId: userId, // Add userId to properly associate work with user
+        moderationStatus,
+        moderationFlags,
+        moderationScore,
       });
 
       console.log('Work created successfully:', work.id);
@@ -918,6 +968,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadsUsed: (currentUsage?.uploadsUsed || 0) + 1,
         storageUsed: (currentUsage?.storageUsed || 0) + req.file.size
       });
+
+      // Return appropriate response based on moderation status
+      const response = {
+        workId: work.id,
+        certificateId: certificate.certificateId,
+        moderationStatus,
+        message: moderationStatus === 'pending' 
+          ? 'Your work has been uploaded but is pending admin review due to content flags.'
+          : 'Your work has been uploaded and approved successfully!',
+        flags: moderationFlags.length > 0 ? moderationFlags : undefined
+      };
 
       console.log('Upload completed successfully:', {
         workId: work.id,
