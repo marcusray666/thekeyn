@@ -9,10 +9,19 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import NotificationCenter from "@/components/NotificationCenter";
 
+interface User {
+  id: number;
+  username: string;
+  email?: string;
+  role?: string;
+  displayName?: string;
+  profileImageUrl?: string;
+}
+
 export function Navigation() {
   const [location, setLocation] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useAuth() as { isAuthenticated: boolean; user: User | null };
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -139,7 +148,7 @@ export function Navigation() {
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-500 shadow-2xl text-white">
+                  <DropdownMenuContent align="end" className="w-56">
                     {/* Account Section */}
                     <div className="px-3 py-2 border-b border-gray-500">
                       <div className="text-xs text-gray-300 uppercase tracking-wide mb-2">Account</div>
