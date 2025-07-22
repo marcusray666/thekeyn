@@ -245,10 +245,36 @@ export default function SocialFeed() {
               <SelectTrigger className="glass-input">
                 <SelectValue placeholder="Filter posts" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Posts</SelectItem>
-                <SelectItem value="following">Following</SelectItem>
-                <SelectItem value="trending">Trending</SelectItem>
+              <SelectContent 
+                className="!bg-gray-900 !text-white !border-gray-600 shadow-2xl"
+                style={{
+                  backgroundColor: 'rgb(17, 24, 39)',
+                  color: 'white',
+                  borderColor: 'rgb(75, 85, 99)',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+                }}
+              >
+                <SelectItem 
+                  value="all"
+                  className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
+                  style={{ color: 'rgb(229, 231, 235)' }}
+                >
+                  All Posts
+                </SelectItem>
+                <SelectItem 
+                  value="following"
+                  className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
+                  style={{ color: 'rgb(229, 231, 235)' }}
+                >
+                  Following
+                </SelectItem>
+                <SelectItem 
+                  value="trending"
+                  className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
+                  style={{ color: 'rgb(229, 231, 235)' }}
+                >
+                  Trending
+                </SelectItem>
               </SelectContent>
             </Select>
 
