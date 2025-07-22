@@ -166,16 +166,27 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       id: user.id,
       username: user.username,
       email: user.email,
+      role: user.role, // CRITICAL: Include role for admin access
       subscriptionTier: user.subscriptionTier,
+      subscriptionStatus: user.subscriptionStatus,
       monthlyUploads: user.monthlyUploads,
       monthlyUploadLimit: user.monthlyUploadLimit,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
       displayName: user.displayName,
       bio: user.bio,
       profileImageUrl: user.profileImageUrl,
+      website: user.website,
+      location: user.location,
       isVerified: user.isVerified,
       followerCount: user.followerCount,
-      followingCount: user.followingCount
+      followingCount: user.followingCount,
+      totalLikes: user.totalLikes,
+      themePreference: user.themePreference,
+      settings: user.settings,
+      lastLoginAt: user.lastLoginAt,
+      isBanned: user.isBanned,
+      banReason: user.banReason,
+      createdAt: user.createdAt
     };
     
     // CRITICAL FIX: Set userId for profile updates

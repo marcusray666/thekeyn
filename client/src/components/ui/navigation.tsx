@@ -53,6 +53,14 @@ export function Navigation() {
     { href: "/", label: "Home", icon: Home },
   ];
 
+  // Debug admin user detection
+  console.log('Navigation - User data:', { 
+    id: user?.id, 
+    username: user?.username, 
+    role: user?.role, 
+    isAdmin: user?.role === 'admin' 
+  });
+
   const authenticatedNavItems = [
     { href: "/", label: "Portfolio", icon: Home },
     { href: "/social", label: "Community", icon: Users },
