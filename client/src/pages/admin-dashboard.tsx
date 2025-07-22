@@ -201,17 +201,25 @@ export default function AdminDashboard() {
       >
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield className="h-8 w-8 text-purple-400" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Admin Dashboard
-            </h1>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Shield className="h-8 w-8 text-purple-400" />
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Admin Dashboard
+                </h1>
+              </div>
+              <p className="text-gray-400">Complete platform management and monitoring</p>
+            </div>
+            <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 px-4 py-2 rounded-lg border border-purple-500/30">
+              <p className="text-purple-200 font-medium">Admin Access Enabled</p>
+              <p className="text-xs text-purple-300">Full platform control</p>
+            </div>
           </div>
-          <p className="text-gray-400">Complete platform management and monitoring</p>
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-5 bg-gray-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 backdrop-blur-sm">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -219,6 +227,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Users
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Content
             </TabsTrigger>
             <TabsTrigger value="moderation" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />

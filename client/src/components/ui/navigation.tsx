@@ -50,7 +50,7 @@ export function Navigation() {
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/studio", label: "Studio", icon: Upload },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    ...(user?.role === 'admin' ? [{ href: "/admin", label: "Admin", icon: Shield }] : []),
+    ...(user?.role === 'admin' ? [{ href: "/admin", label: "Admin Dashboard", icon: Shield }] : []),
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
