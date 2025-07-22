@@ -524,6 +524,26 @@
   background: rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Dropdown menu readability fixes - Maximum contrast enforcement */
+[data-radix-dropdown-menu-content] {
+  background-color: rgb(17, 24, 39) !important;
+  color: white !important;
+  border-color: rgb(75, 85, 99) !important;
+}
+
+[data-radix-dropdown-menu-item] {
+  color: rgb(229, 231, 235) !important;
+}
+
+[data-radix-dropdown-menu-item]:hover {
+  background-color: rgba(147, 51, 234, 0.3) !important;
+  color: white !important;
+}
+
+[data-radix-dropdown-menu-separator] {
+  background-color: rgb(75, 85, 99) !important;
+}
+
 /* Light theme messages page specific styling */
 .light-theme .bg-gradient-to-br.from-slate-900 {
   background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;

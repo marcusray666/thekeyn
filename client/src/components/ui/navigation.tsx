@@ -148,10 +148,19 @@ export function Navigation() {
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-56 !bg-gray-900 !text-white !border-gray-600 shadow-2xl"
+                    style={{
+                      backgroundColor: 'rgb(17, 24, 39)',
+                      color: 'white',
+                      borderColor: 'rgb(75, 85, 99)',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+                    }}
+                  >
                     {/* Account Section */}
-                    <div className="px-3 py-2 border-b border-gray-500">
-                      <div className="text-xs text-gray-300 uppercase tracking-wide mb-2">Account</div>
+                    <div className="px-3 py-2 border-b border-gray-600" style={{ borderColor: 'rgb(75, 85, 99)' }}>
+                      <div className="text-xs uppercase tracking-wide mb-2" style={{ color: 'rgb(209, 213, 219)' }}>Account</div>
                       <div className="flex items-center space-x-3">
                         <Link 
                           href={`/profile/${user?.username}`}
@@ -168,56 +177,125 @@ export function Navigation() {
                           )}
                         </Link>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white font-medium text-sm truncate">{user?.displayName || user?.username}</div>
-                          <div className="text-gray-200 text-xs truncate">{user?.email || `${user?.username}@loggin.app`}</div>
+                          <div className="font-medium text-sm truncate" style={{ color: 'white' }}>{user?.displayName || user?.username}</div>
+                          <div className="text-xs truncate" style={{ color: 'rgb(229, 231, 235)' }}>{user?.email || `${user?.username}@loggin.app`}</div>
                         </div>
                       </div>
                     </div>
 
-                    <DropdownMenuSeparator className="bg-gray-500" />
+                    <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
                     
                     {/* Navigation Items */}
                     <DropdownMenuItem asChild>
-                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-100 hover:text-white hover:bg-purple-600/30 focus:bg-purple-600/30 py-2">
+                      <Link 
+                        href={`/profile/${user?.username}`} 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                        style={{ color: 'rgb(229, 231, 235)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        }}
+                      >
                         <Eye className="mr-3 h-4 w-4" />
                         View Profile
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center w-full text-gray-100 hover:text-white hover:bg-purple-600/30 focus:bg-purple-600/30 py-2">
+                      <Link 
+                        href="/settings" 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                        style={{ color: 'rgb(229, 231, 235)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        }}
+                      >
                         <Settings className="mr-3 h-4 w-4" />
                         Settings
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/security" className="flex items-center w-full text-gray-100 hover:text-white hover:bg-purple-600/30 focus:bg-purple-600/30 py-2">
+                      <Link 
+                        href="/security" 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                        style={{ color: 'rgb(229, 231, 235)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        }}
+                      >
                         <Shield className="mr-3 h-4 w-4" />
                         Security
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/report-theft" className="flex items-center w-full text-gray-100 hover:text-white hover:bg-purple-600/30 focus:bg-purple-600/30 py-2">
+                      <Link 
+                        href="/report-theft" 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                        style={{ color: 'rgb(229, 231, 235)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        }}
+                      >
                         <AlertTriangle className="mr-3 h-4 w-4" />
                         Report Theft
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/analytics" className="flex items-center w-full text-gray-100 hover:text-white hover:bg-purple-600/30 focus:bg-purple-600/30 py-2">
+                      <Link 
+                        href="/analytics" 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                        style={{ color: 'rgb(229, 231, 235)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        }}
+                      >
                         <BarChart3 className="mr-3 h-4 w-4" />
                         Analytics
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className="bg-gray-500" />
+                    <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
                     
                     <DropdownMenuItem
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
-                      className="text-red-300 hover:text-red-200 hover:bg-red-800/40 focus:bg-red-800/40 py-2"
+                      className="flex items-center w-full py-2 px-2 rounded-sm transition-colors cursor-pointer"
+                      style={{ color: 'rgb(248, 113, 113)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.2)';
+                        e.currentTarget.style.color = 'rgb(252, 165, 165)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = 'rgb(248, 113, 113)';
+                      }}
                     >
                       <LogOut className="mr-3 h-4 w-4" />
                       {logoutMutation.isPending ? "Logging out..." : "Logout"}
