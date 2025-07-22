@@ -17,6 +17,32 @@ async function requireAdmin(req: Request, res: Response, next: Function) {
 }
 
 export default function setupAdminRoutes(app: Express) {
+  // Debug endpoint to check admin status
+  app.get("/api/admin/status", async (req: Request, res: Response) => {
+    try {
+      const isAuthenticated = !!req.session?.userId;
+      let user = null;
+      let isAdmin = false;
+      
+      if (isAuthenticated) {
+        user = await storage.getUser(req.session.userId);
+        isAdmin = user?.role === 'admin';
+      }
+      
+      res.json({
+        isAuthenticated,
+        userId: req.session?.userId || null,
+        username: user?.username || null,
+        role: user?.role || null,
+        isAdmin,
+        sessionId: req.sessionID
+      });
+    } catch (error) {
+      console.error("Failed to get admin status:", error);
+      res.status(500).json({ error: "Failed to get admin status" });
+    }
+  });
+
   // Get system metrics
   app.get("/api/admin/metrics", requireAdmin, async (req: Request, res: Response) => {
     try {
