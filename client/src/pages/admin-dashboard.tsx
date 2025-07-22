@@ -52,7 +52,14 @@ interface AdminUser {
   isVerified: boolean;
   isBanned: boolean;
   followerCount: number;
+  followingCount: number;
   totalLikes: number;
+  totalWorks: number;
+  totalPosts: number;
+  displayName?: string;
+  phone?: string;
+  location?: string;
+  birthDate?: string;
   createdAt: string;
   lastLoginAt?: string;
 }
@@ -193,7 +200,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-gray-900 text-white pt-20 p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
