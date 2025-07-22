@@ -668,15 +668,19 @@ export default function AdminDashboard() {
                               <Badge variant="outline">{user.subscriptionTier}</Badge>
                             </div>
                             <p className="text-sm text-gray-400 mb-1">{user.email}</p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
-                              <span className="min-w-[60px] text-right">{user.followerCount || 0}</span>
-                              <span className="text-gray-600">followers</span>
-                              <span className="text-gray-600">•</span>
-                              <span className="min-w-[40px] text-right">{user.totalLikes || 0}</span>
-                              <span className="text-gray-600">likes</span>
-                              <span className="text-gray-600">•</span>
-                              <span className="min-w-[40px] text-right">{user.totalWorks || 0}</span>
-                              <span className="text-gray-600">works</span>
+                            <div className="grid grid-cols-3 gap-4 text-xs text-gray-500 font-mono">
+                              <div className="flex flex-col items-center">
+                                <span className="text-lg font-bold text-white">{user.followerCount || 0}</span>
+                                <span className="text-gray-400">followers</span>
+                              </div>
+                              <div className="flex flex-col items-center">
+                                <span className="text-lg font-bold text-white">{user.totalLikes || 0}</span>
+                                <span className="text-gray-400">likes</span>
+                              </div>
+                              <div className="flex flex-col items-center">
+                                <span className="text-lg font-bold text-white">{user.totalWorks || 0}</span>
+                                <span className="text-gray-400">works</span>
+                              </div>
                             </div>
                           </div>
                         </div>
