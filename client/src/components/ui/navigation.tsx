@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import NotificationCenter from "@/components/NotificationCenter";
 
 export function Navigation() {
   const [location, setLocation] = useLocation();
@@ -122,9 +123,14 @@ export function Navigation() {
               ))}
             </div>
 
-            {/* User Section */}
+            {/* Notifications & User Section */}
             {isAuthenticated ? (
-              <div className="relative ml-4">
+              <div className="flex items-center space-x-3 ml-4">
+                {/* Notification Center */}
+                <NotificationCenter />
+                
+                {/* User Dropdown */}
+                <div className="relative">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center space-x-1 text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5 px-2 py-1.5">
@@ -199,6 +205,7 @@ export function Navigation() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-2 ml-4">
