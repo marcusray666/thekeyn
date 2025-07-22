@@ -4,11 +4,16 @@ import { z } from "zod";
 
 // Admin middleware to check if user is admin
 async function requireAdmin(req: Request, res: Response, next: Function) {
-  if (!req.session?.userId) {
+  interface SessionData {
+    userId?: number;
+  }
+  
+  const session = req.session as SessionData;
+  if (!session?.userId) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const user = await storage.getUser(req.session.userId);
+  const user = await storage.getUser(session.userId);
   if (!user || user.role !== 'admin') {
     return res.status(403).json({ error: "Admin access required" });
   }
@@ -20,18 +25,23 @@ export default function setupAdminRoutes(app: Express) {
   // Debug endpoint to check admin status
   app.get("/api/admin/status", async (req: Request, res: Response) => {
     try {
-      const isAuthenticated = !!req.session?.userId;
+      interface SessionData {
+        userId?: number;
+      }
+      
+      const session = req.session as SessionData;
+      const isAuthenticated = !!session?.userId;
       let user = null;
       let isAdmin = false;
       
       if (isAuthenticated) {
-        user = await storage.getUser(req.session.userId);
+        user = await storage.getUser(session.userId);
         isAdmin = user?.role === 'admin';
       }
       
       res.json({
         isAuthenticated,
-        userId: req.session?.userId || null,
+        userId: session?.userId || null,
         username: user?.username || null,
         role: user?.role || null,
         isAdmin,
