@@ -116,6 +116,7 @@ export default function AdminDashboard() {
   const { data: users, isLoading: usersLoading, refetch: refetchUsers } = useQuery<AdminUser[]>({
     queryKey: ["/api/admin/users", userFilter, searchTerm],
     enabled: selectedTab === "users",
+    retry: 3,
   });
 
   // Fetch content reports
@@ -616,9 +617,9 @@ export default function AdminDashboard() {
                       <div key={i} className="h-16 bg-gray-700/50 rounded animate-pulse"></div>
                     ))}
                   </div>
-                ) : (
+                ) : users && users.length > 0 ? (
                   <div className="space-y-3">
-                    {users?.map((user) => (
+                    {users.map((user) => (
                       <div key={user.id} className="flex items-center justify-between p-4 bg-gray-900/80 rounded-lg border border-purple-500/20">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
@@ -636,7 +637,7 @@ export default function AdminDashboard() {
                             </div>
                             <p className="text-sm text-gray-400">{user.email}</p>
                             <p className="text-xs text-gray-500">
-                              {user.followerCount} followers • {user.totalLikes} likes
+                              {user.followerCount || 0} followers • {user.totalLikes || 0} likes • {user.totalWorks || 0} works
                             </p>
                           </div>
                         </div>
@@ -712,6 +713,10 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-yellow-300/80">
+                    No users found matching the current filters.
                   </div>
                 )}
               </CardContent>
