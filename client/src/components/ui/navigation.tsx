@@ -180,6 +180,13 @@ export function Navigation() {
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
+                      <Link href="/security" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <Shield className="mr-3 h-4 w-4" />
+                        Security
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
                       <Link href="/report-theft" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
                         <AlertTriangle className="mr-3 h-4 w-4" />
                         Report Theft

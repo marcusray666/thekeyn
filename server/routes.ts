@@ -269,12 +269,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       checkPeriod: 86400000, // prune expired entries every 24h
     }),
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+    name: "sessionId", // Don't use default session name
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      sameSite: 'strict', // CSRF protection
     },
   });
 

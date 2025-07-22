@@ -22,6 +22,7 @@ import ReportTheft from "@/pages/report-theft";
 import Analytics from "@/pages/analytics";
 import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
+import Security from "@/pages/security";
 import Profile from "@/pages/profile";
 
 import NFTMinting from "@/pages/nft-minting";
@@ -93,6 +94,7 @@ function Router() {
           <Route path="/messages" component={Messages} />
           <Route path="/followers" component={Followers} />
           <Route path="/settings" component={Settings} />
+          <Route path="/security" component={Security} />
           <Route path="/report-theft" component={ReportTheft} />
           <Route path="/profile/:username" component={Profile} />
         </>
