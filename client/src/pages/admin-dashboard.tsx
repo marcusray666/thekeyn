@@ -657,9 +657,9 @@ export default function AdminDashboard() {
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">{user.username[0].toUpperCase()}</span>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{user.username}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-white">{user.username}</span>
                               {user.isVerified && <CheckCircle className="h-4 w-4 text-blue-400" />}
                               {user.isBanned && <Ban className="h-4 w-4 text-red-400" />}
                               <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
@@ -667,10 +667,14 @@ export default function AdminDashboard() {
                               </Badge>
                               <Badge variant="outline">{user.subscriptionTier}</Badge>
                             </div>
-                            <p className="text-sm text-gray-400">{user.email}</p>
-                            <p className="text-xs text-gray-500">
-                              {user.followerCount || 0} followers • {user.totalLikes || 0} likes • {user.totalWorks || 0} works
-                            </p>
+                            <p className="text-sm text-gray-400 mb-1">{user.email}</p>
+                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                              <span>{user.followerCount || 0} followers</span>
+                              <span>•</span>
+                              <span>{user.totalLikes || 0} likes</span>
+                              <span>•</span>
+                              <span>{user.totalWorks || 0} works</span>
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
