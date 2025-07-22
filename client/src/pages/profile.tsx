@@ -434,6 +434,7 @@ export default function Profile() {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       className="group relative bg-gray-800/40 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:transform hover:scale-105"
+      style={{ WebkitTapHighlightColor: 'transparent' }}
     >
       <div className="aspect-square relative overflow-hidden">
         {work.filename && work.mimeType.startsWith('image/') ? (
@@ -452,12 +453,14 @@ export default function Profile() {
         )}
         
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+             style={{ WebkitTapHighlightColor: 'transparent' }}>
           <div className="flex gap-2">
             <Button 
               size="sm" 
               variant="secondary" 
               className="bg-white/20 backdrop-blur-sm"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedWork(work);
@@ -996,7 +999,10 @@ export default function Profile() {
             background: 'rgba(17, 24, 39, 0.95)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(107, 114, 128, 0.3)',
-            marginTop: '2rem'
+            marginTop: '2rem',
+            WebkitTapHighlightColor: 'transparent',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
           }}
         >
           <DialogHeader>
@@ -1027,7 +1033,8 @@ export default function Profile() {
             {selectedWork && (
               <div className="space-y-4">
                 {/* Media Display */}
-                <div className="bg-black/20 rounded-lg overflow-hidden">
+                <div className="bg-black/20 rounded-lg overflow-hidden" 
+                     style={{ WebkitTapHighlightColor: 'transparent' }}>
                   {selectedWork.mimeType && selectedWork.mimeType.startsWith('image/') && (
                     <div className="flex items-center justify-center p-4">
                       <img
