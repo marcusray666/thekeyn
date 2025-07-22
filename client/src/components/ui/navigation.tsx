@@ -161,13 +161,6 @@ export function Navigation() {
                     {/* Navigation Items */}
                     <DropdownMenuItem asChild>
                       <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
-                        <Sparkles className="mr-3 h-4 w-4" />
-                        Portfolio Showcase
-                      </Link>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
                         <Eye className="mr-3 h-4 w-4" />
                         View Profile
                       </Link>
@@ -291,15 +284,6 @@ export function Navigation() {
               {/* Additional User Options */}
               {isAuthenticated && (
                 <div className="space-y-3">
-                  <Link 
-                    href={`/profile/${user?.username}`}
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Sparkles className="h-5 w-5" />
-                    <span>Portfolio Showcase</span>
-                  </Link>
-                  
                   <Link 
                     href={`/profile/${user?.username}`}
                     className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
