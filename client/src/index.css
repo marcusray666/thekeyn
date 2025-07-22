@@ -561,6 +561,23 @@
   color: white !important;
 }
 
+/* Force readable styling for ALL dropdown menus */
+.bg-black\/90 {
+  background-color: rgb(17, 24, 39) !important;
+}
+
+.border-white\/10 {
+  border-color: rgb(75, 85, 99) !important;
+}
+
+.text-white {
+  color: rgb(229, 231, 235) !important;
+}
+
+.hover\:bg-white\/10:hover {
+  background-color: rgba(147, 51, 234, 0.3) !important;
+}
+
 /* Light theme messages page specific styling */
 .light-theme .bg-gradient-to-br.from-slate-900 {
   background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
