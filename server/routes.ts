@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import blockchainRoutes from "./routes/blockchain-routes";
+import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
 
@@ -322,6 +323,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Blockchain/NFT routes (protected)
   app.use('/api/blockchain', requireAuth, blockchainRoutes);
+  
+  // Admin routes
+  adminRoutes(app);
 
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {

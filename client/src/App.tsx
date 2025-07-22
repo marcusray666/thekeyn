@@ -38,6 +38,7 @@ import Messages from "@/pages/messages";
 import Followers from "@/pages/followers";
 
 import Studio from "@/pages/studio";
+import AdminDashboard from "@/pages/admin-dashboard";
 
 import NotFound from "@/pages/not-found";
 
@@ -83,6 +84,7 @@ function Router() {
           <Route path="/home" component={Home} />
           <Route path="/dashboard" component={Home} />
           <Route path="/studio" component={Studio} />
+          <Route path="/admin" component={AdminDashboard} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
           <Route path="/analytics" component={Analytics} />

@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  role: text("role").notNull().default("user"), // user, admin, moderator
   subscriptionTier: text("subscription_tier").notNull().default("free"), // free, starter, pro
   subscriptionStatus: text("subscription_status").default("active"), // active, cancelled, expired
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
@@ -29,6 +30,9 @@ export const users = pgTable("users", {
   totalLikes: integer("total_likes").default(0),
   themePreference: text("theme_preference").default("liquid-glass"),
   settings: text("settings").default("{}"), // JSON string for settings
+  lastLoginAt: timestamp("last_login_at"),
+  isBanned: boolean("is_banned").default(false),
+  banReason: text("ban_reason"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -256,7 +260,7 @@ export const userFollows = pgTable("user_follows", {
 export const userNotifications = pgTable("user_notifications", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type").notNull(), // 'like', 'comment', 'follow', 'mention', 'post_share', 'work_featured'
+  type: text("type").notNull(), // 'like', 'comment', 'follow', 'mention', 'post_share', 'work_featured', 'admin_action'
   fromUserId: integer("from_user_id").references(() => users.id),
   postId: text("post_id").references(() => posts.id),
   workId: integer("work_id").references(() => works.id),
@@ -266,6 +270,51 @@ export const userNotifications = pgTable("user_notifications", {
   isRead: boolean("is_read").default(false),
   actionUrl: text("action_url"), // Link to relevant content
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Admin audit logs for tracking administrative actions
+export const adminAuditLogs = pgTable("admin_audit_logs", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").references(() => users.id).notNull(),
+  action: text("action").notNull(), // 'user_banned', 'content_removed', 'user_verified', 'subscription_modified'
+  targetType: text("target_type").notNull(), // 'user', 'post', 'work', 'comment'
+  targetId: text("target_id").notNull(),
+  details: text("details"), // JSON string with action details
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Content reports for moderation
+export const contentReports = pgTable("content_reports", {
+  id: serial("id").primaryKey(),
+  reporterId: integer("reporter_id").references(() => users.id).notNull(),
+  reportedUserId: integer("reported_user_id").references(() => users.id),
+  contentType: text("content_type").notNull(), // 'post', 'work', 'comment', 'user'
+  contentId: text("content_id").notNull(),
+  reason: text("reason").notNull(), // 'spam', 'inappropriate', 'copyright', 'harassment', 'other'
+  description: text("description"),
+  status: text("status").notNull().default("pending"), // 'pending', 'reviewed', 'resolved', 'dismissed'
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  resolution: text("resolution"), // Action taken
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// System metrics for admin dashboard
+export const systemMetrics = pgTable("system_metrics", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").defaultNow().notNull(),
+  totalUsers: integer("total_users").default(0),
+  activeUsers: integer("active_users").default(0), // Users active in last 30 days
+  newSignups: integer("new_signups").default(0),
+  totalWorks: integer("total_works").default(0),
+  totalPosts: integer("total_posts").default(0),
+  totalRevenue: integer("total_revenue").default(0), // in cents
+  storageUsed: integer("storage_used").default(0), // in bytes
+  blockchainVerifications: integer("blockchain_verifications").default(0),
+  reportsPending: integer("reports_pending").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Content categories and tags

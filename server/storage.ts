@@ -2,7 +2,7 @@ import {
   users, works, certificates, nftMints, posts, follows, likes, comments, shares, notifications,
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
-  blockchainVerifications, verificationAuditLog,
+  blockchainVerifications, verificationAuditLog, adminAuditLogs, contentReports, systemMetrics,
   conversations, conversationParticipants, messages, messageReadStatus,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
   type NftMint, type InsertNftMint, 
@@ -150,6 +150,18 @@ export interface IStorage {
 
   // User search for messaging
   searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
+  
+  // Admin functions
+  getSystemMetrics(): Promise<any>;
+  getAllUsers(filter?: string, search?: string): Promise<User[]>;
+  banUser(userId: number, reason: string): Promise<User>;
+  unbanUser(userId: number): Promise<User>;
+  verifyUser(userId: number): Promise<User>;
+  createContentReport(report: any): Promise<any>;
+  getContentReports(status?: string): Promise<any[]>;
+  updateContentReport(reportId: number, updates: any): Promise<any>;
+  createAdminAuditLog(log: any): Promise<any>;
+  getAdminAuditLogs(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1590,6 +1602,169 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return created;
+  }
+
+  // Admin method implementations
+  async getSystemMetrics(): Promise<any> {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(users);
+    const activeUsers = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.lastLoginAt, thirtyDaysAgo));
+    const newSignups = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.createdAt, thirtyDaysAgo));
+    const totalWorks = await db.select({ count: sql<number>`count(*)` }).from(works);
+    const totalPosts = await db.select({ count: sql<number>`count(*)` }).from(posts);
+    const pendingReports = await db.select({ count: sql<number>`count(*)` }).from(contentReports).where(eq(contentReports.status, 'pending'));
+
+    return {
+      totalUsers: totalUsers[0]?.count || 0,
+      activeUsers: activeUsers[0]?.count || 0,
+      newSignups: newSignups[0]?.count || 0,
+      totalWorks: totalWorks[0]?.count || 0,
+      totalPosts: totalPosts[0]?.count || 0,
+      totalRevenue: 0, // TODO: Calculate from subscriptions
+      storageUsed: 0, // TODO: Calculate from file sizes
+      blockchainVerifications: totalWorks[0]?.count || 0,
+      reportsPending: pendingReports[0]?.count || 0,
+    };
+  }
+
+  async getAllUsers(filter?: string, search?: string): Promise<User[]> {
+    let query = db.select().from(users);
+    
+    const conditions = [];
+    
+    if (filter) {
+      switch (filter) {
+        case 'admin':
+          conditions.push(eq(users.role, 'admin'));
+          break;
+        case 'verified':
+          conditions.push(eq(users.isVerified, true));
+          break;
+        case 'banned':
+          conditions.push(eq(users.isBanned, true));
+          break;
+        case 'pro':
+          conditions.push(eq(users.subscriptionTier, 'pro'));
+          break;
+        case 'recent':
+          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          conditions.push(gte(users.createdAt, weekAgo));
+          break;
+      }
+    }
+
+    if (search) {
+      conditions.push(
+        or(
+          ilike(users.username, `%${search}%`),
+          ilike(users.email, `%${search}%`)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query.orderBy(desc(users.createdAt)).limit(100);
+  }
+
+  async banUser(userId: number, reason: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isBanned: true, banReason: reason })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async unbanUser(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isBanned: false, banReason: null })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async verifyUser(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isVerified: true })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async createContentReport(report: any): Promise<any> {
+    const [newReport] = await db
+      .insert(contentReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async getContentReports(status?: string): Promise<any[]> {
+    let query = db
+      .select({
+        id: contentReports.id,
+        reporterId: contentReports.reporterId,
+        reportedUserId: contentReports.reportedUserId,
+        contentType: contentReports.contentType,
+        contentId: contentReports.contentId,
+        reason: contentReports.reason,
+        description: contentReports.description,
+        status: contentReports.status,
+        createdAt: contentReports.createdAt,
+        reporterUsername: sql<string>`reporter.username`,
+        reportedUsername: sql<string>`reported.username`,
+      })
+      .from(contentReports)
+      .leftJoin(sql`${users} as reporter`, eq(contentReports.reporterId, sql`reporter.id`))
+      .leftJoin(sql`${users} as reported`, eq(contentReports.reportedUserId, sql`reported.id`));
+
+    if (status) {
+      query = query.where(eq(contentReports.status, status));
+    }
+
+    return await query.orderBy(desc(contentReports.createdAt));
+  }
+
+  async updateContentReport(reportId: number, updates: any): Promise<any> {
+    const [report] = await db
+      .update(contentReports)
+      .set(updates)
+      .where(eq(contentReports.id, reportId))
+      .returning();
+    return report;
+  }
+
+  async createAdminAuditLog(log: any): Promise<any> {
+    const [auditLog] = await db
+      .insert(adminAuditLogs)
+      .values(log)
+      .returning();
+    return auditLog;
+  }
+
+  async getAdminAuditLogs(): Promise<any[]> {
+    return await db
+      .select({
+        id: adminAuditLogs.id,
+        adminId: adminAuditLogs.adminId,
+        action: adminAuditLogs.action,
+        targetType: adminAuditLogs.targetType,
+        targetId: adminAuditLogs.targetId,
+        details: adminAuditLogs.details,
+        createdAt: adminAuditLogs.createdAt,
+        adminUsername: users.username,
+      })
+      .from(adminAuditLogs)
+      .innerJoin(users, eq(adminAuditLogs.adminId, users.id))
+      .orderBy(desc(adminAuditLogs.createdAt))
+      .limit(100);
   }
 }
 
