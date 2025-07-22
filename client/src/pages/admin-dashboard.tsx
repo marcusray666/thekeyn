@@ -496,7 +496,7 @@ export default function AdminDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="bg-blue-900/20 border-blue-600 text-blue-300"
+                                className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 text-purple-300 hover:from-purple-500/30 hover:to-pink-500/30 backdrop-blur-sm"
                                 onClick={() => window.open(`/profile/${user.username}`, '_blank')}
                               >
                                 <Eye className="h-4 w-4 mr-1" />
@@ -506,7 +506,7 @@ export default function AdminDashboard() {
                               {!user.isBanned ? (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button size="sm" variant="outline" className="bg-red-900/20 border-red-600 text-red-300">
+                                    <Button size="sm" variant="outline" className="bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 backdrop-blur-sm">
                                       <Ban className="h-4 w-4 mr-1" />
                                       Ban User
                                     </Button>
@@ -530,7 +530,7 @@ export default function AdminDashboard() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="bg-green-900/20 border-green-600 text-green-300"
+                                  className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm"
                                   onClick={() => handleUserAction(user.id, 'unban')}
                                 >
                                   <CheckCircle className="h-4 w-4 mr-1" />
@@ -620,6 +620,7 @@ export default function AdminDashboard() {
                           <Button
                             size="sm"
                             variant="outline"
+                            className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-purple-500/50 text-purple-300 hover:from-purple-500/30 hover:to-blue-500/30 backdrop-blur-sm"
                             onClick={() => window.open(`/profile/${user.username}`, '_blank')}
                           >
                             <Eye className="h-4 w-4" />
@@ -628,7 +629,7 @@ export default function AdminDashboard() {
                           {!user.isVerified && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="outline">
+                                <Button size="sm" variant="outline" className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm">
                                   <CheckCircle className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
@@ -652,7 +653,7 @@ export default function AdminDashboard() {
                           {!user.isBanned ? (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="destructive">
+                                <Button size="sm" variant="outline" className="bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 backdrop-blur-sm">
                                   <Ban className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
@@ -678,6 +679,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
+                              className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm"
                               onClick={() => handleUserAction(user.id, 'unban')}
                             >
                               Unban
@@ -755,7 +757,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="bg-green-900/20 border-green-700 text-green-300 hover:bg-green-800/30"
+                              className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm"
                               onClick={() => handleModerationAction(work.id, 'approve', 'Manual review: Content approved')}
                             >
                               <Check className="h-4 w-4" />
@@ -764,7 +766,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="bg-red-900/20 border-red-700 text-red-300 hover:bg-red-800/30"
+                              className="bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 backdrop-blur-sm"
                               onClick={() => handleModerationAction(work.id, 'reject', 'Manual review: Content rejected')}
                             >
                               <X className="h-4 w-4" />
@@ -841,6 +843,7 @@ export default function AdminDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                className="bg-gradient-to-r from-gray-600/20 to-slate-600/20 border-gray-500/50 text-gray-300 hover:from-gray-500/30 hover:to-slate-500/30 backdrop-blur-sm"
                                 onClick={() => handleReportAction(report.id, 'dismiss', 'No violation found')}
                               >
                                 <XCircle className="h-4 w-4" />
@@ -848,7 +851,8 @@ export default function AdminDashboard() {
                               </Button>
                               <Button
                                 size="sm"
-                                variant="destructive"
+                                variant="outline"
+                                className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm"
                                 onClick={() => handleReportAction(report.id, 'resolve', 'Content removed')}
                               >
                                 <CheckCircle className="h-4 w-4" />
@@ -925,7 +929,7 @@ export default function AdminDashboard() {
                     <span>Blockchain Verifications</span>
                     <span className="font-mono">{metrics?.blockchainVerifications || 0}</span>
                   </div>
-                  <Button className="w-full" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border-blue-500/50 text-blue-300 hover:from-blue-500/30 hover:to-cyan-500/30 backdrop-blur-sm" variant="outline">
                     <Database className="h-4 w-4 mr-2" />
                     Run Database Maintenance
                   </Button>
@@ -938,15 +942,15 @@ export default function AdminDashboard() {
                   <CardDescription>Configure platform-wide settings</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button className="w-full" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 text-purple-300 hover:from-purple-500/30 hover:to-pink-500/30 backdrop-blur-sm" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
                     Export System Data
                   </Button>
-                  <Button className="w-full" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-indigo-600/20 to-blue-600/20 border-indigo-500/50 text-indigo-300 hover:from-indigo-500/30 hover:to-blue-500/30 backdrop-blur-sm" variant="outline">
                     <Globe className="h-4 w-4 mr-2" />
                     Update Privacy Policy
                   </Button>
-                  <Button className="w-full" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-slate-600/20 to-gray-600/20 border-slate-500/50 text-slate-300 hover:from-slate-500/30 hover:to-gray-500/30 backdrop-blur-sm" variant="outline">
                     <Settings className="h-4 w-4 mr-2" />
                     Configure Rate Limits
                   </Button>
