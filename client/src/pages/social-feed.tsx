@@ -18,7 +18,11 @@ import {
   Image as ImageIcon,
   Play,
   FileText,
-  ExternalLink
+  ExternalLink,
+  BookmarkPlus,
+  Flag,
+  Edit3,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -28,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -369,9 +374,59 @@ export default function SocialFeed() {
                         </Button>
                       )}
                       
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent 
+                          align="end" 
+                          className="w-48 !bg-gray-900 !text-white !border-gray-600 shadow-2xl"
+                          style={{
+                            backgroundColor: 'rgb(17, 24, 39)',
+                            color: 'white',
+                            borderColor: 'rgb(75, 85, 99)',
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+                          }}
+                        >
+                          {user?.id === work.user.id ? (
+                            <>
+                              <DropdownMenuItem 
+                                className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
+                                style={{ color: 'rgb(229, 231, 235)' }}
+                              >
+                                <Edit3 className="mr-2 h-4 w-4" />
+                                Edit Post
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="!text-red-400 hover:!bg-red-500/20 hover:!text-red-300 focus:!bg-red-500/20 focus:!text-red-300"
+                                style={{ color: 'rgb(248, 113, 113)' }}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Post
+                              </DropdownMenuItem>
+                            </>
+                          ) : (
+                            <>
+                              <DropdownMenuItem 
+                                className="!text-gray-200 hover:!bg-purple-600/30 hover:!text-white focus:!bg-purple-600/30 focus:!text-white"
+                                style={{ color: 'rgb(229, 231, 235)' }}
+                              >
+                                <BookmarkPlus className="mr-2 h-4 w-4" />
+                                Bookmark
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="!text-yellow-400 hover:!bg-yellow-500/20 hover:!text-yellow-300 focus:!bg-yellow-500/20 focus:!text-yellow-300"
+                                style={{ color: 'rgb(251, 191, 36)' }}
+                              >
+                                <Flag className="mr-2 h-4 w-4" />
+                                Report Content
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
 
