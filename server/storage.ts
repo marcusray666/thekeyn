@@ -1618,6 +1618,21 @@ export class DatabaseStorage implements IStorage {
     const totalWorks = await db.select({ count: sql<number>`count(*)` }).from(works);
     const totalPosts = await db.select({ count: sql<number>`count(*)` }).from(posts);
     const pendingReports = await db.select({ count: sql<number>`count(*)` }).from(contentReports).where(eq(contentReports.status, 'pending'));
+    
+    // Calculate storage used from file sizes
+    const storageQuery = await db.select({ 
+      totalSize: sql<number>`COALESCE(SUM(${works.fileSize}), 0)` 
+    }).from(works);
+    
+    // Calculate revenue from subscriptions (Starter: $9.99, Pro: $19.99)
+    const revenueData = await db.select({
+      starterCount: sql<number>`COUNT(CASE WHEN ${users.subscriptionTier} = 'starter' THEN 1 END)`,
+      proCount: sql<number>`COUNT(CASE WHEN ${users.subscriptionTier} = 'pro' THEN 1 END)`
+    }).from(users);
+    
+    const starterRevenue = (Number(revenueData[0]?.starterCount) || 0) * 999; // $9.99 in cents
+    const proRevenue = (Number(revenueData[0]?.proCount) || 0) * 1999; // $19.99 in cents
+    const totalRevenue = starterRevenue + proRevenue;
 
     return {
       totalUsers: totalUsers[0]?.count || 0,
@@ -1625,10 +1640,15 @@ export class DatabaseStorage implements IStorage {
       newSignups: newSignups[0]?.count || 0,
       totalWorks: totalWorks[0]?.count || 0,
       totalPosts: totalPosts[0]?.count || 0,
-      totalRevenue: 0, // TODO: Calculate from subscriptions
-      storageUsed: 0, // TODO: Calculate from file sizes
+      totalRevenue: totalRevenue,
+      storageUsed: Number(storageQuery[0]?.totalSize) || 0,
       blockchainVerifications: totalWorks[0]?.count || 0,
       reportsPending: pendingReports[0]?.count || 0,
+      subscriptionBreakdown: {
+        free: Math.max(0, (totalUsers[0]?.count || 0) - (Number(revenueData[0]?.starterCount) || 0) - (Number(revenueData[0]?.proCount) || 0)),
+        starter: Number(revenueData[0]?.starterCount) || 0,
+        pro: Number(revenueData[0]?.proCount) || 0
+      }
     };
   }
 

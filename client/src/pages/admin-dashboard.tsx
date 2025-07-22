@@ -272,7 +272,10 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('users')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -284,7 +287,10 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('users')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -296,7 +302,10 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('users')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -308,19 +317,26 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('system')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-yellow-400">Total Revenue</p>
                         <p className="text-2xl font-bold text-yellow-200">{formatCurrency(metrics?.totalRevenue || 0)}</p>
+                        <p className="text-xs text-yellow-300/80">Subscription earnings</p>
                       </div>
                       <DollarSign className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('content')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -332,7 +348,10 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('content')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -344,7 +363,10 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('system')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -356,7 +378,10 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+                <Card 
+                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  onClick={() => setSelectedTab('moderation')}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -914,42 +939,65 @@ export default function AdminDashboard() {
           {/* System Tab */}
           <TabsContent value="system" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+              <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Database Management</CardTitle>
-                  <CardDescription>Monitor database health and performance</CardDescription>
+                  <CardTitle className="text-yellow-400">Database Management</CardTitle>
+                  <CardDescription className="text-yellow-200/80">Monitor database health and performance</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span>Total Storage Used</span>
-                    <span className="font-mono">{formatBytes(metrics?.storageUsed || 0)}</span>
+                    <span className="text-yellow-300">Total Storage Used</span>
+                    <span className="font-mono text-yellow-200">{formatBytes(metrics?.storageUsed || 0)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Blockchain Verifications</span>
-                    <span className="font-mono">{metrics?.blockchainVerifications || 0}</span>
+                    <span className="text-yellow-300">Platform Revenue</span>
+                    <span className="font-mono text-yellow-200">{formatCurrency(metrics?.totalRevenue || 0)}</span>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border-blue-500/50 text-blue-300 hover:from-blue-500/30 hover:to-cyan-500/30 backdrop-blur-sm" variant="outline">
+                  {metrics?.subscriptionBreakdown && (
+                    <div className="mt-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
+                      <h4 className="text-sm font-medium text-yellow-300 mb-2">Subscription Breakdown</h4>
+                      <div className="space-y-1 text-xs text-yellow-200/80">
+                        <div className="flex justify-between">
+                          <span>Free Users:</span>
+                          <span>{metrics.subscriptionBreakdown.free}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Starter ($9.99/mo):</span>
+                          <span>{metrics.subscriptionBreakdown.starter}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Pro ($19.99/mo):</span>
+                          <span>{metrics.subscriptionBreakdown.pro}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-yellow-300">Blockchain Verifications</span>
+                    <span className="font-mono text-yellow-200">{metrics?.blockchainVerifications || 0}</span>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
                     <Database className="h-4 w-4 mr-2" />
                     Run Database Maintenance
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+              <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>System Settings</CardTitle>
-                  <CardDescription>Configure platform-wide settings</CardDescription>
+                  <CardTitle className="text-yellow-400">System Settings</CardTitle>
+                  <CardDescription className="text-yellow-200/80">Configure platform-wide settings</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button className="w-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 text-purple-300 hover:from-purple-500/30 hover:to-pink-500/30 backdrop-blur-sm" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
                     Export System Data
                   </Button>
-                  <Button className="w-full bg-gradient-to-r from-indigo-600/20 to-blue-600/20 border-indigo-500/50 text-indigo-300 hover:from-indigo-500/30 hover:to-blue-500/30 backdrop-blur-sm" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
                     <Globe className="h-4 w-4 mr-2" />
                     Update Privacy Policy
                   </Button>
-                  <Button className="w-full bg-gradient-to-r from-slate-600/20 to-gray-600/20 border-slate-500/50 text-slate-300 hover:from-slate-500/30 hover:to-gray-500/30 backdrop-blur-sm" variant="outline">
+                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
                     <Settings className="h-4 w-4 mr-2" />
                     Configure Rate Limits
                   </Button>
