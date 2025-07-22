@@ -1693,15 +1693,7 @@ export class DatabaseStorage implements IStorage {
         bio: users.bio,
         location: users.location,
         website: users.website,
-        birthDate: users.birthDate,
-        phone: users.phone,
-        socialLinks: users.socialLinks,
-        privacySettings: users.privacySettings,
-        followerCount: sql`(SELECT count(*) FROM ${follows} WHERE following_id = ${users.id})`.as('followerCount'),
-        followingCount: sql`(SELECT count(*) FROM ${follows} WHERE follower_id = ${users.id})`.as('followingCount'),
-        totalLikes: sql`(SELECT count(*) FROM ${postReactions} WHERE user_id = ${users.id})`.as('totalLikes'),
-        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks'),
-        totalPosts: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('totalPosts')
+        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks')
       }).from(users);
 
       const conditions = [];

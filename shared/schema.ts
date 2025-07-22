@@ -281,14 +281,14 @@ export const userNotifications = pgTable("user_notifications", {
 // Admin audit logs for tracking administrative actions
 export const adminAuditLogs = pgTable("admin_audit_logs", {
   id: serial("id").primaryKey(),
-  adminId: integer("admin_id").references(() => users.id).notNull(),
+  adminId: integer("adminId").references(() => users.id).notNull(),
   action: text("action").notNull(), // 'user_banned', 'content_removed', 'user_verified', 'subscription_modified'
-  targetType: text("target_type").notNull(), // 'user', 'post', 'work', 'comment'
-  targetId: text("target_id").notNull(),
+  targetType: text("targetType").notNull(), // 'user', 'post', 'work', 'comment'
+  targetId: text("targetId").notNull(),
   details: text("details"), // JSON string with action details
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  ipAddress: text("ipAddress"),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 // Content reports for moderation

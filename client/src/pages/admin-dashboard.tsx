@@ -200,7 +200,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white pt-20 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white pt-20 p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-7 bg-gray-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-gray-800/80 backdrop-blur-sm border border-purple-500/30">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -425,7 +425,7 @@ export default function AdminDashboard() {
                 ) : users && users.length > 0 ? (
                   <div className="space-y-4">
                     {users.map((user) => (
-                      <Card key={user.id} className="bg-gray-900/50 border-yellow-700/30">
+                      <Card key={user.id} className="bg-gray-900/90 border-yellow-700/60 backdrop-blur-sm">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div className="flex-1 space-y-3">
@@ -441,7 +441,7 @@ export default function AdminDashboard() {
                                     {user.isBanned && <Ban className="inline ml-2 h-4 w-4 text-red-400" />}
                                   </h3>
                                   <div className="flex items-center gap-3 text-sm">
-                                    <span className="text-gray-300">@{user.username}</span>
+                                    <span className="text-gray-100">@{user.username}</span>
                                     <Badge variant={user.role === 'admin' ? 'default' : 'outline'}>
                                       {user.role}
                                     </Badge>
@@ -460,10 +460,10 @@ export default function AdminDashboard() {
                                     Private Contact Information
                                   </h4>
                                   <div className="space-y-1 text-sm">
-                                    <div><span className="text-gray-400">Email:</span> <span className="text-white">{user.email}</span></div>
-                                    <div><span className="text-gray-400">Phone:</span> <span className="text-white">{user.phone || 'Not provided'}</span></div>
-                                    <div><span className="text-gray-400">Location:</span> <span className="text-white">{user.location || 'Not provided'}</span></div>
-                                    <div><span className="text-gray-400">Birth Date:</span> <span className="text-white">{user.birthDate || 'Not provided'}</span></div>
+                                    <div><span className="text-gray-300">Email:</span> <span className="text-gray-100">{user.email}</span></div>
+                                    <div><span className="text-gray-300">Location:</span> <span className="text-gray-100">{user.location || 'Not provided'}</span></div>
+                                    <div><span className="text-gray-300">Created:</span> <span className="text-gray-100">{new Date(user.createdAt).toLocaleDateString()}</span></div>
+                                    <div><span className="text-gray-300">Last Login:</span> <span className="text-gray-100">{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}</span></div>
                                   </div>
                                 </div>
                                 
@@ -473,11 +473,10 @@ export default function AdminDashboard() {
                                     Account Statistics
                                   </h4>
                                   <div className="space-y-1 text-sm">
-                                    <div><span className="text-gray-400">Followers:</span> <span className="text-white">{user.followerCount || 0}</span></div>
-                                    <div><span className="text-gray-400">Following:</span> <span className="text-white">{user.followingCount || 0}</span></div>
-                                    <div><span className="text-gray-400">Total Works:</span> <span className="text-white">{user.totalWorks || 0}</span></div>
-                                    <div><span className="text-gray-400">Total Posts:</span> <span className="text-white">{user.totalPosts || 0}</span></div>
-                                    <div><span className="text-gray-400">Last Login:</span> <span className="text-white">{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}</span></div>
+                                    <div><span className="text-gray-300">Total Works:</span> <span className="text-gray-100">{user.totalWorks || 0}</span></div>
+                                    <div><span className="text-gray-300">Subscription:</span> <span className="text-gray-100">{user.subscriptionTier} ({user.subscriptionStatus})</span></div>
+                                    <div><span className="text-gray-300">Verified:</span> <span className="text-gray-100">{user.isVerified ? 'Yes' : 'No'}</span></div>
+                                    <div><span className="text-gray-300">Banned:</span> <span className="text-gray-100">{user.isBanned ? 'Yes' : 'No'}</span></div>
                                   </div>
                                 </div>
                               </div>
@@ -555,7 +554,7 @@ export default function AdminDashboard() {
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
             {/* User Management Controls */}
-            <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+            <Card className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30">
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
                 <CardDescription>Search, filter, and manage platform users</CardDescription>
@@ -595,7 +594,7 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-3">
                     {users?.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                      <div key={user.id} className="flex items-center justify-between p-4 bg-gray-900/80 rounded-lg border border-purple-500/20">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">{user.username[0].toUpperCase()}</span>
