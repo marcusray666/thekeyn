@@ -1423,6 +1423,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user settings
+  app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const settings = user.settings ? JSON.parse(user.settings) : {};
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
   app.patch('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { type, settings } = req.body;
@@ -1433,13 +1451,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const currentSettings = user.settings || {};
+      const currentSettings = user.settings ? JSON.parse(user.settings) : {};
       const updatedSettings = {
         ...currentSettings,
         [type]: settings
       };
 
-      await storage.updateUser(userId, { settings: updatedSettings });
+      await storage.updateUser(userId, { settings: JSON.stringify(updatedSettings) });
       res.json({ message: "Settings updated successfully" });
     } catch (error) {
       console.error("Error updating settings:", error);
@@ -1457,9 +1475,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Remove sensitive information
-      const { passwordHash, ...publicProfile } = user;
-      res.json(publicProfile);
+      // Parse privacy settings
+      const settings = user.settings ? JSON.parse(user.settings) : {};
+      const privacySettings = settings.privacy || {};
+
+      // Check if profile is public
+      if (!privacySettings.publicProfile) {
+        // Only allow access to own profile or return limited info
+        const requesterId = (req as any).userId;
+        if (!requesterId || requesterId !== user.id) {
+          return res.json({
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            isPrivate: true,
+            message: "This profile is private"
+          });
+        }
+      }
+
+      // Remove sensitive information and apply privacy filters
+      const { passwordHash, settings: userSettings, ...publicProfile } = user;
+      
+      // Apply privacy settings to response
+      const filteredProfile = {
+        ...publicProfile,
+        // Hide email if privacy setting is enabled
+        email: privacySettings.showEmail !== false ? publicProfile.email : undefined,
+        // Hide follower/following counts if privacy setting is disabled
+        followerCount: privacySettings.showFollowers !== false ? publicProfile.followerCount : undefined,
+        followingCount: privacySettings.showFollowing !== false ? publicProfile.followingCount : undefined,
+        // Hide statistics if privacy setting is disabled
+        totalLikes: privacySettings.showStatistics !== false ? publicProfile.totalLikes : undefined,
+      };
+
+      res.json(filteredProfile);
     } catch (error) {
       console.error("Error fetching profile:", error);
       res.status(500).json({ message: "Failed to fetch profile" });
@@ -3054,6 +3104,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!Array.isArray(participants) || participants.length === 0) {
         return res.status(400).json({ error: "Participants array is required" });
+      }
+
+      // Check privacy settings for all participants
+      for (const participantId of participants) {
+        if (participantId !== req.user!.id) {
+          const participant = await storage.getUser(participantId);
+          if (participant) {
+            const settings = participant.settings ? JSON.parse(participant.settings) : {};
+            const privacySettings = settings.privacy || {};
+            
+            // Check if user allows direct messages
+            if (privacySettings.allowDirectMessages === false) {
+              return res.status(403).json({ 
+                error: "This user has disabled direct messages" 
+              });
+            }
+          }
+        }
       }
 
       // Ensure current user is included in participants

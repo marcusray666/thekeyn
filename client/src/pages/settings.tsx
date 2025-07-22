@@ -92,6 +92,28 @@ export default function Settings() {
     enabled: !!user,
   });
 
+  // Load settings from database when available
+  useEffect(() => {
+    if (userSettings && userSettings.privacy) {
+      setPrivacySettings(prev => ({
+        ...prev,
+        ...userSettings.privacy
+      }));
+    }
+    if (userSettings && userSettings.notifications) {
+      setNotificationSettings(prev => ({
+        ...prev,
+        ...userSettings.notifications
+      }));
+    }
+    if (userSettings && userSettings.security) {
+      setSecuritySettings(prev => ({
+        ...prev,
+        ...userSettings.security
+      }));
+    }
+  }, [userSettings]);
+
   useEffect(() => {
     if (user) {
       setProfileSettings(prev => ({
