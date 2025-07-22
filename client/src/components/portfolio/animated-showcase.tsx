@@ -443,7 +443,7 @@ export function AnimatedShowcase({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
             style={{ WebkitTapHighlightColor: 'transparent' }}
             onClick={() => setSelectedWork(null)}
           >
@@ -453,7 +453,7 @@ export function AnimatedShowcase({
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="max-w-2xl w-full"
+              className="max-w-2xl w-full mx-auto my-auto"
             >
               <GlassCard>
                 <div className="p-6">
