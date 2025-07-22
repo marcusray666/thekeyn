@@ -226,7 +226,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-7 bg-gray-800/80 backdrop-blur-sm border border-purple-500/30">
+          <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -272,98 +272,98 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <Card className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Total Users</p>
-                        <p className="text-2xl font-bold">{metrics?.totalUsers?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">Total Users</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalUsers?.toLocaleString() || 0}</p>
                       </div>
-                      <Users className="h-8 w-8 text-blue-400" />
+                      <Users className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Active Users (30d)</p>
-                        <p className="text-2xl font-bold">{metrics?.activeUsers?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">Active Users (30d)</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.activeUsers?.toLocaleString() || 0}</p>
                       </div>
-                      <Activity className="h-8 w-8 text-green-400" />
+                      <Activity className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">New Signups</p>
-                        <p className="text-2xl font-bold">{metrics?.newSignups?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">New Signups</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.newSignups?.toLocaleString() || 0}</p>
                       </div>
-                      <Users className="h-8 w-8 text-purple-400" />
+                      <Users className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Total Revenue</p>
-                        <p className="text-2xl font-bold">{formatCurrency(metrics?.totalRevenue || 0)}</p>
+                        <p className="text-sm text-yellow-400">Total Revenue</p>
+                        <p className="text-2xl font-bold text-yellow-200">{formatCurrency(metrics?.totalRevenue || 0)}</p>
                       </div>
                       <DollarSign className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Protected Works</p>
-                        <p className="text-2xl font-bold">{metrics?.totalWorks?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">Protected Works</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalWorks?.toLocaleString() || 0}</p>
                       </div>
-                      <Shield className="h-8 w-8 text-cyan-400" />
+                      <Shield className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Community Posts</p>
-                        <p className="text-2xl font-bold">{metrics?.totalPosts?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">Community Posts</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalPosts?.toLocaleString() || 0}</p>
                       </div>
-                      <FileText className="h-8 w-8 text-orange-400" />
+                      <FileText className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Storage Used</p>
-                        <p className="text-2xl font-bold">{formatBytes(metrics?.storageUsed || 0)}</p>
+                        <p className="text-sm text-yellow-400">Storage Used</p>
+                        <p className="text-2xl font-bold text-yellow-200">{formatBytes(metrics?.storageUsed || 0)}</p>
                       </div>
-                      <Database className="h-8 w-8 text-indigo-400" />
+                      <Database className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50">
+                <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-400">Pending Reports</p>
-                        <p className="text-2xl font-bold">{metrics?.reportsPending?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-yellow-400">Pending Reports</p>
+                        <p className="text-2xl font-bold text-yellow-200">{metrics?.reportsPending?.toLocaleString() || 0}</p>
                       </div>
-                      <AlertTriangle className="h-8 w-8 text-red-400" />
+                      <AlertTriangle className="h-8 w-8 text-yellow-400" />
                     </div>
                   </CardContent>
                 </Card>
@@ -554,10 +554,10 @@ export default function AdminDashboard() {
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
             {/* User Management Controls */}
-            <Card className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30">
+            <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>Search, filter, and manage platform users</CardDescription>
+                <CardTitle className="text-yellow-400">User Management</CardTitle>
+                <CardDescription className="text-yellow-200/80">Search, filter, and manage platform users</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-4">
