@@ -281,6 +281,32 @@ export function Navigation() {
                       </Link>
                     </DropdownMenuItem>
 
+                    {/* Admin Option - Only visible to admins */}
+                    {user?.role === 'admin' && (
+                      <>
+                        <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
+                        
+                        <DropdownMenuItem asChild>
+                          <Link 
+                            href="/admin-dashboard" 
+                            className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
+                            style={{ color: 'rgb(251, 191, 36)' }} // Gold color for admin
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(251, 191, 36, 0.2)';
+                              e.currentTarget.style.color = 'rgb(254, 240, 138)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = 'rgb(251, 191, 36)';
+                            }}
+                          >
+                            <Shield className="mr-3 h-4 w-4" />
+                            Admin Control Panel
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+
                     <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
                     
                     <DropdownMenuItem

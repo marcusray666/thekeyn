@@ -219,7 +219,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-gray-800/50 backdrop-blur-sm">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -227,6 +227,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Users
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2 text-yellow-400">
+              <Shield className="h-4 w-4" />
+              Privacy Override
             </TabsTrigger>
             <TabsTrigger value="content" className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
@@ -358,6 +362,187 @@ export default function AdminDashboard() {
                 </Card>
               </div>
             )}
+          </TabsContent>
+
+          {/* Privacy Override Tab - Admin can see ALL user information */}
+          <TabsContent value="privacy" className="space-y-6">
+            <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 backdrop-blur-sm border-yellow-700/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-yellow-400">
+                      <Shield className="h-5 w-5" />
+                      Admin Privacy Override Panel
+                    </CardTitle>
+                    <CardDescription className="text-yellow-200/80">
+                      🔒 Access ALL user information regardless of privacy settings. Admin-only capability.
+                    </CardDescription>
+                  </div>
+                  <Badge variant="outline" className="bg-yellow-600/20 text-yellow-300 border-yellow-500">
+                    ADMIN ACCESS
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Enhanced Search */}
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Search users by username, email, phone, or any private info..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="bg-gray-800/50 border-yellow-600/50 text-white"
+                    />
+                  </div>
+                  <Select value={userFilter} onValueChange={setUserFilter}>
+                    <SelectTrigger className="w-48 bg-gray-800/50 border-yellow-600/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="all">All Users</SelectItem>
+                      <SelectItem value="premium">Premium Users</SelectItem>
+                      <SelectItem value="verified">Verified Users</SelectItem>
+                      <SelectItem value="banned">Banned Users</SelectItem>
+                      <SelectItem value="admins">Admin Users</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Users with Complete Private Information */}
+                {usersLoading ? (
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-32 bg-gray-700/50 rounded animate-pulse"></div>
+                    ))}
+                  </div>
+                ) : users && users.length > 0 ? (
+                  <div className="space-y-4">
+                    {users.map((user) => (
+                      <Card key={user.id} className="bg-gray-900/50 border-yellow-700/30">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 space-y-3">
+                              {/* Basic Info */}
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                  {user.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-white text-lg">
+                                    {user.displayName || user.username}
+                                    {user.isVerified && <CheckCircle className="inline ml-2 h-4 w-4 text-blue-400" />}
+                                    {user.isBanned && <Ban className="inline ml-2 h-4 w-4 text-red-400" />}
+                                  </h3>
+                                  <div className="flex items-center gap-3 text-sm">
+                                    <span className="text-gray-300">@{user.username}</span>
+                                    <Badge variant={user.role === 'admin' ? 'default' : 'outline'}>
+                                      {user.role}
+                                    </Badge>
+                                    <Badge variant={user.subscriptionTier === 'pro' ? 'default' : 'secondary'}>
+                                      {user.subscriptionTier}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* PRIVATE INFORMATION - Admin Override */}
+                              <div className="grid md:grid-cols-2 gap-6 p-4 bg-yellow-900/10 rounded-lg border border-yellow-600/30">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium text-yellow-400 flex items-center gap-2">
+                                    <Shield className="h-4 w-4" />
+                                    Private Contact Information
+                                  </h4>
+                                  <div className="space-y-1 text-sm">
+                                    <div><span className="text-gray-400">Email:</span> <span className="text-white">{user.email}</span></div>
+                                    <div><span className="text-gray-400">Phone:</span> <span className="text-white">{user.phone || 'Not provided'}</span></div>
+                                    <div><span className="text-gray-400">Location:</span> <span className="text-white">{user.location || 'Not provided'}</span></div>
+                                    <div><span className="text-gray-400">Birth Date:</span> <span className="text-white">{user.birthDate || 'Not provided'}</span></div>
+                                  </div>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <h4 className="font-medium text-yellow-400 flex items-center gap-2">
+                                    <Database className="h-4 w-4" />
+                                    Account Statistics
+                                  </h4>
+                                  <div className="space-y-1 text-sm">
+                                    <div><span className="text-gray-400">Followers:</span> <span className="text-white">{user.followerCount || 0}</span></div>
+                                    <div><span className="text-gray-400">Following:</span> <span className="text-white">{user.followingCount || 0}</span></div>
+                                    <div><span className="text-gray-400">Total Works:</span> <span className="text-white">{user.totalWorks || 0}</span></div>
+                                    <div><span className="text-gray-400">Total Posts:</span> <span className="text-white">{user.totalPosts || 0}</span></div>
+                                    <div><span className="text-gray-400">Last Login:</span> <span className="text-white">{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}</span></div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Privacy Settings Override */}
+                              <div className="p-3 bg-red-900/20 rounded border border-red-600/50">
+                                <h4 className="font-medium text-red-400 mb-2">🔓 Privacy Settings (Admin View)</h4>
+                                <div className="text-xs text-red-200">
+                                  Admin override active - All information visible regardless of user privacy preferences
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Admin Actions */}
+                            <div className="flex flex-col gap-2 ml-6">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="bg-blue-900/20 border-blue-600 text-blue-300"
+                                onClick={() => window.open(`/profile/${user.username}`, '_blank')}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                View Profile
+                              </Button>
+                              
+                              {!user.isBanned ? (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button size="sm" variant="outline" className="bg-red-900/20 border-red-600 text-red-300">
+                                      <Ban className="h-4 w-4 mr-1" />
+                                      Ban User
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent className="bg-gray-800 border-gray-700">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Ban User</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will ban {user.username} from the platform. This action can be reversed.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleUserAction(user.id, 'ban', 'Admin action')}>
+                                        Ban User
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="bg-green-900/20 border-green-600 text-green-300"
+                                  onClick={() => handleUserAction(user.id, 'unban')}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Unban
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    No users found matching the current filters.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Users Tab */}

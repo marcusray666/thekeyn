@@ -1674,6 +1674,151 @@ export class DatabaseStorage implements IStorage {
     return await query.orderBy(desc(users.createdAt)).limit(100);
   }
 
+  // ADMIN PRIVACY OVERRIDE: Get all users with complete private information
+  async getAllUsersWithPrivateInfo(filter?: string, search?: string): Promise<any[]> {
+    try {
+      let query = db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        displayName: users.displayName,
+        role: users.role,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
+        isVerified: users.isVerified,
+        isBanned: users.isBanned,
+        createdAt: users.createdAt,
+        lastLoginAt: users.lastLoginAt,
+        profileImageUrl: users.profileImageUrl,
+        bio: users.bio,
+        location: users.location,
+        website: users.website,
+        birthDate: users.birthDate,
+        phone: users.phone,
+        socialLinks: users.socialLinks,
+        privacySettings: users.privacySettings,
+        followerCount: sql`(SELECT count(*) FROM ${follows} WHERE following_id = ${users.id})`.as('followerCount'),
+        followingCount: sql`(SELECT count(*) FROM ${follows} WHERE follower_id = ${users.id})`.as('followingCount'),
+        totalLikes: sql`(SELECT count(*) FROM ${postReactions} WHERE user_id = ${users.id})`.as('totalLikes'),
+        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks'),
+        totalPosts: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('totalPosts')
+      }).from(users);
+
+      const conditions = [];
+
+      if (search) {
+        conditions.push(
+          or(
+            ilike(users.username, `%${search}%`),
+            ilike(users.email, `%${search}%`),
+            ilike(users.displayName, `%${search}%`)
+          )
+        );
+      }
+
+      if (filter && filter !== 'all') {
+        switch (filter) {
+          case 'banned':
+            conditions.push(eq(users.isBanned, true));
+            break;
+          case 'verified':
+            conditions.push(eq(users.isVerified, true));
+            break;
+          case 'premium':
+            conditions.push(ne(users.subscriptionTier, 'free'));
+            break;
+          case 'admins':
+            conditions.push(eq(users.role, 'admin'));
+            break;
+        }
+      }
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+
+      return await query.orderBy(desc(users.createdAt));
+    } catch (error) {
+      console.error("Error getting users with private info:", error);
+      return [];
+    }
+  }
+
+  // ADMIN PRIVACY OVERRIDE: Get complete user information including all private data
+  async getUserWithAllPrivateInfo(userId: number): Promise<any> {
+    try {
+      const [user] = await db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        displayName: users.displayName,
+        role: users.role,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
+        isVerified: users.isVerified,
+        isBanned: users.isBanned,
+        createdAt: users.createdAt,
+        lastLoginAt: users.lastLoginAt,
+        profileImageUrl: users.profileImageUrl,
+        bio: users.bio,
+        location: users.location,
+        website: users.website,
+        birthDate: users.birthDate,
+        phone: users.phone,
+        socialLinks: users.socialLinks,
+        privacySettings: users.privacySettings,
+        passwordHash: users.passwordHash,
+        stripeCustomerId: users.stripeCustomerId,
+        uploadCount: users.uploadCount,
+        totalStorageUsed: users.totalStorageUsed,
+        followerCount: sql`(SELECT count(*) FROM ${follows} WHERE following_id = ${users.id})`.as('followerCount'),
+        followingCount: sql`(SELECT count(*) FROM ${follows} WHERE follower_id = ${users.id})`.as('followingCount'),
+        totalLikes: sql`(SELECT count(*) FROM ${postReactions} WHERE user_id = ${users.id})`.as('totalLikes'),
+        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks'),
+        totalPosts: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('totalPosts')
+      }).from(users).where(eq(users.id, userId));
+
+      return user;
+    } catch (error) {
+      console.error("Error getting user with all private info:", error);
+      return null;
+    }
+  }
+
+  // Get user's complete activity log
+  async getUserActivityLog(userId: number): Promise<any[]> {
+    try {
+      const activities = await db.select().from(auditLogs)
+        .where(eq(auditLogs.targetId, userId.toString()))
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(100);
+
+      return activities;
+    } catch (error) {
+      console.error("Error getting user activity log:", error);
+      return [];
+    }
+  }
+
+  // ADMIN PRIVACY OVERRIDE: Get all user content including private posts/works
+  async getUserAllContent(userId: number): Promise<any> {
+    try {
+      const [userWorks, userPosts] = await Promise.all([
+        db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt)),
+        db.select().from(posts).where(eq(posts.userId, userId)).orderBy(desc(posts.createdAt))
+      ]);
+
+      return {
+        works: userWorks,
+        posts: userPosts,
+        totalContent: userWorks.length + userPosts.length
+      };
+    } catch (error) {
+      console.error("Error getting user content:", error);
+      return { works: [], posts: [], totalContent: 0 };
+    }
+  }
+
   async banUser(userId: number, reason: string): Promise<User> {
     const [user] = await db
       .update(users)

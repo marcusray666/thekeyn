@@ -28,15 +28,67 @@ export default function setupAdminRoutes(app: Express) {
     }
   });
 
-  // Get all users with filters
+  // Get all users with filters - ADMIN PRIVACY OVERRIDE
   app.get("/api/admin/users", requireAdmin, async (req: Request, res: Response) => {
     try {
       const { filter, search } = req.query as { filter?: string; search?: string };
-      const users = await storage.getAllUsers(filter, search);
+      const users = await storage.getAllUsersWithPrivateInfo(filter, search);
       res.json(users);
     } catch (error) {
       console.error("Failed to get users:", error);
       res.status(500).json({ error: "Failed to get users" });
+    }
+  });
+
+  // Get detailed user information - ADMIN PRIVACY OVERRIDE
+  app.get("/api/admin/users/:userId", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const user = await storage.getUserWithAllPrivateInfo(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      console.error("Failed to get user details:", error);
+      res.status(500).json({ error: "Failed to get user details" });
+    }
+  });
+
+  // Get user's complete activity log
+  app.get("/api/admin/users/:userId/activity", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const activity = await storage.getUserActivityLog(userId);
+      res.json(activity);
+    } catch (error) {
+      console.error("Failed to get user activity:", error);
+      res.status(500).json({ error: "Failed to get user activity" });
+    }
+  });
+
+  // Get user's all content (posts, works, etc.) - PRIVACY OVERRIDE
+  app.get("/api/admin/users/:userId/content", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const content = await storage.getUserAllContent(userId);
+      res.json(content);
+    } catch (error) {
+      console.error("Failed to get user content:", error);
+      res.status(500).json({ error: "Failed to get user content" });
     }
   });
 
