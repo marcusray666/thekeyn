@@ -444,6 +444,7 @@ export function AnimatedShowcase({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
             onClick={() => setSelectedWork(null)}
           >
             <motion.div
@@ -451,6 +452,7 @@ export function AnimatedShowcase({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
               className="max-w-2xl w-full"
             >
               <GlassCard>

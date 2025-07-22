@@ -86,6 +86,26 @@
     min-height: 100vh;
   }
   
+  /* Disable iOS tap highlight for better mobile experience */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Re-enable selection for text inputs and content areas */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
   /* Mobile responsive improvements */
   @media (max-width: 768px) {
     .max-w-7xl {
@@ -103,6 +123,11 @@
     .btn-mobile {
       min-height: 44px;
       padding: 0.75rem 1rem;
+    }
+    
+    /* Additional tap highlight prevention for mobile */
+    .fixed, .relative, .absolute {
+      -webkit-tap-highlight-color: transparent !important;
     }
   }
 }
