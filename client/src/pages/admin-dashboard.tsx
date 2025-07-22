@@ -668,12 +668,15 @@ export default function AdminDashboard() {
                               <Badge variant="outline">{user.subscriptionTier}</Badge>
                             </div>
                             <p className="text-sm text-gray-400 mb-1">{user.email}</p>
-                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                              <span>{user.followerCount || 0} followers</span>
-                              <span>•</span>
-                              <span>{user.totalLikes || 0} likes</span>
-                              <span>•</span>
-                              <span>{user.totalWorks || 0} works</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
+                              <span className="min-w-[60px] text-right">{user.followerCount || 0}</span>
+                              <span className="text-gray-600">followers</span>
+                              <span className="text-gray-600">•</span>
+                              <span className="min-w-[40px] text-right">{user.totalLikes || 0}</span>
+                              <span className="text-gray-600">likes</span>
+                              <span className="text-gray-600">•</span>
+                              <span className="min-w-[40px] text-right">{user.totalWorks || 0}</span>
+                              <span className="text-gray-600">works</span>
                             </div>
                           </div>
                         </div>

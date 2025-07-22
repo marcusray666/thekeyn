@@ -398,12 +398,43 @@ export class DatabaseStorage implements IStorage {
     const [like] = await db.insert(likes)
       .values({ userId, workId })
       .returning();
+    
+    // Update work like count
+    await db
+      .update(works)
+      .set({ likeCount: sql`${works.likeCount} + 1` })
+      .where(eq(works.id, workId));
+    
+    // Update user's total likes count (for the work owner)
+    const work = await this.getWork(workId);
+    if (work) {
+      await db
+        .update(users)
+        .set({ totalLikes: sql`${users.totalLikes} + 1` })
+        .where(eq(users.id, work.userId));
+    }
+    
     return like;
   }
 
   async unlikeWork(userId: number, workId: number): Promise<void> {
     await db.delete(likes)
-      .where(eq(likes.userId, userId));
+      .where(and(eq(likes.userId, userId), eq(likes.workId, workId)));
+    
+    // Update work like count
+    await db
+      .update(works)
+      .set({ likeCount: sql`GREATEST(${works.likeCount} - 1, 0)` })
+      .where(eq(works.id, workId));
+    
+    // Update user's total likes count (for the work owner)
+    const work = await this.getWork(workId);
+    if (work) {
+      await db
+        .update(users)
+        .set({ totalLikes: sql`GREATEST(${users.totalLikes} - 1, 0)` })
+        .where(eq(users.id, work.userId));
+    }
   }
 
   async isWorkLiked(userId: number, workId: number): Promise<boolean> {
