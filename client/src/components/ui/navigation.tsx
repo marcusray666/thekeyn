@@ -139,12 +139,15 @@ export function Navigation() {
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-800/95 backdrop-blur-md border-gray-700 shadow-xl">
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-900/98 backdrop-blur-md border-gray-600 shadow-2xl text-white">
                     {/* Account Section */}
-                    <div className="px-3 py-2 border-b border-gray-700">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Account</div>
+                    <div className="px-3 py-2 border-b border-gray-600">
+                      <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Account</div>
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                        <Link 
+                          href={`/profile/${user?.username}`}
+                          className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm hover:scale-105 transition-transform cursor-pointer"
+                        >
                           {user?.profileImageUrl ? (
                             <img
                               src={user.profileImageUrl}
@@ -154,58 +157,58 @@ export function Navigation() {
                           ) : (
                             user?.username?.charAt(0).toUpperCase()
                           )}
-                        </div>
+                        </Link>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white font-medium text-sm truncate">{user?.username}</div>
-                          <div className="text-gray-400 text-xs truncate">{user?.email || `${user?.username}@loggin.app`}</div>
+                          <div className="text-white font-medium text-sm truncate">{user?.displayName || user?.username}</div>
+                          <div className="text-gray-300 text-xs truncate">{user?.email || `${user?.username}@loggin.app`}</div>
                         </div>
                       </div>
                     </div>
 
-                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuSeparator className="bg-gray-600" />
                     
                     {/* Navigation Items */}
                     <DropdownMenuItem asChild>
-                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                      <Link href={`/profile/${user?.username}`} className="flex items-center w-full text-white hover:text-white hover:bg-purple-600/20 focus:bg-purple-600/20">
                         <Eye className="mr-3 h-4 w-4" />
                         View Profile
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                      <Link href="/settings" className="flex items-center w-full text-white hover:text-white hover:bg-purple-600/20 focus:bg-purple-600/20">
                         <Settings className="mr-3 h-4 w-4" />
                         Settings
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/security" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                      <Link href="/security" className="flex items-center w-full text-white hover:text-white hover:bg-purple-600/20 focus:bg-purple-600/20">
                         <Shield className="mr-3 h-4 w-4" />
                         Security
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/report-theft" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                      <Link href="/report-theft" className="flex items-center w-full text-white hover:text-white hover:bg-purple-600/20 focus:bg-purple-600/20">
                         <AlertTriangle className="mr-3 h-4 w-4" />
                         Report Theft
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
-                      <Link href="/analytics" className="flex items-center w-full text-gray-300 hover:text-white hover:bg-gray-700/50">
+                      <Link href="/analytics" className="flex items-center w-full text-white hover:text-white hover:bg-purple-600/20 focus:bg-purple-600/20">
                         <BarChart3 className="mr-3 h-4 w-4" />
                         Analytics
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuSeparator className="bg-gray-600" />
                     
                     <DropdownMenuItem
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/30 focus:bg-red-900/30"
                     >
                       <LogOut className="mr-3 h-4 w-4" />
                       {logoutMutation.isPending ? "Logging out..." : "Logout"}

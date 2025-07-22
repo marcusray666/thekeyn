@@ -31,6 +31,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import CommentsSection from "./CommentsSection";
 import FollowButton from "./FollowButton";
 import { AudioPlayer } from "./AudioPlayer";
+import { Link } from "wouter";
 
 interface Post {
   id: string;
@@ -161,17 +162,21 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {/* Post Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <Avatar className="w-12 h-12 border-2 border-purple-500/20">
-                <AvatarImage src={post.userImage} alt={post.username} />
-                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold">
-                  {post.username.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <Link href={`/profile/${post.username}`}>
+                <Avatar className="w-12 h-12 border-2 border-purple-500/20 hover:scale-105 transition-transform cursor-pointer">
+                  <AvatarImage src={post.userImage} alt={post.username} />
+                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold">
+                    {post.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-white hover:text-purple-300 transition-colors">
-                    {post.username}
-                  </h4>
+                  <Link href={`/profile/${post.username}`}>
+                    <h4 className="font-semibold text-white hover:text-purple-300 transition-colors cursor-pointer">
+                      {post.username}
+                    </h4>
+                  </Link>
                   {post.isProtected && (
                     <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
                       Protected
