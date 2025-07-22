@@ -85,6 +85,7 @@ function Router() {
           <Route path="/dashboard" component={Home} />
           <Route path="/studio" component={Studio} />
           <Route path="/admin" component={AdminDashboard} />
+          <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/certificates" component={MyCertificates} />
           <Route path="/upload-work" component={AuthenticatedUpload} />
           <Route path="/analytics" component={Analytics} />
