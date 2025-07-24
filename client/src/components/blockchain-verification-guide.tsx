@@ -70,7 +70,7 @@ export function BlockchainVerificationGuide({
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <h4 className="text-blue-400 font-medium mb-2">Real Blockchain Timestamping</h4>
             <p className="text-gray-300 text-sm mb-3">
-              Your work is protected using <strong>OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
+              Your work is protected using <strong>immediate Ethereum anchoring</strong> - creating instantly verifiable proofs on the Ethereum mainnet blockchain.
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
@@ -84,11 +84,11 @@ export function BlockchainVerificationGuide({
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
+                <span className="text-gray-300">Immediate Ethereum proof anchored to current blockchain block</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300">Verifiable through multiple calendar servers and block explorers</span>
+                <span className="text-gray-300">Instantly verifiable through Etherscan and other Ethereum block explorers</span>
               </div>
             </div>
           </div>
@@ -120,24 +120,67 @@ export function BlockchainVerificationGuide({
           <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
             <h4 className="text-green-400 font-medium mb-4">Verification Details</h4>
             <div className="space-y-4 text-sm">
-              <div>
-                <span className="text-gray-400 block mb-2">OpenTimestamps Commitment:</span>
-                <div className="relative">
-                  <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.blockchainAnchor}</div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => copyToClipboard(proofData.blockchainAnchor, 'OpenTimestamps commitment')}
-                    className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
+              {proofData.network === 'ethereum' && proofData.blockNumber && (
+                <>
+                  <div>
+                    <span className="text-gray-400 block mb-2">Blockchain Network:</span>
+                    <div className="flex items-center gap-2">
+                      <div className="text-white bg-blue-600 px-3 py-2 rounded font-semibold">Ethereum Mainnet</div>
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-green-400 text-xs">CONFIRMED</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block mb-2">Block Number:</span>
+                    <div className="relative">
+                      <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-sm">{proofData.blockNumber}</div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(proofData.blockNumber.toString(), 'Block number')}
+                        className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-gray-500 text-xs mt-1">Verify at: <a href={`https://etherscan.io/block/${proofData.blockNumber}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">https://etherscan.io/block/{proofData.blockNumber}</a></p>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block mb-2">Block Hash:</span>
+                    <div className="relative">
+                      <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.blockHash}</div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(proofData.blockHash, 'Block hash')}
+                        className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+              {(!proofData.network || proofData.network !== 'ethereum') && (
+                <div>
+                  <span className="text-gray-400 block mb-2">OpenTimestamps Commitment:</span>
+                  <div className="relative">
+                    <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.blockchainAnchor}</div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(proofData.blockchainAnchor, 'OpenTimestamps commitment')}
+                      className="absolute top-1 right-1 p-1 h-6 w-6 hover:bg-gray-700"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-1">This commitment will be anchored to Bitcoin blockchain within 1-6 hours</p>
                 </div>
-                <p className="text-gray-500 text-xs mt-1">This commitment will be anchored to Bitcoin blockchain within 1-6 hours</p>
-              </div>
+              )}
               <div>
                 <span className="text-gray-400 block mb-2">Timestamp Created:</span>
-                <p className="text-white bg-gray-800 px-3 py-2 rounded">{new Date(proofData.timestamp).toLocaleString()}</p>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded">{new Date(proofData.timestamp || proofData.blockTimestamp || proofData.createdAt).toLocaleString()}</p>
                 <p className="text-gray-500 text-xs mt-1">When your file was first timestamped</p>
               </div>
               <div>
