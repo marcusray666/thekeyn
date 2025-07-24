@@ -904,17 +904,17 @@ export default function StudioUnified() {
                       
                       {/* File Details */}
                       <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
-                        <div className="text-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl">
-                          <p className="text-pink-500 dark:text-pink-400 font-medium mb-1">Original Name</p>
-                          <p className="text-pink-800 dark:text-pink-200 text-xs break-all font-mono">{showPreview.certificate.work.originalName}</p>
+                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-pink-200 dark:border-pink-600 shadow-md">
+                          <p className="text-pink-700 dark:text-pink-300 font-bold mb-1">Original Name</p>
+                          <p className="text-gray-900 dark:text-white text-xs break-all font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{showPreview.certificate.work.originalName}</p>
                         </div>
-                        <div className="text-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl">
-                          <p className="text-rose-500 dark:text-rose-400 font-medium mb-1">File Type</p>
-                          <p className="text-rose-800 dark:text-rose-200 text-xs font-mono">{showPreview.certificate.work.mimeType}</p>
+                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-rose-200 dark:border-rose-600 shadow-md">
+                          <p className="text-rose-700 dark:text-rose-300 font-bold mb-1">File Type</p>
+                          <p className="text-gray-900 dark:text-white text-xs font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{showPreview.certificate.work.mimeType}</p>
                         </div>
-                        <div className="text-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl">
-                          <p className="text-pink-500 dark:text-pink-400 font-medium mb-1">File Size</p>
-                          <p className="text-pink-800 dark:text-pink-200 text-xs font-mono">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</p>
+                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-pink-200 dark:border-pink-600 shadow-md">
+                          <p className="text-pink-700 dark:text-pink-300 font-bold mb-1">File Size</p>
+                          <p className="text-gray-900 dark:text-white text-xs font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</p>
                         </div>
                       </div>
                     </div>
@@ -932,17 +932,17 @@ export default function StudioUnified() {
                         File Information
                       </h4>
                       <div className="space-y-4 text-sm">
-                        <div className="flex justify-between items-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-                          <span className="text-pink-600 dark:text-pink-400 font-medium">Original Name:</span>
-                          <span className="text-pink-900 dark:text-pink-100 font-mono text-xs break-all max-w-[60%] text-right">{showPreview.certificate.work.originalName}</span>
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Original Name:</span>
+                          <span className="text-gray-900 dark:text-white font-mono text-xs break-all max-w-[60%] text-right bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
-                          <span className="text-rose-600 dark:text-rose-400 font-medium">Type:</span>
-                          <span className="text-rose-900 dark:text-rose-100">{showPreview.certificate.work.mimeType}</span>
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-rose-200 dark:border-rose-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Type:</span>
+                          <span className="text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-                          <span className="text-pink-600 dark:text-pink-400 font-medium">Size:</span>
-                          <span className="text-pink-900 dark:text-pink-100">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</span>
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Size:</span>
+                          <span className="text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</span>
                         </div>
                       </div>
                     </div>
@@ -971,24 +971,28 @@ export default function StudioUnified() {
 
                       {/* Content */}
                       <div className="space-y-4">
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-500/30 rounded-xl p-4">
-                          <h5 className="text-blue-700 dark:text-blue-300 font-semibold mb-2 text-sm">Real Blockchain Timestamping</h5>
-                          <p className="text-blue-600 dark:text-blue-400 text-xs mb-3">
-                            Your work is protected using <strong>OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
+                        <div className="bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-500 rounded-xl p-6 shadow-lg">
+                          <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Real Blockchain Timestamping</h5>
+                          <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
+                            Your work is protected using <strong className="text-blue-600 dark:text-blue-400">OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
                           </p>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex items-start gap-2">
-                              <CheckCircle className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <div className="space-y-3 text-sm">
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <span className="text-blue-700 dark:text-blue-300">Your file's SHA-256 hash:</span>
-                                <div className="mt-1 p-2 bg-blue-100 dark:bg-blue-900/40 rounded text-xs font-mono break-all">
-                                  <span className="text-purple-600 dark:text-purple-400">{showPreview.certificate.work.fileHash}</span>
+                                <span className="text-gray-900 dark:text-white font-semibold block mb-2">Your file's SHA-256 hash:</span>
+                                <div className="p-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                  <span className="text-purple-700 dark:text-purple-300 font-mono text-xs break-all">{showPreview.certificate.work.fileHash}</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-3 h-3 text-emerald-500 flex-shrink-0" />
-                              <span className="text-blue-700 dark:text-blue-300">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                              <span className="text-gray-900 dark:text-white font-semibold">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                              <span className="text-gray-900 dark:text-white font-semibold">Verifiable through multiple calendar servers and block explorers</span>
                             </div>
                           </div>
                         </div>
