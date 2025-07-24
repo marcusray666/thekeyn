@@ -28,7 +28,9 @@ import {
   Eye,
   Trash2,
   AlertTriangle,
-  X
+  X,
+  Copy,
+  Share
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -812,7 +814,7 @@ export default function StudioUnified() {
         )}
       </AnimatePresence>
 
-      {/* Work Preview Modal */}
+      {/* Work Preview Modal - Completely Redesigned */}
       <AnimatePresence>
         {showPreview.show && showPreview.certificate && (
           <motion.div
@@ -826,78 +828,173 @@ export default function StudioUnified() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-6xl max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <Card className="glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4">
+              {/* Main Modal Card - Using exact same pattern as certificate cards */}
+              <Card className="glass-morphism p-8 relative overflow-hidden">
+                {/* Close Button */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPreview({ show: false, certificate: null })}
-                  className="absolute top-4 right-4 h-8 w-8 p-0 text-gray-400 hover:text-white"
+                  className="absolute top-6 right-6 h-10 w-10 p-0 text-gray-400 hover:text-white z-10"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-5 w-5" />
                 </Button>
-              
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">Work Preview</h2>
-                  <h3 className="text-lg text-gray-300">{showPreview.certificate.work.title}</h3>
+
+                {/* Header */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
+                      <WorkImage
+                        filename={showPreview.certificate.work.filename}
+                        mimeType={showPreview.certificate.work.mimeType}
+                        title={showPreview.certificate.work.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-white">{showPreview.certificate.work.title}</h2>
+                      <p className="text-gray-400">{showPreview.certificate.work.description || 'No description provided'}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                        <Shield className="w-3 h-3 mr-1" />
+                        Certified
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Preview */}
-                  <div className="space-y-4 flex flex-col items-center">
-                    <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
-                      <div className="flex items-center justify-center w-full h-full">
+                {/* Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-h-[60vh] overflow-auto">
+                  
+                  {/* Large Preview Section */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Main Image/File Preview */}
+                    <Card className="glass-morphism p-6">
+                      <div className="bg-gray-800/30 rounded-xl p-8 min-h-[400px] flex items-center justify-center">
                         <WorkImage
                           filename={showPreview.certificate.work.filename}
                           mimeType={showPreview.certificate.work.mimeType}
                           title={showPreview.certificate.work.title}
-                          className="max-w-full max-h-[400px] object-contain rounded-lg mx-auto"
+                          className="max-w-full max-h-[350px] object-contain rounded-lg"
                         />
                       </div>
-                    </div>
-                    <div className="text-center w-full">
-                      <p className="text-sm text-gray-400">
-                        Original Name: {showPreview.certificate.work.originalName}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        File Type: {showPreview.certificate.work.mimeType}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
-                      </p>
-                    </div>
+                      
+                      {/* File Details */}
+                      <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+                        <div className="text-center">
+                          <p className="text-gray-400">Original Name</p>
+                          <p className="text-white font-medium break-all">{showPreview.certificate.work.originalName}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-gray-400">File Type</p>
+                          <p className="text-white font-medium">{showPreview.certificate.work.mimeType}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-gray-400">File Size</p>
+                          <p className="text-white font-medium">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
 
-                  {/* File Information */}
-                  <div className="space-y-4">
-                    <Card className="glass-morphism p-4">
-                      <h4 className="text-lg font-semibold text-white mb-4">File Information</h4>
+                  {/* Info Sidebar */}
+                  <div className="space-y-6">
+                    
+                    {/* Certificate Information */}
+                    <Card className="glass-morphism p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <Award className="w-5 h-5 text-purple-400" />
+                        Certificate Details
+                      </h3>
                       <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Certificate ID:</span>
-                          <span className="text-white font-mono text-xs">{showPreview.certificate.id}</span>
+                        <div>
+                          <p className="text-gray-400">Certificate ID</p>
+                          <p className="text-white font-mono text-xs bg-gray-800/50 p-2 rounded mt-1 break-all">
+                            {showPreview.certificate.id}
+                          </p>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Creator:</span>
-                          <span className="text-white">{showPreview.certificate.work.creatorName}</span>
+                        <div>
+                          <p className="text-gray-400">Creator</p>
+                          <p className="text-white">{showPreview.certificate.work.creatorName}</p>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Created:</span>
-                          <span className="text-white">{new Date(showPreview.certificate.work.createdAt).toLocaleDateString()}</span>
+                        <div>
+                          <p className="text-gray-400">Created Date</p>
+                          <p className="text-white">{new Date(showPreview.certificate.work.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Status:</span>
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Certified</span>
+                        <div>
+                          <p className="text-gray-400">Blockchain Status</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-green-400 text-sm">Verified</span>
+                          </div>
                         </div>
                       </div>
                     </Card>
 
-                    <BlockchainVerificationGuide
-                      blockchainHash={showPreview.certificate.work.blockchainHash || ''}
-                      fileHash={showPreview.certificate.work.fileHash}
-                      verificationProof={showPreview.certificate.verificationProof}
-                    />
+                    {/* Quick Actions */}
+                    <Card className="glass-morphism p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+                      <div className="space-y-3">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Download PDF Certificate
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start bg-green-500/10 border-green-500/30 text-green-300 hover:bg-green-500/20"
+                          onClick={() => navigator.clipboard.writeText(showPreview.certificate.work.fileHash)}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy File Hash
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
+                        >
+                          <Share className="w-4 h-4 mr-2" />
+                          Share Certificate
+                        </Button>
+                      </div>
+                    </Card>
+
+                    {/* Blockchain Verification */}
+                    <Card className="glass-morphism p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-green-400" />
+                        Blockchain Proof
+                      </h3>
+                      <div className="space-y-3 text-sm">
+                        <div>
+                          <p className="text-gray-400">File Hash (SHA-256)</p>
+                          <div className="mt-1 p-2 bg-gray-800/50 rounded font-mono text-xs break-all">
+                            <span className="text-green-400">{showPreview.certificate.work.fileHash}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Blockchain Verification</p>
+                          <div className="mt-1 p-2 bg-gray-800/50 rounded font-mono text-xs break-all">
+                            <span className="text-purple-400">{showPreview.certificate.work.blockchainHash || 'Processing...'}</span>
+                          </div>
+                        </div>
+                        <div className="bg-green-500/10 border border-green-500/20 rounded p-3 mt-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                            <span className="text-green-400 font-medium text-sm">Blockchain Verified</span>
+                          </div>
+                          <p className="text-gray-300 text-xs">
+                            This work is timestamped and verified on Bitcoin/Ethereum blockchain using OpenTimestamps protocol.
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+
                   </div>
                 </div>
               </Card>

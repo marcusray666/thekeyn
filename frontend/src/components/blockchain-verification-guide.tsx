@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, ExternalLink, Shield, Search, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/components/theme-provider';
 
 interface BlockchainVerificationGuideProps {
   blockchainHash: string;
@@ -18,7 +17,6 @@ export function BlockchainVerificationGuide({
 }: BlockchainVerificationGuideProps) {
   const [activeTab, setActiveTab] = useState<'explanation' | 'verification' | 'tools'>('explanation');
   const { toast } = useToast();
-  const { theme } = useTheme();
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -58,9 +56,8 @@ export function BlockchainVerificationGuide({
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-purple-500 text-purple-400'
-                : 'border-transparent'
+                : 'border-transparent text-gray-400 hover:text-purple-300'
             }`}
-            className={activeTab === tab.id ? 'text-purple-400' : 'text-gray-400 hover:text-purple-300'}
           >
             {tab.label}
           </button>
