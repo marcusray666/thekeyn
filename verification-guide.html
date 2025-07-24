@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Verify Your Hash - Complete Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e1e2e, #2d2d44);
+            color: white;
+            line-height: 1.6;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1, h2 {
+            color: #a855f7;
+        }
+        .hash-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            margin: 20px 0;
+            border: 1px solid #4c1d95;
+            font-size: 14px;
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #a855f7;
+        }
+        .step-number {
+            background: #a855f7;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .method {
+            background: rgba(168, 85, 247, 0.1);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        .method h3 {
+            margin-top: 0;
+            color: #c084fc;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #86efac;
+        }
+        .warning {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: #fbbf24;
+            color: #fde047;
+        }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Complete Hash Verification Guide</h1>
+        
+        <div class="hash-display">
+            <strong>Your File Hash:</strong><br>
+            7b8e6c5699d9e33558daa98051c512d2fe2b43b733d263df847def8688d0f1d5
+        </div>
+
+        <div class="method success">
+            <h3>✅ Current Status: Successfully Submitted to OpenTimestamps</h3>
+            <p>Your hash has been submitted to 3 Bitcoin calendar servers and is being processed for blockchain anchoring. This typically takes 1-6 hours to complete.</p>
+        </div>
+
+        <h2>🔍 Verification Methods</h2>
+
+        <div class="method">
+            <h3>Method 1: Through Your Studio Dashboard (Easiest)</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Go to Studio → My Certificates</strong><br>
+                Click the "My Certificates" tab in your Studio
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Find Your Work</strong><br>
+                Look for your uploaded work with the green "Blockchain Verified" badge
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Copy Verification Proof</strong><br>
+                Click the green Shield button to copy your complete verification proof
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>View Full Certificate</strong><br>
+                Click "View" to see your complete certificate with all verification details
+            </div>
+            <a href="http://localhost:5000/studio" class="button" target="_blank">Go to Studio</a>
+        </div>
+
+        <div class="method">
+            <h3>Method 2: Using OpenTimestamps.org (Official Verification)</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Get Your .ots File</strong><br>
+                From Studio → My Certificates, copy your verification proof (contains .ots data)
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Visit OpenTimestamps.org</strong><br>
+                Go to the official verification site
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Upload or Paste</strong><br>
+                Either upload your .ots file or paste the verification proof
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Get Results</strong><br>
+                The site will show Bitcoin blockchain confirmation status
+            </div>
+            <a href="https://opentimestamps.org/" class="button" target="_blank">Visit OpenTimestamps.org</a>
+        </div>
+
+        <div class="method warning">
+            <h3>Method 3: Bitcoin Blockchain Explorers (After Confirmation)</h3>
+            <p><strong>Note:</strong> This method only works after your timestamp is anchored to a Bitcoin block (1-6 hours)</p>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Wait for Confirmation</strong><br>
+                Your hash needs to be included in a Bitcoin block first
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Get Bitcoin Transaction ID</strong><br>
+                Once confirmed, your verification proof will contain a Bitcoin transaction ID
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Search Blockchain</strong><br>
+                Use the transaction ID to search on blockchain explorers
+            </div>
+            <a href="https://www.blockchain.com/explorer" class="button" target="_blank">Blockchain.com</a>
+            <a href="https://blockstream.info/" class="button" target="_blank">Blockstream.info</a>
+        </div>
+
+        <h2>📋 What Each Method Shows You</h2>
+
+        <div class="method">
+            <h3>Studio Dashboard Shows:</h3>
+            <ul>
+                <li>Certificate ID: CERT-MDGX1PKF-796E636273939F7F</li>
+                <li>Verification status and blockchain proof</li>
+                <li>Complete file metadata and creation time</li>
+                <li>Downloadable PDF certificate</li>
+            </ul>
+        </div>
+
+        <div class="method">
+            <h3>OpenTimestamps.org Shows:</h3>
+            <ul>
+                <li>Bitcoin blockchain confirmation status</li>
+                <li>Block number and timestamp when anchored</li>
+                <li>Cryptographic proof of authenticity</li>
+                <li>Calendar server submission details</li>
+            </ul>
+        </div>
+
+        <div class="method">
+            <h3>Blockchain Explorers Show:</h3>
+            <ul>
+                <li>Bitcoin transaction containing your hash</li>
+                <li>Block confirmation details</li>
+                <li>Permanent blockchain record</li>
+                <li>Network confirmations</li>
+            </ul>
+        </div>
+
+        <h2>⏰ Timeline</h2>
+        <div class="method">
+            <p><strong>Right Now:</strong> Hash submitted to calendar servers ✅</p>
+            <p><strong>1-6 Hours:</strong> Anchored to Bitcoin blockchain</p>
+            <p><strong>After Anchoring:</strong> Permanent verification available on all Bitcoin explorers</p>
+        </div>
+
+        <div class="method success">
+            <h3>🎉 Your Work Is Protected!</h3>
+            <p>Your file hash is already in the OpenTimestamps system and will be permanently recorded on the Bitcoin blockchain. The verification process is automatic and your proof of ownership is secure.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="button" onclick="navigator.clipboard.writeText('7b8e6c5699d9e33558daa98051c512d2fe2b43b733d263df847def8688d0f1d5')">
+                📋 Copy Hash
+            </button>
+            <button class="button" onclick="window.open('http://localhost:5000/certificate/CERT-MDGX1PKF-796E636273939F7F', '_blank')">
+                📄 View Certificate
+            </button>
+        </div>
+    </div>
+</body>
+</html>
