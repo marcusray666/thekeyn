@@ -818,18 +818,23 @@ export default function StudioUnified() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="work-preview-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 pt-20"
+            style={{ pointerEvents: 'auto' }}
+            onMouseOver={(e) => e.stopPropagation()}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="work-preview-modal glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4"
+              className="work-preview-modal-content p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4 rounded-lg"
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(16px)',
                 border: '1px solid rgba(0, 0, 0, 0.1)',
                 boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                pointerEvents: 'auto',
               }}
+              onMouseOver={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <Button
                 onClick={() => setShowPreview({ show: false, certificate: null })}

@@ -782,27 +782,21 @@ nav, .nav-glass {
 
 /* Work Preview Modal - Completely prevent dark hover states */
 .work-preview-modal,
-.work-preview-modal * {
+.work-preview-modal *,
+.work-preview-modal *:hover,
+.work-preview-modal *:focus {
   transition: none !important;
+  transform: none !important;
 }
 
-.work-preview-modal .glass-morphism:hover,
-.work-preview-modal .glass-morphism:hover *,
-.work-preview-modal [class*="bg-gray"]:hover,
-.work-preview-modal [class*="bg-blue"]:hover,
-.work-preview-modal [class*="bg-green"]:hover,
-.work-preview-modal [class*="bg-purple"]:hover,
-.work-preview-modal div:hover,
-.work-preview-modal p:hover,
-.work-preview-modal span:hover,
-.work-preview-modal h1:hover,
-.work-preview-modal h2:hover,
-.work-preview-modal h3:hover,
-.work-preview-modal h4:hover {
+/* Universal hover prevention - disable ALL hover effects in modal */
+.work-preview-modal *:hover {
   background-color: inherit !important;
   color: inherit !important;
   transform: none !important;
-  box-shadow: none !important;
+  box-shadow: inherit !important;
+  border-color: inherit !important;
+  opacity: inherit !important;
 }
 
 /* Specific overrides for known problematic elements */
@@ -1007,6 +1001,26 @@ nav, .nav-glass {
 
 .light-theme .work-preview-modal .text-gray-400 {
   color: #6b7280 !important;
+}
+
+/* Add specific class-based overrides for the modal content */
+.work-preview-modal-content,
+.work-preview-modal-content *,
+.work-preview-modal-content *:hover {
+  transition: none !important;
+  transform: none !important;
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Force light theme styling on modal content */
+.work-preview-modal-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #1a1a1a !important;
+}
+
+.work-preview-modal-content * {
+  color: inherit !important;
 }
 
 /* Loading animations */
