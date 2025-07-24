@@ -870,29 +870,31 @@ export default function StudioUnified() {
 
                 {/* File Information */}
                 <div className="space-y-4">
-                  <div className="glass-morphism p-4 rounded-lg">
-                    <h4 className="text-lg font-semibold text-white mb-3">File Information</h4>
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">File Information</h4>
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="text-gray-400">Original Name:</span>
-                        <p className="text-white break-all">{showPreview.certificate.work.originalName}</p>
+                        <span className="font-bold text-gray-900 dark:text-white">Original Name:</span>
+                        <p className="text-gray-700 dark:text-gray-300 break-all bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{showPreview.certificate.work.originalName}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Type:</span>
-                        <p className="text-white">{showPreview.certificate.work.mimeType}</p>
+                        <span className="font-bold text-gray-900 dark:text-white">Type:</span>
+                        <p className="text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{showPreview.certificate.work.mimeType}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Size:</span>
-                        <p className="text-white">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
+                        <span className="font-bold text-gray-900 dark:text-white">Size:</span>
+                        <p className="text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
                       </div>
                     </div>
                   </div>
 
-                  <BlockchainVerificationGuide
-                    blockchainHash={showPreview.certificate.work.blockchainHash || ''}
-                    fileHash={showPreview.certificate.work.fileHash}
-                    verificationProof={showPreview.certificate.verificationProof}
-                  />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+                    <BlockchainVerificationGuide
+                      blockchainHash={showPreview.certificate.work.blockchainHash || ''}
+                      fileHash={showPreview.certificate.work.fileHash}
+                      verificationProof={showPreview.certificate.verificationProof}
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
