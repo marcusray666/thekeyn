@@ -5,6 +5,10 @@
 Loggin' is a comprehensive social media platform for creators that combines digital art protection with community networking. The platform empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community through sharing, commenting, liking, and following other creators. Users can showcase their protected works, engage with fellow creators, mint NFTs, and access premium features for serious creative professionals.
 
 **Recent Updates (July 24, 2025):**
+- ✅ UNIFIED CERTIFICATE PAGES: Fixed inconsistency between standalone "My Certificates" page and Studio "My Certificates" tab - both now have identical Studio-style design with same buttons, layout, and functionality
+- ✅ BLOCKCHAIN HASH DISTINCTION: Enhanced PDF certificate template to clearly differentiate file hash (SHA-256 of original file) from blockchain verification hash (OpenTimestamps proof) with explanatory text
+- ✅ CERTIFICATE GUIDE NAVIGATION: Added comprehensive Certificate ID Usage Guide to main navigation with BookOpen icon, explaining real-world use cases for legal protection, social media verification, and business licensing
+- ✅ ENHANCED CERTIFICATE DISPLAY: Both certificate pages now show certified status, metadata, preview buttons, and consistent action buttons (Preview, PDF, View, Copy Hash, Share)
 - ✅ FRONTEND/BACKEND SEPARATION: Complete architectural restructure for separate hosting platforms
 - ✅ DEPLOYMENT-READY STRUCTURE: Created standalone frontend/ and backend/ directories with independent package.json files
 - ✅ CORS CONFIGURATION: Added proper cross-origin resource sharing for separate domain hosting
