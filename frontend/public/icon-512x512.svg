@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a1a2e" rx="64"/>
+  
+  <!-- Main logo shape -->
+  <g transform="translate(128, 128)">
+    <!-- Shield base -->
+    <path d="M128 32 L224 64 L224 160 Q224 224 128 256 Q32 224 32 160 L32 64 Z" 
+          fill="url(#logoGradient)" 
+          stroke="none"/>
+    
+    <!-- Inner pattern -->
+    <path d="M128 64 L192 80 L192 160 Q192 202 128 224 Q64 202 64 160 L64 80 Z" 
+          fill="rgba(255,255,255,0.2)" 
+          stroke="none"/>
+    
+    <!-- Center dot -->
+    <circle cx="128" cy="144" r="20" fill="white" opacity="0.9"/>
+    
+    <!-- Decorative elements -->
+    <path d="M96 112 L128 128 L160 112" stroke="white" stroke-width="6" fill="none" opacity="0.7"/>
+    <path d="M96 176 L128 160 L160 176" stroke="white" stroke-width="6" fill="none" opacity="0.7"/>
+  </g>
+  
+  <!-- App name -->
+  <text x="256" y="420" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="48" font-weight="bold">
+    Loggin'
+  </text>
+</svg>

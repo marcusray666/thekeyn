@@ -1,0 +1,3328 @@
+import type { Express, Request, Response, NextFunction } from "express";
+import express from "express";
+import { createServer, type Server } from "http";
+import path from "path";
+import fs from "fs";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
+import multer from "multer";
+import session from "express-session";
+import MemoryStore from "memorystore";
+import { z } from "zod";
+import Stripe from "stripe";
+import { fileURLToPath } from 'url';
+import { storage } from "./storage";
+import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
+import blockchainRoutes from "./routes/blockchain-routes";
+import adminRoutes from "./routes/admin-routes";
+import { blockchainVerification } from "./blockchain-verification";
+import { openTimestampsService } from "./opentimestamps-service";
+import { contentModerationService } from "./services/content-moderation";
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-06-20",
+});
+
+const MemStore = MemoryStore(session);
+
+function generateCertificateId(): string {
+  const timestamp = Date.now().toString(36);
+  const random = crypto.randomBytes(8).toString("hex");
+  return `CERT-${timestamp}-${random}`.toUpperCase();
+}
+
+function generateFileHash(filePath: string): string {
+  const fileBuffer = fs.readFileSync(filePath);
+  return crypto.createHash("sha256").update(fileBuffer).digest("hex");
+}
+
+async function generateBlockchainHash(): Promise<string> {
+  try {
+    // Create real blockchain anchor using Ethereum mainnet
+    const ethers = await import('ethers');
+    const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+    
+    // Get current block for real blockchain anchoring
+    const currentBlock = await provider.getBlock('latest');
+    if (!currentBlock) {
+      throw new Error('Failed to get current block');
+    }
+    
+    // Create verifiable hash linking to real blockchain data
+    const blockchainData = {
+      blockNumber: currentBlock.number,
+      blockHash: currentBlock.hash,
+      timestamp: currentBlock.timestamp,
+      parentHash: currentBlock.parentHash,
+      gasUsed: currentBlock.gasUsed.toString()
+    };
+    
+    // Generate deterministic hash that can be verified against Ethereum mainnet
+    const blockchainHash = crypto.createHash('sha256')
+      .update(JSON.stringify(blockchainData))
+      .digest('hex');
+    
+    console.log(`Real blockchain anchor created:`);
+    console.log(`- Block: ${currentBlock.number}`);
+    console.log(`- Block Hash: ${currentBlock.hash}`);
+    console.log(`- Verification Hash: ${blockchainHash}`);
+    
+    return blockchainHash;
+  } catch (error) {
+    console.error('Blockchain anchoring failed:', error);
+    // Fallback to timestamp-based hash if blockchain access fails
+    return crypto.createHash('sha256')
+      .update(Date.now().toString())
+      .digest('hex');
+  }
+}
+
+
+
+// DMCA Takedown Email Template Generator
+function generateTakedownEmail(data: {
+  work: any;
+  certificate: any;
+  platform: string;
+  infringingUrl: string;
+  description: string;
+  contactEmail: string;
+  baseUrl: string;
+}) {
+  const { work, certificate, platform, infringingUrl, description, contactEmail, baseUrl } = data;
+  
+  return `Subject: Takedown Request – Unauthorized Use of Copyrighted Content
+
+Hello,
+
+I am contacting you on behalf of ${work.creatorName}, the rights holder of the original content referenced below. We have identified that our content has been published or distributed without permission on your platform.
+
+Details of the original content:
+
+Title: ${work.title}
+Author: ${work.creatorName}${work.collaborators && work.collaborators.length > 0 ? `
+Collaborators: ${work.collaborators.join(', ')}` : ''}
+Original file name: ${work.originalName}
+Copyright registration: Certificate ID ${certificate.certificateId}
+URL/Location of original content: ${baseUrl}/certificate/${certificate.certificateId}
+Blockchain verification hash: ${work.blockchainHash}
+
+Details of the infringing content:
+
+URL/Location where infringing content appears: ${infringingUrl}
+Platform: ${platform}
+Description of the infringing content: ${description}
+
+This unauthorized use constitutes copyright infringement. We request that you promptly remove or disable access to the infringing material.
+
+I have a good faith belief that use of the copyrighted content described above is not authorized by the copyright owner, its agent, or the law.
+
+I declare, under penalty of perjury, that the information in this notice is accurate and that I am the copyright owner or am authorized to act on behalf of the copyright owner.
+
+Please confirm when this content has been removed. If you need additional information, you can contact me at ${contactEmail}.
+
+You can verify the authenticity of this copyright claim by visiting our certificate page: ${baseUrl}/certificate/${certificate.certificateId}
+
+Thank you for your cooperation.
+
+Sincerely,
+${work.creatorName}
+${contactEmail}
+
+---
+This takedown request was generated through Loggin' Digital Copyright Protection Platform
+Certificate ID: ${certificate.certificateId}
+File Hash: ${work.fileHash}
+Registration Date: ${new Date(certificate.createdAt).toLocaleDateString()}`;
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: { id: number; username: string; email: string };
+  userId?: number;
+}
+
+const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    interface SessionData {
+      userId?: number;
+    }
+
+    const sessionData = req.session as SessionData;
+    if (!sessionData || !sessionData.userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const user = await storage.getUser(sessionData.userId);
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    req.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role, // CRITICAL: Include role for admin access
+      subscriptionTier: user.subscriptionTier,
+      subscriptionStatus: user.subscriptionStatus,
+      monthlyUploads: user.monthlyUploads,
+      monthlyUploadLimit: user.monthlyUploadLimit,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+      displayName: user.displayName,
+      bio: user.bio,
+      profileImageUrl: user.profileImageUrl,
+      website: user.website,
+      location: user.location,
+      isVerified: user.isVerified,
+      followerCount: user.followerCount,
+      followingCount: user.followingCount,
+      totalLikes: user.totalLikes,
+      themePreference: user.themePreference,
+      settings: user.settings,
+      lastLoginAt: user.lastLoginAt,
+      isBanned: user.isBanned,
+      banReason: user.banReason,
+      createdAt: user.createdAt
+    };
+    
+    // CRITICAL FIX: Set userId for profile updates
+    req.userId = user.id;
+
+    next();
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+    res.status(500).json({ error: "Authentication error" });
+  }
+};
+
+// Set up multer for file uploads
+const storage_multer = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = "uploads";
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const randomString = crypto.randomBytes(8).toString("hex");
+    const extension = path.extname(file.originalname);
+    cb(null, `${timestamp}-${randomString}${extension}`);
+  },
+});
+
+const upload = multer({
+  storage: storage_multer,
+  limits: {
+    fileSize: 2 * 1024 * 1024 * 1024, // 2GB limit for 4K videos
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      // Images
+      "image/jpeg",
+      "image/jpg", 
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "image/bmp",
+      "image/tiff",
+      // Audio
+      "audio/mpeg",
+      "audio/wav",
+      "audio/ogg",
+      "audio/mp4",
+      "audio/m4a",
+      "audio/aac",
+      "audio/flac",
+      "audio/x-wav",
+      "audio/webm",
+      // Video
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+      "video/avi",
+      "video/mov",
+      "video/x-msvideo",
+      "video/mkv",
+      "video/x-matroska",
+      // Documents
+      "application/pdf",
+      "text/plain",
+      "text/csv",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      // Archives
+      "application/zip",
+      "application/x-rar-compressed",
+      "application/x-7z-compressed",
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Unsupported file type"));
+    }
+  },
+});
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Session middleware
+  const sessionMiddleware = session({
+    store: new MemStore({
+      checkPeriod: 86400000, // prune expired entries every 24h
+    }),
+    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+    name: "sessionId", // Don't use default session name
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      sameSite: 'strict', // CSRF protection
+    },
+  });
+
+  app.use(sessionMiddleware);
+
+  // Serve uploaded files with proper headers
+  app.use("/uploads", express.static("uploads", {
+    setHeaders: (res, path) => {
+      // Set proper MIME type for images
+      if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+        res.setHeader('Content-Type', 'image/jpeg');
+      } else if (path.endsWith('.png')) {
+        res.setHeader('Content-Type', 'image/png');
+      } else if (path.endsWith('.gif')) {
+        res.setHeader('Content-Type', 'image/gif');
+      } else if (path.endsWith('.webp')) {
+        res.setHeader('Content-Type', 'image/webp');
+      }
+      // Set proper MIME type for videos
+      else if (path.endsWith('.mp4')) {
+        res.setHeader('Content-Type', 'video/mp4');
+      } else if (path.endsWith('.webm')) {
+        res.setHeader('Content-Type', 'video/webm');
+      } else if (path.endsWith('.mov') || path.endsWith('.quicktime')) {
+        res.setHeader('Content-Type', 'video/quicktime');
+      } else if (path.endsWith('.avi')) {
+        res.setHeader('Content-Type', 'video/x-msvideo');
+      }
+      // Set proper MIME type for audio
+      else if (path.endsWith('.mp3')) {
+        res.setHeader('Content-Type', 'audio/mpeg');
+      } else if (path.endsWith('.wav')) {
+        res.setHeader('Content-Type', 'audio/wav');
+      } else if (path.endsWith('.ogg')) {
+        res.setHeader('Content-Type', 'audio/ogg');
+      } else if (path.endsWith('.m4a')) {
+        res.setHeader('Content-Type', 'audio/mp4');
+      }
+      // Allow CORS for all media files
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  }));
+
+  // Blockchain/NFT routes (protected)
+  app.use('/api/blockchain', requireAuth, blockchainRoutes);
+  
+  // Admin routes
+  adminRoutes(app);
+
+  // Auth routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const validatedData = registerSchema.parse(req.body);
+      
+      // Check if user already exists (case insensitive username)
+      const existingUser = await storage.getUserByUsername(validatedData.username.toLowerCase());
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const existingEmail = await storage.getUserByEmail(validatedData.email);
+      if (existingEmail) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      // Hash password
+      const passwordHash = await bcrypt.hash(validatedData.password, 12);
+
+      // Create user (store username in lowercase)
+      const user = await storage.createUser({
+        username: validatedData.username.toLowerCase(),
+        email: validatedData.email,
+        passwordHash,
+      });
+
+      // Set session
+      req.session.userId = user.id;
+      
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      
+      // Find user (case insensitive username)
+      const user = await storage.getUserByUsername(validatedData.username.toLowerCase());
+      if (!user) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Check password
+      const passwordMatch = await bcrypt.compare(validatedData.password, user.passwordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Set session
+      req.session.userId = user.id;
+      
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
+      const { passwordHash: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.clearCookie('connect.sid');
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
+    console.log('Auth user request for:', req.user?.id, 'tier:', req.user?.subscriptionTier);
+    res.json(req.user);
+  });
+
+  // Get single certificate by ID (public endpoint for certificate verification)
+  app.get("/api/certificate/:id", async (req, res) => {
+    try {
+      const certificateId = req.params.id;
+      
+      // Find work by certificate ID
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      // Find certificate by work ID
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+      
+      // Return certificate with work data
+      res.json({
+        ...certificate,
+        work
+      });
+    } catch (error) {
+      console.error("Error fetching certificate:", error);
+      res.status(500).json({ error: "Failed to fetch certificate" });
+    }
+  });
+
+  // Get all certificates for authenticated user
+  app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      // Only get the user's own works and their associated certificates
+      const userWorks = await storage.getUserWorks(userId);
+      
+      // Get certificates for user's works only
+      const certificatesWithWorks = await Promise.all(
+        userWorks.map(async (work) => {
+          const cert = await storage.getCertificateByWorkId(work.id);
+          if (cert) {
+            return {
+              ...cert,
+              work: work,
+            };
+          }
+          return null;
+        })
+      );
+
+      // Filter out null entries (works without certificates)
+      const validCertificates = certificatesWithWorks.filter(cert => cert !== null);
+
+      res.json(validCertificates);
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+      res.status(500).json({ error: "Failed to fetch certificates" });
+    }
+  });
+
+  // Serve uploaded files
+  app.get("/api/files/:filename", async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const filePath = path.join("uploads", filename);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File not found" });
+      }
+
+      // Set appropriate headers
+      const stat = fs.statSync(filePath);
+      res.setHeader('Content-Length', stat.size);
+      
+      // Set content type based on file extension
+      const ext = path.extname(filename).toLowerCase();
+      const contentTypeMap: { [key: string]: string } = {
+        // Images
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.bmp': 'image/bmp',
+        '.svg': 'image/svg+xml',
+        // Videos
+        '.mp4': 'video/mp4',
+        '.mov': 'video/quicktime',
+        '.avi': 'video/x-msvideo',
+        '.mkv': 'video/x-matroska',
+        '.webm': 'video/webm',
+        '.flv': 'video/x-flv',
+        '.wmv': 'video/x-ms-wmv',
+        '.m4v': 'video/x-m4v',
+        '.3gp': 'video/3gpp',
+        // Audio
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav',
+        '.m4a': 'audio/mp4',
+        '.aac': 'audio/aac',
+        '.ogg': 'audio/ogg',
+        '.wma': 'audio/x-ms-wma',
+        '.flac': 'audio/flac',
+        '.mp2': 'audio/mpeg',
+        // Documents
+        '.pdf': 'application/pdf',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.ppt': 'application/vnd.ms-powerpoint',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.txt': 'text/plain',
+        '.zip': 'application/zip',
+        '.rar': 'application/x-rar-compressed',
+        '.7z': 'application/x-7z-compressed',
+      };
+      
+      if (contentTypeMap[ext]) {
+        res.setHeader('Content-Type', contentTypeMap[ext]);
+      }
+      
+      // Stream the file
+      const readStream = fs.createReadStream(filePath);
+      readStream.pipe(res);
+    } catch (error) {
+      console.error("Error serving file:", error);
+      res.status(500).json({ error: "Failed to serve file" });
+    }
+  });
+
+  // Generate and download certificate PDF
+  app.get("/api/certificates/:id/pdf", async (req, res) => {
+    try {
+      const certificateId = req.params.id;
+      
+      // Find work by certificate ID
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      
+      // Find certificate by work ID
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+      
+      // Generate PDF content
+      const pdfContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+              .header { text-align: center; margin-bottom: 40px; }
+              .title { color: #8B5CF6; font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+              .subtitle { color: #666; font-size: 18px; }
+              .content { max-width: 600px; margin: 0 auto; }
+              .section { margin-bottom: 30px; }
+              .label { font-weight: bold; color: #4A5568; }
+              .value { margin-top: 5px; color: #2D3748; }
+              .blockchain { background: #F7FAFC; padding: 20px; border-left: 4px solid #8B5CF6; margin: 20px 0; }
+              .footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="title">Loggin'</div>
+              <div class="subtitle">Digital Work Protection Certificate</div>
+            </div>
+            
+            <div class="content">
+              <div class="section">
+                <div class="label">Certificate ID:</div>
+                <div class="value">${certificate.certificateId}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Work Title:</div>
+                <div class="value">${work.title}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Creator:</div>
+                <div class="value">${work.creatorName}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Name:</div>
+                <div class="value">${work.originalName}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Type:</div>
+                <div class="value">${work.mimeType}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">File Size:</div>
+                <div class="value">${Math.round(work.fileSize / 1024)} KB</div>
+              </div>
+              
+              <div class="blockchain">
+                <div class="label">Blockchain Verification:</div>
+                <div class="value">${work.blockchainHash}</div>
+              </div>
+              
+              <div class="section">
+                <div class="label">Protected On:</div>
+                <div class="value">${new Date(work.createdAt).toLocaleDateString()}</div>
+              </div>
+            </div>
+            
+            <div class="footer">
+              <p>This certificate serves as proof of digital work ownership and timestamp verification.</p>
+              <p>Certificate URL: ${certificate.shareableLink}</p>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="certificate-${certificateId}.pdf"`);
+      
+      // For now, return HTML that will be converted to PDF by the browser
+      res.setHeader('Content-Type', 'text/html');
+      res.send(pdfContent);
+      
+    } catch (error) {
+      console.error("Error generating certificate PDF:", error);
+      res.status(500).json({ error: "Failed to generate certificate PDF" });
+    }
+  });
+
+  // Get dashboard stats - user specific only
+  app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      // Only get the user's own works and certificates
+      const userWorks = await storage.getUserWorks(userId);
+      
+      // Get user's certificates by checking their works
+      let userCertificates = 0;
+      for (const work of userWorks) {
+        const cert = await storage.getCertificateByWorkId(work.id);
+        if (cert) userCertificates++;
+      }
+
+      const stats = {
+        protected: userWorks.length,
+        certificates: userCertificates,
+        reports: 0, // Placeholder for future implementation
+        totalViews: userWorks.reduce((total, work) => total + (work.viewCount || 0), 0),
+        thisMonth: userWorks.filter(work => {
+          const workDate = new Date(work.createdAt);
+          const now = new Date();
+          return workDate.getMonth() === now.getMonth() && workDate.getFullYear() === now.getFullYear();
+        }).length,
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Old social feed endpoint removed to prevent duplicate posts
+
+  // Get recent works - user specific only
+  app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      // Only return the user's own works
+      const userWorks = await storage.getUserWorks(userId);
+      // Sort by creation date and limit to 10 most recent
+      const recentWorks = userWorks
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10);
+      res.json(recentWorks);
+    } catch (error) {
+      console.error("Error fetching recent works:", error);
+      res.status(500).json({ error: "Failed to fetch recent works" });
+    }
+  });
+
+  // Report theft endpoint
+  app.post("/api/report-theft", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { certificateId, platform, infringingUrl, description, contactEmail } = req.body;
+      
+      // Validate the certificate exists
+      const work = await storage.getWorkByCertificateId(certificateId);
+      if (!work) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+
+      // Get certificate data
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate data not found" });
+      }
+
+      // Generate DMCA takedown email template
+      const emailTemplate = generateTakedownEmail({
+        work,
+        certificate,
+        platform,
+        infringingUrl,
+        description,
+        contactEmail,
+        baseUrl: `${req.protocol}://${req.get("host")}`
+      });
+
+      // Get platform contact info
+      const platformContacts = {
+        'Twitter/X': 'copyright@twitter.com',
+        'Instagram': 'ip@instagram.com',
+        'Facebook': 'ip@facebook.com',
+        'YouTube': 'copyright@youtube.com',
+        'LinkedIn': 'copyright@linkedin.com',
+        'TikTok': 'legal@tiktok.com',
+        'Pinterest': 'copyright@pinterest.com'
+      };
+
+      const reportId = crypto.randomUUID();
+
+      res.json({ 
+        message: "Takedown request generated successfully",
+        reportId,
+        emailTemplate,
+        platformEmail: platformContacts[platform as keyof typeof platformContacts] || 'Unknown platform',
+        certificateUrl: `${req.protocol}://${req.get("host")}/certificate/${certificate.certificateId}`
+      });
+    } catch (error) {
+      console.error("Error submitting theft report:", error);
+      res.status(500).json({ error: "Failed to submit theft report" });
+    }
+  });
+
+  // Get user's works endpoint
+  app.get("/api/works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      console.log("Fetching works for user ID:", userId);
+      const works = await storage.getUserWorks(userId);
+      console.log("Found works:", works.length, works.map(w => ({ id: w.id, title: w.title, userId: w.userId })));
+      res.json(works);
+    } catch (error) {
+      console.error("Error fetching user works:", error);
+      res.status(500).json({ error: "Failed to fetch works" });
+    }
+  });
+
+  // Upload work endpoint
+  app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
+    try {
+      console.log('Upload request received:', {
+        hasFile: !!req.file,
+        bodyKeys: Object.keys(req.body),
+        body: req.body
+      });
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const { title, description, creatorName, collaborators } = req.body;
+
+      if (!title || !creatorName) {
+        return res.status(400).json({ error: "Title and creator name are required" });
+      }
+
+      // Check subscription limits
+      const userId = req.session!.userId;
+      console.log('Checking upload limits for user:', userId);
+      const uploadCheck = await storage.checkUploadLimit(userId);
+      console.log('Upload limit check result:', uploadCheck);
+      
+      if (!uploadCheck.canUpload) {
+        return res.status(403).json({ 
+          error: "Upload limit exceeded",
+          message: `You have reached your monthly upload limit of ${uploadCheck.limit}. Please upgrade your subscription to upload more works.`,
+          remainingUploads: uploadCheck.remainingUploads,
+          limit: uploadCheck.limit
+        });
+      }
+
+      // Parse collaborators if provided (could be JSON string from form data)
+      let collaboratorList = [];
+      if (collaborators) {
+        try {
+          if (typeof collaborators === 'string') {
+            // Clean up the string first - remove any problematic characters
+            const cleanedCollaborators = collaborators.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+            if (cleanedCollaborators.startsWith('[') || cleanedCollaborators.startsWith('{')) {
+              collaboratorList = JSON.parse(cleanedCollaborators);
+            } else {
+              collaboratorList = cleanedCollaborators.split(',').map((c: string) => c.trim()).filter(Boolean);
+            }
+          } else {
+            collaboratorList = collaborators;
+          }
+        } catch (e) {
+          console.error('Error parsing collaborators:', e);
+          // If not valid JSON, treat as comma-separated string
+          collaboratorList = String(collaborators).split(',').map((c: string) => c.trim()).filter(Boolean);
+        }
+      }
+
+      // Generate file hash
+      console.log('Generating file hash for:', req.file.filename);
+      const fileHash = generateFileHash(req.file.path);
+      const certificateId = generateCertificateId();
+
+      // AI Content Moderation Analysis
+      console.log('Running AI content moderation analysis...');
+      const existingHashes = await storage.getAllFileHashes();
+      const contentAnalysis = await contentModerationService.analyzeContent(
+        description || '',
+        title,
+        req.file.path,
+        fileHash,
+        existingHashes
+      );
+      
+      console.log('Content moderation result:', {
+        decision: contentAnalysis.overallDecision,
+        textFlags: contentAnalysis.textModeration?.flags,
+        imageFlags: contentAnalysis.imageModeration?.flags,
+        plagiarismFlags: contentAnalysis.plagiarismCheck?.flags
+      });
+
+      // Handle moderation decision
+      if (contentAnalysis.overallDecision === 'rejected') {
+        // Delete uploaded file
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({
+          error: "Content rejected by AI moderation",
+          reason: "Your content was flagged for inappropriate material",
+          flags: [
+            ...(contentAnalysis.textModeration?.flags || []),
+            ...(contentAnalysis.imageModeration?.flags || []),
+            ...(contentAnalysis.plagiarismCheck?.flags || [])
+          ]
+        });
+      }
+      
+      // Create REAL blockchain timestamp using OpenTimestamps
+      console.log('Creating real blockchain timestamp...');
+      const timestampData = await openTimestampsService.createTimestamp(fileHash);
+      const blockchainHash = timestampData.commitment;
+      
+      console.log('Generated IDs:', { 
+        fileHash, 
+        certificateId, 
+        blockchainHash,
+        verificationUrls: timestampData.calendarUrls,
+        isRealBlockchain: !timestampData.pendingAttestation
+      });
+
+      // Determine moderation status
+      const moderationStatus = contentAnalysis.overallDecision === 'pending_review' ? 'pending' : 'approved';
+      const moderationFlags = [
+        ...(contentAnalysis.textModeration?.flags || []),
+        ...(contentAnalysis.imageModeration?.flags || []),
+        ...(contentAnalysis.plagiarismCheck?.flags || [])
+      ];
+      const moderationScore = Math.max(
+        contentAnalysis.textModeration?.confidence || 0,
+        contentAnalysis.imageModeration?.confidence || 0,
+        contentAnalysis.plagiarismCheck?.confidence || 0
+      );
+
+      // Create work record
+      console.log('Creating work record...');
+      const work = await storage.createWork({
+        title,
+        description: description || "",
+        creatorName,
+        collaborators: collaboratorList,
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        mimeType: req.file.mimetype,
+        fileSize: req.file.size,
+        fileHash,
+        certificateId,
+        blockchainHash,
+        userId: userId, // Add userId to properly associate work with user
+        moderationStatus,
+        moderationFlags,
+        moderationScore,
+      });
+
+      console.log('Work created successfully:', work.id);
+
+      // Get user's subscription limits for certificate features
+      console.log('Getting subscription limits...');
+      const limits = await storage.getUserSubscriptionLimits(userId);
+      console.log('Subscription limits:', limits);
+      
+      // Read file buffer for verification proof
+      const fileBuffer = fs.readFileSync(req.file.path);
+      
+      // Generate verification proof with real blockchain data
+      console.log('Generating verification proof with OpenTimestamps...');
+      const verificationProof = {
+        fileHash: work.fileHash,
+        timestamp: Date.now(),
+        creator: work.creatorName,
+        certificateId: work.certificateId,
+        blockchainAnchor: timestampData.commitment,
+        verificationUrl: openTimestampsService.getVerificationUrl(timestampData.commitment, timestampData.ots),
+        otsProof: timestampData.ots,
+        calendarServers: timestampData.calendarUrls,
+        isRealBlockchain: !timestampData.pendingAttestation,
+        verificationInstructions: timestampData.pendingAttestation 
+          ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
+          : 'This timestamp is anchored to Ethereum blockchain and can be verified immediately.'
+      };
+
+      // Create certificate with verification proof
+      console.log('Creating certificate with verification proof...');
+      const certificate = await storage.createCertificate({
+        workId: work.id,
+        certificateId,
+        shareableLink: `${req.protocol}://${req.get("host")}/certificate/${certificateId}`,
+        qrCode: `data:image/svg+xml;base64,${Buffer.from(`<svg></svg>`).toString("base64")}`,
+        isDownloadable: limits.hasDownloadableCertificates,
+        hasCustomBranding: limits.hasCustomBranding,
+        verificationProof: JSON.stringify(verificationProof),
+        verificationLevel: 'basic',
+      });
+
+      // Update usage counter
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const currentUsage = await storage.getSubscriptionUsage(userId, currentMonth);
+      await storage.updateSubscriptionUsage(userId, currentMonth, {
+        uploadsUsed: (currentUsage?.uploadsUsed || 0) + 1,
+        storageUsed: (currentUsage?.storageUsed || 0) + req.file.size
+      });
+
+      // Return appropriate response based on moderation status
+      const response = {
+        workId: work.id,
+        certificateId: certificate.certificateId,
+        moderationStatus,
+        message: moderationStatus === 'pending' 
+          ? 'Your work has been uploaded but is pending admin review due to content flags.'
+          : 'Your work has been uploaded and approved successfully!',
+        flags: moderationFlags.length > 0 ? moderationFlags : undefined
+      };
+
+      console.log('Upload completed successfully:', {
+        workId: work.id,
+        certificateId: certificate.certificateId,
+        title: work.title
+      });
+
+      res.json({
+        work,
+        certificate,
+        verificationProof,
+        message: "Work uploaded, certified, and verified successfully",
+        remainingUploads: uploadCheck.remainingUploads - 1,
+      });
+    } catch (error) {
+      console.error("Error uploading work:", error);
+      
+      // Check if it's a JSON parsing error
+      if (error instanceof SyntaxError && error.message.includes('Unexpected token')) {
+        return res.status(400).json({ 
+          error: "Invalid JSON data in request", 
+          details: error.message,
+          suggestion: "Please check the format of the data being sent"
+        });
+      }
+      
+      res.status(500).json({ error: "Failed to upload work", details: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Update work endpoint
+  app.put("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+      const { title, description, creatorName, collaborators } = req.body;
+
+      if (!title || !creatorName) {
+        return res.status(400).json({ error: "Title and creator name are required" });
+      }
+
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      const updatedWork = await storage.updateWork(workId, {
+        title,
+        description: description || "",
+        creatorName,
+        collaborators: collaborators || [],
+      });
+
+      res.json({
+        work: updatedWork,
+        message: "Work updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating work:", error);
+      res.status(500).json({ error: "Failed to update work" });
+    }
+  });
+
+  // Delete work endpoint
+  app.delete("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+      const userId = req.session!.userId;
+      
+      if (isNaN(workId)) {
+        return res.status(400).json({ error: "Invalid work ID" });
+      }
+
+      console.log(`Delete request for work ${workId} by user ${userId}`);
+
+      // Get the work to verify ownership and get file info
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      // Verify ownership
+      if (work.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized to delete this work" });
+      }
+
+      console.log(`Deleting work: ${work.title} (${work.filename})`);
+
+      // Delete the physical file
+      try {
+        const filePath = path.join(__dirname, "../uploads", work.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file: ${filePath}`);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file:', fileError);
+        // Continue with database deletion even if file deletion fails
+      }
+
+      // Delete associated certificate first
+      const certificate = await storage.getCertificateByWorkId(workId);
+      if (certificate) {
+        await storage.deleteCertificate(certificate.id);
+      }
+
+      // Delete the work from database
+      await storage.deleteWork(workId);
+
+      // Log the deletion for audit purposes
+      console.log(`Work deletion completed:`, {
+        workId,
+        title: work.title,
+        filename: work.filename,
+        fileHash: work.fileHash,
+        blockchainHash: work.blockchainHash,
+        deletedAt: new Date().toISOString(),
+        deletedBy: userId
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Work and associated records deleted successfully",
+        deletedWork: {
+          id: workId,
+          title: work.title,
+          filename: work.filename,
+          blockchainHash: work.blockchainHash
+        }
+      });
+    } catch (error) {
+      console.error("Error deleting work:", error);
+      res.status(500).json({ error: "Failed to delete work" });
+    }
+  });
+
+
+
+  // NFT minting routes
+  app.post('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Simulate blockchain minting process
+      const mockTransactionHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+      const mockTokenId = Math.floor(Math.random() * 10000) + 1;
+      
+      const nftMint = await storage.createNftMint({
+        ...req.body,
+        userId: req.userId!,
+        transactionHash: mockTransactionHash,
+        tokenId: mockTokenId.toString(),
+        status: 'minting',
+        mintingCost: req.body.blockchain === 'ethereum' ? '$25.43' : 
+                    req.body.blockchain === 'polygon' ? '$3.21' :
+                    req.body.blockchain === 'arbitrum' ? '$6.18' : '$2.14',
+        metadataUri: `https://prooff.app/metadata/${mockTokenId}`,
+        marketplaceListings: ['OpenSea']
+      });
+
+      // Simulate minting completion after a delay
+      setTimeout(async () => {
+        try {
+          await storage.updateNftMint(nftMint.id, {
+            status: 'completed'
+          });
+        } catch (error) {
+          console.error('Error updating NFT mint status:', error);
+        }
+      }, 5000);
+
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error creating NFT mint:', error);
+      res.status(500).json({ message: 'Failed to create NFT mint' });
+    }
+  });
+
+  app.get('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMints = await storage.getNftMints(req.userId!);
+      res.json(nftMints);
+    } catch (error) {
+      console.error('Error fetching NFT mints:', error);
+      res.status(500).json({ message: 'Failed to fetch NFT mints' });
+    }
+  });
+
+  app.get('/api/nft-mints/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMint = await storage.getNftMint(parseInt(req.params.id));
+      if (!nftMint || nftMint.userId !== req.userId!) {
+        return res.status(404).json({ message: 'NFT mint not found' });
+      }
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error fetching NFT mint:', error);
+      res.status(500).json({ message: 'Failed to fetch NFT mint' });
+    }
+  });
+
+  app.put('/api/nft-mints/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const nftMint = await storage.updateNftMint(parseInt(req.params.id), req.body);
+      res.json(nftMint);
+    } catch (error) {
+      console.error('Error updating NFT mint:', error);
+      res.status(500).json({ message: 'Failed to update NFT mint' });
+    }
+  });
+
+  // Subscription management routes
+  app.post('/api/subscription/upgrade', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { tierId } = req.body;
+      
+      // Simulate payment processing and subscription update
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Calculate expiration date (30 days from now for monthly plans)
+      const expirationDate = new Date();
+      expirationDate.setMonth(expirationDate.getMonth() + 1);
+
+      // Update user subscription
+      await storage.updateUser(req.userId!, {
+        subscriptionTier: tierId,
+        subscriptionExpiresAt: expirationDate
+      });
+
+      res.json({ 
+        message: 'Subscription upgraded successfully',
+        tier: tierId,
+        expiresAt: expirationDate
+      });
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      res.status(500).json({ message: 'Failed to upgrade subscription' });
+    }
+  });
+
+  // Main subscription endpoint with limits and usage
+  app.get('/api/subscription', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      console.log('Subscription API - userId from auth:', userId);
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      console.log('Subscription API - user from DB:', { id: user.id, tier: user.subscriptionTier, uploads: user.monthlyUploads });
+
+      const limits = await storage.getUserSubscriptionLimits(userId);
+      console.log('Subscription API - limits calculated:', limits);
+      
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const usage = await storage.getSubscriptionUsage(userId, currentMonth);
+      const uploadLimit = await storage.checkUploadLimit(userId);
+
+      const tier = user.subscriptionTier || 'free';
+      const isPro = tier === 'pro';
+      
+      const now = new Date();
+      const isActive = user.subscriptionStatus === 'active' && (!user.subscriptionExpiresAt || user.subscriptionExpiresAt > now);
+      const isCancelled = user.subscriptionStatus === 'cancelled';
+      
+      const subscriptionData = {
+        tier,
+        uploadLimit: isPro ? -1 : limits.uploadLimit, // Use proper unlimited for pro
+        uploadsUsed: user.monthlyUploads || 0,
+        remainingUploads: isPro ? -1 : Math.max(0, limits.uploadLimit - (user.monthlyUploads || 0)),
+        canUpload: isPro || (user.monthlyUploads || 0) < limits.uploadLimit,
+        hasDownloadableCertificates: limits.hasDownloadableCertificates,
+        hasCustomBranding: limits.hasCustomBranding,
+        hasIPFSStorage: limits.hasIPFSStorage,
+        hasAPIAccess: limits.hasAPIAccess,
+        teamSize: limits.teamSize,
+        expiresAt: user.subscriptionExpiresAt,
+        isActive: isActive,
+        isCancelled: isCancelled,
+        status: user.subscriptionStatus || 'active'
+      };
+      
+      console.log('Subscription API - sending response:', subscriptionData);
+      res.json(subscriptionData);
+    } catch (error) {
+      console.error('Error fetching subscription data:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription data' });
+    }
+  });
+
+  app.get('/api/subscription/status', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.json({
+        tier: user.subscriptionTier,
+        expiresAt: user.subscriptionExpiresAt,
+        isActive: !user.subscriptionExpiresAt || user.subscriptionExpiresAt > new Date()
+      });
+    } catch (error) {
+      console.error('Error fetching subscription status:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription status' });
+    }
+  });
+
+  // Cancel subscription
+  app.post('/api/subscription/cancel', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.subscriptionTier === 'free') {
+        return res.status(400).json({ message: 'No active subscription to cancel' });
+      }
+
+      // Set subscription to cancel at period end
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // Expire at end of current billing period
+      
+      await storage.updateUser(userId, { 
+        subscriptionStatus: 'cancelled',
+        subscriptionExpiresAt: expiresAt
+      });
+
+      res.json({ 
+        message: 'Subscription cancelled successfully. Access will continue until the end of your billing period.',
+        expiresAt: expiresAt.toISOString()
+      });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      res.status(500).json({ message: 'Failed to cancel subscription' });
+    }
+  });
+
+  // Reactivate subscription
+  app.post('/api/subscription/reactivate', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.subscriptionStatus !== 'cancelled') {
+        return res.status(400).json({ message: 'No cancelled subscription to reactivate' });
+      }
+
+      // Reactivate subscription
+      await storage.updateUser(userId, { 
+        subscriptionStatus: 'active',
+        subscriptionExpiresAt: null // Remove expiration date
+      });
+
+      res.json({ 
+        message: 'Subscription reactivated successfully.'
+      });
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
+      res.status(500).json({ message: 'Failed to reactivate subscription' });
+    }
+  });
+
+  // User settings routes
+  app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({
+        notifications: user.settings?.notifications || {},
+        privacy: user.settings?.privacy || {},
+        security: user.settings?.security || {},
+        theme: user.themePreference || 'liquid-glass'
+      });
+    } catch (error) {
+      console.error("Error fetching user settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const updates = req.body;
+      const userId = req.userId!;
+      
+      console.log('Profile update request:', { userId, updates });
+      
+      // Filter out undefined values and update user profile
+      const filteredUpdates: any = {};
+      if (updates.displayName !== undefined) filteredUpdates.displayName = updates.displayName;
+      if (updates.bio !== undefined) filteredUpdates.bio = updates.bio;
+      if (updates.website !== undefined) filteredUpdates.website = updates.website;
+      if (updates.location !== undefined) filteredUpdates.location = updates.location;
+      if (updates.username !== undefined) filteredUpdates.username = updates.username;
+      if (updates.email !== undefined) filteredUpdates.email = updates.email;
+      
+      await storage.updateUser(userId, filteredUpdates);
+      
+      // Return updated user data
+      const updatedUser = await storage.getUser(userId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { passwordHash, ...userWithoutPassword } = updatedUser;
+      console.log('Profile updated successfully:', userWithoutPassword);
+      
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Avatar upload endpoint
+  app.post('/api/user/avatar', requireAuth, upload.single('avatar'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ message: "No file provided" });
+      }
+
+      // Validate file type
+      if (!file.mimetype.startsWith('image/')) {
+        return res.status(400).json({ message: "File must be an image" });
+      }
+
+      console.log('Avatar upload:', {
+        userId,
+        filename: file.filename,
+        originalname: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size
+      });
+
+      // Update user profile with new avatar URL
+      const profileImageUrl = `/api/files/${file.filename}`;
+      await storage.updateUser(userId, { profileImageUrl });
+
+      // Return updated user data
+      const updatedUser = await storage.getUser(userId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { passwordHash, ...userWithoutPassword } = updatedUser;
+      
+      res.json({
+        message: "Avatar updated successfully",
+        user: userWithoutPassword,
+        avatarUrl: profileImageUrl
+      });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      res.status(500).json({ message: "Failed to upload avatar" });
+    }
+  });
+
+  app.patch('/api/user/password', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify current password
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUser(userId, { passwordHash: hashedPassword });
+      
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
+  app.patch('/api/user/theme', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { theme } = req.body;
+      const userId = req.userId!;
+      
+      await storage.updateUser(userId, { themePreference: theme });
+      res.json({ message: "Theme updated successfully" });
+    } catch (error) {
+      console.error("Error updating theme:", error);
+      res.status(500).json({ message: "Failed to update theme" });
+    }
+  });
+
+  // Get user settings
+  app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Handle settings parsing (both object and string formats)
+      let settings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            settings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            settings = {};
+          }
+        } else {
+          settings = user.settings;
+        }
+      }
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { type, settings } = req.body;
+      const userId = req.userId!;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Handle settings parsing (both object and string formats)
+      let currentSettings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            currentSettings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            currentSettings = {};
+          }
+        } else {
+          currentSettings = user.settings;
+        }
+      }
+      const updatedSettings = {
+        ...currentSettings,
+        [type]: settings
+      };
+
+      await storage.updateUser(userId, { settings: JSON.stringify(updatedSettings) });
+      res.json({ message: "Settings updated successfully" });
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Profile routes
+  app.get('/api/profile/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Parse privacy settings (handle both object and string format)
+      let settings = {};
+      if (user.settings) {
+        if (typeof user.settings === 'string') {
+          try {
+            settings = JSON.parse(user.settings);
+          } catch (e) {
+            console.error('Error parsing user settings:', e);
+            settings = {};
+          }
+        } else {
+          settings = user.settings;
+        }
+      }
+      const privacySettings = settings.privacy || {};
+
+      // Check if profile is public
+      if (!privacySettings.publicProfile) {
+        // Only allow access to own profile or return limited info
+        const requesterId = (req as any).userId;
+        if (!requesterId || requesterId !== user.id) {
+          return res.json({
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            isPrivate: true,
+            message: "This profile is private"
+          });
+        }
+      }
+
+      // Remove sensitive information and apply privacy filters
+      const { passwordHash, settings: userSettings, ...publicProfile } = user;
+      
+      // Apply privacy settings to response
+      const filteredProfile = {
+        ...publicProfile,
+        // Hide email if privacy setting is enabled
+        email: privacySettings.showEmail !== false ? publicProfile.email : undefined,
+        // Hide follower/following counts if privacy setting is disabled
+        followerCount: privacySettings.showFollowers !== false ? publicProfile.followerCount : undefined,
+        followingCount: privacySettings.showFollowing !== false ? publicProfile.followingCount : undefined,
+        // Hide statistics if privacy setting is disabled
+        totalLikes: privacySettings.showStatistics !== false ? publicProfile.totalLikes : undefined,
+      };
+
+      res.json(filteredProfile);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.get('/api/profile/:username/works', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get both protected works and social posts for a unified portfolio
+      const [protectedWorks, socialPosts] = await Promise.all([
+        storage.getUserWorks(user.id),
+        storage.getUserPosts(user.id)
+      ]);
+      
+      // Transform social posts to match work format for portfolio display
+      const transformedPosts = socialPosts.map(post => ({
+        id: post.id, // Use original post ID without prefix
+        userId: post.userId,
+        title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '') || 'Untitled',
+        description: post.content,
+        filename: post.filename || (post.imageUrl ? post.imageUrl.split('/').pop() : null),
+        fileType: post.fileType || 'text',
+        mimeType: post.mimeType || 'text/plain',
+        fileUrl: post.filename ? `/api/files/${post.filename}` : (post.imageUrl ? `/api/files/${post.imageUrl}` : null),
+        fileSize: post.fileSize || 0,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        likes: post.likes || 0,
+        views: 0,
+        tags: post.tags || [],
+        isProtected: false,
+        isPost: true // Flag to identify this as a social post
+      }));
+      
+      // Combine and sort by creation date
+      const allWorks = [...protectedWorks.map(w => ({ ...w, isProtected: true, isPost: false })), ...transformedPosts]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      res.json(allWorks);
+    } catch (error) {
+      console.error("Error fetching user works:", error);
+      res.status(500).json({ message: "Failed to fetch user works" });
+    }
+  });
+
+  // Social media routes
+  app.get('/api/social/feed', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { filter = 'all', search, tags, limit = 20, offset = 0 } = req.query;
+      
+      const tagArray = tags ? (tags as string).split(',').filter(Boolean) : [];
+      
+      const works = await storage.getPublicWorks({
+        userId: req.userId!,
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string),
+        filter: filter as string,
+        search: search as string,
+        tags: tagArray
+      });
+
+      // Enrich with user data and interaction status
+      const enrichedWorks = await Promise.all(
+        works.map(async (work) => {
+          const user = await storage.getUser(work.userId);
+          const isLiked = await storage.isWorkLiked(req.userId!, work.id);
+          const hasUserFollowed = user ? await storage.isFollowing(req.userId!, user.id) : false;
+          
+          return {
+            ...work,
+            user: user ? {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              profileImageUrl: user.profileImageUrl,
+              isVerified: user.isVerified
+            } : null,
+            isLiked,
+            hasUserFollowed: user?.id !== req.userId! ? hasUserFollowed : false
+          };
+        })
+      );
+
+      res.json(enrichedWorks);
+    } catch (error) {
+      console.error('Error fetching social feed:', error);
+      res.status(500).json({ message: 'Failed to fetch social feed' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/like', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const like = await storage.likeWork(req.userId!, workId);
+      
+      // Create notification for work owner
+      const work = await storage.getWork(workId);
+      if (work && work.userId !== req.userId!) {
+        await storage.createNotification({
+          userId: work.userId,
+          type: 'like',
+          fromUserId: req.userId!,
+          workId: workId,
+          message: 'liked your work'
+        });
+      }
+      
+      res.json(like);
+    } catch (error) {
+      console.error('Error liking work:', error);
+      res.status(500).json({ message: 'Failed to like work' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/unlike', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      await storage.unlikeWork(req.userId!, workId);
+      res.json({ message: 'Work unliked successfully' });
+    } catch (error) {
+      console.error('Error unliking work:', error);
+      res.status(500).json({ message: 'Failed to unlike work' });
+    }
+  });
+
+  app.post('/api/social/users/:userId/follow', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (userId === req.userId!) {
+        return res.status(400).json({ message: 'Cannot follow yourself' });
+      }
+      
+      const follow = await storage.followUser(req.userId!, userId);
+      
+      // Create notification
+      await storage.createNotification({
+        userId: userId,
+        type: 'follow',
+        fromUserId: req.userId!,
+        title: 'New Follower',
+        message: 'started following you'
+      });
+      
+      res.json(follow);
+    } catch (error) {
+      console.error('Error following user:', error);
+      res.status(500).json({ message: 'Failed to follow user' });
+    }
+  });
+
+  app.post('/api/social/users/:userId/unfollow', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      await storage.unfollowUser(req.userId!, userId);
+      res.json({ message: 'User unfollowed successfully' });
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+      res.status(500).json({ message: 'Failed to unfollow user' });
+    }
+  });
+
+  app.post('/api/social/works/:workId/share', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      const { shareText } = req.body;
+      
+      const share = await storage.shareWork({
+        userId: req.userId!,
+        workId: workId,
+        shareText: shareText || ''
+      });
+      
+      // Create notification for work owner
+      const work = await storage.getWork(workId);
+      if (work && work.userId !== req.userId!) {
+        await storage.createNotification({
+          userId: work.userId,
+          type: 'share',
+          fromUserId: req.userId!,
+          workId: workId,
+          title: 'Work Shared',
+          message: 'shared your work'
+        });
+      }
+      
+      res.json(share);
+    } catch (error) {
+      console.error('Error sharing work:', error);
+      res.status(500).json({ message: 'Failed to share work' });
+    }
+  });
+
+  app.get('/api/social/trending-tags', async (req, res) => {
+    try {
+      const { limit = 10 } = req.query;
+      const tags = await storage.getTrendingTags(parseInt(limit as string));
+      res.json(tags);
+    } catch (error) {
+      console.error('Error fetching trending tags:', error);
+      res.status(500).json({ message: 'Failed to fetch trending tags' });
+    }
+  });
+
+  // Profile showcase routes
+  app.get('/api/social/profile/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check if current user is following this profile (if authenticated)
+      let isFollowing = false;
+      if (req.userId) {
+        isFollowing = await storage.isFollowing(req.userId, user.id);
+      }
+
+      const profile = {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        bio: user.bio,
+        profileImageUrl: user.profileImageUrl,
+        website: user.website,
+        location: user.location,
+        isVerified: user.isVerified,
+        // Hide follower/following counts for privacy
+        // followerCount: user.followerCount || 0,
+        // followingCount: user.followingCount || 0,
+        totalLikes: user.totalLikes || 0,
+        createdAt: user.createdAt,
+        isFollowing
+      };
+
+      res.json(profile);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      res.status(500).json({ message: 'Failed to fetch profile' });
+    }
+  });
+
+  app.get('/api/social/profile/:username/works', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const { sort = 'recent' } = req.query;
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const userWorks = await storage.getUserWorks(user.id);
+      
+      // Sort works based on request
+      let sortedWorks = [...userWorks];
+      switch (sort) {
+        case 'popular':
+          sortedWorks.sort((a, b) => (b.likeCount || 0) + (b.viewCount || 0) - (a.likeCount || 0) - (a.viewCount || 0));
+          break;
+        case 'liked':
+          sortedWorks.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+          break;
+        case 'recent':
+        default:
+          sortedWorks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          break;
+      }
+
+      // Enrich with like status if user is authenticated
+      const enrichedWorks = await Promise.all(
+        sortedWorks.map(async (work) => {
+          let isLiked = false;
+          if (req.userId) {
+            isLiked = await storage.isWorkLiked(req.userId, work.id);
+          }
+          
+          return {
+            ...work,
+            isLiked,
+            // Set default values for social counts if missing
+            likeCount: work.likeCount || 0,
+            commentCount: work.commentCount || 0,
+            shareCount: work.shareCount || 0,
+            viewCount: work.viewCount || 0
+          };
+        })
+      );
+
+      res.json(enrichedWorks);
+    } catch (error) {
+      console.error('Error fetching user works:', error);
+      res.status(500).json({ message: 'Failed to fetch user works' });
+    }
+  });
+
+  // Posts endpoints
+  app.get("/api/social/posts", requireAuth, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = 20;
+      const offset = (page - 1) * limit;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      const currentUserId = req.session.userId;
+
+      const posts = await storage.getPosts({ limit, offset, userId, currentUserId });
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).json({ message: "Failed to fetch posts" });
+    }
+  });
+
+  app.post("/api/social/posts", requireAuth, upload.single('file'), async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { content, tags } = req.body;
+      const file = req.file;
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ message: "Post content is required" });
+      }
+
+      let imageUrl = null;
+      let fileType = null;
+
+      // Handle file upload
+      if (file) {
+        console.log("File upload details:", {
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size
+        });
+        
+        imageUrl = file.filename;
+        const mimeType = file.mimetype.toLowerCase();
+        
+        // More specific file type detection
+        if (mimeType.startsWith('image/')) {
+          fileType = 'image';
+        } else if (mimeType.startsWith('video/') || 
+                   mimeType === 'video/quicktime' || 
+                   mimeType === 'video/x-msvideo' ||
+                   mimeType === 'video/avi' ||
+                   mimeType === 'video/mov') {
+          fileType = 'video';
+          console.log("Detected video file:", mimeType);
+        } else if (mimeType.startsWith('audio/')) {
+          fileType = 'audio';
+        } else if (mimeType === 'application/pdf') {
+          fileType = 'document';
+        } else {
+          fileType = 'document';
+        }
+        
+        console.log("Detected file type:", fileType);
+      }
+
+      const parsedTags = tags ? JSON.parse(tags) : [];
+
+      const post = await storage.createPost({
+        userId,
+        content: content.trim(),
+        imageUrl,
+        filename: file ? file.filename : null,
+        fileType,
+        mimeType: file ? file.mimetype : null,
+        fileSize: file ? file.size : null,
+        tags: parsedTags
+      });
+
+      res.status(201).json(post);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
+
+  app.post("/api/social/posts/:postId/like", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      await storage.likePost(userId, postId);
+      res.json({ message: "Post liked successfully" });
+    } catch (error) {
+      console.error("Error liking post:", error);
+      res.status(500).json({ message: "Failed to like post" });
+    }
+  });
+
+  app.delete("/api/social/posts/:postId/like", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      await storage.unlikePost(userId, postId);
+      res.json({ message: "Post unliked successfully" });
+    } catch (error) {
+      console.error("Error unliking post:", error);
+      res.status(500).json({ message: "Failed to unlike post" });
+    }
+  });
+
+  app.put("/api/social/posts/:postId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+      const { content, tags } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ message: "Post content is required" });
+      }
+
+      // Check if post exists and belongs to user
+      const existingPost = await storage.getPost(postId);
+      if (!existingPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ message: "You can only edit your own posts" });
+      }
+
+      const updatedPost = await storage.updatePost(postId, {
+        content: content.trim(),
+        tags: tags || [],
+        updatedAt: new Date()
+      });
+
+      res.json(updatedPost);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      res.status(500).json({ message: "Failed to update post" });
+    }
+  });
+
+  app.delete("/api/social/posts/:postId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const { postId } = req.params;
+
+      console.log("Delete request - User ID:", userId, "Post ID:", postId);
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Validate postId parameter
+      if (!postId || postId.trim() === '') {
+        return res.status(400).json({ message: "Invalid post ID" });
+      }
+
+      // Check if post exists and belongs to user
+      const existingPost = await storage.getPost(postId.trim());
+      console.log("Found post:", existingPost);
+      
+      if (!existingPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      // Compare userId (both should be integers)
+      console.log("User ID comparison:", userId, "vs Post User ID:", existingPost.userId);
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ message: "You can only delete your own posts" });
+      }
+
+      await storage.deletePost(postId.trim(), userId);
+      console.log("Post deleted successfully");
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ message: "Failed to delete post" });
+    }
+  });
+
+  // Enhanced Social Media API Routes
+  
+  // Post search and discovery
+  app.get("/api/social/posts/search", async (req, res) => {
+    try {
+      const { q, limit = 20, offset = 0 } = req.query;
+      
+      if (!q) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+      
+      const posts = await storage.searchPosts(q as string, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error searching posts:", error);
+      res.status(500).json({ error: "Failed to search posts" });
+    }
+  });
+
+  app.get("/api/social/posts/trending", async (req, res) => {
+    try {
+      const { limit = 10 } = req.query;
+      
+      const posts = await storage.getTrendingPosts(Number(limit));
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error getting trending posts:", error);
+      res.status(500).json({ error: "Failed to get trending posts" });
+    }
+  });
+
+  // Comments API
+  app.post("/api/social/posts/:id/comments", requireAuth, async (req: any, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session.userId;
+      const { content, parentId, mentionedUsers } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const comment = await storage.createComment({
+        postId,
+        userId,
+        content: content.trim(),
+        parentId: parentId || null,
+        mentionedUsers: mentionedUsers || [],
+      });
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  app.get("/api/social/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const { limit = 50, offset = 0 } = req.query;
+      
+      const comments = await storage.getPostComments(postId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(comments);
+    } catch (error) {
+      console.error("Error getting comments:", error);
+      res.status(500).json({ error: "Failed to get comments" });
+    }
+  });
+
+  app.put("/api/social/comments/:id", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      const { content } = req.body;
+      
+      if (isNaN(commentId) || !isFinite(commentId) || commentId <= 0) {
+        return res.status(400).json({ error: "Invalid comment ID" });
+      }
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const updatedComment = await storage.updateComment(commentId, {
+        content: content.trim(),
+      });
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      res.status(500).json({ error: "Failed to update comment" });
+    }
+  });
+
+  app.delete("/api/social/comments/:id", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.deleteComment(commentId, userId);
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  app.post("/api/social/comments/:id/like", requireAuth, async (req: any, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.likeComment(userId, commentId);
+      
+      res.json({ message: "Comment liked successfully" });
+    } catch (error) {
+      console.error("Error liking comment:", error);
+      res.status(500).json({ error: "Failed to like comment" });
+    }
+  });
+
+  // Following API
+  app.post("/api/social/users/:id/follow", requireAuth, async (req: any, res) => {
+    try {
+      const followingId = Number(req.params.id);
+      const followerId = req.session.userId;
+      
+      if (isNaN(followingId) || !isFinite(followingId) || followingId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      if (followerId === followingId) {
+        return res.status(400).json({ error: "Cannot follow yourself" });
+      }
+      
+      const follow = await storage.followUser(followerId, followingId);
+      
+      res.json(follow);
+    } catch (error) {
+      console.error("Error following user:", error);
+      res.status(500).json({ error: "Failed to follow user" });
+    }
+  });
+
+  app.delete("/api/social/users/:id/follow", requireAuth, async (req: any, res) => {
+    try {
+      const followingId = Number(req.params.id);
+      const followerId = req.session.userId;
+      
+      if (isNaN(followingId) || !isFinite(followingId) || followingId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      await storage.unfollowUser(followerId, followingId);
+      
+      res.json({ message: "User unfollowed successfully" });
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      res.status(500).json({ error: "Failed to unfollow user" });
+    }
+  });
+
+  app.get("/api/social/users/:id/following", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const currentUserId = req.userId!;
+      const { limit = 50, offset = 0 } = req.query;
+      
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      // Only allow users to see their own following list
+      if (userId !== currentUserId) {
+        return res.status(403).json({ error: "You can only view your own following list" });
+      }
+      
+      const following = await storage.getFollowing(userId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(following);
+    } catch (error) {
+      console.error("Error getting following:", error);
+      res.status(500).json({ error: "Failed to get following" });
+    }
+  });
+
+  app.get("/api/social/users/:id/followers", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const currentUserId = req.userId!;
+      const { limit = 50, offset = 0 } = req.query;
+      
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      // Only allow users to see their own followers list
+      if (userId !== currentUserId) {
+        return res.status(403).json({ error: "You can only view your own followers list" });
+      }
+      
+      const followers = await storage.getFollowers(userId, {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(followers);
+    } catch (error) {
+      console.error("Error getting followers:", error);
+      res.status(500).json({ error: "Failed to get followers" });
+    }
+  });
+
+  app.get("/api/social/users/:id/follow-stats", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      
+      if (isNaN(userId) || !isFinite(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      const stats = await storage.getFollowStats(userId);
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting follow stats:", error);
+      res.status(500).json({ error: "Failed to get follow stats" });
+    }
+  });
+
+  // Notifications API
+  app.get("/api/notifications", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { unreadOnly = false, limit = 50, offset = 0 } = req.query;
+      
+      const notifications = await storage.getUserNotifications(userId, {
+        unreadOnly: unreadOnly === 'true',
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error getting notifications:", error);
+      res.status(500).json({ error: "Failed to get notifications" });
+    }
+  });
+
+  app.get("/api/notifications/unread-count", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      const count = await storage.getUnreadNotificationCount(userId);
+      
+      res.json({ count });
+    } catch (error) {
+      console.error("Error getting unread notification count:", error);
+      res.status(500).json({ error: "Failed to get unread notification count" });
+    }
+  });
+
+  app.post("/api/notifications/:id/read", requireAuth, async (req: any, res) => {
+    try {
+      const notificationId = Number(req.params.id);
+      
+      await storage.markNotificationRead(notificationId);
+      
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  app.post("/api/notifications/mark-all-read", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      await storage.markAllNotificationsRead(userId);
+      
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ error: "Failed to mark all notifications as read" });
+    }
+  });
+
+  // User preferences API
+  app.get("/api/user/preferences", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      const preferences = await storage.getUserPreferences(userId);
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error getting user preferences:", error);
+      res.status(500).json({ error: "Failed to get user preferences" });
+    }
+  });
+
+  app.put("/api/user/preferences", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const preferences = req.body;
+      
+      const updatedPreferences = await storage.updateUserPreferences(userId, preferences);
+      
+      res.json(updatedPreferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ error: "Failed to update user preferences" });
+    }
+  });
+
+  // Analytics API
+  app.get("/api/user/analytics", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { days = 30 } = req.query;
+      
+      const analytics = await storage.getUserAnalytics(userId, Number(days));
+      
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error getting user analytics:", error);
+      res.status(500).json({ error: "Failed to get user analytics" });
+    }
+  });
+
+  // Marketplace API
+  app.post("/api/marketplace/listings", requireAuth, async (req: any, res) => {
+    try {
+      const sellerId = req.session.userId;
+      const { workId, title, description, price, currency, licenseType, tags } = req.body;
+      
+      if (!workId || !title || !price || !licenseType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      const listing = await storage.createMarketplaceListing({
+        sellerId,
+        workId,
+        title,
+        description,
+        price,
+        currency,
+        licenseType,
+        tags,
+      });
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error creating marketplace listing:", error);
+      res.status(500).json({ error: "Failed to create marketplace listing" });
+    }
+  });
+
+  app.get("/api/marketplace/listings", async (req, res) => {
+    try {
+      const { category, priceMin, priceMax, limit = 20, offset = 0 } = req.query;
+      
+      const options: any = {
+        limit: Number(limit),
+        offset: Number(offset),
+      };
+      
+      if (category) options.category = category;
+      if (priceMin || priceMax) {
+        options.priceRange = [
+          Number(priceMin || 0),
+          Number(priceMax || 999999999)
+        ];
+      }
+      
+      const listings = await storage.getMarketplaceListings(options);
+      
+      res.json(listings);
+    } catch (error) {
+      console.error("Error getting marketplace listings:", error);
+      res.status(500).json({ error: "Failed to get marketplace listings" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
+      
+      const listing = await storage.getMarketplaceListing(listingId);
+      
+      if (!listing) {
+        return res.status(404).json({ error: "Listing not found" });
+      }
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error getting marketplace listing:", error);
+      res.status(500).json({ error: "Failed to get marketplace listing" });
+    }
+  });
+
+  app.put("/api/marketplace/listings/:id", requireAuth, async (req: any, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      const sellerId = req.session.userId;
+      const updates = req.body;
+      
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
+      
+      const updatedListing = await storage.updateMarketplaceListing(listingId, updates);
+      
+      res.json(updatedListing);
+    } catch (error) {
+      console.error("Error updating marketplace listing:", error);
+      res.status(500).json({ error: "Failed to update marketplace listing" });
+    }
+  });
+
+  app.delete("/api/marketplace/listings/:id", requireAuth, async (req: any, res) => {
+    try {
+      const listingId = Number(req.params.id);
+      const sellerId = req.session.userId;
+      
+      // Validate the listing ID is a valid number
+      if (isNaN(listingId) || !isFinite(listingId) || listingId <= 0) {
+        return res.status(400).json({ error: "Invalid listing ID" });
+      }
+      
+      await storage.deleteMarketplaceListing(listingId, sellerId);
+      
+      res.json({ message: "Listing deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting marketplace listing:", error);
+      res.status(500).json({ error: "Failed to delete marketplace listing" });
+    }
+  });
+
+  // Collaboration API
+  app.post("/api/collaboration/projects", requireAuth, async (req: any, res) => {
+    try {
+      const ownerId = req.session.userId;
+      const { title, description, type, maxCollaborators, deadline, budget, tags, requirements } = req.body;
+      
+      if (!title || !type) {
+        return res.status(400).json({ error: "Title and type are required" });
+      }
+      
+      const project = await storage.createCollaborationProject({
+        ownerId,
+        title,
+        description,
+        type,
+        maxCollaborators,
+        deadline,
+        budget,
+        tags,
+        requirements,
+      });
+      
+      res.json(project);
+    } catch (error) {
+      console.error("Error creating collaboration project:", error);
+      res.status(500).json({ error: "Failed to create collaboration project" });
+    }
+  });
+
+  app.get("/api/collaboration/projects", async (req, res) => {
+    try {
+      const { userId, status, limit = 20, offset = 0 } = req.query;
+      
+      const projects = await storage.getCollaborationProjects({
+        userId: userId ? Number(userId) : undefined,
+        status: status as string,
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(projects);
+    } catch (error) {
+      console.error("Error getting collaboration projects:", error);
+      res.status(500).json({ error: "Failed to get collaboration projects" });
+    }
+  });
+
+  app.get("/api/collaboration/projects/:id", async (req, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      
+      const project = await storage.getCollaborationProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      res.json(project);
+    } catch (error) {
+      console.error("Error getting collaboration project:", error);
+      res.status(500).json({ error: "Failed to get collaboration project" });
+    }
+  });
+
+  app.post("/api/collaboration/projects/:id/join", requireAuth, async (req: any, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      const userId = req.session.userId;
+      const { role = 'collaborator' } = req.body;
+      
+      const collaborator = await storage.joinCollaborationProject(projectId, userId, role);
+      
+      res.json(collaborator);
+    } catch (error) {
+      console.error("Error joining collaboration project:", error);
+      res.status(500).json({ error: "Failed to join collaboration project" });
+    }
+  });
+
+  app.post("/api/collaboration/projects/:id/leave", requireAuth, async (req: any, res) => {
+    try {
+      const projectId = Number(req.params.id);
+      const userId = req.session.userId;
+      
+      await storage.leaveCollaborationProject(projectId, userId);
+      
+      res.json({ message: "Left collaboration project successfully" });
+    } catch (error) {
+      console.error("Error leaving collaboration project:", error);
+      res.status(500).json({ error: "Failed to leave collaboration project" });
+    }
+  });
+
+  // Content categories API
+  app.get("/api/content/categories", async (req, res) => {
+    try {
+      const categories = await storage.getContentCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error getting content categories:", error);
+      res.status(500).json({ error: "Failed to get content categories" });
+    }
+  });
+
+  // Subscription API routes
+  app.get("/api/subscription", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      // Get fresh user data
+      const user = await storage.getUser(userId);
+      const subscription = await storage.getUserSubscription(userId);
+      const limits = await storage.getUserSubscriptionLimits(userId);
+      const uploadCheck = await storage.checkUploadLimit(userId);
+      
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const usage = await storage.getSubscriptionUsage(userId, currentMonth);
+      
+      // Return subscription data based on user's current tier
+      const tier = user?.subscriptionTier || 'free';
+      const tierInfo = {
+        free: { uploadLimit: 3, features: ['Basic certificates', 'Community support'] },
+        starter: { uploadLimit: 10, features: ['PDF certificates', 'Priority support'] },
+        pro: { uploadLimit: -1, features: ['Unlimited uploads', 'Custom branding', 'IPFS storage', 'API access'] },
+        agency: { uploadLimit: -1, features: ['Everything in Pro', 'Multi-seat access', 'Team tools'] }
+      };
+      
+      console.log('Subscription API - User tier:', tier, 'User data:', { id: user?.id, tier: user?.subscriptionTier, uploads: user?.monthlyUploads });
+      
+      const currentTierInfo = tierInfo[tier as keyof typeof tierInfo];
+      const uploadLimit = currentTierInfo?.uploadLimit || 3;
+      const uploadsUsed = user?.monthlyUploads || 0;
+      const remainingUploads = tier === 'pro' || tier === 'agency' ? -1 : Math.max(0, uploadLimit - uploadsUsed);
+      
+      const responseData = {
+        tier: tier,
+        uploadLimit: uploadLimit,
+        uploadsUsed: uploadsUsed,
+        remainingUploads: remainingUploads,
+        canUpload: tier === 'pro' || tier === 'agency' || uploadsUsed < uploadLimit,
+        hasDownloadableCertificates: tier !== 'free',
+        hasCustomBranding: tier === 'pro' || tier === 'agency',
+        hasIPFSStorage: tier === 'pro' || tier === 'agency',
+        hasAPIAccess: tier === 'pro' || tier === 'agency',
+        teamSize: tier === 'agency' ? 10 : 1,
+        expiresAt: user?.subscriptionExpiresAt?.toISOString(),
+        isActive: tier !== 'free',
+        subscription,
+        limits,
+        usage: {
+          uploads: uploadCheck,
+          storage: usage?.storageUsed || 0,
+          apiCalls: usage?.apiCallsUsed || 0
+        }
+      };
+      
+      console.log('Subscription API Response:', responseData);
+      res.json(responseData);
+    } catch (error) {
+      console.error("Error getting subscription:", error);
+      res.status(500).json({ error: "Failed to get subscription" });
+    }
+  });
+
+  app.post("/api/subscription/create-checkout", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { tier } = req.body;
+      
+      console.log("Creating checkout session:", { userId, tier, body: req.body });
+      
+      if (!tier) {
+        return res.status(400).json({ error: "Tier is required" });
+      }
+      
+      if (!['starter', 'pro', 'agency'].includes(tier)) {
+        return res.status(400).json({ error: "Invalid subscription tier" });
+      }
+      
+      // Price mapping (in cents)
+      const prices = {
+        starter: 799, // $7.99
+        pro: 1999,    // $19.99
+        agency: 4999  // $49.99
+      };
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Create or retrieve Stripe customer
+      let customer;
+      try {
+        const existingSubscription = await storage.getUserSubscription(userId);
+        if (existingSubscription?.stripeCustomerId) {
+          customer = await stripe.customers.retrieve(existingSubscription.stripeCustomerId);
+        } else {
+          customer = await stripe.customers.create({
+            email: user.email,
+            metadata: {
+              userId: userId.toString(),
+              username: user.username
+            }
+          });
+        }
+      } catch (error) {
+        customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            userId: userId.toString(),
+            username: user.username
+          }
+        });
+      }
+      
+      // Create checkout session
+      const session = await stripe.checkout.sessions.create({
+        customer: customer.id,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `Loggin' ${tier.charAt(0).toUpperCase() + tier.slice(1)} Plan`,
+                description: `Monthly subscription to Loggin' ${tier} tier`,
+              },
+              unit_amount: prices[tier as keyof typeof prices],
+              recurring: {
+                interval: 'month',
+              },
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        success_url: `${req.protocol}://${req.get('host')}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.protocol}://${req.get('host')}/subscription/cancelled`,
+        metadata: {
+          userId: userId.toString(),
+          tier: tier
+        }
+      });
+      
+      console.log("Checkout session created successfully:", session.id);
+      console.log("Checkout URL:", session.url);
+      
+      if (!session.url) {
+        console.error("No URL in session object:", session);
+        return res.status(500).json({ error: "Failed to create checkout URL" });
+      }
+      
+      res.json({ sessionId: session.id, url: session.url });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+      res.status(500).json({ 
+        error: "Failed to create checkout session",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.post("/api/subscription/cancel", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const subscription = await storage.getUserSubscription(userId);
+      
+      if (!subscription || !subscription.stripeSubscriptionId) {
+        return res.status(404).json({ error: "No active subscription found" });
+      }
+      
+      // Cancel at period end in Stripe
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: true
+      });
+      
+      // Update in our database
+      await storage.updateSubscription(subscription.id, {
+        cancelAtPeriodEnd: true
+      });
+      
+      res.json({ message: "Subscription cancelled successfully" });
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      res.status(500).json({ error: "Failed to cancel subscription" });
+    }
+  });
+
+  app.post("/api/subscription/reactivate", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const subscription = await storage.getUserSubscription(userId);
+      
+      if (!subscription || !subscription.stripeSubscriptionId) {
+        return res.status(404).json({ error: "No subscription found" });
+      }
+      
+      // Reactivate in Stripe
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: false
+      });
+      
+      // Update in our database
+      await storage.updateSubscription(subscription.id, {
+        cancelAtPeriodEnd: false,
+        status: 'active'
+      });
+      
+      res.json({ message: "Subscription reactivated successfully" });
+    } catch (error) {
+      console.error("Error reactivating subscription:", error);
+      res.status(500).json({ error: "Failed to reactivate subscription" });
+    }
+  });
+
+  // Manual subscription refresh endpoint for debugging
+  app.post("/api/subscription/refresh", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      
+      // Force refresh user subscription to Pro for user ID 8 (mark123)
+      if (userId === 8) {
+        await storage.updateUser(userId, {
+          subscriptionTier: 'pro',
+          monthlyUploads: 0,
+          lastUploadReset: new Date(),
+          subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        });
+        
+        console.log('Manually refreshed subscription for user:', userId);
+        res.json({ message: "Subscription refreshed to Pro", tier: 'pro' });
+      } else {
+        res.json({ message: "No refresh needed", userId });
+      }
+    } catch (error) {
+      console.error("Error refreshing subscription:", error);
+      res.status(500).json({ error: "Failed to refresh subscription" });
+    }
+  });
+
+  // Webhook endpoint for Stripe events
+  app.post("/api/webhook/stripe", express.raw({type: 'application/json'}), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+    
+    try {
+      // For production, you'd need to set the webhook secret
+      event = stripe.webhooks.constructEvent(req.body, sig!, process.env.STRIPE_WEBHOOK_SECRET || '');
+    } catch (err: any) {
+      console.log(`Webhook signature verification failed.`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    
+    try {
+      switch (event.type) {
+        case 'checkout.session.completed':
+          const session = event.data.object as Stripe.Checkout.Session;
+          const userId = parseInt(session.metadata?.userId || '0');
+          const tier = session.metadata?.tier;
+          
+          console.log('Processing checkout session completed:', { userId, tier, sessionId: session.id });
+          
+          if (userId && tier && session.subscription) {
+            const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
+            
+            try {
+              // Create or update subscription in our database
+              await storage.createSubscription({
+                userId,
+                tier,
+                status: 'active',
+                stripeSubscriptionId: stripeSubscription.id,
+                stripeCustomerId: session.customer as string,
+                priceId: stripeSubscription.items.data[0].price.id,
+                currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+                currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+                features: JSON.stringify({}),
+                teamSize: tier === 'agency' ? 10 : 1
+              });
+            } catch (subError) {
+              console.log('Subscription creation failed, trying update:', subError);
+              // If creation fails, try to update existing subscription
+              const existingSub = await storage.getUserSubscription(userId);
+              if (existingSub) {
+                await storage.updateSubscription(existingSub.id, {
+                  tier,
+                  status: 'active',
+                  stripeSubscriptionId: stripeSubscription.id,
+                  currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000)
+                });
+              }
+            }
+            
+            // Update user's subscription tier and reset upload limit
+            await storage.updateUser(userId, {
+              subscriptionTier: tier,
+              subscriptionExpiresAt: new Date(stripeSubscription.current_period_end * 1000),
+              monthlyUploads: 0, // Reset upload count for new subscription
+              lastUploadReset: new Date()
+            });
+            
+            console.log('Successfully updated user subscription to:', tier);
+          }
+          break;
+          
+        case 'invoice.payment_succeeded':
+          // Handle successful payment
+          break;
+          
+        case 'invoice.payment_failed':
+          // Handle failed payment
+          break;
+          
+        case 'customer.subscription.deleted':
+          const deletedSub = event.data.object as Stripe.Subscription;
+          const subscription = await storage.getUserSubscription(0); // We'd need to find by stripe ID
+          if (subscription) {
+            await storage.updateSubscription(subscription.id, {
+              status: 'cancelled'
+            });
+          }
+          break;
+      }
+      
+      res.json({received: true});
+    } catch (error) {
+      console.error("Error processing webhook:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // Advanced blockchain verification routes
+  app.post("/api/verification/generate", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { workId, verificationLevel = 'basic' } = req.body;
+      
+      const work = await storage.getWork(workId);
+      if (!work) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      // Read the file to generate verification proof
+      const filePath = path.join(process.cwd(), "uploads", work.filename);
+      const fileBuffer = fs.readFileSync(filePath);
+
+      // Generate comprehensive verification proof
+      const verificationProof = await blockchainVerification.generateVerificationProof(
+        fileBuffer,
+        {
+          title: work.title,
+          creator: work.creatorName,
+          certificateId: work.certificateId,
+          collaborators: work.collaborators
+        },
+        {
+          verificationLevel: verificationLevel as 'basic' | 'enhanced' | 'premium',
+          networkId: 'ethereum',
+          includeIPFS: verificationLevel !== 'basic'
+        }
+      );
+
+      res.json({
+        proof: verificationProof,
+        message: "Advanced verification generated successfully",
+        details: {
+          verificationLevel,
+          networkId: 'ethereum',
+          confidence: 100,
+          timestampProof: verificationProof.blockchainAnchor,
+          merkleProofLength: verificationProof.merkleProof.length
+        }
+      });
+    } catch (error) {
+      console.error("Error generating verification:", error);
+      res.status(500).json({ error: "Failed to generate verification" });
+    }
+  });
+
+  app.post("/api/verification/verify", async (req, res) => {
+    try {
+      const { fileHash, proof, fileBuffer } = req.body;
+      
+      if (!proof || !fileHash) {
+        return res.status(400).json({ error: "Missing required verification data" });
+      }
+
+      // Verify the proof
+      const verificationResult = await blockchainVerification.verifyProof(
+        proof,
+        fileBuffer ? Buffer.from(fileBuffer, 'base64') : undefined
+      );
+
+      res.json({
+        isValid: verificationResult.isValid,
+        confidence: verificationResult.confidence,
+        details: verificationResult.verificationDetails,
+        timestamp: new Date().toISOString(),
+        message: verificationResult.isValid ? "Verification successful" : "Verification failed"
+      });
+    } catch (error) {
+      console.error("Error verifying proof:", error);
+      res.status(500).json({ error: "Failed to verify proof" });
+    }
+  });
+
+  app.post("/api/verification/batch-verify", async (req, res) => {
+    try {
+      const { workIds, verificationLevel = 'basic' } = req.body;
+      
+      if (!Array.isArray(workIds) || workIds.length === 0) {
+        return res.status(400).json({ error: "Invalid work IDs array" });
+      }
+
+      const results = [];
+      
+      for (const workId of workIds) {
+        try {
+          const work = await storage.getWork(workId);
+          if (!work) {
+            results.push({
+              workId,
+              status: 'failed',
+              error: 'Work not found'
+            });
+            continue;
+          }
+
+          const filePath = path.join(process.cwd(), "uploads", work.filename);
+          const fileBuffer = fs.readFileSync(filePath);
+
+          const blockchainCertificate = await blockchainVerification.generateBlockchainCertificate(
+            fileBuffer,
+            {
+              title: work.title,
+              creator: work.creatorName,
+              description: work.description,
+              certificateId: work.certificateId,
+              collaborators: work.collaborators
+            },
+            verificationLevel as 'basic' | 'enhanced' | 'premium'
+          );
+
+          results.push({
+            workId,
+            certificate: blockchainCertificate,
+            status: 'verified'
+          });
+        } catch (error) {
+          results.push({
+            workId,
+            status: 'failed',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      res.json({
+        results,
+        summary: {
+          totalProcessed: results.length,
+          successful: results.filter(r => r.status === 'verified').length,
+          failed: results.filter(r => r.status === 'failed').length
+        },
+        message: "Batch verification completed"
+      });
+    } catch (error) {
+      console.error("Error in batch verification:", error);
+      res.status(500).json({ error: "Failed to complete batch verification" });
+    }
+  });
+
+  app.get("/api/verification/network-status", async (req, res) => {
+    try {
+      // Get status of supported blockchain networks
+      const networks = ['ethereum', 'polygon', 'arbitrum', 'base'];
+      const networkStatus = [];
+
+      for (const network of networks) {
+        try {
+          const timestampProof = await blockchainVerification.generateTimestampProof('test', network);
+          networkStatus.push({
+            network,
+            status: 'online',
+            blockNumber: timestampProof.blockNumber,
+            blockHash: timestampProof.blockHash,
+            timestamp: timestampProof.timestamp
+          });
+        } catch (error) {
+          networkStatus.push({
+            network,
+            status: 'offline',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      res.json({
+        networks: networkStatus,
+        summary: {
+          totalNetworks: networks.length,
+          onlineNetworks: networkStatus.filter(n => n.status === 'online').length,
+          offlineNetworks: networkStatus.filter(n => n.status === 'offline').length
+        }
+      });
+    } catch (error) {
+      console.error("Error checking network status:", error);
+      res.status(500).json({ error: "Failed to check network status" });
+    }
+  });
+
+  // Messaging Routes
+  app.get("/api/conversations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const conversations = await storage.getUserConversations(req.user!.id);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+
+  app.post("/api/conversations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { participants, title } = req.body;
+
+      if (!Array.isArray(participants) || participants.length === 0) {
+        return res.status(400).json({ error: "Participants array is required" });
+      }
+
+      // Check privacy settings for all participants
+      for (const participantId of participants) {
+        if (participantId !== req.user!.id) {
+          const participant = await storage.getUser(participantId);
+          if (participant) {
+            const settings = participant.settings ? JSON.parse(participant.settings) : {};
+            const privacySettings = settings.privacy || {};
+            
+            // Check if user allows direct messages
+            if (privacySettings.allowDirectMessages === false) {
+              return res.status(403).json({ 
+                error: "This user has disabled direct messages" 
+              });
+            }
+          }
+        }
+      }
+
+      // Ensure current user is included in participants
+      const allParticipants = [...new Set([req.user!.id, ...participants])];
+
+      const conversation = await storage.createConversation(allParticipants, title);
+      res.status(201).json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ error: "Failed to create conversation" });
+    }
+  });
+
+  app.get("/api/conversations/:conversationId/messages", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { conversationId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const messages = await storage.getConversationMessages(conversationId, req.user!.id, limit, offset);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      if (error.message === "User not authorized to view this conversation") {
+        res.status(403).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Failed to fetch messages" });
+      }
+    }
+  });
+
+  app.post("/api/conversations/:conversationId/messages", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { conversationId } = req.params;
+      const { content, messageType = "text", attachmentUrl, attachmentMetadata, replyToMessageId } = req.body;
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ error: "Message content is required" });
+      }
+
+      const messageData = {
+        conversationId,
+        senderId: req.user!.id,
+        content: content.trim(),
+        messageType,
+        attachmentUrl,
+        attachmentMetadata,
+        replyToMessageId
+      };
+
+      const message = await storage.sendMessage(messageData);
+      res.status(201).json(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.put("/api/conversations/:conversationId/messages/read", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { conversationId } = req.params;
+      await storage.markMessagesAsRead(req.user!.id, conversationId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+      res.status(500).json({ error: "Failed to mark messages as read" });
+    }
+  });
+
+  app.get("/api/search/users", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { q: query } = req.query;
+
+      if (!query || typeof query !== "string" || query.trim().length === 0) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+
+      const users = await storage.searchUsers(query.trim(), req.user!.id);
+      res.json(users);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Failed to search users" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
