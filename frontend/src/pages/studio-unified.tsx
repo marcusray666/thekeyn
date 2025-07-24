@@ -824,6 +824,12 @@ export default function StudioUnified() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="work-preview-modal glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+              }}
             >
               <Button
                 onClick={() => setShowPreview({ show: false, certificate: null })}
@@ -865,20 +871,27 @@ export default function StudioUnified() {
 
                 {/* File Information */}
                 <div className="space-y-4">
-                  <div className="glass-morphism p-4 rounded-lg">
-                    <h4 className="text-lg font-semibold text-white mb-3">File Information</h4>
+                  <div 
+                    className="p-4 rounded-lg border"
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                  >
+                    <h4 className="text-lg font-semibold mb-3" style={{ color: '#1a1a1a' }}>File Information</h4>
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="text-gray-400">Original Name:</span>
-                        <p className="text-white break-all">{showPreview.certificate.work.originalName}</p>
+                        <span style={{ color: '#6b7280' }}>Original Name:</span>
+                        <p className="break-all" style={{ color: '#1a1a1a' }}>{showPreview.certificate.work.originalName}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Type:</span>
-                        <p className="text-white">{showPreview.certificate.work.mimeType}</p>
+                        <span style={{ color: '#6b7280' }}>Type:</span>
+                        <p style={{ color: '#1a1a1a' }}>{showPreview.certificate.work.mimeType}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Size:</span>
-                        <p className="text-white">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
+                        <span style={{ color: '#6b7280' }}>Size:</span>
+                        <p style={{ color: '#1a1a1a' }}>{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
                       </div>
                     </div>
                   </div>

@@ -972,6 +972,43 @@ nav, .nav-glass {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
+/* Ultimate light theme fix - force light modal background */
+.light-theme .work-preview-modal {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force light theme for all blockchain guide elements */
+.light-theme .work-preview-modal .bg-green-500\/10 {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.light-theme .work-preview-modal .bg-blue-500\/10 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.light-theme .work-preview-modal .bg-purple-500\/10 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+  border-color: rgba(168, 85, 247, 0.2) !important;
+}
+
+/* Force all text to be dark in light theme modal */
+.light-theme .work-preview-modal .text-white {
+  color: #1a1a1a !important;
+}
+
+.light-theme .work-preview-modal .text-gray-300 {
+  color: #4b5563 !important;
+}
+
+.light-theme .work-preview-modal .text-gray-400 {
+  color: #6b7280 !important;
+}
+
 /* Loading animations */
 @keyframes shimmer {
   0% {
