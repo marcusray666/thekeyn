@@ -39,12 +39,15 @@ export function BlockchainVerificationGuide({
   const proofData = verificationProof ? parseVerificationProof(verificationProof) : null;
 
   return (
-    <Card 
-      className="p-6 border rounded-lg"
+    <div 
+      className="p-6 border rounded-lg blockchain-verification-card"
       style={{
-        backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(31, 41, 55, 0.9)',
-        borderColor: theme === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(75, 85, 99, 0.3)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: theme === 'light' ? '#ffffff' : '#374151',
+        borderColor: theme === 'light' ? '#e5e7eb' : '#4b5563',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderRadius: '8px',
+        boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.3)',
       }}
     >
       <div className="flex items-center gap-2 mb-4">
@@ -252,6 +255,6 @@ export function BlockchainVerificationGuide({
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

@@ -772,12 +772,20 @@ nav, .nav-glass {
   top: 6px;
 }
 
-/* Card hover effects */
+/* Card hover effects - DISABLED for work preview modal */
 .glass-morphism:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-4px);
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+}
+
+/* CRITICAL FIX: Disable glass-morphism hover in work preview modal */
+.work-preview-modal .glass-morphism:hover {
+  background: inherit !important;
+  border-color: inherit !important;
+  transform: none !important;
+  box-shadow: inherit !important;
 }
 
 /* NUCLEAR OPTION: Disable ALL CSS interactions in work preview modal */
@@ -1046,6 +1054,16 @@ nav, .nav-glass {
   backdrop-filter: none !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* Additional protection for blockchain verification guide */
+.work-preview-modal .no-hover-effects,
+.work-preview-modal .no-hover-effects *,
+.work-preview-modal .no-hover-effects *:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 /* Loading animations */

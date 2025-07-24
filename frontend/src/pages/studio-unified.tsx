@@ -926,11 +926,13 @@ export default function StudioUnified() {
                     </div>
                   </div>
 
-                  <BlockchainVerificationGuide
-                    blockchainHash={showPreview.certificate.work.blockchainHash || ''}
-                    fileHash={showPreview.certificate.work.fileHash}
-                    verificationProof={showPreview.certificate.verificationProof}
-                  />
+                  <div className="no-hover-effects">
+                    <BlockchainVerificationGuide
+                      blockchainHash={showPreview.certificate.work.blockchainHash || ''}
+                      fileHash={showPreview.certificate.work.fileHash}
+                      verificationProof={showPreview.certificate.verificationProof}
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
