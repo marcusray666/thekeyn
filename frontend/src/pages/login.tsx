@@ -35,10 +35,11 @@ export default function Login() {
       // Invalidate and refetch user data
       await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Wait a moment for the query to refetch, then navigate
-      setTimeout(() => {
-        setLocation('/');
-      }, 100);
+      // Force a refetch to ensure the user data is loaded
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      
+      // Navigate to profile directly for authenticated users
+      setLocation('/');
     },
     onError: (error: Error) => {
       toast({

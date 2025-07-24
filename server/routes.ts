@@ -296,6 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       sameSite: 'lax', // Change to lax for better compatibility
+      domain: undefined, // Don't set domain for localhost
     },
   });
 

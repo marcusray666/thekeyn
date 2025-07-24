@@ -78,7 +78,7 @@ function Router() {
       
       {/* Home route */}
       <Route path="/">
-        {isAuthenticated ? <AuthenticatedHome /> : <Welcome />}
+        <AuthenticatedHome />
       </Route>
       
       {/* Protected routes */}
