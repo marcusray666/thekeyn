@@ -819,167 +819,80 @@ export default function StudioUnified() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(4px)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px',
-              paddingTop: '80px'
-            }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 pt-20"
+            onClick={() => setShowPreview({ show: false, certificate: null })}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              style={{
-                backgroundColor: theme === 'light' ? '#ffffff' : '#374151',
-                border: theme === 'light' ? '1px solid #e5e7eb' : '1px solid #4b5563',
-                borderRadius: '12px',
-                padding: '24px',
-                maxWidth: '64rem',
-                maxHeight: '85vh',
-                overflow: 'auto',
-                margin: '0 16px',
-                position: 'relative',
-                marginTop: '16px',
-                boxShadow: theme === 'light' ? '0 8px 32px rgba(0,0,0,0.1)' : '0 8px 32px rgba(0,0,0,0.5)',
-                color: theme === 'light' ? '#111827' : '#f9fafb'
-              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                onClick={() => setShowPreview({ show: false, certificate: null })}
-                style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  width: '32px',
-                  height: '32px',
-                  padding: 0,
-                  backgroundColor: theme === 'light' ? '#e5e7eb' : '#4b5563',
-                  border: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: theme === 'light' ? '#374151' : '#f9fafb'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = theme === 'light' ? '#d1d5db' : '#6b7280';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = theme === 'light' ? '#e5e7eb' : '#4b5563';
-                }}
-              >
-                <X style={{ width: '16px', height: '16px' }} />
-              </button>
+              <Card className="glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPreview({ show: false, certificate: null })}
+                  className="absolute top-4 right-4 h-8 w-8 p-0 text-gray-400 hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <h2 style={{ 
-                  fontSize: '1.5rem', 
-                  fontWeight: 'bold', 
-                  marginBottom: '8px',
-                  color: theme === 'light' ? '#111827' : '#f9fafb'
-                }}>
-                  Work Preview
-                </h2>
-                <h3 style={{ 
-                  fontSize: '1.125rem',
-                  color: theme === 'light' ? '#4b5563' : '#d1d5db'
-                }}>
-                  {showPreview.certificate.work.title}
-                </h3>
-              </div>
-
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-                gap: '24px' 
-              }}>
-                {/* Preview */}
-                <div className="space-y-4 flex flex-col items-center">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
-                    <div className="flex items-center justify-center w-full h-full">
-                      <WorkImage
-                        filename={showPreview.certificate.work.filename}
-                        mimeType={showPreview.certificate.work.mimeType}
-                        title={showPreview.certificate.work.title}
-                        className="max-w-full max-h-[400px] object-contain rounded-lg mx-auto"
-                      />
-                    </div>
-                  </div>
-                  <div className="text-center w-full">
-                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
-                      Original Name: {showPreview.certificate.work.originalName}
-                    </p>
-                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
-                      File Type: {showPreview.certificate.work.mimeType}
-                    </p>
-                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
-                      Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
-                    </p>
-                  </div>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Work Preview</h2>
+                  <h3 className="text-lg text-gray-300">{showPreview.certificate.work.title}</h3>
                 </div>
 
-                {/* File Information */}
-                <div className="space-y-4">
-                  <div 
-                    style={{
-                      backgroundColor: theme === 'light' ? '#ffffff' : '#374151',
-                      border: theme === 'light' ? '1px solid #e5e7eb' : '1px solid #4b5563',
-                      borderRadius: '8px',
-                      padding: '16px',
-                      boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.3)',
-                    }}
-                  >
-                    <h4 
-                      style={{ 
-                        color: theme === 'light' ? '#111827' : '#f9fafb',
-                        fontSize: '1.125rem',
-                        fontWeight: '600',
-                        marginBottom: '12px'
-                      }}
-                    >
-                      File Information
-                    </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
-                      <div>
-                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Original Name:</span>
-                        <p 
-                          style={{ 
-                            color: theme === 'light' ? '#111827' : '#f9fafb',
-                            wordBreak: 'break-all',
-                            margin: 0
-                          }}
-                        >
-                          {showPreview.certificate.work.originalName}
-                        </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Preview */}
+                  <div className="space-y-4 flex flex-col items-center">
+                    <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
+                      <div className="flex items-center justify-center w-full h-full">
+                        <WorkImage
+                          filename={showPreview.certificate.work.filename}
+                          mimeType={showPreview.certificate.work.mimeType}
+                          title={showPreview.certificate.work.title}
+                          className="max-w-full max-h-[400px] object-contain rounded-lg mx-auto"
+                        />
                       </div>
-                      <div>
-                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Type:</span>
-                        <p style={{ color: theme === 'light' ? '#111827' : '#f9fafb', margin: 0 }}>
-                          {showPreview.certificate.work.mimeType}
-                        </p>
-                      </div>
-                      <div>
-                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Size:</span>
-                        <p style={{ color: theme === 'light' ? '#111827' : '#f9fafb', margin: 0 }}>
-                          {(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB
-                        </p>
-                      </div>
+                    </div>
+                    <div className="text-center w-full">
+                      <p className="text-sm text-gray-400">
+                        Original Name: {showPreview.certificate.work.originalName}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        File Type: {showPreview.certificate.work.mimeType}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
+                      </p>
                     </div>
                   </div>
 
-                  <div className="no-hover-effects">
+                  {/* File Information */}
+                  <div className="space-y-4">
+                    <Card className="glass-morphism p-4">
+                      <h4 className="text-lg font-semibold text-white mb-4">File Information</h4>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Certificate ID:</span>
+                          <span className="text-white font-mono text-xs">{showPreview.certificate.id}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Creator:</span>
+                          <span className="text-white">{showPreview.certificate.work.creatorName}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Created:</span>
+                          <span className="text-white">{new Date(showPreview.certificate.work.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Status:</span>
+                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Certified</span>
+                        </div>
+                      </div>
+                    </Card>
+
                     <BlockchainVerificationGuide
                       blockchainHash={showPreview.certificate.work.blockchainHash || ''}
                       fileHash={showPreview.certificate.work.fileHash}
@@ -987,7 +900,7 @@ export default function StudioUnified() {
                     />
                   </div>
                 </div>
-              </div>
+              </Card>
             </motion.div>
           </motion.div>
         )}
