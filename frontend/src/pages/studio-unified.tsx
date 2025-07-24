@@ -42,6 +42,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/components/theme-provider";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { WorkImage } from "@/components/work-image";
 import { BlockchainVerificationGuide } from "@/components/blockchain-verification-guide";
@@ -86,6 +87,7 @@ type WorkflowStep = 'upload' | 'certificate' | 'nft' | 'complete';
 export default function StudioUnified() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const { theme } = useTheme();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
@@ -827,11 +829,12 @@ export default function StudioUnified() {
               exit={{ scale: 0.9, opacity: 0 }}
               className="work-preview-modal-content p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4 rounded-lg"
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(31, 41, 55, 0.95)',
                 backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(0, 0, 0, 0.1)',
-                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                border: theme === 'light' ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(75, 85, 99, 0.3)',
+                boxShadow: theme === 'light' ? '0 8px 32px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
                 pointerEvents: 'auto',
+                color: theme === 'light' ? '#1a1a1a' : '#ffffff',
               }}
               onMouseOver={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
@@ -844,8 +847,8 @@ export default function StudioUnified() {
               </Button>
               
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Work Preview</h2>
-                <h3 className="text-lg text-gray-300">{showPreview.certificate.work.title}</h3>
+                <h2 className="text-2xl font-bold mb-2" style={{ color: theme === 'light' ? '#1a1a1a' : '#ffffff' }}>Work Preview</h2>
+                <h3 className="text-lg" style={{ color: theme === 'light' ? '#4b5563' : '#d1d5db' }}>{showPreview.certificate.work.title}</h3>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -862,13 +865,13 @@ export default function StudioUnified() {
                     </div>
                   </div>
                   <div className="text-center w-full">
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
                       Original Name: {showPreview.certificate.work.originalName}
                     </p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
                       File Type: {showPreview.certificate.work.mimeType}
                     </p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm" style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>
                       Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
                     </p>
                   </div>
