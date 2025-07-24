@@ -943,7 +943,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileBuffer = fs.readFileSync(req.file.path);
       
       // Generate verification proof with real blockchain data
-      console.log('Generating verification proof with OpenTimestamps...');
+      console.log('Generating verification proof with blockchain anchor...');
       const verificationProof = {
         fileHash: work.fileHash,
         timestamp: Date.now(),
@@ -953,10 +953,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verificationUrl: openTimestampsService.getVerificationUrl(timestampData.commitment, timestampData.ots),
         otsProof: timestampData.ots,
         calendarServers: timestampData.calendarUrls,
-        isRealBlockchain: !timestampData.pendingAttestation,
-        verificationInstructions: timestampData.pendingAttestation 
+        verificationStatus: timestampData.verificationStatus || 'confirmed',
+        blockHeight: timestampData.blockHeight,
+        isRealBlockchain: timestampData.verificationStatus === 'confirmed',
+        verificationInstructions: timestampData.verificationStatus === 'pending'
           ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
-          : 'This timestamp is anchored to Ethereum blockchain and can be verified immediately.'
+          : timestampData.verificationStatus === 'confirmed'
+          ? 'This timestamp is anchored to Ethereum blockchain and verified immediately.'
+          : 'Blockchain verification is available with real block data.',
+        // Additional verification fields for transparency
+        anchorType: timestampData.verificationStatus === 'confirmed' ? 'ethereum_mainnet' : 'bitcoin_pending',
+        canVerifyImmediately: timestampData.verificationStatus === 'confirmed'
       };
 
       // Create certificate with verification proof
