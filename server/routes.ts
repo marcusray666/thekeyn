@@ -18,6 +18,7 @@ import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
 import { contentModerationService } from "./services/content-moderation";
+import { ImmediateBlockchainService } from "./immediate-blockchain-service";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const MemStore = MemoryStore(session);
+const immediateBlockchainService = new ImmediateBlockchainService();
 
 function generateCertificateId(): string {
   const timestamp = Date.now().toString(36);
@@ -3358,6 +3360,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching users:", error);
       res.status(500).json({ error: "Failed to search users" });
+    }
+  });
+
+  // Fix pending blockchain certificates with immediate verification
+  app.post("/api/blockchain/fix-pending", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      console.log('🔧 Fixing pending blockchain certificates for user:', userId);
+      
+      // Get all user's certificates that are still pending
+      const certificates = await storage.getUserCertificates(userId);
+      const pendingCertificates = certificates.filter(cert => {
+        try {
+          const proof = JSON.parse(cert.verificationProof || '{}');
+          return proof.verificationStatus === 'pending' || proof.isRealBlockchain === false;
+        } catch {
+          return true; // Fix certificates with malformed proof data
+        }
+      });
+
+      console.log(`Found ${pendingCertificates.length} pending certificates to fix`);
+
+      const fixedCertificates = [];
+      
+      for (const certificate of pendingCertificates) {
+        try {
+          // Get work details for the certificate
+          const work = await storage.getWork(certificate.workId);
+          if (!work) continue;
+
+          console.log(`Fixing certificate ${certificate.certificateId} for work: ${work.title}`);
+
+          // Create immediate blockchain anchor
+          const immediateAnchor = await immediateBlockchainService.createImmediateAnchor(
+            work.fileHash, 
+            certificate.certificateId
+          );
+
+          // Update certificate with new verification proof
+          await storage.updateCertificate(certificate.id, {
+            verificationProof: immediateAnchor.verificationProof,
+            verificationLevel: 'enhanced'
+          });
+
+          // Update work with new blockchain hash
+          await storage.updateWork(work.id, {
+            blockchainHash: immediateAnchor.blockchainHash
+          });
+
+          fixedCertificates.push({
+            certificateId: certificate.certificateId,
+            workTitle: work.title,
+            networkUsed: immediateAnchor.networkUsed,
+            blockNumber: immediateAnchor.blockNumber,
+            verificationUrls: immediateAnchor.blockExplorerUrls
+          });
+
+          console.log(`✅ Fixed certificate ${certificate.certificateId} - Network: ${immediateAnchor.networkUsed}, Block: ${immediateAnchor.blockNumber}`);
+        } catch (error) {
+          console.error(`Failed to fix certificate ${certificate.certificateId}:`, error);
+        }
+      }
+
+      res.json({
+        message: `Successfully fixed ${fixedCertificates.length} certificates with immediate blockchain verification`,
+        fixedCertificates,
+        totalProcessed: pendingCertificates.length,
+        summary: {
+          previouslyPending: pendingCertificates.length,
+          nowVerified: fixedCertificates.length,
+          networksUsed: [...new Set(fixedCertificates.map(c => c.networkUsed))]
+        }
+      });
+    } catch (error) {
+      console.error("Error fixing pending certificates:", error);
+      res.status(500).json({ error: "Failed to fix pending certificates" });
     }
   });
 
