@@ -13,12 +13,14 @@ import Stripe from "stripe";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
+import { sql } from "drizzle-orm";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
 import { contentModerationService } from "./services/content-moderation";
 import { ImmediateBlockchainService } from "./immediate-blockchain-service";
+import { db } from "./db";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -3369,26 +3371,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.userId!;
       console.log('🔧 Fixing pending blockchain certificates for user:', userId);
       
-      // Get all user's certificates that are still pending
-      const certificates = await storage.getUserCertificates(userId);
-      const pendingCertificates = certificates.filter(cert => {
-        try {
-          const proof = JSON.parse(cert.verificationProof || '{}');
-          return proof.verificationStatus === 'pending' || proof.isRealBlockchain === false;
-        } catch {
-          return true; // Fix certificates with malformed proof data
-        }
-      });
-
-      console.log(`Found ${pendingCertificates.length} pending certificates to fix`);
+      // Get all user's works that have certificates
+      const userWorks = await storage.getUserWorks(userId);
+      console.log(`Found ${userWorks.length} works for user`);
 
       const fixedCertificates = [];
       
-      for (const certificate of pendingCertificates) {
+      for (const work of userWorks) {
         try {
-          // Get work details for the certificate
-          const work = await storage.getWork(certificate.workId);
-          if (!work) continue;
+          // Get certificate for this work
+          const certificate = await storage.getCertificateByWorkId(work.id);
+          if (!certificate) continue;
+
+          // Check if certificate needs fixing
+          let needsFix = false;
+          try {
+            const proof = JSON.parse(certificate.verificationProof || '{}');
+            needsFix = proof.verificationStatus === 'pending' || proof.isRealBlockchain === false;
+          } catch {
+            needsFix = true; // Fix certificates with malformed proof data
+          }
+
+          if (!needsFix) continue;
 
           console.log(`Fixing certificate ${certificate.certificateId} for work: ${work.title}`);
 
@@ -3398,11 +3402,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             certificate.certificateId
           );
 
-          // Update certificate with new verification proof
-          await storage.updateCertificate(certificate.id, {
-            verificationProof: immediateAnchor.verificationProof,
-            verificationLevel: 'enhanced'
-          });
+          // Update certificate using raw SQL to avoid storage interface issues
+          await db.execute(sql`
+            UPDATE certificates 
+            SET verification_proof = ${immediateAnchor.verificationProof},
+                verification_level = 'enhanced'
+            WHERE id = ${certificate.id}
+          `);
 
           // Update work with new blockchain hash
           await storage.updateWork(work.id, {
@@ -3419,23 +3425,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           console.log(`✅ Fixed certificate ${certificate.certificateId} - Network: ${immediateAnchor.networkUsed}, Block: ${immediateAnchor.blockNumber}`);
         } catch (error) {
-          console.error(`Failed to fix certificate ${certificate.certificateId}:`, error);
+          console.error(`Failed to fix certificate for work ${work.title}:`, error);
         }
       }
 
       res.json({
         message: `Successfully fixed ${fixedCertificates.length} certificates with immediate blockchain verification`,
         fixedCertificates,
-        totalProcessed: pendingCertificates.length,
+        totalProcessed: userWorks.length,
         summary: {
-          previouslyPending: pendingCertificates.length,
-          nowVerified: fixedCertificates.length,
+          worksProcessed: userWorks.length,
+          certificatesFixed: fixedCertificates.length,
           networksUsed: [...new Set(fixedCertificates.map(c => c.networkUsed))]
         }
       });
     } catch (error) {
       console.error("Error fixing pending certificates:", error);
-      res.status(500).json({ error: "Failed to fix pending certificates" });
+      res.status(500).json({ error: "Failed to fix pending certificates", details: error.message });
     }
   });
 

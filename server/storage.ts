@@ -38,6 +38,8 @@ export interface IStorage {
   getCertificate(id: number): Promise<Certificate | undefined>;
   getCertificateByWorkId(workId: number): Promise<Certificate | undefined>;
   getAllCertificates(): Promise<Certificate[]>;
+  getUserCertificates(userId: number): Promise<Certificate[]>;
+  updateCertificate(id: number, updates: Partial<InsertCertificate>): Promise<Certificate>;
   deleteCertificate(id: number): Promise<void>;
   
 
@@ -271,6 +273,31 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(certificates)
       .orderBy(desc(certificates.createdAt));
+  }
+
+  async getUserCertificates(userId: number): Promise<Certificate[]> {
+    return await db
+      .select({
+        id: certificates.id,
+        workId: certificates.workId,
+        certificateId: certificates.certificateId,
+        verificationProof: certificates.verificationProof,
+        verificationLevel: certificates.verificationLevel,
+        createdAt: certificates.createdAt
+      })
+      .from(certificates)
+      .innerJoin(works, eq(certificates.workId, works.id))
+      .where(eq(works.userId, userId))
+      .orderBy(desc(certificates.createdAt));
+  }
+
+  async updateCertificate(id: number, updates: Partial<InsertCertificate>): Promise<Certificate> {
+    const [updated] = await db
+      .update(certificates)
+      .set(updates)
+      .where(eq(certificates.id, id))
+      .returning();
+    return updated;
   }
 
   async updateWork(id: number, updates: Partial<InsertWork>): Promise<Work> {
