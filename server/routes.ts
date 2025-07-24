@@ -288,15 +288,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       checkPeriod: 86400000, // prune expired entries every 24h
     }),
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
-    name: "sessionId", // Don't use default session name
-    resave: false,
-    saveUninitialized: false,
+    name: "sessionId", // Use consistent session name
+    resave: true, // Force session save  
+    saveUninitialized: true, // Save uninitialized sessions
     cookie: {
       secure: false, // Set to false for development
-      httpOnly: true,
+      httpOnly: false, // Allow JavaScript access for debugging
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       sameSite: 'lax', // Change to lax for better compatibility
-      domain: undefined, // Don't set domain for localhost
     },
   });
 
@@ -397,6 +396,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
+      console.log('Login attempt - SessionID before:', req.sessionID);
+      
       // Find user (case insensitive username)
       const user = await storage.getUserByUsername(validatedData.username.toLowerCase());
       if (!user) {
@@ -409,13 +410,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // Set session
-      req.session.userId = user.id;
+      // Set session with proper typing
+      (req.session as any).userId = user.id;
+      
+      console.log('Login - Setting session userId:', user.id, 'SessionID:', req.sessionID);
+      console.log('Login - Session before save:', req.session);
       
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
+          if (err) {
+            console.error('Login - Session save error:', err);
+            reject(err);
+          } else {
+            console.log('Login - Session saved successfully:', req.session);
+            resolve();
+          }
         });
       });
       
@@ -435,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err) {
         return res.status(500).json({ error: "Logout failed" });
       }
-      res.clearCookie('connect.sid');
+      res.clearCookie('sessionId');
       res.json({ message: "Logged out successfully" });
     });
   });
@@ -443,6 +452,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
     console.log('Auth user request for:', req.user?.id, 'tier:', req.user?.subscriptionTier);
     res.json(req.user);
+  });
+
+  // Debug endpoint to check session
+  app.get("/api/debug/session", (req, res) => {
+    console.log('Debug session - Session ID:', req.sessionID);
+    console.log('Debug session - Session data:', req.session);
+    res.json({
+      sessionID: req.sessionID,
+      session: req.session,
+      cookies: req.headers.cookie
+    });
   });
 
   // Get single certificate by ID (public endpoint for certificate verification)
