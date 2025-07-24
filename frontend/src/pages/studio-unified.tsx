@@ -620,116 +620,137 @@ export default function StudioUnified() {
                   : 'grid-cols-1'
               }`}>
                 {filteredCertificates.map((certificate: Certificate) => (
-                  <Card key={certificate.id} className="glass-morphism p-6 hover:shadow-lg transition-all duration-200">
-                    <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
-                        <WorkImage
-                          filename={certificate.work.filename}
-                          mimeType={certificate.work.mimeType}
-                          title={certificate.work.title}
-                          className="w-full h-full object-cover"
-                        />
+                  <motion.div
+                    key={certificate.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-500"
+                  >
+                    {/* Gradient Header */}
+                    <div className="h-32 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 relative">
+                      <div className="absolute inset-0 bg-black/20"></div>
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Certified
+                        </Badge>
                       </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-white truncate">{certificate.work.title}</h3>
-                          <Badge variant="secondary" className="bg-purple-500/20 text-purple-100 ml-2">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Certified
-                          </Badge>
-                        </div>
-                        
-                        <p className="text-sm text-gray-400 mb-2 line-clamp-2">
-                          {certificate.work.description || 'No description provided'}
-                        </p>
-                        
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(certificate.createdAt)}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3" />
-                            {certificate.work.mimeType.split('/')[0]}
-                          </div>
-                          <div className="flex items-center gap-1 text-green-400">
-                            <Shield className="h-3 w-3" />
-                            Blockchain Verified
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2 flex-wrap">
-                          <Button
-                            size="sm"
-                            onClick={() => handlePreviewWork(certificate)}
-                            className="bg-blue-600 hover:bg-blue-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Preview Work"
-                          >
-                            <Eye className="h-3 w-3" />
-                            Preview
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleDownloadCertificate(certificate)}
-                            className="bg-purple-600 hover:bg-purple-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Download Certificate PDF"
-                          >
-                            <Download className="h-3 w-3" />
-                            PDF
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="View Certificate"
-                          >
-                            <Eye className="h-3 w-3" />
-                            View
-                          </Button>
-                          {certificate.verificationProof && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                navigator.clipboard.writeText(certificate.verificationProof!);
-                                toast({
-                                  title: "Verification Proof Copied",
-                                  description: "Blockchain verification proof copied to clipboard.",
-                                });
-                              }}
-                              className="border-green-600 text-green-300 hover:bg-green-700/20 px-3 py-2 h-8 flex items-center gap-1"
-                              title="Copy Verification Proof"
-                            >
-                              <Shield className="h-3 w-3" />
-                              Copy Hash
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => window.open(certificate.shareableLink, '_blank')}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Share Certificate"
-                          >
-                            <Share2 className="h-3 w-3" />
-                            Share
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteWork(certificate)}
-                            className="border-red-600 text-red-300 hover:bg-red-700/20 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Delete Work"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                            Delete
-                          </Button>
+                      <div className="absolute bottom-4 left-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/20 backdrop-blur-sm border border-white/30">
+                          <WorkImage
+                            filename={certificate.work.filename}
+                            mimeType={certificate.work.mimeType}
+                            title={certificate.work.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       </div>
                     </div>
-                  </Card>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate">
+                        {certificate.work.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4">
+                        {certificate.work.description || 'No description provided'}
+                      </p>
+
+                      {/* Stats Row */}
+                      <div className="flex items-center justify-between mb-6 text-xs">
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(certificate.createdAt)}
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <FileText className="w-3 h-3" />
+                          {certificate.work.mimeType.split('/')[0]}
+                        </div>
+                        <div className="flex items-center gap-1 text-green-500">
+                          <Shield className="w-3 h-3" />
+                          Verified
+                        </div>
+                      </div>
+
+                      {/* Primary Actions */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                          onClick={() => handlePreviewWork(certificate)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Preview
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                          onClick={() => handleDownloadCertificate(certificate)}
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          PDF
+                        </Button>
+                      </div>
+
+                      {/* Secondary Actions */}
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                          onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
+                        >
+                          <Eye className="w-3 h-3 mr-2" />
+                          View
+                        </Button>
+                        {certificate.verificationProof && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-green-600 border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-200"
+                            onClick={() => {
+                              navigator.clipboard.writeText(certificate.verificationProof!);
+                              toast({
+                                title: "Verification Proof Copied",
+                                description: "Blockchain verification proof copied to clipboard.",
+                              });
+                            }}
+                          >
+                            <Copy className="w-3 h-3 mr-2" />
+                            Copy Hash
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Final Actions */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-blue-600 border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
+                          onClick={() => window.open(certificate.shareableLink, '_blank')}
+                        >
+                          <Share className="w-3 h-3 mr-2" />
+                          Share
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+                          onClick={() => handleDeleteWork(certificate)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Hover Effect Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                  </motion.div>
                 ))}
               </div>
             )}
