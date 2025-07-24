@@ -880,26 +880,48 @@ export default function StudioUnified() {
                 {/* File Information */}
                 <div className="space-y-4">
                   <div 
-                    className="p-4 rounded-lg border"
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                      border: '1px solid rgba(0, 0, 0, 0.1)',
-                      backdropFilter: 'blur(8px)',
+                      backgroundColor: theme === 'light' ? '#ffffff' : '#374151',
+                      border: theme === 'light' ? '1px solid #e5e7eb' : '1px solid #4b5563',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.3)',
                     }}
                   >
-                    <h4 className="text-lg font-semibold mb-3" style={{ color: '#1a1a1a' }}>File Information</h4>
-                    <div className="space-y-2 text-sm">
+                    <h4 
+                      style={{ 
+                        color: theme === 'light' ? '#111827' : '#f9fafb',
+                        fontSize: '1.125rem',
+                        fontWeight: '600',
+                        marginBottom: '12px'
+                      }}
+                    >
+                      File Information
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
                       <div>
-                        <span style={{ color: '#6b7280' }}>Original Name:</span>
-                        <p className="break-all" style={{ color: '#1a1a1a' }}>{showPreview.certificate.work.originalName}</p>
+                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Original Name:</span>
+                        <p 
+                          style={{ 
+                            color: theme === 'light' ? '#111827' : '#f9fafb',
+                            wordBreak: 'break-all',
+                            margin: 0
+                          }}
+                        >
+                          {showPreview.certificate.work.originalName}
+                        </p>
                       </div>
                       <div>
-                        <span style={{ color: '#6b7280' }}>Type:</span>
-                        <p style={{ color: '#1a1a1a' }}>{showPreview.certificate.work.mimeType}</p>
+                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Type:</span>
+                        <p style={{ color: theme === 'light' ? '#111827' : '#f9fafb', margin: 0 }}>
+                          {showPreview.certificate.work.mimeType}
+                        </p>
                       </div>
                       <div>
-                        <span style={{ color: '#6b7280' }}>Size:</span>
-                        <p style={{ color: '#1a1a1a' }}>{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
+                        <span style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}>Size:</span>
+                        <p style={{ color: theme === 'light' ? '#111827' : '#f9fafb', margin: 0 }}>
+                          {(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB
+                        </p>
                       </div>
                     </div>
                   </div>

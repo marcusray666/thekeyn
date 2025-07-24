@@ -780,23 +780,42 @@ nav, .nav-glass {
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
 }
 
-/* Work Preview Modal - Completely prevent dark hover states */
-.work-preview-modal,
-.work-preview-modal *,
-.work-preview-modal *:hover,
-.work-preview-modal *:focus {
-  transition: none !important;
-  transform: none !important;
+/* NUCLEAR OPTION: Disable ALL CSS interactions in work preview modal */
+.work-preview-modal {
+  pointer-events: auto !important;
 }
 
-/* Universal hover prevention - disable ALL hover effects in modal */
-.work-preview-modal *:hover {
+.work-preview-modal *,
+.work-preview-modal *:hover,
+.work-preview-modal *:focus,
+.work-preview-modal *:active,
+.work-preview-modal *:visited {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  pointer-events: auto !important;
+}
+
+/* Force specific overrides for common problematic classes */
+.work-preview-modal .hover\:bg-gray-800:hover,
+.work-preview-modal .hover\:bg-gray-700:hover,
+.work-preview-modal .hover\:bg-gray-600:hover,
+.work-preview-modal .hover\:text-white:hover,
+.work-preview-modal .glass-morphism:hover,
+.work-preview-modal .bg-gray-800:hover,
+.work-preview-modal .bg-gray-700:hover,
+.work-preview-modal [class*="hover:"]:hover,
+.work-preview-modal [class*="bg-"]:hover,
+.work-preview-modal [class*="text-"]:hover {
   background-color: inherit !important;
   color: inherit !important;
-  transform: none !important;
-  box-shadow: inherit !important;
-  border-color: inherit !important;
-  opacity: inherit !important;
+}
+
+/* Disable CSS variables that might change on hover */
+.work-preview-modal * {
+  --tw-bg-opacity: initial !important;
+  --tw-text-opacity: initial !important;
+  --tw-border-opacity: initial !important;
 }
 
 /* Specific overrides for known problematic elements */
@@ -1003,24 +1022,30 @@ nav, .nav-glass {
   color: #6b7280 !important;
 }
 
-/* Add specific class-based overrides for the modal content */
+/* Disable ALL CSS classes that could interfere with modal styling */
+.work-preview-modal .file-info-section,
+.work-preview-modal .file-info-section *,
+.work-preview-modal .file-info-section *:hover,
+.work-preview-modal .file-info-section *:focus {
+  all: unset !important;
+  display: initial !important;
+  box-sizing: border-box !important;
+}
+
+/* Force modal content to ignore all inherited styles */
 .work-preview-modal-content,
 .work-preview-modal-content *,
 .work-preview-modal-content *:hover {
   transition: none !important;
   transform: none !important;
-  background-color: inherit !important;
-  color: inherit !important;
 }
 
-/* Force light theme styling on modal content */
-.work-preview-modal-content {
-  background: rgba(255, 255, 255, 0.95) !important;
-  color: #1a1a1a !important;
-}
-
-.work-preview-modal-content * {
-  color: inherit !important;
+/* Reset any glass morphism effects in modal */
+.work-preview-modal .glass-morphism {
+  background: none !important;
+  backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Loading animations */
