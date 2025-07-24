@@ -33,10 +33,12 @@ export default function Login() {
       });
       
       // Invalidate and refetch user data
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Navigate to home page (will show ProfileShowcase for authenticated users)
-      setLocation('/');
+      // Wait a moment for the query to refetch, then navigate
+      setTimeout(() => {
+        setLocation('/');
+      }, 100);
     },
     onError: (error: Error) => {
       toast({

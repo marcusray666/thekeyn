@@ -152,15 +152,21 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       userId?: number;
     }
 
+    console.log('Auth middleware - Session:', req.session?.userId, 'SessionID:', req.sessionID);
+    
     const sessionData = req.session as SessionData;
     if (!sessionData || !sessionData.userId) {
+      console.log('Auth middleware - No userId in session');
       return res.status(401).json({ error: "Authentication required" });
     }
 
     const user = await storage.getUser(sessionData.userId);
     if (!user) {
+      console.log('Auth middleware - User not found for ID:', sessionData.userId);
       return res.status(401).json({ error: "User not found" });
     }
+
+    console.log('Auth middleware - User found:', user.username, 'ID:', user.id);
 
     req.user = {
       id: user.id,
@@ -286,10 +292,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      secure: false, // Set to false for development
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-      sameSite: 'strict', // CSRF protection
+      sameSite: 'lax', // Change to lax for better compatibility
     },
   });
 

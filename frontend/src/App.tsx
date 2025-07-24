@@ -45,11 +45,14 @@ import NotFound from "@/pages/not-found";
 function AuthenticatedHome() {
   const { user, isAuthenticated, isLoading } = useAuth();
   
+  // Debug log to see auth state
+  console.log('AuthenticatedHome:', { user: !!user, isAuthenticated, isLoading });
+  
   if (isLoading) {
     return <FullScreenLoader text="Loading your portfolio..." />;
   }
   
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Welcome />;
   }
   
