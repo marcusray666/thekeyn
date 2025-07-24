@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle, BarChart3, AlertTriangle, Eye } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, MessageCircle, BarChart3, AlertTriangle, Eye, BookOpen } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -67,6 +67,7 @@ export function Navigation() {
     { href: "/social", label: "Community", icon: Users },
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/studio", label: "Studio", icon: Upload },
+    { href: "/certificate-guide", label: "Certificate Guide", icon: BookOpen },
     { href: "/subscription", label: "Subscription", icon: Crown },
     ...(user?.role === 'admin' ? [{ href: "/admin-dashboard", label: "Admin Panel", icon: Shield }] : []),
   ];

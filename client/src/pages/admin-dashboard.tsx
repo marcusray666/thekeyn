@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -102,7 +101,6 @@ interface AuditLog {
 }
 
 export default function AdminDashboard() {
-  const [, setLocation] = useLocation();
   const [selectedTab, setSelectedTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [userFilter, setUserFilter] = useState("all");
@@ -369,14 +367,13 @@ export default function AdminDashboard() {
 
                 <Card 
                   className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
-                  onClick={() => setLocation('/studio-unified')}
+                  onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-yellow-400">Protected Works</p>
                         <p className="text-2xl font-bold text-yellow-200">{metrics?.totalWorks?.toLocaleString() || 0}</p>
-                        <p className="text-xs text-yellow-300/70">View & manage all protected works</p>
                       </div>
                       <Shield className="h-8 w-8 text-yellow-400" />
                     </div>
@@ -385,14 +382,13 @@ export default function AdminDashboard() {
 
                 <Card 
                   className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
-                  onClick={() => setLocation('/social-feed')}
+                  onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-yellow-400">Community Posts</p>
                         <p className="text-2xl font-bold text-yellow-200">{metrics?.totalPosts?.toLocaleString() || 0}</p>
-                        <p className="text-xs text-yellow-300/70">View & moderate community posts</p>
                       </div>
                       <FileText className="h-8 w-8 text-yellow-400" />
                     </div>

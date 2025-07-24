@@ -110,9 +110,9 @@ export class OpenTimestampsService {
   }
 
   /**
-   * Create immediate Ethereum block anchor for instant verification
+   * Fallback: Create local block anchor using real Ethereum data
    */
-  private async createEthereumBlockAnchor(fileHash: string): Promise<{
+  private async createLocalBlockAnchor(fileHash: string): Promise<{
     ots: string;
     commitment: string;
     calendarUrls: string[];
@@ -152,19 +152,13 @@ export class OpenTimestampsService {
           .update(JSON.stringify(anchorData))
           .digest('hex');
 
-        console.log('Created Ethereum block anchor:', anchorData);
-        
         return {
           ots: Buffer.from(JSON.stringify(anchorData)).toString('base64'),
           commitment,
-          calendarUrls: [
-            `https://etherscan.io/block/${anchorData.blockNumber}`,
-            `https://eth.blockscout.com/block/${anchorData.blockNumber}`
-          ],
+          calendarUrls: [`https://etherscan.io/block/${anchorData.blockNumber}`],
           pendingAttestation: false,
           verificationStatus: 'confirmed',
-          blockHeight: anchorData.blockNumber,
-          bitcoinTxId: `eth-block-${anchorData.blockNumber}`
+          blockHeight: anchorData.blockNumber
         };
       }
     } catch (error) {

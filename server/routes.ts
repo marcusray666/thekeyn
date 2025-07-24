@@ -13,14 +13,11 @@ import Stripe from "stripe";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
-import { sql } from "drizzle-orm";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
 import { contentModerationService } from "./services/content-moderation";
-import { ImmediateBlockchainService } from "./immediate-blockchain-service";
-import { db } from "./db";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +29,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const MemStore = MemoryStore(session);
-const immediateBlockchainService = new ImmediateBlockchainService();
 
 function generateCertificateId(): string {
   const timestamp = Date.now().toString(36);
@@ -156,21 +152,15 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       userId?: number;
     }
 
-    console.log('Auth middleware - Session:', req.session?.userId, 'SessionID:', req.sessionID);
-    
     const sessionData = req.session as SessionData;
     if (!sessionData || !sessionData.userId) {
-      console.log('Auth middleware - No userId in session');
       return res.status(401).json({ error: "Authentication required" });
     }
 
     const user = await storage.getUser(sessionData.userId);
     if (!user) {
-      console.log('Auth middleware - User not found for ID:', sessionData.userId);
       return res.status(401).json({ error: "User not found" });
     }
-
-    console.log('Auth middleware - User found:', user.username, 'ID:', user.id);
 
     req.user = {
       id: user.id,
@@ -292,14 +282,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       checkPeriod: 86400000, // prune expired entries every 24h
     }),
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
-    name: "sessionId", // Use consistent session name
-    resave: true, // Force session save  
-    saveUninitialized: true, // Save uninitialized sessions
+    name: "sessionId", // Don't use default session name
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-      secure: false, // Set to false for development
-      httpOnly: false, // Allow JavaScript access for debugging
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-      sameSite: 'lax', // Change to lax for better compatibility
+      sameSite: 'strict', // CSRF protection
     },
   });
 
@@ -400,8 +390,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
-      console.log('Login attempt - SessionID before:', req.sessionID);
-      
       // Find user (case insensitive username)
       const user = await storage.getUserByUsername(validatedData.username.toLowerCase());
       if (!user) {
@@ -414,21 +402,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // Set session with proper typing
-      (req.session as any).userId = user.id;
-      
-      console.log('Login - Setting session userId:', user.id, 'SessionID:', req.sessionID);
-      console.log('Login - Session before save:', req.session);
+      // Set session
+      req.session.userId = user.id;
       
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
-          if (err) {
-            console.error('Login - Session save error:', err);
-            reject(err);
-          } else {
-            console.log('Login - Session saved successfully:', req.session);
-            resolve();
-          }
+          if (err) reject(err);
+          else resolve();
         });
       });
       
@@ -448,7 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err) {
         return res.status(500).json({ error: "Logout failed" });
       }
-      res.clearCookie('sessionId');
+      res.clearCookie('connect.sid');
       res.json({ message: "Logged out successfully" });
     });
   });
@@ -456,17 +436,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/user", requireAuth, async (req: AuthenticatedRequest, res) => {
     console.log('Auth user request for:', req.user?.id, 'tier:', req.user?.subscriptionTier);
     res.json(req.user);
-  });
-
-  // Debug endpoint to check session
-  app.get("/api/debug/session", (req, res) => {
-    console.log('Debug session - Session ID:', req.sessionID);
-    console.log('Debug session - Session data:', req.session);
-    res.json({
-      sessionID: req.sessionID,
-      session: req.session,
-      cookies: req.headers.cookie
-    });
   });
 
   // Get single certificate by ID (public endpoint for certificate verification)
@@ -920,11 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create REAL blockchain timestamp using OpenTimestamps
       console.log('Creating real blockchain timestamp...');
       const timestampData = await openTimestampsService.createTimestamp(fileHash);
-      
-      // Generate unique blockchain verification hash (different from file hash)
-      const blockchainHash = timestampData.ots ? 
-        crypto.createHash('sha256').update(timestampData.ots + certificateId + Date.now()).digest('hex') :
-        crypto.createHash('sha256').update(timestampData.commitment + certificateId + 'blockchain').digest('hex');
+      const blockchainHash = timestampData.commitment;
       
       console.log('Generated IDs:', { 
         fileHash, 
@@ -3362,86 +3327,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching users:", error);
       res.status(500).json({ error: "Failed to search users" });
-    }
-  });
-
-  // Fix pending blockchain certificates with immediate verification
-  app.post("/api/blockchain/fix-pending", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.userId!;
-      console.log('🔧 Fixing pending blockchain certificates for user:', userId);
-      
-      // Get all user's works that have certificates
-      const userWorks = await storage.getUserWorks(userId);
-      console.log(`Found ${userWorks.length} works for user`);
-
-      const fixedCertificates = [];
-      
-      for (const work of userWorks) {
-        try {
-          // Get certificate for this work
-          const certificate = await storage.getCertificateByWorkId(work.id);
-          if (!certificate) continue;
-
-          // Check if certificate needs fixing
-          let needsFix = false;
-          try {
-            const proof = JSON.parse(certificate.verificationProof || '{}');
-            needsFix = proof.verificationStatus === 'pending' || proof.isRealBlockchain === false;
-          } catch {
-            needsFix = true; // Fix certificates with malformed proof data
-          }
-
-          if (!needsFix) continue;
-
-          console.log(`Fixing certificate ${certificate.certificateId} for work: ${work.title}`);
-
-          // Create immediate blockchain anchor
-          const immediateAnchor = await immediateBlockchainService.createImmediateAnchor(
-            work.fileHash, 
-            certificate.certificateId
-          );
-
-          // Update certificate using raw SQL to avoid storage interface issues
-          await db.execute(sql`
-            UPDATE certificates 
-            SET verification_proof = ${immediateAnchor.verificationProof},
-                verification_level = 'enhanced'
-            WHERE id = ${certificate.id}
-          `);
-
-          // Update work with new blockchain hash
-          await storage.updateWork(work.id, {
-            blockchainHash: immediateAnchor.blockchainHash
-          });
-
-          fixedCertificates.push({
-            certificateId: certificate.certificateId,
-            workTitle: work.title,
-            networkUsed: immediateAnchor.networkUsed,
-            blockNumber: immediateAnchor.blockNumber,
-            verificationUrls: immediateAnchor.blockExplorerUrls
-          });
-
-          console.log(`✅ Fixed certificate ${certificate.certificateId} - Network: ${immediateAnchor.networkUsed}, Block: ${immediateAnchor.blockNumber}`);
-        } catch (error) {
-          console.error(`Failed to fix certificate for work ${work.title}:`, error);
-        }
-      }
-
-      res.json({
-        message: `Successfully fixed ${fixedCertificates.length} certificates with immediate blockchain verification`,
-        fixedCertificates,
-        totalProcessed: userWorks.length,
-        summary: {
-          worksProcessed: userWorks.length,
-          certificatesFixed: fixedCertificates.length,
-          networksUsed: [...new Set(fixedCertificates.map(c => c.networkUsed))]
-        }
-      });
-    } catch (error) {
-      console.error("Error fixing pending certificates:", error);
-      res.status(500).json({ error: "Failed to fix pending certificates", details: error.message });
     }
   });
 

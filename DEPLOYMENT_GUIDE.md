@@ -47,7 +47,7 @@ loggin-platform/
    DATABASE_URL=your_postgresql_url
    SESSION_SECRET=your_secret_key
    STRIPE_SECRET_KEY=your_stripe_secret
-   OPENAI_API_KEY=your_openai_key
+
    NODE_ENV=production
    ```
 5. Railway automatically builds and deploys

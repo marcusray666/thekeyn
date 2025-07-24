@@ -817,12 +817,298 @@ nav, .nav-glass {
   top: 6px;
 }
 
-/* Card hover effects */
+/* Card hover effects - DISABLED for work preview modal */
 .glass-morphism:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-4px);
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+}
+
+/* CRITICAL FIX: Disable glass-morphism hover in work preview modal */
+.work-preview-modal .glass-morphism:hover {
+  background: inherit !important;
+  border-color: inherit !important;
+  transform: none !important;
+  box-shadow: inherit !important;
+}
+
+/* NUCLEAR OPTION: Disable ALL CSS interactions in work preview modal */
+.work-preview-modal {
+  pointer-events: auto !important;
+}
+
+.work-preview-modal *,
+.work-preview-modal *:hover,
+.work-preview-modal *:focus,
+.work-preview-modal *:active,
+.work-preview-modal *:visited {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  pointer-events: auto !important;
+}
+
+/* Force specific overrides for common problematic classes */
+.work-preview-modal .hover\:bg-gray-800:hover,
+.work-preview-modal .hover\:bg-gray-700:hover,
+.work-preview-modal .hover\:bg-gray-600:hover,
+.work-preview-modal .hover\:text-white:hover,
+.work-preview-modal .glass-morphism:hover,
+.work-preview-modal .bg-gray-800:hover,
+.work-preview-modal .bg-gray-700:hover,
+.work-preview-modal [class*="hover:"]:hover,
+.work-preview-modal [class*="bg-"]:hover,
+.work-preview-modal [class*="text-"]:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Disable CSS variables that might change on hover */
+.work-preview-modal * {
+  --tw-bg-opacity: initial !important;
+  --tw-text-opacity: initial !important;
+  --tw-border-opacity: initial !important;
+}
+
+/* Specific overrides for known problematic elements */
+.work-preview-modal .bg-gray-800:hover {
+  background-color: rgb(31 41 59) !important;
+}
+
+.work-preview-modal .bg-gray-900:hover {
+  background-color: rgb(15 23 42) !important;
+}
+
+.work-preview-modal .bg-blue-500\/10:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.work-preview-modal .bg-green-500\/10:hover {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.work-preview-modal .bg-purple-500\/10:hover {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Ensure text remains visible */
+.work-preview-modal .text-white:hover {
+  color: white !important;
+}
+
+.work-preview-modal .text-gray-300:hover {
+  color: rgb(209 213 219) !important;
+}
+
+.work-preview-modal .text-gray-400:hover {
+  color: rgb(156 163 175) !important;
+}
+
+/* Light theme specific fixes for work preview modal */
+.light-theme .work-preview-modal,
+.light-theme .work-preview-modal * {
+  transition: none !important;
+}
+
+/* Force all elements in light theme modal to use light backgrounds */
+.light-theme .work-preview-modal *:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transform: none !important;
+  box-shadow: inherit !important;
+}
+
+.light-theme .work-preview-modal .glass-morphism:hover,
+.light-theme .work-preview-modal .glass-morphism:hover *,
+.light-theme .work-preview-modal [class*="bg-"]:hover,
+.light-theme .work-preview-modal div:hover,
+.light-theme .work-preview-modal p:hover,
+.light-theme .work-preview-modal span:hover,
+.light-theme .work-preview-modal h1:hover,
+.light-theme .work-preview-modal h2:hover,
+.light-theme .work-preview-modal h3:hover,
+.light-theme .work-preview-modal h4:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Light theme specific background preservation - use light colors */
+.light-theme .work-preview-modal .bg-gray-800,
+.light-theme .work-preview-modal .bg-gray-800:hover {
+  background-color: rgb(243 244 246) !important;
+}
+
+.light-theme .work-preview-modal .bg-gray-900,
+.light-theme .work-preview-modal .bg-gray-900:hover {
+  background-color: rgb(249 250 251) !important;
+}
+
+.light-theme .work-preview-modal .bg-gray-800\/50,
+.light-theme .work-preview-modal .bg-gray-800\/50:hover {
+  background-color: rgba(243, 244, 246, 0.5) !important;
+}
+
+.light-theme .work-preview-modal .bg-blue-500\/10,
+.light-theme .work-preview-modal .bg-blue-500\/10:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.light-theme .work-preview-modal .bg-green-500\/10,
+.light-theme .work-preview-modal .bg-green-500\/10:hover {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.light-theme .work-preview-modal .bg-purple-500\/10,
+.light-theme .work-preview-modal .bg-purple-500\/10:hover {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Light theme text color preservation */
+.light-theme .work-preview-modal .text-white:hover {
+  color: #1a1a1a !important;
+}
+
+.light-theme .work-preview-modal .text-gray-300:hover {
+  color: #4b5563 !important;
+}
+
+.light-theme .work-preview-modal .text-gray-400:hover {
+  color: #6b7280 !important;
+}
+
+.light-theme .work-preview-modal .text-blue-400:hover {
+  color: #2563eb !important;
+}
+
+.light-theme .work-preview-modal .text-green-400:hover {
+  color: #16a34a !important;
+}
+
+.light-theme .work-preview-modal .text-purple-400:hover {
+  color: #7c3aed !important;
+}
+
+/* Light theme modal glass morphism override */
+.light-theme .work-preview-modal .glass-morphism {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+.light-theme .work-preview-modal .glass-morphism:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Ultimate light theme fix - target all possible Tailwind classes */
+.light-theme .work-preview-modal .bg-gray-800\/50,
+.light-theme .work-preview-modal .bg-gray-800,
+.light-theme .work-preview-modal .bg-gray-900,
+.light-theme .work-preview-modal .bg-blue-500\/10,
+.light-theme .work-preview-modal .bg-green-500\/10,
+.light-theme .work-preview-modal .bg-purple-500\/10 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light-theme .work-preview-modal .bg-gray-800\/50:hover,
+.light-theme .work-preview-modal .bg-gray-800:hover,
+.light-theme .work-preview-modal .bg-gray-900:hover,
+.light-theme .work-preview-modal .bg-blue-500\/10:hover,
+.light-theme .work-preview-modal .bg-green-500\/10:hover,
+.light-theme .work-preview-modal .bg-purple-500\/10:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Force override all dark colors in light theme modal */
+.light-theme .work-preview-modal [class*="bg-gray"],
+.light-theme .work-preview-modal [class*="bg-slate"],
+.light-theme .work-preview-modal [class*="bg-black"] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light-theme .work-preview-modal [class*="bg-gray"]:hover,
+.light-theme .work-preview-modal [class*="bg-slate"]:hover,
+.light-theme .work-preview-modal [class*="bg-black"]:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ultimate light theme fix - force light modal background */
+.light-theme .work-preview-modal {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force light theme for all blockchain guide elements */
+.light-theme .work-preview-modal .bg-green-500\/10 {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.light-theme .work-preview-modal .bg-blue-500\/10 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.light-theme .work-preview-modal .bg-purple-500\/10 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+  border-color: rgba(168, 85, 247, 0.2) !important;
+}
+
+/* Force all text to be dark in light theme modal */
+.light-theme .work-preview-modal .text-white {
+  color: #1a1a1a !important;
+}
+
+.light-theme .work-preview-modal .text-gray-300 {
+  color: #4b5563 !important;
+}
+
+.light-theme .work-preview-modal .text-gray-400 {
+  color: #6b7280 !important;
+}
+
+/* Disable ALL CSS classes that could interfere with modal styling */
+.work-preview-modal .file-info-section,
+.work-preview-modal .file-info-section *,
+.work-preview-modal .file-info-section *:hover,
+.work-preview-modal .file-info-section *:focus {
+  all: unset !important;
+  display: initial !important;
+  box-sizing: border-box !important;
+}
+
+/* Force modal content to ignore all inherited styles */
+.work-preview-modal-content,
+.work-preview-modal-content *,
+.work-preview-modal-content *:hover {
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Reset any glass morphism effects in modal */
+.work-preview-modal .glass-morphism {
+  background: none !important;
+  backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Additional protection for blockchain verification guide */
+.work-preview-modal .no-hover-effects,
+.work-preview-modal .no-hover-effects *,
+.work-preview-modal .no-hover-effects *:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 /* Loading animations */

@@ -28,7 +28,9 @@ import {
   Eye,
   Trash2,
   AlertTriangle,
-  X
+  X,
+  Copy,
+  Share
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -42,6 +44,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/components/theme-provider";
 import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { WorkImage } from "@/components/work-image";
 import { BlockchainVerificationGuide } from "@/components/blockchain-verification-guide";
@@ -86,6 +89,7 @@ type WorkflowStep = 'upload' | 'certificate' | 'nft' | 'complete';
 export default function StudioUnified() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const { theme } = useTheme();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
@@ -616,116 +620,137 @@ export default function StudioUnified() {
                   : 'grid-cols-1'
               }`}>
                 {filteredCertificates.map((certificate: Certificate) => (
-                  <Card key={certificate.id} className="glass-morphism p-6 hover:shadow-lg transition-all duration-200">
-                    <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
-                        <WorkImage
-                          filename={certificate.work.filename}
-                          mimeType={certificate.work.mimeType}
-                          title={certificate.work.title}
-                          className="w-full h-full object-cover"
-                        />
+                  <motion.div
+                    key={certificate.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-500"
+                  >
+                    {/* Gradient Header */}
+                    <div className="h-32 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 relative">
+                      <div className="absolute inset-0 bg-black/20"></div>
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Certified
+                        </Badge>
                       </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-white truncate">{certificate.work.title}</h3>
-                          <Badge variant="secondary" className="bg-purple-500/20 text-purple-100 ml-2">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Certified
-                          </Badge>
-                        </div>
-                        
-                        <p className="text-sm text-gray-400 mb-2 line-clamp-2">
-                          {certificate.work.description || 'No description provided'}
-                        </p>
-                        
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(certificate.createdAt)}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3" />
-                            {certificate.work.mimeType.split('/')[0]}
-                          </div>
-                          <div className="flex items-center gap-1 text-green-400">
-                            <Shield className="h-3 w-3" />
-                            Blockchain Verified
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2 flex-wrap">
-                          <Button
-                            size="sm"
-                            onClick={() => handlePreviewWork(certificate)}
-                            className="bg-blue-600 hover:bg-blue-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Preview Work"
-                          >
-                            <Eye className="h-3 w-3" />
-                            Preview
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleDownloadCertificate(certificate)}
-                            className="bg-purple-600 hover:bg-purple-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Download Certificate PDF"
-                          >
-                            <Download className="h-3 w-3" />
-                            PDF
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="View Certificate"
-                          >
-                            <Eye className="h-3 w-3" />
-                            View
-                          </Button>
-                          {certificate.verificationProof && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                navigator.clipboard.writeText(certificate.verificationProof!);
-                                toast({
-                                  title: "Verification Proof Copied",
-                                  description: "Blockchain verification proof copied to clipboard.",
-                                });
-                              }}
-                              className="border-green-600 text-green-300 hover:bg-green-700/20 px-3 py-2 h-8 flex items-center gap-1"
-                              title="Copy Verification Proof"
-                            >
-                              <Shield className="h-3 w-3" />
-                              Copy Hash
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => window.open(certificate.shareableLink, '_blank')}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Share Certificate"
-                          >
-                            <Share2 className="h-3 w-3" />
-                            Share
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteWork(certificate)}
-                            className="border-red-600 text-red-300 hover:bg-red-700/20 px-3 py-2 h-8 flex items-center gap-1"
-                            title="Delete Work"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                            Delete
-                          </Button>
+                      <div className="absolute bottom-4 left-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/20 backdrop-blur-sm border border-white/30">
+                          <WorkImage
+                            filename={certificate.work.filename}
+                            mimeType={certificate.work.mimeType}
+                            title={certificate.work.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       </div>
                     </div>
-                  </Card>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate">
+                        {certificate.work.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4">
+                        {certificate.work.description || 'No description provided'}
+                      </p>
+
+                      {/* Stats Row */}
+                      <div className="flex items-center justify-between mb-6 text-xs">
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(certificate.createdAt)}
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <FileText className="w-3 h-3" />
+                          {certificate.work.mimeType.split('/')[0]}
+                        </div>
+                        <div className="flex items-center gap-1 text-green-500">
+                          <Shield className="w-3 h-3" />
+                          Verified
+                        </div>
+                      </div>
+
+                      {/* Primary Actions */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                          onClick={() => handlePreviewWork(certificate)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Preview
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                          onClick={() => handleDownloadCertificate(certificate)}
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          PDF
+                        </Button>
+                      </div>
+
+                      {/* Secondary Actions */}
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                          onClick={() => setLocation(`/certificate/${certificate.certificateId}`)}
+                        >
+                          <Eye className="w-3 h-3 mr-2" />
+                          View
+                        </Button>
+                        {certificate.verificationProof && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-green-600 border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-200"
+                            onClick={() => {
+                              navigator.clipboard.writeText(certificate.verificationProof!);
+                              toast({
+                                title: "Verification Proof Copied",
+                                description: "Blockchain verification proof copied to clipboard.",
+                              });
+                            }}
+                          >
+                            <Copy className="w-3 h-3 mr-2" />
+                            Copy Hash
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Final Actions */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-blue-600 border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
+                          onClick={() => window.open(certificate.shareableLink, '_blank')}
+                        >
+                          <Share className="w-3 h-3 mr-2" />
+                          Share
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+                          onClick={() => handleDeleteWork(certificate)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Hover Effect Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -810,90 +835,173 @@ export default function StudioUnified() {
         )}
       </AnimatePresence>
 
-      {/* Work Preview Modal */}
+      {/* Work Preview Modal - Cute Pink Theme */}
       <AnimatePresence>
         {showPreview.show && showPreview.certificate && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 pt-20"
+            className="fixed inset-0 bg-pink-900/20 backdrop-blur-md z-[9999] flex items-center justify-center p-4 pt-20"
+            onClick={() => setShowPreview({ show: false, certificate: null })}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4"
+              initial={{ scale: 0.9, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 50 }}
+              className="w-full max-w-5xl max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
             >
-              <Button
-                onClick={() => setShowPreview({ show: false, certificate: null })}
-                className="absolute top-4 right-4 bg-gray-600 hover:bg-gray-700 p-2 h-8 w-8"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Work Preview</h2>
-                <h3 className="text-lg text-gray-300">{showPreview.certificate.work.title}</h3>
-              </div>
+              {/* Cute Pink Modal */}
+              <div className="bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 dark:from-gray-900 dark:via-pink-900/20 dark:to-gray-800 rounded-3xl shadow-2xl border border-pink-200/50 dark:border-pink-500/20 p-8 relative overflow-hidden">
+                
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-300 via-rose-300 to-pink-400"></div>
+                <div className="absolute -top-10 -right-10 w-20 h-20 bg-pink-200/30 rounded-full blur-xl"></div>
+                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-rose-200/20 rounded-full blur-xl"></div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Preview */}
-                <div className="space-y-4 flex flex-col items-center">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
-                    <div className="flex items-center justify-center w-full h-full">
+                {/* Close Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPreview({ show: false, certificate: null })}
+                  className="absolute top-6 right-6 h-10 w-10 p-0 text-pink-400 hover:text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-full z-10"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-pink-200 to-rose-200 dark:from-pink-800/30 dark:to-rose-800/30 rounded-full mb-4">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-white shadow-md">
                       <WorkImage
                         filename={showPreview.certificate.work.filename}
                         mimeType={showPreview.certificate.work.mimeType}
                         title={showPreview.certificate.work.title}
-                        className="max-w-full max-h-[400px] object-contain rounded-lg mx-auto"
+                        className="w-full h-full object-cover"
                       />
                     </div>
+                    <h2 className="text-xl font-bold text-pink-900 dark:text-pink-100">Work Preview</h2>
                   </div>
-                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md w-full">
-                    <div className="text-center space-y-2">
-                      <div className="text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white">Original Name: </span>
-                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white">File Type: </span>
-                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white">Size: </span>
-                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
-                      </div>
-                    </div>
-                  </div>
+                  <h3 className="text-2xl font-bold text-pink-800 dark:text-pink-200 mb-2">{showPreview.certificate.work.title}</h3>
+                  <p className="text-pink-600 dark:text-pink-300">{showPreview.certificate.work.description || 'No description provided'}</p>
                 </div>
 
-                {/* File Information */}
-                <div className="space-y-4">
-                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
-                    <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">File Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="font-bold text-gray-900 dark:text-white">Original Name:</span>
-                        <p className="text-gray-700 dark:text-gray-300 break-all bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{showPreview.certificate.work.originalName}</p>
+                {/* Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-h-[60vh] overflow-auto">
+                  
+                  {/* Image Preview */}
+                  <div className="space-y-6">
+                    {/* Main Image Display */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-pink-200/50 dark:border-pink-500/20">
+                      <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-8 min-h-[300px] flex items-center justify-center border-2 border-dashed border-pink-300 dark:border-pink-500/30">
+                        <WorkImage
+                          filename={showPreview.certificate.work.filename}
+                          mimeType={showPreview.certificate.work.mimeType}
+                          title={showPreview.certificate.work.title}
+                          className="max-w-full max-h-[250px] object-contain rounded-lg shadow-md"
+                        />
                       </div>
-                      <div>
-                        <span className="font-bold text-gray-900 dark:text-white">Type:</span>
-                        <p className="text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{showPreview.certificate.work.mimeType}</p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-gray-900 dark:text-white">Size:</span>
-                        <p className="text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded mt-1">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</p>
+                      
+                      {/* File Info Below Image - MOVED OUTSIDE THE IMAGE CONTAINER */}
+                      <div className="mt-6 bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+                        <div className="text-center space-y-2">
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">Original Name: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">File Type: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">Size: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
-                    <BlockchainVerificationGuide
-                      blockchainHash={showPreview.certificate.work.blockchainHash || ''}
-                      fileHash={showPreview.certificate.work.fileHash}
-                      verificationProof={showPreview.certificate.verificationProof}
-                    />
+                  {/* Info Sidebar */}
+                  <div className="space-y-6">
+                    
+                    {/* File Information Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-pink-200/50 dark:border-pink-500/20">
+                      <h4 className="text-lg font-bold text-pink-800 dark:text-pink-200 mb-4 flex items-center gap-2">
+                        <div className="w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center">
+                          <FileText className="w-3 h-3 text-white" />
+                        </div>
+                        File Information
+                      </h4>
+                      <div className="space-y-4 text-sm">
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Original Name:</span>
+                          <span className="text-gray-900 dark:text-white font-mono text-xs break-all max-w-[60%] text-right bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-rose-200 dark:border-rose-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Type:</span>
+                          <span className="text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-600 rounded-lg shadow-md">
+                          <span className="text-gray-900 dark:text-white font-bold">Size:</span>
+                          <span className="text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / 1024).toFixed(2)} KB</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Blockchain Verification Guide */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-pink-200/50 dark:border-pink-500/20">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-white" />
+                        </div>
+                        <h4 className="text-lg font-bold text-pink-800 dark:text-pink-200">Blockchain Verification Guide</h4>
+                      </div>
+
+                      {/* Tabs */}
+                      <div className="flex gap-1 mb-6 p-1 bg-pink-100 dark:bg-pink-900/30 rounded-xl">
+                        <button className="flex-1 px-3 py-2 text-xs font-medium bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg shadow-sm">
+                          How It Works
+                        </button>
+                        <button className="flex-1 px-3 py-2 text-xs font-medium text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30 rounded-lg transition-colors">
+                          Verify Your Proof
+                        </button>
+                        <button className="flex-1 px-3 py-2 text-xs font-medium text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30 rounded-lg transition-colors">
+                          Verification Tools
+                        </button>
+                      </div>
+
+                      {/* Content */}
+                      <div className="space-y-4">
+                        <div className="bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-500 rounded-xl p-6 shadow-lg">
+                          <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Real Blockchain Timestamping</h5>
+                          <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
+                            Your work is protected using <strong className="text-blue-600 dark:text-blue-400">OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
+                          </p>
+                          <div className="space-y-3 text-sm">
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-gray-900 dark:text-white font-semibold block mb-2">Your file's SHA-256 hash:</span>
+                                <div className="p-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                  <span className="text-purple-700 dark:text-purple-300 font-mono text-xs break-all">{showPreview.certificate.work.fileHash}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                              <span className="text-gray-900 dark:text-white font-semibold">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                              <span className="text-gray-900 dark:text-white font-semibold">Verifiable through multiple calendar servers and block explorers</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>

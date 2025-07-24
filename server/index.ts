@@ -1,51 +1,57 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { createServer } from "http";
+import session from "express-session";
+import ConnectPgSimple from "connect-pg-simple";
+import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { pool } from "./db.js";
+import { registerRoutes } from "./routes.js";
 
 const app = express();
 
-// Enable trust proxy for Replit environment
+// Enable trust proxy for production deployments
 app.set('trust proxy', 1);
+
+// CORS Configuration for separate frontend hosting
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || ['https://your-frontend-domain.com']
+    : ['http://localhost:3000', 'http://localhost:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+};
+
+app.use(cors(corsOptions));
 
 // Security Headers
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:", "https:"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Required for Vite dev
-      mediaSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
-    },
-  },
-  crossOriginEmbedderPolicy: false, // Required for some file operations
+  contentSecurityPolicy: false, // Disable CSP for API-only server
+  crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
 // Rate Limiting
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100,
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // limit each IP to 20 auth requests per windowMs (more reasonable for development)
+  windowMs: 15 * 60 * 1000,
+  max: 20,
   message: "Too many authentication attempts, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // Don't count successful logins toward the limit
+  skipSuccessfulRequests: true,
 });
 
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // limit each IP to 20 uploads per hour
+  windowMs: 60 * 60 * 1000,
+  max: 20,
   message: "Too many upload attempts, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -58,27 +64,58 @@ app.use('/api/works', uploadLimiter);
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ extended: false, limit: '500mb' }));
 
+// Session configuration
+const PgSession = ConnectPgSimple(session);
+
+app.use(session({
+  store: new PgSession({
+    pool: pool,
+    tableName: 'session',
+    createTableIfMissing: true,
+  }),
+  secret: process.env.SESSION_SECRET || 'development-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  },
+}));
+
 (async () => {
   const server = await registerRoutes(app);
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the API routes
-  if (app.get("env") === "development") {
+  // Set up Vite middleware for development
+  if (process.env.NODE_ENV === 'development') {
+    const { setupVite } = await import('./vite.js');
     await setupVite(app, server);
+    console.log('🎨 Vite development server configured');
   } else {
+    // In production, serve static files
+    const { serveStatic } = await import('./vite.js');
     serveStatic(app);
+    console.log('📁 Static files configured for production');
   }
+
+  // Health check endpoint
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  });
 
   // Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('Global error handler:', err);
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     res.status(status).json({ error: message });
   });
 
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
+  const PORT = parseInt(process.env.PORT || '5000');
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Backend server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔒 CORS origins: ${JSON.stringify(corsOptions.origin)}`);
   });
-})();
+})().catch(console.error);

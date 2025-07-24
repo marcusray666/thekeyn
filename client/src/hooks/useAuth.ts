@@ -9,10 +9,13 @@ export function useAuth() {
     gcTime: 0, // Don't cache (updated from cacheTime in v5)
   });
 
+  // Debug log to trace authentication state
+  console.log('useAuth:', { user: !!user, isLoading, error: !!error });
+
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !error,
     error,
   };
 }

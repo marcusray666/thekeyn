@@ -38,14 +38,13 @@ loggin-platform/
 ├── 📚 Documentation/
 │   ├── DEPLOYMENT_GUIDE.md       # Complete deployment instructions
 │   ├── PROJECT_STRUCTURE.md      # This file
-│   └── replit.md                 # Project history & architecture
+│   └── ARCHITECTURE.md           # Project history & architecture
 │
-└── 📱 Legacy Files/               # Original unified structure
-    ├── client/                   # Original frontend (now in frontend/)
-    ├── server/                   # Original backend (now in backend/src/)
-    ├── android/                  # Mobile app configuration
-    ├── ios/                      # Mobile app configuration
-    └── package.json              # Original unified dependencies
+└── 🔧 Development Files/         # Development environment files
+    ├── server/                   # Development server (copy of backend/src/)
+    ├── shared/                   # Development shared types (copy of backend/shared/)
+    ├── uploads/                  # File uploads directory
+    └── package.json              # Unified development dependencies
 ```
 
 ## 🚀 Deployment Ready
@@ -75,7 +74,7 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_live_your_key
 DATABASE_URL=postgresql://username:password@host:port/database
 SESSION_SECRET=your-secret-key
 STRIPE_SECRET_KEY=sk_live_your_key
-OPENAI_API_KEY=your-openai-key
+
 FRONTEND_URL=https://your-frontend-domain.com
 ```
 
