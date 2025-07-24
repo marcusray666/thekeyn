@@ -780,6 +780,27 @@ nav, .nav-glass {
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
 }
 
+/* Work Preview Modal - Prevent dark hover states */
+.work-preview-modal .glass-morphism:hover,
+.work-preview-modal .bg-gray-800:hover,
+.work-preview-modal .bg-gray-900:hover,
+.work-preview-modal .bg-gray-800\/50:hover {
+  background: rgba(75, 85, 99, 0.6) !important;
+  transform: none !important;
+}
+
+.work-preview-modal .bg-blue-500\/10:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+}
+
+.work-preview-modal .bg-green-500\/10:hover {
+  background: rgba(34, 197, 94, 0.15) !important;
+}
+
+.work-preview-modal .bg-purple-500\/10:hover {
+  background: rgba(168, 85, 247, 0.15) !important;
+}
+
 /* Loading animations */
 @keyframes shimmer {
   0% {

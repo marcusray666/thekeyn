@@ -823,7 +823,7 @@ export default function StudioUnified() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4"
+              className="work-preview-modal glass-morphism p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4"
             >
               <Button
                 onClick={() => setShowPreview({ show: false, certificate: null })}
