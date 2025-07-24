@@ -940,6 +940,38 @@ nav, .nav-glass {
   box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.08) !important;
 }
 
+/* Ultimate light theme fix - target all possible Tailwind classes */
+.light-theme .work-preview-modal .bg-gray-800\/50,
+.light-theme .work-preview-modal .bg-gray-800,
+.light-theme .work-preview-modal .bg-gray-900,
+.light-theme .work-preview-modal .bg-blue-500\/10,
+.light-theme .work-preview-modal .bg-green-500\/10,
+.light-theme .work-preview-modal .bg-purple-500\/10 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light-theme .work-preview-modal .bg-gray-800\/50:hover,
+.light-theme .work-preview-modal .bg-gray-800:hover,
+.light-theme .work-preview-modal .bg-gray-900:hover,
+.light-theme .work-preview-modal .bg-blue-500\/10:hover,
+.light-theme .work-preview-modal .bg-green-500\/10:hover,
+.light-theme .work-preview-modal .bg-purple-500\/10:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Force override all dark colors in light theme modal */
+.light-theme .work-preview-modal [class*="bg-gray"],
+.light-theme .work-preview-modal [class*="bg-slate"],
+.light-theme .work-preview-modal [class*="bg-black"] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light-theme .work-preview-modal [class*="bg-gray"]:hover,
+.light-theme .work-preview-modal [class*="bg-slate"]:hover,
+.light-theme .work-preview-modal [class*="bg-black"]:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
 /* Loading animations */
 @keyframes shimmer {
   0% {
