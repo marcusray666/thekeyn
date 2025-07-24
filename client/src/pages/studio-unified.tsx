@@ -850,16 +850,21 @@ export default function StudioUnified() {
                       />
                     </div>
                   </div>
-                  <div className="text-center w-full">
-                    <p className="text-sm text-gray-400">
-                      Original Name: {showPreview.certificate.work.originalName}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      File Type: {showPreview.certificate.work.mimeType}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Size: {(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB
-                    </p>
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md w-full">
+                    <div className="text-center space-y-2">
+                      <div className="text-sm">
+                        <span className="font-bold text-gray-900 dark:text-white">Original Name: </span>
+                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-bold text-gray-900 dark:text-white">File Type: </span>
+                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-bold text-gray-900 dark:text-white">Size: </span>
+                        <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
