@@ -892,6 +892,7 @@ export default function StudioUnified() {
                   
                   {/* Image Preview */}
                   <div className="space-y-6">
+                    {/* Main Image Display */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-pink-200/50 dark:border-pink-500/20">
                       <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-8 min-h-[300px] flex items-center justify-center border-2 border-dashed border-pink-300 dark:border-pink-500/30">
                         <WorkImage
@@ -902,19 +903,21 @@ export default function StudioUnified() {
                         />
                       </div>
                       
-                      {/* File Details */}
-                      <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
-                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-pink-200 dark:border-pink-600 shadow-md">
-                          <p className="text-pink-700 dark:text-pink-300 font-bold mb-1">Original Name</p>
-                          <p className="text-gray-900 dark:text-white text-xs break-all font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{showPreview.certificate.work.originalName}</p>
-                        </div>
-                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-rose-200 dark:border-rose-600 shadow-md">
-                          <p className="text-rose-700 dark:text-rose-300 font-bold mb-1">File Type</p>
-                          <p className="text-gray-900 dark:text-white text-xs font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{showPreview.certificate.work.mimeType}</p>
-                        </div>
-                        <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-xl border border-pink-200 dark:border-pink-600 shadow-md">
-                          <p className="text-pink-700 dark:text-pink-300 font-bold mb-1">File Size</p>
-                          <p className="text-gray-900 dark:text-white text-xs font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</p>
+                      {/* File Info Below Image - MOVED OUTSIDE THE IMAGE CONTAINER */}
+                      <div className="mt-6 bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+                        <div className="text-center space-y-2">
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">Original Name: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.originalName}</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">File Type: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{showPreview.certificate.work.mimeType}</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-bold text-gray-900 dark:text-white">Size: </span>
+                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{(showPreview.certificate.work.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
+                          </div>
                         </div>
                       </div>
                     </div>
