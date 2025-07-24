@@ -93,10 +93,10 @@ export function BlockchainVerificationGuide({
             </div>
           </div>
 
-          <div className="bg-gray-800/50 rounded-lg p-4">
+          <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/60 transition-colors">
             <h4 className="text-white font-medium mb-3">Your Blockchain Verification Hash</h4>
             <div className="relative">
-              <div className="bg-gray-900 p-3 rounded font-mono text-xs break-all pr-10">
+              <div className="bg-gray-900 p-3 rounded font-mono text-xs break-all pr-10 hover:bg-gray-800 transition-colors">
                 <span className="text-green-400">{blockchainHash}</span>
               </div>
               <Button
@@ -123,7 +123,7 @@ export function BlockchainVerificationGuide({
               <div>
                 <span className="text-gray-400 block mb-2">OpenTimestamps Commitment:</span>
                 <div className="relative">
-                  <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.blockchainAnchor}</div>
+                  <div className="text-white bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10 hover:bg-gray-700 transition-colors">{proofData.blockchainAnchor}</div>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -137,12 +137,12 @@ export function BlockchainVerificationGuide({
               </div>
               <div>
                 <span className="text-gray-400 block mb-2">Timestamp Created:</span>
-                <p className="text-white bg-gray-800 px-3 py-2 rounded">{new Date(proofData.timestamp).toLocaleString()}</p>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded hover:bg-gray-700 transition-colors">{new Date(proofData.timestamp).toLocaleString()}</p>
                 <p className="text-gray-500 text-xs mt-1">When your file was first timestamped</p>
               </div>
               <div>
                 <span className="text-gray-400 block mb-2">Verification Status:</span>
-                <div className="bg-gray-800 px-3 py-2 rounded">
+                <div className="bg-gray-800 px-3 py-2 rounded hover:bg-gray-700 transition-colors">
                   {proofData.isRealBlockchain ? (
                     <span className="text-green-400">✓ Anchored to blockchain - fully verifiable</span>
                   ) : (
@@ -152,12 +152,12 @@ export function BlockchainVerificationGuide({
               </div>
               <div>
                 <span className="text-gray-400 block mb-2">Creator:</span>
-                <p className="text-white bg-gray-800 px-3 py-2 rounded">{proofData.creator}</p>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded hover:bg-gray-700 transition-colors">{proofData.creator}</p>
               </div>
               <div>
                 <span className="text-gray-400 block mb-2">File Hash:</span>
                 <div className="relative">
-                  <div className="text-purple-400 bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10">{proofData.fileHash}</div>
+                  <div className="text-purple-400 bg-gray-800 px-3 py-2 rounded font-mono text-xs break-all pr-10 hover:bg-gray-700 transition-colors">{proofData.fileHash}</div>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -178,7 +178,7 @@ export function BlockchainVerificationGuide({
           <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
             <h4 className="text-purple-400 font-medium mb-3">Verification Tools</h4>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded hover:bg-gray-800/60 transition-colors">
                 <div>
                   <p className="text-white font-medium">OpenTimestamps Verification</p>
                   <p className="text-gray-400 text-sm">Official timestamp verification tool</p>
@@ -193,7 +193,7 @@ export function BlockchainVerificationGuide({
                 </Button>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded hover:bg-gray-800/60 transition-colors">
                 <div>
                   <p className="text-white font-medium">SHA-256 Hash Calculator</p>
                   <p className="text-gray-400 text-sm">Verify your file's hash independently</p>

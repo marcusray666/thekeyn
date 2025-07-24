@@ -865,7 +865,7 @@ export default function StudioUnified() {
 
                 {/* File Information */}
                 <div className="space-y-4">
-                  <div className="glass-morphism p-4 rounded-lg">
+                  <div className="glass-morphism p-4 rounded-lg hover:bg-white/5 transition-colors">
                     <h4 className="text-lg font-semibold text-white mb-3">File Information</h4>
                     <div className="space-y-2 text-sm">
                       <div>
