@@ -819,39 +819,92 @@ export default function StudioUnified() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="work-preview-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 pt-20"
-            style={{ pointerEvents: 'auto' }}
-            onMouseOver={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px',
+              paddingTop: '80px'
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="work-preview-modal-content p-6 max-w-4xl max-h-[85vh] overflow-auto mx-4 relative mt-4 rounded-lg"
               style={{
-                backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(31, 41, 55, 0.95)',
-                backdropFilter: 'blur(16px)',
-                border: theme === 'light' ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(75, 85, 99, 0.3)',
-                boxShadow: theme === 'light' ? '0 8px 32px 0 rgba(0, 0, 0, 0.1)' : '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
-                pointerEvents: 'auto',
-                color: theme === 'light' ? '#1a1a1a' : '#ffffff',
+                backgroundColor: theme === 'light' ? '#ffffff' : '#374151',
+                border: theme === 'light' ? '1px solid #e5e7eb' : '1px solid #4b5563',
+                borderRadius: '12px',
+                padding: '24px',
+                maxWidth: '64rem',
+                maxHeight: '85vh',
+                overflow: 'auto',
+                margin: '0 16px',
+                position: 'relative',
+                marginTop: '16px',
+                boxShadow: theme === 'light' ? '0 8px 32px rgba(0,0,0,0.1)' : '0 8px 32px rgba(0,0,0,0.5)',
+                color: theme === 'light' ? '#111827' : '#f9fafb'
               }}
-              onMouseOver={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
-              <Button
+              <button
                 onClick={() => setShowPreview({ show: false, certificate: null })}
-                className="absolute top-4 right-4 bg-gray-600 hover:bg-gray-700 p-2 h-8 w-8"
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  width: '32px',
+                  height: '32px',
+                  padding: 0,
+                  backgroundColor: theme === 'light' ? '#e5e7eb' : '#4b5563',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: theme === 'light' ? '#374151' : '#f9fafb'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'light' ? '#d1d5db' : '#6b7280';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'light' ? '#e5e7eb' : '#4b5563';
+                }}
               >
-                <X className="h-4 w-4" />
-              </Button>
+                <X style={{ width: '16px', height: '16px' }} />
+              </button>
               
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: theme === 'light' ? '#1a1a1a' : '#ffffff' }}>Work Preview</h2>
-                <h3 className="text-lg" style={{ color: theme === 'light' ? '#4b5563' : '#d1d5db' }}>{showPreview.certificate.work.title}</h3>
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <h2 style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: 'bold', 
+                  marginBottom: '8px',
+                  color: theme === 'light' ? '#111827' : '#f9fafb'
+                }}>
+                  Work Preview
+                </h2>
+                <h3 style={{ 
+                  fontSize: '1.125rem',
+                  color: theme === 'light' ? '#4b5563' : '#d1d5db'
+                }}>
+                  {showPreview.certificate.work.title}
+                </h3>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+                gap: '24px' 
+              }}>
                 {/* Preview */}
                 <div className="space-y-4 flex flex-col items-center">
                   <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600 min-h-[300px] w-full flex items-center justify-center">
