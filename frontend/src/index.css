@@ -839,6 +839,74 @@ nav, .nav-glass {
   color: rgb(156 163 175) !important;
 }
 
+/* Light theme specific fixes for work preview modal */
+.light-theme .work-preview-modal,
+.light-theme .work-preview-modal * {
+  transition: none !important;
+}
+
+.light-theme .work-preview-modal .glass-morphism:hover,
+.light-theme .work-preview-modal .glass-morphism:hover *,
+.light-theme .work-preview-modal [class*="bg-"]:hover,
+.light-theme .work-preview-modal div:hover,
+.light-theme .work-preview-modal p:hover,
+.light-theme .work-preview-modal span:hover,
+.light-theme .work-preview-modal h1:hover,
+.light-theme .work-preview-modal h2:hover,
+.light-theme .work-preview-modal h3:hover,
+.light-theme .work-preview-modal h4:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Light theme specific background preservation */
+.light-theme .work-preview-modal .bg-gray-800:hover {
+  background-color: rgb(31 41 59) !important;
+}
+
+.light-theme .work-preview-modal .bg-gray-900:hover {
+  background-color: rgb(15 23 42) !important;
+}
+
+.light-theme .work-preview-modal .bg-blue-500\/10:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.light-theme .work-preview-modal .bg-green-500\/10:hover {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.light-theme .work-preview-modal .bg-purple-500\/10:hover {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Light theme text color preservation */
+.light-theme .work-preview-modal .text-white:hover {
+  color: #1a1a1a !important;
+}
+
+.light-theme .work-preview-modal .text-gray-300:hover {
+  color: #4b5563 !important;
+}
+
+.light-theme .work-preview-modal .text-gray-400:hover {
+  color: #6b7280 !important;
+}
+
+.light-theme .work-preview-modal .text-blue-400:hover {
+  color: #2563eb !important;
+}
+
+.light-theme .work-preview-modal .text-green-400:hover {
+  color: #16a34a !important;
+}
+
+.light-theme .work-preview-modal .text-purple-400:hover {
+  color: #7c3aed !important;
+}
+
 /* Loading animations */
 @keyframes shimmer {
   0% {
