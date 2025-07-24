@@ -322,14 +322,14 @@ export function Navigation() {
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
                       className="flex items-center w-full py-2 px-2 rounded-sm transition-colors cursor-pointer"
-                      style={{ color: 'rgb(248, 113, 113)' }}
+                      style={{ color: 'rgb(229, 231, 235)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.2)';
-                        e.currentTarget.style.color = 'rgb(252, 165, 165)';
+                        e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                        e.currentTarget.style.color = 'white';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'rgb(248, 113, 113)';
+                        e.currentTarget.style.color = 'rgb(229, 231, 235)';
                       }}
                     >
                       <LogOut className="mr-3 h-4 w-4" />
