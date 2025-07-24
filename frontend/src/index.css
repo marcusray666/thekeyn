@@ -780,25 +780,63 @@ nav, .nav-glass {
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
 }
 
-/* Work Preview Modal - Prevent dark hover states */
+/* Work Preview Modal - Completely prevent dark hover states */
+.work-preview-modal,
+.work-preview-modal * {
+  transition: none !important;
+}
+
 .work-preview-modal .glass-morphism:hover,
-.work-preview-modal .bg-gray-800:hover,
-.work-preview-modal .bg-gray-900:hover,
-.work-preview-modal .bg-gray-800\/50:hover {
-  background: rgba(75, 85, 99, 0.6) !important;
+.work-preview-modal .glass-morphism:hover *,
+.work-preview-modal [class*="bg-gray"]:hover,
+.work-preview-modal [class*="bg-blue"]:hover,
+.work-preview-modal [class*="bg-green"]:hover,
+.work-preview-modal [class*="bg-purple"]:hover,
+.work-preview-modal div:hover,
+.work-preview-modal p:hover,
+.work-preview-modal span:hover,
+.work-preview-modal h1:hover,
+.work-preview-modal h2:hover,
+.work-preview-modal h3:hover,
+.work-preview-modal h4:hover {
+  background-color: inherit !important;
+  color: inherit !important;
   transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Specific overrides for known problematic elements */
+.work-preview-modal .bg-gray-800:hover {
+  background-color: rgb(31 41 59) !important;
+}
+
+.work-preview-modal .bg-gray-900:hover {
+  background-color: rgb(15 23 42) !important;
 }
 
 .work-preview-modal .bg-blue-500\/10:hover {
-  background: rgba(59, 130, 246, 0.15) !important;
+  background-color: rgba(59, 130, 246, 0.1) !important;
 }
 
 .work-preview-modal .bg-green-500\/10:hover {
-  background: rgba(34, 197, 94, 0.15) !important;
+  background-color: rgba(34, 197, 94, 0.1) !important;
 }
 
 .work-preview-modal .bg-purple-500\/10:hover {
-  background: rgba(168, 85, 247, 0.15) !important;
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Ensure text remains visible */
+.work-preview-modal .text-white:hover {
+  color: white !important;
+}
+
+.work-preview-modal .text-gray-300:hover {
+  color: rgb(209 213 219) !important;
+}
+
+.work-preview-modal .text-gray-400:hover {
+  color: rgb(156 163 175) !important;
 }
 
 /* Loading animations */
