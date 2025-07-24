@@ -24,6 +24,7 @@ import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
 import Security from "@/pages/security";
 import Profile from "@/pages/profile";
+import CertificateGuide from "@/pages/certificate-guide";
 
 import NFTMinting from "@/pages/nft-minting";
 import NFTStudio from "@/pages/nft-studio";
@@ -103,6 +104,7 @@ function Router() {
           <Route path="/followers" component={Followers} />
           <Route path="/settings" component={Settings} />
           <Route path="/security" component={Security} />
+          <Route path="/certificate-guide" component={CertificateGuide} />
           <Route path="/report-theft" component={ReportTheft} />
           <Route path="/profile/:username" component={Profile} />
         </>

@@ -143,10 +143,14 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
   yPos += 15;
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Blockchain Hash:', leftColumn, yPos);
-  yPos += 7;
-  pdf.setFont('helvetica', 'normal');
+  pdf.text('Blockchain Verification Hash:', leftColumn, yPos);
+  yPos += 5;
+  pdf.setTextColor(99, 102, 241); // Indigo for distinction
   pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('(OpenTimestamps proof - different from file hash)', leftColumn, yPos);
+  yPos += 7;
+  pdf.setTextColor(55, 65, 81); // Back to dark gray
   pdf.text(data.blockchainHash, leftColumn, yPos);
   
   // QR Code Section

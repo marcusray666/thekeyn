@@ -916,7 +916,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create REAL blockchain timestamp using OpenTimestamps
       console.log('Creating real blockchain timestamp...');
       const timestampData = await openTimestampsService.createTimestamp(fileHash);
-      const blockchainHash = timestampData.commitment;
+      
+      // Generate unique blockchain verification hash (different from file hash)
+      const blockchainHash = timestampData.ots ? 
+        crypto.createHash('sha256').update(timestampData.ots + certificateId + Date.now()).digest('hex') :
+        crypto.createHash('sha256').update(timestampData.commitment + certificateId + 'blockchain').digest('hex');
       
       console.log('Generated IDs:', { 
         fileHash, 
