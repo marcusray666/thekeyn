@@ -37,9 +37,10 @@ if (stripeKey && stripeKey.trim().length > 0) {
   try {
     // Validate Stripe key format
     if (!stripeKey.startsWith('sk_test_') && !stripeKey.startsWith('sk_live_')) {
-      console.log("⚠️ Stripe key format invalid. Using test mode placeholder.");
-      // Use a minimal valid test key for development
-      stripe = new Stripe('sk_test_51234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890', {
+      console.log("⚠️ Stripe key format invalid - found publishable key (pk_) instead of secret key (sk_)");
+      console.log("🔄 Using development placeholder - payment features disabled");
+      // Use a valid test secret key for development
+      stripe = new Stripe('sk_test_51H123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890', {
         apiVersion: "2024-06-20",
       });
     } else {
