@@ -1,10 +1,9 @@
 services:
   - type: web
     name: loggin-backend
-    env: node
+    env: docker
     plan: starter
-    buildCommand: echo "Build complete - no compilation needed"
-    startCommand: npx tsx src/index.ts
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
