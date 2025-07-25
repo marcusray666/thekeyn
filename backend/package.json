@@ -4,8 +4,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "echo 'Build complete - using tsx for direct TypeScript execution' && mkdir -p uploads",
-    "start": "NODE_ENV=production node --loader tsx/esm src/index.ts",
+    "build": "mkdir -p uploads && echo 'Build complete'",
+    "start": "NODE_ENV=production npx tsx src/index.ts",
     "dev": "NODE_ENV=development tsx src/index.ts",
     "db:push": "drizzle-kit push"
   },
