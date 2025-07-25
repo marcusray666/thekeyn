@@ -29,8 +29,9 @@ export async function apiRequest(
   url: string,
   options: RequestInit = {}
 ): Promise<any> {
-  // Use relative URLs so requests go to the same server
-  const fullUrl = url.startsWith('/') ? url : `/${url}`;
+  // Use backend URL from environment variable or default to production backend
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://loggin-64qr.onrender.com';
+  const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
   
   // Don't set Content-Type for FormData - let the browser set it automatically
   const headers: Record<string, string> = {};
@@ -66,7 +67,8 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
-    const fullUrl = url.startsWith('/') ? url : `/${url}`;
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://loggin-64qr.onrender.com';
+    const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
     
     const res = await fetch(fullUrl, {
       credentials: "include",
