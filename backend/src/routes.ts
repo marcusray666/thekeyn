@@ -23,10 +23,20 @@ import { contentModerationService } from "./services/content-moderation";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
+// Initialize Stripe (optional for deployment without payments)
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  try {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2024-06-20",
+    });
+    console.log("✅ Stripe initialized successfully");
+  } catch (error) {
+    console.log("⚠️ Stripe initialization failed:", error);
+  }
+} else {
+  console.log("⚠️ Stripe disabled (no STRIPE_SECRET_KEY provided)");
+}
 
 const MemStore = MemoryStore(session);
 
@@ -2761,6 +2771,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/subscription/create-checkout", requireAuth, async (req: any, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Stripe is not configured. Please contact support." 
+        });
+      }
+
       const userId = req.session.userId;
       const { tier } = req.body;
       
@@ -2864,6 +2881,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/subscription/cancel", requireAuth, async (req: any, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Stripe is not configured. Please contact support." 
+        });
+      }
+
       const userId = req.session.userId;
       const subscription = await storage.getUserSubscription(userId);
       
@@ -2890,6 +2914,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/subscription/reactivate", requireAuth, async (req: any, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Stripe is not configured. Please contact support." 
+        });
+      }
+
       const userId = req.session.userId;
       const subscription = await storage.getUserSubscription(userId);
       
@@ -2942,6 +2973,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Webhook endpoint for Stripe events
   app.post("/api/webhook/stripe", express.raw({type: 'application/json'}), async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ 
+        error: "Payment processing unavailable", 
+        message: "Stripe is not configured" 
+      });
+    }
+
     const sig = req.headers['stripe-signature'];
     let event;
     
