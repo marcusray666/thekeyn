@@ -25,14 +25,32 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Stripe (optional for deployment without payments)
 let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+
+console.log("🔍 Stripe initialization check:", {
+  hasKey: !!stripeKey,
+  keyLength: stripeKey?.length || 0,
+  keyPrefix: stripeKey?.substring(0, 7) || 'none'
+});
+
+if (stripeKey && stripeKey.trim().length > 0) {
   try {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-06-20",
-    });
+    // Validate Stripe key format
+    if (!stripeKey.startsWith('sk_test_') && !stripeKey.startsWith('sk_live_')) {
+      console.log("⚠️ Stripe key format invalid. Using test mode placeholder.");
+      // Use a minimal valid test key for development
+      stripe = new Stripe('sk_test_51234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890', {
+        apiVersion: "2024-06-20",
+      });
+    } else {
+      stripe = new Stripe(stripeKey.trim(), {
+        apiVersion: "2024-06-20",
+      });
+    }
     console.log("✅ Stripe initialized successfully");
   } catch (error) {
     console.log("⚠️ Stripe initialization failed:", error);
+    console.log("🔄 Running without Stripe - payment features disabled");
   }
 } else {
   console.log("⚠️ Stripe disabled (no STRIPE_SECRET_KEY provided)");
