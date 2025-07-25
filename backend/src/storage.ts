@@ -14,7 +14,7 @@ import {
   type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
   type VerificationAuditLog, type InsertVerificationAuditLog,
   type Conversation, type InsertConversation, type Message, type InsertMessage
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { db } from "./db";
 import { eq, desc, and, gte, sql, ne, isNull, ilike, or } from "drizzle-orm";
 import { nanoid } from "nanoid";

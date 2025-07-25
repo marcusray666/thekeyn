@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
-import { works } from '@shared/schema';
+import { works } from '../../shared/schema.js';
 import { 
   ipfsUploads, 
   nftMetadata, 
@@ -12,7 +12,7 @@ import {
   insertBlockchainTransactionSchema,
   insertNftTokenSchema,
   type NFTMintRequest 
-} from '@shared/blockchain-schema';
+} from '../../shared/blockchain-schema.js';
 import { IPFSService } from '../services/ipfs-service';
 import { BlockchainService } from '../services/blockchain-service';
 import { readFile } from 'fs/promises';

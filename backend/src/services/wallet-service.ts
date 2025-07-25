@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import crypto from 'crypto';
 import { db } from '../db';
-import { users } from '@shared/schema';
+import { users } from '../../shared/schema.js';
 import { eq } from 'drizzle-orm';
 
 // Service for managing user wallets automatically

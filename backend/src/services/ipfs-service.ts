@@ -2,7 +2,7 @@ import { create } from 'ipfs-http-client';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
-import type { IPFSUploadResponse } from '@shared/blockchain-schema';
+import type { IPFSUploadResponse } from '../../shared/blockchain-schema.js';
 
 // IPFS service class for handling decentralized storage
 export class IPFSService {

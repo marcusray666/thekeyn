@@ -12,7 +12,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
-import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
+import { loginSchema, registerSchema, insertWorkSchema } from "../shared/schema.js";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";

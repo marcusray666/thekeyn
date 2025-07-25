@@ -6,7 +6,7 @@ import type {
   BlockchainNetwork,
   InsertBlockchainTransaction,
   InsertNftToken 
-} from '@shared/blockchain-schema';
+} from '../../shared/blockchain-schema.js';
 
 // Smart contract ABI for ERC-721 NFT minting
 const NFT_CONTRACT_ABI = [
