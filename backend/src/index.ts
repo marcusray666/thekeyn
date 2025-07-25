@@ -16,8 +16,14 @@ app.set('trust proxy', 1);
 // CORS Configuration for separate frontend hosting
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || ['https://your-frontend-domain.com']
-    : ['http://localhost:3000', 'http://localhost:5173'],
+    ? [
+        process.env.FRONTEND_URL,
+        // Add patterns for common hosting services
+        /https:\/\/.*\.vercel\.app$/,
+        /https:\/\/.*\.netlify\.app$/,
+        /https:\/\/.*\.pages\.dev$/
+      ].filter(Boolean)
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
@@ -87,6 +93,9 @@ app.use(session({
 (async () => {
   const server = await registerRoutes(app);
 
+  // This is a pure API backend server
+  // Frontend is deployed separately
+
   // Health check endpoint
   app.get('/health', (_req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
@@ -100,7 +109,7 @@ app.use(session({
     res.status(status).json({ error: message });
   });
 
-  const PORT = process.env.PORT || 5000;
+  const PORT = parseInt(process.env.PORT || '5000');
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Backend server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
