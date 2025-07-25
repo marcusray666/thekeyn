@@ -1,0 +1,126 @@
+[23:03:25.139] Running build in Washington, D.C., USA (East) – iad1
+[23:03:25.139] Build machine configuration: 2 cores, 8 GB
+[23:03:25.158] Cloning github.com/marcusray666/loggin (Branch: main, Commit: 262dd2d)
+[23:03:25.187] Skipping build cache, deployment was triggered without cache.
+[23:03:36.059] Cloning completed: 10.901s
+[23:03:38.711] Running "vercel build"
+[23:03:39.196] Vercel CLI 44.5.0
+[23:03:39.843] Installing dependencies...
+[23:03:44.721] npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+[23:03:45.573] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[23:03:45.612] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[23:03:53.209] 
+[23:03:53.209] added 694 packages in 13s
+[23:03:53.210] 
+[23:03:53.210] 89 packages are looking for funding
+[23:03:53.210]   run `npm fund` for details
+[23:03:53.291] Running "npm run build"
+[23:03:53.454] 
+[23:03:53.455] > rest-express@1.0.0 build
+[23:03:53.455] > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[23:03:53.455] 
+[23:03:54.193] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[23:03:54.245] transforming...
+[23:03:54.507] Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+[23:03:54.507]   npx update-browserslist-db@latest
+[23:03:54.508]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[23:04:06.324] [32m✓[39m 3671 modules transformed.
+[23:04:07.273] rendering chunks...
+[23:04:07.975] computing gzip size...
+[23:04:08.032] [2m../dist/public/[22m[32mindex.html                               [39m[1m[2m    2.55 kB[22m[1m[22m[2m │ gzip:   1.02 kB[22m
+[23:04:08.033] [2m../dist/public/[22m[2massets/[22m[35mindex-DFmaFlEe.css                [39m[1m[2m  124.83 kB[22m[1m[22m[2m │ gzip:  20.21 kB[22m
+[23:04:08.034] [2m../dist/public/[22m[2massets/[22m[36mpurify.es-BFmuJLeH.js             [39m[1m[2m   21.93 kB[22m[1m[22m[2m │ gzip:   8.62 kB[22m
+[23:04:08.034] [2m../dist/public/[22m[2massets/[22m[36mindex.es-DsEJjsTn.js              [39m[1m[2m  150.58 kB[22m[1m[22m[2m │ gzip:  51.51 kB[22m
+[23:04:08.034] [2m../dist/public/[22m[2massets/[22m[36mhtml2canvas.esm-CBrSDip1.js       [39m[1m[2m  201.42 kB[22m[1m[22m[2m │ gzip:  48.03 kB[22m
+[23:04:08.035] [2m../dist/public/[22m[2massets/[22m[36mcertificateGenerator-CgxomNmH.js  [39m[1m[2m  385.17 kB[22m[1m[22m[2m │ gzip: 128.15 kB[22m
+[23:04:08.037] [2m../dist/public/[22m[2massets/[22m[36mindex-QojCLhMp.js                 [39m[1m[33m1,298.35 kB[39m[22m[2m │ gzip: 348.61 kB[22m
+[23:04:08.038] [33m
+[23:04:08.038] (!) Some chunks are larger than 500 kB after minification. Consider:
+[23:04:08.038] - Using dynamic import() to code-split the application
+[23:04:08.038] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[23:04:08.039] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[23:04:08.039] [32m✓ built in 13.82s[39m
+[23:04:08.103] ▲ [WARNING] Duplicate member "createEthereumBlockAnchor" in class body [duplicate-class-member]
+[23:04:08.103] 
+[23:04:08.103]     server/opentimestamps-service.ts:189:16:
+[23:04:08.103]       189 │   private async createEthereumBlockAnchor(fileHash: string): Prom...
+[23:04:08.104]           ╵                 ~~~~~~~~~~~~~~~~~~~~~~~~~
+[23:04:08.104] 
+[23:04:08.104]   The original member "createEthereumBlockAnchor" is here:
+[23:04:08.104] 
+[23:04:08.104]     server/opentimestamps-service.ts:115:16:
+[23:04:08.104]       115 │   private async createEthereumBlockAnchor(fileHash: string): Prom...
+[23:04:08.104]           ╵                 ~~~~~~~~~~~~~~~~~~~~~~~~~
+[23:04:08.104] 
+[23:04:08.108] ▲ [WARNING] Duplicate member "getUserWorks" in class body [duplicate-class-member]
+[23:04:08.108] 
+[23:04:08.109]     server/storage.ts:527:8:
+[23:04:08.109]       527 │   async getUserWorks(userId: number): Promise<Work[]> {
+[23:04:08.109]           ╵         ~~~~~~~~~~~~
+[23:04:08.109] 
+[23:04:08.109]   The original member "getUserWorks" is here:
+[23:04:08.109] 
+[23:04:08.109]     server/storage.ts:399:8:
+[23:04:08.109]       399 │   async getUserWorks(userId: number): Promise<Work[]> {
+[23:04:08.109]           ╵         ~~~~~~~~~~~~
+[23:04:08.109] 
+[23:04:08.109] ▲ [WARNING] Duplicate member "followUser" in class body [duplicate-class-member]
+[23:04:08.109] 
+[23:04:08.109]     server/storage.ts:810:8:
+[23:04:08.109]       810 │   async followUser(followerId: number, followingId: number): Prom...
+[23:04:08.109]           ╵         ~~~~~~~~~~
+[23:04:08.109] 
+[23:04:08.110]   The original member "followUser" is here:
+[23:04:08.110] 
+[23:04:08.110]     server/storage.ts:405:8:
+[23:04:08.110]       405 │   async followUser(followerId: number, followingId: number): Prom...
+[23:04:08.110]           ╵         ~~~~~~~~~~
+[23:04:08.110] 
+[23:04:08.121] ▲ [WARNING] Duplicate member "unfollowUser" in class body [duplicate-class-member]
+[23:04:08.121] 
+[23:04:08.121]     server/storage.ts:830:8:
+[23:04:08.121]       830 │   async unfollowUser(followerId: number, followingId: number): Pr...
+[23:04:08.121]           ╵         ~~~~~~~~~~~~
+[23:04:08.121] 
+[23:04:08.122]   The original member "unfollowUser" is here:
+[23:04:08.122] 
+[23:04:08.122]     server/storage.ts:413:8:
+[23:04:08.122]       413 │   async unfollowUser(followerId: number, followingId: number): Pr...
+[23:04:08.122]           ╵         ~~~~~~~~~~~~
+[23:04:08.122] 
+[23:04:08.122] ▲ [WARNING] Duplicate member "isFollowing" in class body [duplicate-class-member]
+[23:04:08.122] 
+[23:04:08.122]     server/storage.ts:850:8:
+[23:04:08.122]       850 │   async isFollowing(followerId: number, followingId: number): Pro...
+[23:04:08.122]           ╵         ~~~~~~~~~~~
+[23:04:08.127] 
+[23:04:08.127]   The original member "isFollowing" is here:
+[23:04:08.127] 
+[23:04:08.127]     server/storage.ts:418:8:
+[23:04:08.127]       418 │   async isFollowing(followerId: number, followingId: number): Pro...
+[23:04:08.127]           ╵         ~~~~~~~~~~~
+[23:04:08.127] 
+[23:04:08.127] ▲ [WARNING] Duplicate member "createNotification" in class body [duplicate-class-member]
+[23:04:08.127] 
+[23:04:08.128]     server/storage.ts:942:8:
+[23:04:08.128]       942 │   async createNotification(notification: InsertUserNotification):...
+[23:04:08.128]           ╵         ~~~~~~~~~~~~~~~~~~
+[23:04:08.128] 
+[23:04:08.128]   The original member "createNotification" is here:
+[23:04:08.128] 
+[23:04:08.128]     server/storage.ts:493:8:
+[23:04:08.128]       493 │   async createNotification(notification: Partial<InsertNotificati...
+[23:04:08.128]           ╵         ~~~~~~~~~~~~~~~~~~
+[23:04:08.128] 
+[23:04:08.128] 6 of 8 warnings shown (disable the message limit with --log-limit=0)
+[23:04:08.128] 
+[23:04:08.128]   dist/index.js  257.6kb
+[23:04:08.128] 
+[23:04:08.128] ⚡ Done in 30ms
+[23:04:08.322] Build Completed in /vercel/output [29s]
+[23:04:08.351] Deploying outputs...
+[23:04:10.161] 
+[23:04:10.295] Deployment completed
+[23:04:29.314] Uploading build cache [106.93 MB]...
+[23:04:31.039] Build cache uploaded: 1.725s
+[23:04:33.256] Exiting build container
