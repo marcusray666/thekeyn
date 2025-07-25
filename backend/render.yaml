@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: loggin-backend
+    env: node
+    plan: starter
+    buildCommand: echo "Build complete - no compilation needed"
+    startCommand: npx tsx src/index.ts
+    envVars:
+      - key: NODE_ENV
+        value: production
