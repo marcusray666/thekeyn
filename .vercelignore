@@ -1,0 +1,10 @@
+server/
+backend/
+uploads/
+.env
+*.log
+node_modules/
+dist/
+.replit
+*.md
+build.sh
