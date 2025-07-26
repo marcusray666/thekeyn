@@ -10,7 +10,7 @@ type ThemeProviderContext = {
 const ThemeProviderContext = createContext<ThemeProviderContext | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     // Load theme from localStorage on mount

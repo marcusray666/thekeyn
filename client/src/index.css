@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    /* Dark theme colors (default) */
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
+    /* Light theme colors (default for better visibility) */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
     --primary: 263.4 70% 50.4%;
     --primary-foreground: 210 20% 98%;
     --secondary: 215 27.9% 16.9%;
@@ -59,6 +59,12 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  /* Default light theme styling */
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
   }
 
   /* Dark theme styling */
