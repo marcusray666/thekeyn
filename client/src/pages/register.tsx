@@ -27,7 +27,7 @@ export default function Register() {
         body: JSON.stringify(data),
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast({
         title: "Account created!",
         description: "Welcome to Loggin. Your account has been created successfully.",

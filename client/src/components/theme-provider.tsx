@@ -27,11 +27,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     // Remove existing theme classes
     root.classList.remove("light", "dark");
-    body.classList.remove("light-theme", "dark-theme");
+    body.classList.remove("light", "dark");
     
     // Add new theme classes
     root.classList.add(theme);
-    body.classList.add(`${theme}-theme`);
+    body.classList.add(theme);
     
     // Save to localStorage
     localStorage.setItem("loggin-theme", theme);

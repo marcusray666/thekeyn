@@ -61,35 +61,27 @@
     @apply border-border;
   }
 
-  /* Default light theme styling */
+  /* Base body styling */
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  /* Light theme styling */
+  .light,
+  .light body,
+  .light #root {
+    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9);
+    color: #1a1a1a;
   }
 
   /* Dark theme styling */
-  .dark-theme,
-  .dark-theme body,
-  .dark-theme #root {
-    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
-    color: white !important;
-    min-height: 100vh;
-  }
-
-  /* Light theme styling - clean, bright interface */
-  .light-theme,
-  .light-theme body,
-  .light-theme #root {
-    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
-    color: #1a1a1a !important;
-    min-height: 100vh;
-  }
-
-  /* Default to dark theme */
-  body {
-    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
-    color: white !important;
-    min-height: 100vh;
+  .dark,
+  .dark body,
+  .dark #root {
+    background: linear-gradient(135deg, #1f2937, #111827, #1f2937);
+    color: white;
   }
   
   /* Disable iOS tap highlight for better mobile experience */
@@ -136,14 +128,26 @@
     transform: none !important;
   }
 
-  /* Fix for crooked/misaligned elements */
+  /* Glass morphism effects */
   .glass-morphism {
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(17, 25, 40, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+
+  .light .glass-morphism {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #1a1a1a;
+  }
+
+  .dark .glass-morphism {
+    background-color: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    color: white;
   }
 
   /* Ensure proper alignment for all fixed elements */
@@ -181,36 +185,6 @@
       -webkit-tap-highlight-color: transparent !important;
     }
   }
-}
-
-/* Glass morphism components */
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-}
-
-/* Light theme glass morphism - clean white cards with subtle shadows */
-.light-theme .glass-morphism {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.04);
-  position: relative;
-  z-index: 1;
-}
-
-/* Dark theme glass morphism - sophisticated dark cards */
-.dark-theme .glass-morphism {
-  background: rgba(30, 41, 59, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  position: relative;
-  z-index: 1;
 }
 
 /* Light theme inputs */
