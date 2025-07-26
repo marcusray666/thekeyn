@@ -43,24 +43,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 
 import NotFound from "@/pages/not-found";
 
-function AuthenticatedHome() {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  
-  // Debug log to see auth state
-  console.log('AuthenticatedHome:', { user: !!user, isAuthenticated, isLoading });
-  
-  // Show welcome page while loading or when not authenticated
-  if (isLoading || !isAuthenticated || !user) {
-    return <Welcome />;
-  }
-  
-  // For authenticated users, show their profile
-  return <Profile />;
-}
-
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
       {/* Public routes - accessible to everyone */}
@@ -68,38 +51,32 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
       
-      {/* Home route */}
-      <Route path="/">
-        <AuthenticatedHome />
-      </Route>
+      {/* Home route - always show Welcome for now */}
+      <Route path="/" component={Welcome} />
       
       {/* Protected routes */}
-      {isAuthenticated && (
-        <>
-          <Route path="/home" component={Home} />
-          <Route path="/dashboard" component={Home} />
-          <Route path="/studio" component={Studio} />
-          <Route path="/admin" component={AdminDashboard} />
-          <Route path="/admin-dashboard" component={AdminDashboard} />
-          <Route path="/certificates" component={MyCertificates} />
-          <Route path="/upload-work" component={AuthenticatedUpload} />
-          <Route path="/analytics" component={Analytics} />
-          <Route path="/bulk-operations" component={BulkOperations} />
+      <Route path="/home" component={Home} />
+      <Route path="/dashboard" component={Home} />
+      <Route path="/studio" component={Studio} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/certificates" component={MyCertificates} />
+      <Route path="/upload-work" component={AuthenticatedUpload} />
+      <Route path="/analytics" component={Analytics} />
+      <Route path="/bulk-operations" component={BulkOperations} />
 
-          <Route path="/nft-minting" component={NFTMinting} />
-          <Route path="/nft-studio" component={NFTStudio} />
-          <Route path="/nft-simple" component={SimplifiedNFT} />
-          <Route path="/blockchain-verification" component={BlockchainVerification} />
-          <Route path="/social" component={Social} />
-          <Route path="/messages" component={Messages} />
-          <Route path="/followers" component={Followers} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/security" component={Security} />
-          <Route path="/certificate-guide" component={CertificateGuide} />
-          <Route path="/report-theft" component={ReportTheft} />
-          <Route path="/profile/:username" component={Profile} />
-        </>
-      )}
+      <Route path="/nft-minting" component={NFTMinting} />
+      <Route path="/nft-studio" component={NFTStudio} />
+      <Route path="/nft-simple" component={SimplifiedNFT} />
+      <Route path="/blockchain-verification" component={BlockchainVerification} />
+      <Route path="/social" component={Social} />
+      <Route path="/messages" component={Messages} />
+      <Route path="/followers" component={Followers} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/security" component={Security} />
+      <Route path="/certificate-guide" component={CertificateGuide} />
+      <Route path="/report-theft" component={ReportTheft} />
+      <Route path="/profile/:username" component={Profile} />
       
       {/* Public certificate routes */}
       <Route path="/certificate/:id" component={CertificateDetail} />
