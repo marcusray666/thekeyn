@@ -63,7 +63,8 @@
 
   /* Base body styling */
   body {
-    @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%) !important;
+    color: white !important;
     min-height: 100vh;
     font-family: system-ui, -apple-system, sans-serif;
   }
@@ -79,9 +80,11 @@
   /* Dark theme styling */
   .dark,
   .dark body,
-  .dark #root {
-    background: linear-gradient(135deg, #1f2937, #111827, #1f2937);
-    color: white;
+  .dark #root,
+  html,
+  #root {
+    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
+    color: white !important;
   }
   
   /* Disable iOS tap highlight for better mobile experience */

@@ -105,10 +105,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
-          <div className="min-h-screen text-foreground" style={{ 
-            background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%)',
-            color: 'white'
-          }}>
+          <div 
+            className="min-h-screen text-foreground" 
+            style={{ 
+              background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%)',
+              color: 'white',
+              minHeight: '100vh'
+            }}
+          >
             {/* Skip Links for Screen Readers */}
             <a href="#main-content" className="skip-link">
               Skip to main content
