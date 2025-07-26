@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "cd client && npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://loggin-64qr.onrender.com"
+  }
+}
+
+INSTRUCTIONS:
+1. Rename this file to "vercel.json" when uploading to GitHub
+2. This configuration forces frontend-only deployment
+3. Fixes the issue where Vercel builds both frontend and backend
