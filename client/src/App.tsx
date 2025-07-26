@@ -105,7 +105,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
-          <div className="min-h-screen bg-background text-foreground">
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-foreground">
             {/* Skip Links for Screen Readers */}
             <a href="#main-content" className="skip-link">
               Skip to main content
