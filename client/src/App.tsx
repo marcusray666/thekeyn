@@ -49,11 +49,8 @@ function AuthenticatedHome() {
   // Debug log to see auth state
   console.log('AuthenticatedHome:', { user: !!user, isAuthenticated, isLoading });
   
-  if (isLoading) {
-    return <FullScreenLoader text="Loading your portfolio..." />;
-  }
-  
-  if (!isAuthenticated || !user) {
+  // Show welcome page while loading or when not authenticated
+  if (isLoading || !isAuthenticated || !user) {
     return <Welcome />;
   }
   
@@ -63,12 +60,6 @@ function AuthenticatedHome() {
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <FullScreenLoader text="Loading your creative space..." />
-    );
-  }
 
   return (
     <Switch>
