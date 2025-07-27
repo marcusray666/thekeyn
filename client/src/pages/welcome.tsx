@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { Shield, Upload, Link as LinkIcon, Gavel, Plus, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
 
 export default function Welcome() {
   const features = [
@@ -31,6 +30,12 @@ export default function Welcome() {
     },
   ];
 
+  const glassCardStyle = {
+    backdropFilter: 'blur(20px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+  };
+
   return (
     <div className="pt-24 min-h-screen" style={{ 
       background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%)',
@@ -39,7 +44,8 @@ export default function Welcome() {
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="max-w-4xl mx-auto text-center">
-          <GlassCard floating className="p-8 md:p-12 mb-8">
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl bg-white/10 p-8 md:p-12 mb-8 hover:translate-y-[-4px] transition-transform duration-300" 
+               style={glassCardStyle}>
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="gradient-text">Protect. Create.</span><br/>
               <span className="text-white">Own Your Art.</span>
@@ -67,9 +73,7 @@ export default function Welcome() {
                 </Button>
               </Link>
             </div>
-
-
-          </GlassCard>
+          </div>
         </div>
       </section>
 
@@ -82,11 +86,10 @@ export default function Welcome() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <GlassCard
+              <div
                 key={index}
-                variant={feature.variant}
-                floating
-                className="text-center"
+                className="backdrop-blur-xl border rounded-2xl shadow-2xl bg-white/10 backdrop-saturate-150 border-white/20 hover:translate-y-[-4px] transition-transform duration-300 p-6 text-center"
+                style={glassCardStyle}
               >
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${
                   feature.variant === 'purple' ? 'from-purple-500 to-purple-600' :
@@ -102,7 +105,7 @@ export default function Welcome() {
                 <p className="text-gray-300 text-sm">
                   {feature.description}
                 </p>
-              </GlassCard>
+              </div>
             ))}
           </div>
         </div>
@@ -111,7 +114,8 @@ export default function Welcome() {
       {/* Call to Action */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <GlassCard className="p-8 md:p-12">
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl bg-white/10 p-8 md:p-12" 
+               style={glassCardStyle}>
             <h2 className="text-4xl font-bold mb-6">
               <span className="gradient-text">Ready to Protect</span><br/>
               <span className="text-white">Your Creative Work?</span>
@@ -143,7 +147,7 @@ export default function Welcome() {
                 <span>Works Everywhere</span>
               </div>
             </div>
-          </GlassCard>
+          </div>
         </div>
       </section>
     </div>
