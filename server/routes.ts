@@ -281,8 +281,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
 
-  // Root endpoint
-  app.get("/", (_req, res) => {
+  // API info endpoint (moved from root to avoid conflicting with frontend)
+  app.get("/api", (_req, res) => {
     res.json({ 
       message: "Loggin Backend API",
       status: "running",

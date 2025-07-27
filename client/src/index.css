@@ -69,6 +69,21 @@
     font-family: system-ui, -apple-system, sans-serif;
   }
 
+  /* Gradient text animation */
+  .gradient-text {
+    background: linear-gradient(45deg, #8b5cf6, #06b6d4, #ec4899, #8b5cf6);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
   /* Light theme styling */
   .light,
   .light body,
