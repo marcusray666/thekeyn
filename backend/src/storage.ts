@@ -1,0 +1,1989 @@
+import { 
+  users, works, certificates, nftMints, posts, follows, likes, comments, shares, notifications,
+  postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
+  marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
+  blockchainVerifications, verificationAuditLog, adminAuditLogs, contentReports, systemMetrics,
+  conversations, conversationParticipants, messages, messageReadStatus,
+  type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
+  type NftMint, type InsertNftMint, 
+  type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
+  type UserNotification, type InsertUserNotification, type ContentCategory, type UserPreference, type UserAnalytic,
+  type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
+  type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
+  type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
+  type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
+  type VerificationAuditLog, type InsertVerificationAuditLog,
+  type Conversation, type InsertConversation, type Message, type InsertMessage
+} from "../shared/schema.js";
+import { db } from "./db";
+import { eq, desc, and, gte, sql, ne, isNull, ilike, or } from "drizzle-orm";
+import { nanoid } from "nanoid";
+
+export interface IStorage {
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
+  
+  createWork(work: InsertWork): Promise<Work>;
+  getWork(id: number): Promise<Work | undefined>;
+  getWorkByCertificateId(certificateId: string): Promise<Work | undefined>;
+  getAllWorks(): Promise<Work[]>;
+  getRecentWorks(limit?: number): Promise<Work[]>;
+  updateWork(id: number, updates: Partial<InsertWork>): Promise<Work>;
+  deleteWork(id: number): Promise<void>;
+  
+  createCertificate(certificate: InsertCertificate): Promise<Certificate>;
+  getCertificate(id: number): Promise<Certificate | undefined>;
+  getCertificateByWorkId(workId: number): Promise<Certificate | undefined>;
+  getAllCertificates(): Promise<Certificate[]>;
+  deleteCertificate(id: number): Promise<void>;
+  
+
+  
+  createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint>;
+  getNftMint(id: number): Promise<NftMint | undefined>;
+  getNftMints(userId: number): Promise<NftMint[]>;
+  updateNftMint(id: number, updates: Partial<InsertNftMint>): Promise<NftMint>;
+  
+  // Social features
+  getPublicWorks(options?: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] }): Promise<Work[]>;
+  getUserWorks(userId: number): Promise<Work[]>;
+  followUser(followerId: number, followingId: number): Promise<Follow>;
+  unfollowUser(followerId: number, followingId: number): Promise<void>;
+  isFollowing(followerId: number, followingId: number): Promise<boolean>;
+  likeWork(userId: number, workId: number): Promise<Like>;
+  unlikeWork(userId: number, workId: number): Promise<void>;
+  isWorkLiked(userId: number, workId: number): Promise<boolean>;
+  addComment(comment: Partial<InsertComment>): Promise<Comment>;
+  getWorkComments(workId: number): Promise<Comment[]>;
+  shareWork(share: Partial<InsertShare>): Promise<Share>;
+  createNotification(notification: Partial<InsertNotification>): Promise<Notification>;
+  getUserNotifications(userId: number, unreadOnly?: boolean): Promise<Notification[]>;
+  markNotificationRead(notificationId: number): Promise<void>;
+  incrementWorkViews(workId: number): Promise<void>;
+  getTrendingTags(limit?: number): Promise<string[]>;
+  
+  // Posts functionality
+  createPost(post: InsertPost & { userId: number }): Promise<Post>;
+  getPosts(options?: { userId?: number; limit?: number; offset?: number; category?: string; following?: boolean; currentUserId?: number }): Promise<(Post & { username: string; userImage?: string; isFollowing?: boolean })[]>;
+  getPost(id: string): Promise<Post | undefined>;
+  updatePost(id: string, updates: Partial<Post>): Promise<Post>;
+  likePost(userId: number, postId: string): Promise<void>;
+  unlikePost(userId: number, postId: string): Promise<void>;
+  deletePost(id: string, userId: number): Promise<void>;
+  searchPosts(query: string, options?: { limit?: number; offset?: number }): Promise<(Post & { username: string })[]>;
+  getTrendingPosts(limit?: number): Promise<(Post & { username: string })[]>;
+  
+  // Comments functionality
+  createComment(comment: InsertPostComment & { userId: number }): Promise<PostComment>;
+  getPostComments(postId: string, options?: { limit?: number; offset?: number }): Promise<(PostComment & { username: string; userImage?: string })[]>;
+  updateComment(id: number, updates: Partial<PostComment>): Promise<PostComment>;
+  deleteComment(id: number, userId: number): Promise<void>;
+  likeComment(userId: number, commentId: number): Promise<void>;
+  
+  // Following functionality
+  followUser(followerId: number, followingId: number): Promise<UserFollow>;
+  unfollowUser(followerId: number, followingId: number): Promise<void>;
+  isFollowing(followerId: number, followingId: number): Promise<boolean>;
+  getFollowers(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
+  getFollowing(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
+  getFollowStats(userId: number): Promise<{ followers: number; following: number }>;
+  
+  // Notifications functionality
+  createNotification(notification: InsertUserNotification): Promise<UserNotification>;
+  getUserNotifications(userId: number, options?: { unreadOnly?: boolean; limit?: number; offset?: number }): Promise<UserNotification[]>;
+  markNotificationRead(notificationId: number): Promise<void>;
+  markAllNotificationsRead(userId: number): Promise<void>;
+  getUnreadNotificationCount(userId: number): Promise<number>;
+  
+  // User preferences
+  getUserPreferences(userId: number): Promise<UserPreference | undefined>;
+  updateUserPreferences(userId: number, preferences: Partial<UserPreference>): Promise<UserPreference>;
+  
+  // Analytics
+  getUserAnalytics(userId: number, days?: number): Promise<UserAnalytic[]>;
+  recordUserActivity(userId: number, activity: Partial<UserAnalytic>): Promise<void>;
+  
+  // Marketplace
+  createMarketplaceListing(listing: InsertMarketplaceListing & { sellerId: number }): Promise<MarketplaceListing>;
+  getMarketplaceListings(options?: { category?: string; priceRange?: [number, number]; limit?: number; offset?: number }): Promise<(MarketplaceListing & { sellerName: string })[]>;
+  getMarketplaceListing(id: number): Promise<MarketplaceListing | undefined>;
+  updateMarketplaceListing(id: number, updates: Partial<MarketplaceListing>): Promise<MarketplaceListing>;
+  deleteMarketplaceListing(id: number, sellerId: number): Promise<void>;
+  
+  // Collaboration
+  createCollaborationProject(project: InsertCollaborationProject & { ownerId: number }): Promise<CollaborationProject>;
+  getCollaborationProjects(options?: { userId?: number; status?: string; limit?: number; offset?: number }): Promise<(CollaborationProject & { ownerName: string })[]>;
+  getCollaborationProject(id: number): Promise<CollaborationProject | undefined>;
+  joinCollaborationProject(projectId: number, userId: number, role: string): Promise<ProjectCollaborator>;
+  leaveCollaborationProject(projectId: number, userId: number): Promise<void>;
+  
+  // Content categories
+  getContentCategories(): Promise<ContentCategory[]>;
+
+  // Subscription management
+  getUserSubscription(userId: number): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription>;
+  getSubscriptionUsage(userId: number, month: string): Promise<SubscriptionUsage | undefined>;
+  updateSubscriptionUsage(userId: number, month: string, usage: Partial<SubscriptionUsage>): Promise<SubscriptionUsage>;
+  checkUploadLimit(userId: number): Promise<{ canUpload: boolean; remainingUploads: number; limit: number }>;
+  resetMonthlyUploads(userId: number): Promise<void>;
+  getUserSubscriptionLimits(userId: number): Promise<{
+    tier: string;
+    uploadLimit: number;
+    hasDownloadableCertificates: boolean;
+    hasCustomBranding: boolean;
+    hasIPFSStorage: boolean;
+    hasAPIAccess: boolean;
+    teamSize: number;
+  }>;
+
+  // Blockchain verification
+  createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification>;
+  getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined>;
+  getBlockchainVerificationByFileHash(fileHash: string): Promise<BlockchainVerification | undefined>;
+  updateBlockchainVerification(id: string, updates: Partial<InsertBlockchainVerification>): Promise<BlockchainVerification>;
+  logVerificationAttempt(log: InsertVerificationAuditLog): Promise<VerificationAuditLog>;
+
+  // User search for messaging
+  searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
+  
+  // Admin functions
+  getSystemMetrics(): Promise<any>;
+  getAllUsers(filter?: string, search?: string): Promise<User[]>;
+  banUser(userId: number, reason: string): Promise<User>;
+  unbanUser(userId: number): Promise<User>;
+  verifyUser(userId: number): Promise<User>;
+  createContentReport(report: any): Promise<any>;
+  getContentReports(status?: string): Promise<any[]>;
+  updateContentReport(reportId: number, updates: any): Promise<any>;
+  createAdminAuditLog(log: any): Promise<any>;
+  getAdminAuditLogs(): Promise<any[]>;
+  getAllFileHashes(): Promise<string[]>;
+  getPendingModerationWorks(): Promise<Work[]>;
+  updateWorkModerationStatus(workId: number, status: string, reviewedBy: number, resolution?: string): Promise<Work>;
+}
+
+export class DatabaseStorage implements IStorage {
+  // Database storage - no constructor needed
+
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username.toLowerCase()));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async createWork(insertWork: InsertWork): Promise<Work> {
+    const [work] = await db
+      .insert(works)
+      .values(insertWork)
+      .returning();
+    return work;
+  }
+
+  async getWork(id: number): Promise<Work | undefined> {
+    const [work] = await db.select().from(works).where(eq(works.id, id));
+    return work || undefined;
+  }
+
+  async getWorkByCertificateId(certificateId: string): Promise<Work | undefined> {
+    const [work] = await db.select().from(works).where(eq(works.certificateId, certificateId));
+    return work || undefined;
+  }
+
+  async getAllWorks(): Promise<Work[]> {
+    return await db
+      .select()
+      .from(works)
+      .orderBy(desc(works.createdAt));
+  }
+
+  async getRecentWorks(limit: number = 10): Promise<Work[]> {
+    return await db
+      .select()
+      .from(works)
+      .orderBy(desc(works.createdAt))
+      .limit(limit);
+  }
+
+  async createCertificate(insertCertificate: InsertCertificate): Promise<Certificate> {
+    // Check if verification proof already exists to ensure uniqueness
+    if (insertCertificate.verificationProof) {
+      const existingCert = await db
+        .select()
+        .from(certificates)
+        .where(eq(certificates.verificationProof, insertCertificate.verificationProof))
+        .limit(1);
+      
+      if (existingCert.length > 0) {
+        throw new Error("Verification proof already exists for another work");
+      }
+    }
+
+    const [certificate] = await db
+      .insert(certificates)
+      .values(insertCertificate)
+      .returning();
+    return certificate;
+  }
+
+  async getCertificate(id: number): Promise<Certificate | undefined> {
+    const [certificate] = await db.select().from(certificates).where(eq(certificates.id, id));
+    return certificate || undefined;
+  }
+
+  async getCertificateByWorkId(workId: number): Promise<Certificate | undefined> {
+    const [certificate] = await db.select().from(certificates).where(eq(certificates.workId, workId));
+    return certificate || undefined;
+  }
+
+  async getAllCertificates(): Promise<Certificate[]> {
+    return await db
+      .select()
+      .from(certificates)
+      .orderBy(desc(certificates.createdAt));
+  }
+
+  async updateWork(id: number, updates: Partial<InsertWork>): Promise<Work> {
+    const [work] = await db
+      .update(works)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(works.id, id))
+      .returning();
+    return work;
+  }
+
+  async deleteWork(id: number): Promise<void> {
+    // Delete related records first to avoid foreign key constraints
+    // For now, we'll handle this with raw SQL since the table structure may vary
+    
+    try {
+      // Delete copyright applications if they exist
+      await db.execute(sql`DELETE FROM copyright_applications WHERE work_id = ${id}`);
+    } catch (error) {
+      // Table might not exist, continue
+      console.log('Note: copyright_applications table cleanup skipped');
+    }
+    
+    // Delete any other related records that might reference this work
+    // Add other deletions here as needed
+    
+    // Finally delete the work
+    await db.delete(works).where(eq(works.id, id));
+  }
+
+  async deleteCertificate(id: number): Promise<void> {
+    await db.delete(certificates).where(eq(certificates.id, id));
+  }
+
+
+
+
+
+
+
+
+
+  async createNftMint(mint: Partial<InsertNftMint>): Promise<NftMint> {
+    const mintData = {
+      ...mint,
+      status: mint.status || 'pending',
+      royaltyPercentage: mint.royaltyPercentage || 10,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const [nftMint] = await db
+      .insert(nftMints)
+      .values(mintData as any)
+      .returning();
+    return nftMint;
+  }
+
+  async getNftMint(id: number): Promise<NftMint | undefined> {
+    const [mint] = await db.select().from(nftMints).where(eq(nftMints.id, id));
+    return mint || undefined;
+  }
+
+  async getNftMints(userId: number): Promise<NftMint[]> {
+    return await db
+      .select()
+      .from(nftMints)
+      .where(eq(nftMints.userId, userId))
+      .orderBy(desc(nftMints.createdAt));
+  }
+
+  async updateNftMint(id: number, updates: Partial<InsertNftMint>): Promise<NftMint> {
+    const updateData = {
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    const [mint] = await db
+      .update(nftMints)
+      .set(updateData as any)
+      .where(eq(nftMints.id, id))
+      .returning();
+    return mint;
+  }
+
+  // Social feature implementations
+  async getPublicWorks(options: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] } = {}): Promise<Work[]> {
+    const { userId, limit = 20, offset = 0, filter, search, tags } = options;
+    
+    // For now, return all works until we add the isPublic column
+    const publicWorks = await db.select().from(works)
+      .orderBy(desc(works.createdAt))
+      .limit(limit)
+      .offset(offset);
+      
+    return publicWorks;
+  }
+
+  async getUserWorks(userId: number): Promise<Work[]> {
+    return await db.select().from(works)
+      .where(eq(works.userId, userId))
+      .orderBy(desc(works.createdAt));
+  }
+
+  async followUser(followerId: number, followingId: number): Promise<Follow> {
+    // Simple implementation for now
+    const [follow] = await db.insert(follows)
+      .values({ followerId, followingId })
+      .returning();
+    return follow;
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    await db.delete(follows)
+      .where(eq(follows.followerId, followerId));
+  }
+
+  async isFollowing(followerId: number, followingId: number): Promise<boolean> {
+    const result = await db.select().from(follows)
+      .where(eq(follows.followerId, followerId));
+    return result.length > 0;
+  }
+
+  async likeWork(userId: number, workId: number): Promise<Like> {
+    const [like] = await db.insert(likes)
+      .values({ userId, workId })
+      .returning();
+    
+    // Update work like count
+    await db
+      .update(works)
+      .set({ likeCount: sql`${works.likeCount} + 1` })
+      .where(eq(works.id, workId));
+    
+    // Update user's total likes count (for the work owner)
+    const work = await this.getWork(workId);
+    if (work) {
+      await db
+        .update(users)
+        .set({ totalLikes: sql`${users.totalLikes} + 1` })
+        .where(eq(users.id, work.userId));
+    }
+    
+    return like;
+  }
+
+  async unlikeWork(userId: number, workId: number): Promise<void> {
+    await db.delete(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.workId, workId)));
+    
+    // Update work like count
+    await db
+      .update(works)
+      .set({ likeCount: sql`GREATEST(${works.likeCount} - 1, 0)` })
+      .where(eq(works.id, workId));
+    
+    // Update user's total likes count (for the work owner)
+    const work = await this.getWork(workId);
+    if (work) {
+      await db
+        .update(users)
+        .set({ totalLikes: sql`GREATEST(${users.totalLikes} - 1, 0)` })
+        .where(eq(users.id, work.userId));
+    }
+  }
+
+  async isWorkLiked(userId: number, workId: number): Promise<boolean> {
+    const result = await db.select().from(likes)
+      .where(eq(likes.userId, userId));
+    return result.length > 0;
+  }
+
+  async addComment(comment: Partial<InsertComment>): Promise<Comment> {
+    const [newComment] = await db.insert(comments)
+      .values(comment as any)
+      .returning();
+    return newComment;
+  }
+
+  async getWorkComments(workId: number): Promise<Comment[]> {
+    return await db.select().from(comments)
+      .where(eq(comments.workId, workId))
+      .orderBy(desc(comments.createdAt));
+  }
+
+  async shareWork(share: Partial<InsertShare>): Promise<Share> {
+    const [newShare] = await db.insert(shares)
+      .values(share as any)
+      .returning();
+    return newShare;
+  }
+
+  async createNotification(notification: Partial<InsertNotification>): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications)
+      .values(notification as any)
+      .returning();
+    return newNotification;
+  }
+
+  async getUserNotifications(userId: number, unreadOnly = false): Promise<Notification[]> {
+    let query = db.select().from(notifications).where(eq(notifications.userId, userId));
+    
+    if (unreadOnly) {
+      query = query.where(eq(notifications.isRead, false));
+    }
+    
+    return await query.orderBy(desc(notifications.createdAt));
+  }
+
+  async markNotificationRead(notificationId: number): Promise<void> {
+    await db.update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, notificationId));
+  }
+
+  async incrementWorkViews(workId: number): Promise<void> {
+    // Will implement once we add the viewCount column
+    console.log(`Incrementing views for work ${workId}`);
+  }
+
+  async getTrendingTags(limit = 10): Promise<string[]> {
+    // Simple implementation - in production, use proper analytics
+    const mockTags = ['digital-art', 'photography', 'design', 'nft', 'blockchain', 'ai-art', 'illustration', 'music', 'video', 'creative'];
+    return mockTags.slice(0, limit);
+  }
+
+  async getUserWorks(userId: number): Promise<Work[]> {
+    return await db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt));
+  }
+
+  // Posts functionality implementation
+  async createPost(postData: InsertPost & { userId: number }): Promise<Post> {
+    const postId = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const [post] = await db
+      .insert(posts)
+      .values({
+        id: postId,
+        userId: postData.userId,
+        content: postData.content,
+        imageUrl: postData.imageUrl,
+        filename: postData.filename,
+        fileType: postData.fileType,
+        mimeType: postData.mimeType,
+        fileSize: postData.fileSize,
+        tags: postData.tags || [],
+      })
+      .returning();
+    
+    return post;
+  }
+
+  async getPosts(options: { userId?: number; limit?: number; offset?: number; currentUserId?: number } = {}): Promise<(Post & { username: string })[]> {
+    const { limit = 20, offset = 0, userId, currentUserId } = options;
+    
+    let query = db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        filename: posts.filename,
+        fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+        isLiked: sql<boolean>`EXISTS (
+          SELECT 1 FROM ${postReactions} 
+          WHERE ${postReactions.postId} = ${posts.id} 
+          AND ${postReactions.userId} = ${currentUserId || -1}
+          AND ${postReactions.type} = 'like'
+        )`.as('isLiked'),
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .orderBy(desc(posts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    if (userId) {
+      query = query.where(eq(posts.userId, userId));
+    }
+
+    return await query;
+  }
+
+  async getPost(id: string): Promise<Post | undefined> {
+    const [post] = await db.select().from(posts).where(eq(posts.id, id));
+    return post || undefined;
+  }
+
+  async likePost(userId: number, postId: string): Promise<void> {
+    // Check if user already liked this post
+    const [existingLike] = await db
+      .select()
+      .from(postReactions)
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+
+    if (existingLike) {
+      // User already liked this post, so this is an unlike action
+      await this.unlikePost(userId, postId);
+      return;
+    }
+
+    // Add like reaction
+    await db.insert(postReactions).values({
+      postId,
+      userId,
+      type: 'like'
+    });
+
+    // Increment the likes counter
+    await db
+      .update(posts)
+      .set({ 
+        likes: sql`${posts.likes} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId));
+  }
+
+  async unlikePost(userId: number, postId: string): Promise<void> {
+    // Remove like reaction
+    await db
+      .delete(postReactions)
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+
+    // Decrement the likes counter
+    await db
+      .update(posts)
+      .set({ 
+        likes: sql`GREATEST(${posts.likes} - 1, 0)`,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId));
+  }
+
+  async updatePost(id: string, updates: Partial<Post>): Promise<Post> {
+    const [updatedPost] = await db
+      .update(posts)
+      .set(updates)
+      .where(eq(posts.id, id))
+      .returning();
+    
+    return updatedPost;
+  }
+
+  async deletePost(id: string, userId: number): Promise<void> {
+    await db
+      .delete(posts)
+      .where(eq(posts.id, id));
+  }
+
+  async searchPosts(query: string, options: { limit?: number; offset?: number } = {}): Promise<(Post & { username: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    // Simple text search in content and tags
+    const searchResults = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        fileType: posts.fileType,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(
+        // Search in content or tags
+        sql`${posts.content} ILIKE ${`%${query}%`} OR ${posts.tags}::text ILIKE ${`%${query}%`}`
+      )
+      .orderBy(desc(posts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return searchResults;
+  }
+
+  async getTrendingPosts(limit = 10): Promise<(Post & { username: string })[]> {
+    // Get posts with high engagement in the last 7 days
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const trendingPosts = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        fileType: posts.fileType,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(gte(posts.createdAt, weekAgo))
+      .orderBy(desc(sql`${posts.likes} + ${posts.comments} + ${posts.shares}`))
+      .limit(limit);
+
+    return trendingPosts;
+  }
+
+  async getUserPosts(userId: number): Promise<Post[]> {
+    const userPosts = await db
+      .select()
+      .from(posts)
+      .where(eq(posts.userId, userId))
+      .orderBy(desc(posts.createdAt));
+
+    return userPosts;
+  }
+
+  // Comments functionality
+  async createComment(commentData: InsertPostComment & { userId: number }): Promise<PostComment> {
+    const [comment] = await db
+      .insert(postComments)
+      .values({
+        postId: commentData.postId,
+        userId: commentData.userId,
+        content: commentData.content,
+        parentId: commentData.parentId,
+        mentionedUsers: commentData.mentionedUsers || [],
+      })
+      .returning();
+    
+    // Increment comment count on post
+    await db
+      .update(posts)
+      .set({ 
+        comments: sql`${posts.comments} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, commentData.postId));
+    
+    return comment;
+  }
+
+  async getPostComments(postId: string, options: { limit?: number; offset?: number } = {}): Promise<(PostComment & { username: string; userImage?: string })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const comments = await db
+      .select({
+        id: postComments.id,
+        postId: postComments.postId,
+        userId: postComments.userId,
+        parentId: postComments.parentId,
+        content: postComments.content,
+        mentionedUsers: postComments.mentionedUsers,
+        likes: postComments.likes,
+        createdAt: postComments.createdAt,
+        updatedAt: postComments.updatedAt,
+        username: users.username,
+        userImage: users.profileImageUrl,
+      })
+      .from(postComments)
+      .innerJoin(users, eq(postComments.userId, users.id))
+      .where(eq(postComments.postId, postId))
+      .orderBy(desc(postComments.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return comments;
+  }
+
+  async updateComment(id: number, updates: Partial<PostComment>): Promise<PostComment> {
+    const [updatedComment] = await db
+      .update(postComments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(postComments.id, id))
+      .returning();
+    
+    return updatedComment;
+  }
+
+  async deleteComment(id: number, userId: number): Promise<void> {
+    await db
+      .delete(postComments)
+      .where(eq(postComments.id, id));
+  }
+
+  async likeComment(userId: number, commentId: number): Promise<void> {
+    await db
+      .update(postComments)
+      .set({ 
+        likes: sql`${postComments.likes} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(postComments.id, commentId));
+  }
+
+  // Following functionality
+  async followUser(followerId: number, followingId: number): Promise<UserFollow> {
+    const [follow] = await db
+      .insert(userFollows)
+      .values({ followerId, followingId })
+      .returning();
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`${users.followingCount} + 1` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`${users.followerCount} + 1` })
+      .where(eq(users.id, followingId));
+    
+    return follow;
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    await db
+      .delete(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ));
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`GREATEST(${users.followingCount} - 1, 0)` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`GREATEST(${users.followerCount} - 1, 0)` })
+      .where(eq(users.id, followingId));
+  }
+
+  async isFollowing(followerId: number, followingId: number): Promise<boolean> {
+    const [follow] = await db
+      .select()
+      .from(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ))
+      .limit(1);
+    
+    return !!follow;
+  }
+
+  async getFollowers(userId: number, options: { limit?: number; offset?: number } = {}): Promise<(User & { isFollowing?: boolean })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const followers = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        passwordHash: users.passwordHash,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionExpiresAt: users.subscriptionExpiresAt,
+        walletAddress: users.walletAddress,
+        displayName: users.displayName,
+        bio: users.bio,
+        profileImageUrl: users.profileImageUrl,
+        website: users.website,
+        location: users.location,
+        isVerified: users.isVerified,
+        followerCount: users.followerCount,
+        followingCount: users.followingCount,
+        totalLikes: users.totalLikes,
+        themePreference: users.themePreference,
+        settings: users.settings,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .innerJoin(userFollows, eq(users.id, userFollows.followerId))
+      .where(eq(userFollows.followingId, userId))
+      .orderBy(desc(userFollows.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return followers;
+  }
+
+  async getFollowing(userId: number, options: { limit?: number; offset?: number } = {}): Promise<(User & { isFollowing?: boolean })[]> {
+    const { limit = 50, offset = 0 } = options;
+    
+    const following = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        passwordHash: users.passwordHash,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionExpiresAt: users.subscriptionExpiresAt,
+        walletAddress: users.walletAddress,
+        displayName: users.displayName,
+        bio: users.bio,
+        profileImageUrl: users.profileImageUrl,
+        website: users.website,
+        location: users.location,
+        isVerified: users.isVerified,
+        followerCount: users.followerCount,
+        followingCount: users.followingCount,
+        totalLikes: users.totalLikes,
+        themePreference: users.themePreference,
+        settings: users.settings,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .innerJoin(userFollows, eq(users.id, userFollows.followingId))
+      .where(eq(userFollows.followerId, userId))
+      .orderBy(desc(userFollows.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return following;
+  }
+
+  async getFollowStats(userId: number): Promise<{ followers: number; following: number }> {
+    const user = await this.getUser(userId);
+    return {
+      followers: user?.followerCount || 0,
+      following: user?.followingCount || 0
+    };
+  }
+
+  // Notifications functionality
+  async createNotification(notification: InsertUserNotification): Promise<UserNotification> {
+    const [newNotification] = await db
+      .insert(userNotifications)
+      .values(notification)
+      .returning();
+    
+    return newNotification;
+  }
+
+  async getUserNotifications(userId: number, options: { unreadOnly?: boolean; limit?: number; offset?: number } = {}): Promise<UserNotification[]> {
+    const { unreadOnly = false, limit = 50, offset = 0 } = options;
+    
+    let query = db
+      .select()
+      .from(userNotifications)
+      .where(eq(userNotifications.userId, userId));
+    
+    if (unreadOnly) {
+      query = query.where(eq(userNotifications.isRead, false));
+    }
+    
+    return await query
+      .orderBy(desc(userNotifications.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async markNotificationRead(notificationId: number): Promise<void> {
+    await db
+      .update(userNotifications)
+      .set({ isRead: true })
+      .where(eq(userNotifications.id, notificationId));
+  }
+
+  async markAllNotificationsRead(userId: number): Promise<void> {
+    await db
+      .update(userNotifications)
+      .set({ isRead: true })
+      .where(eq(userNotifications.userId, userId));
+  }
+
+  async getUnreadNotificationCount(userId: number): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(userNotifications)
+      .where(and(
+        eq(userNotifications.userId, userId),
+        eq(userNotifications.isRead, false)
+      ));
+    
+    return result[0]?.count || 0;
+  }
+
+  // User preferences
+  async getUserPreferences(userId: number): Promise<UserPreference | undefined> {
+    const [preferences] = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, userId))
+      .limit(1);
+    
+    return preferences;
+  }
+
+  async updateUserPreferences(userId: number, preferences: Partial<UserPreference>): Promise<UserPreference> {
+    const [updatedPreferences] = await db
+      .insert(userPreferences)
+      .values({ userId, ...preferences })
+      .onConflictDoUpdate({
+        target: [userPreferences.userId],
+        set: { ...preferences, updatedAt: new Date() }
+      })
+      .returning();
+    
+    return updatedPreferences;
+  }
+
+  // Analytics
+  async getUserAnalytics(userId: number, days = 30): Promise<UserAnalytic[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const analytics = await db
+      .select()
+      .from(userAnalytics)
+      .where(and(
+        eq(userAnalytics.userId, userId),
+        gte(userAnalytics.date, startDate)
+      ))
+      .orderBy(desc(userAnalytics.date));
+    
+    return analytics;
+  }
+
+  async recordUserActivity(userId: number, activity: Partial<UserAnalytic>): Promise<void> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    await db
+      .insert(userAnalytics)
+      .values({ userId, date: today, ...activity })
+      .onConflictDoUpdate({
+        target: [userAnalytics.userId, userAnalytics.date],
+        set: {
+          profileViews: sql`${userAnalytics.profileViews} + ${activity.profileViews || 0}`,
+          postViews: sql`${userAnalytics.postViews} + ${activity.postViews || 0}`,
+          workViews: sql`${userAnalytics.workViews} + ${activity.workViews || 0}`,
+          newFollowers: sql`${userAnalytics.newFollowers} + ${activity.newFollowers || 0}`,
+          totalEngagement: sql`${userAnalytics.totalEngagement} + ${activity.totalEngagement || 0}`,
+          revenue: sql`${userAnalytics.revenue} + ${activity.revenue || 0}`,
+        }
+      });
+  }
+
+  // Marketplace
+  async createMarketplaceListing(listing: InsertMarketplaceListing & { sellerId: number }): Promise<MarketplaceListing> {
+    const [newListing] = await db
+      .insert(marketplace)
+      .values(listing)
+      .returning();
+    
+    return newListing;
+  }
+
+  async getMarketplaceListings(options: { category?: string; priceRange?: [number, number]; limit?: number; offset?: number } = {}): Promise<(MarketplaceListing & { sellerName: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    let query = db
+      .select({
+        id: marketplace.id,
+        workId: marketplace.workId,
+        sellerId: marketplace.sellerId,
+        title: marketplace.title,
+        description: marketplace.description,
+        price: marketplace.price,
+        currency: marketplace.currency,
+        isActive: marketplace.isActive,
+        isFeatured: marketplace.isFeatured,
+        licenseType: marketplace.licenseType,
+        tags: marketplace.tags,
+        views: marketplace.views,
+        favorites: marketplace.favorites,
+        createdAt: marketplace.createdAt,
+        updatedAt: marketplace.updatedAt,
+        sellerName: users.username,
+      })
+      .from(marketplace)
+      .innerJoin(users, eq(marketplace.sellerId, users.id))
+      .where(eq(marketplace.isActive, true))
+      .orderBy(desc(marketplace.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return await query;
+  }
+
+  async getMarketplaceListing(id: number): Promise<MarketplaceListing | undefined> {
+    const [listing] = await db
+      .select()
+      .from(marketplace)
+      .where(eq(marketplace.id, id))
+      .limit(1);
+    
+    return listing;
+  }
+
+  async updateMarketplaceListing(id: number, updates: Partial<MarketplaceListing>): Promise<MarketplaceListing> {
+    const [updatedListing] = await db
+      .update(marketplace)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(marketplace.id, id))
+      .returning();
+    
+    return updatedListing;
+  }
+
+  async deleteMarketplaceListing(id: number, sellerId: number): Promise<void> {
+    await db
+      .delete(marketplace)
+      .where(and(
+        eq(marketplace.id, id),
+        eq(marketplace.sellerId, sellerId)
+      ));
+  }
+
+  // Collaboration
+  async createCollaborationProject(project: InsertCollaborationProject & { ownerId: number }): Promise<CollaborationProject> {
+    const [newProject] = await db
+      .insert(collaborationProjects)
+      .values(project)
+      .returning();
+    
+    return newProject;
+  }
+
+  async getCollaborationProjects(options: { userId?: number; status?: string; limit?: number; offset?: number } = {}): Promise<(CollaborationProject & { ownerName: string })[]> {
+    const { limit = 20, offset = 0 } = options;
+    
+    let query = db
+      .select({
+        id: collaborationProjects.id,
+        title: collaborationProjects.title,
+        description: collaborationProjects.description,
+        ownerId: collaborationProjects.ownerId,
+        status: collaborationProjects.status,
+        type: collaborationProjects.type,
+        maxCollaborators: collaborationProjects.maxCollaborators,
+        deadline: collaborationProjects.deadline,
+        budget: collaborationProjects.budget,
+        tags: collaborationProjects.tags,
+        requirements: collaborationProjects.requirements,
+        createdAt: collaborationProjects.createdAt,
+        updatedAt: collaborationProjects.updatedAt,
+        ownerName: users.username,
+      })
+      .from(collaborationProjects)
+      .innerJoin(users, eq(collaborationProjects.ownerId, users.id))
+      .orderBy(desc(collaborationProjects.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return await query;
+  }
+
+  async getCollaborationProject(id: number): Promise<CollaborationProject | undefined> {
+    const [project] = await db
+      .select()
+      .from(collaborationProjects)
+      .where(eq(collaborationProjects.id, id))
+      .limit(1);
+    
+    return project;
+  }
+
+  async joinCollaborationProject(projectId: number, userId: number, role: string): Promise<ProjectCollaborator> {
+    const [collaborator] = await db
+      .insert(projectCollaborators)
+      .values({
+        projectId,
+        userId,
+        role,
+        permissions: ['edit', 'comment'],
+        status: 'active'
+      })
+      .returning();
+    
+    return collaborator;
+  }
+
+  async leaveCollaborationProject(projectId: number, userId: number): Promise<void> {
+    await db
+      .update(projectCollaborators)
+      .set({ status: 'left' })
+      .where(and(
+        eq(projectCollaborators.projectId, projectId),
+        eq(projectCollaborators.userId, userId)
+      ));
+  }
+
+  // Content categories
+  async getContentCategories(): Promise<ContentCategory[]> {
+    const categories = await db
+      .select()
+      .from(contentCategories)
+      .where(eq(contentCategories.isActive, true))
+      .orderBy(contentCategories.name);
+    
+    return categories;
+  }
+
+  // Subscription management
+  async getUserSubscription(userId: number): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId))
+      .orderBy(desc(subscriptions.createdAt))
+      .limit(1);
+    
+    return subscription;
+  }
+
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const [newSubscription] = await db
+      .insert(subscriptions)
+      .values(subscription)
+      .returning();
+    
+    return newSubscription;
+  }
+
+  async updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription> {
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    
+    return subscription;
+  }
+
+  async getSubscriptionUsage(userId: number, month: string): Promise<SubscriptionUsage | undefined> {
+    const [usage] = await db
+      .select()
+      .from(subscriptionUsage)
+      .where(and(
+        eq(subscriptionUsage.userId, userId),
+        eq(subscriptionUsage.month, month)
+      ));
+    
+    return usage;
+  }
+
+  async updateSubscriptionUsage(userId: number, month: string, usage: Partial<SubscriptionUsage>): Promise<SubscriptionUsage> {
+    const existingUsage = await this.getSubscriptionUsage(userId, month);
+    
+    if (existingUsage) {
+      const [updated] = await db
+        .update(subscriptionUsage)
+        .set({ ...usage, updatedAt: new Date() })
+        .where(and(
+          eq(subscriptionUsage.userId, userId),
+          eq(subscriptionUsage.month, month)
+        ))
+        .returning();
+      
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(subscriptionUsage)
+        .values({
+          userId,
+          month,
+          ...usage
+        })
+        .returning();
+      
+      return created;
+    }
+  }
+
+  async checkUploadLimit(userId: number): Promise<{ canUpload: boolean; remainingUploads: number; limit: number }> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      return { canUpload: false, remainingUploads: 0, limit: 0 };
+    }
+
+    const limits = await this.getUserSubscriptionLimits(userId);
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const usage = await this.getSubscriptionUsage(userId, currentMonth);
+    
+    const uploadsUsed = usage?.uploadsUsed || 0;
+    
+    // For unlimited plans (uploadLimit = -1), return -1 as remainingUploads
+    if (limits.uploadLimit === -1) {
+      return {
+        canUpload: true,
+        remainingUploads: -1,
+        limit: -1
+      };
+    }
+    
+    const remainingUploads = Math.max(0, limits.uploadLimit - uploadsUsed);
+    
+    return {
+      canUpload: remainingUploads > 0,
+      remainingUploads,
+      limit: limits.uploadLimit
+    };
+  }
+
+  async resetMonthlyUploads(userId: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        monthlyUploads: 0,
+        lastUploadReset: new Date()
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async getUserSubscriptionLimits(userId: number): Promise<{
+    tier: string;
+    uploadLimit: number;
+    hasDownloadableCertificates: boolean;
+    hasCustomBranding: boolean;
+    hasIPFSStorage: boolean;
+    hasAPIAccess: boolean;
+    teamSize: number;
+  }> {
+    const user = await this.getUser(userId);
+    
+    // Use direct user subscription tier from database, prioritize it
+    const tier = user?.subscriptionTier || 'free';
+    console.log('getUserSubscriptionLimits - detected tier:', tier, 'for user:', userId);
+    
+    const tierLimits = {
+      free: {
+        uploadLimit: 3,
+        hasDownloadableCertificates: true, // 3 PDF certificates per month
+        hasCustomBranding: false,
+        hasIPFSStorage: false,
+        hasAPIAccess: false,
+        teamSize: 1
+      },
+      starter: {
+        uploadLimit: 5,
+        hasDownloadableCertificates: true, // 5 PDF certificates per month
+        hasCustomBranding: false,
+        hasIPFSStorage: false,
+        hasAPIAccess: false,
+        teamSize: 1
+      },
+      pro: {
+        uploadLimit: -1, // unlimited uploads
+        hasDownloadableCertificates: true, // unlimited PDF certificates
+        hasCustomBranding: true,
+        hasIPFSStorage: true,
+        hasAPIAccess: true,
+        teamSize: 10 // Pro now supports teams up to 10 users
+      }
+    };
+    
+    const limits = tierLimits[tier as keyof typeof tierLimits] || tierLimits.free;
+    console.log('getUserSubscriptionLimits - returning limits:', { tier, ...limits });
+    
+    return {
+      tier,
+      ...limits
+    };
+  }
+
+  // Messaging System Methods
+  async createConversation(participants: number[], title?: string): Promise<Conversation> {
+    const conversationId = nanoid();
+    
+    // Create conversation
+    const [conversation] = await db
+      .insert(conversations)
+      .values({
+        id: conversationId,
+        title,
+        type: participants.length > 2 ? "group" : "direct",
+      })
+      .returning();
+
+    // Add participants
+    const participantData = participants.map(userId => ({
+      conversationId,
+      userId,
+    }));
+
+    await db.insert(conversationParticipants).values(participantData);
+
+    return conversation;
+  }
+
+  async getUserConversations(userId: number): Promise<(Conversation & { 
+    participants: { userId: number; username: string }[]; 
+    lastMessage?: { content: string; createdAt: Date; senderName: string };
+    unreadCount: number;
+  })[]> {
+    const userConversations = await db
+      .select({
+        id: conversations.id,
+        title: conversations.title,
+        type: conversations.type,
+        isArchived: conversations.isArchived,
+        lastMessageAt: conversations.lastMessageAt,
+        createdAt: conversations.createdAt,
+        updatedAt: conversations.updatedAt,
+      })
+      .from(conversations)
+      .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+      .where(
+        and(
+          eq(conversationParticipants.userId, userId),
+          eq(conversationParticipants.isActive, true)
+        )
+      )
+      .orderBy(desc(conversations.lastMessageAt));
+
+    // Enrich with participants and last message for each conversation
+    const enrichedConversations = await Promise.all(
+      userConversations.map(async (conv) => {
+        // Get participants
+        const participants = await db
+          .select({
+            userId: users.id,
+            username: users.username,
+          })
+          .from(conversationParticipants)
+          .innerJoin(users, eq(conversationParticipants.userId, users.id))
+          .where(eq(conversationParticipants.conversationId, conv.id));
+
+        // Get last message
+        const lastMessage = await db
+          .select({
+            content: messages.content,
+            createdAt: messages.createdAt,
+            senderName: users.username,
+          })
+          .from(messages)
+          .innerJoin(users, eq(messages.senderId, users.id))
+          .where(eq(messages.conversationId, conv.id))
+          .orderBy(desc(messages.createdAt))
+          .limit(1);
+
+        // Count unread messages
+        const unreadCount = await this.getUnreadMessageCount(userId, conv.id);
+
+        return {
+          ...conv,
+          participants,
+          lastMessage: lastMessage[0],
+          unreadCount,
+        };
+      })
+    );
+
+    return enrichedConversations;
+  }
+
+  async getConversationMessages(conversationId: string, userId: number, limit = 50, offset = 0): Promise<(Message & { senderName: string; senderAvatar?: string })[]> {
+    // Verify user is participant
+    const participant = await db
+      .select()
+      .from(conversationParticipants)
+      .where(
+        and(
+          eq(conversationParticipants.conversationId, conversationId),
+          eq(conversationParticipants.userId, userId),
+          eq(conversationParticipants.isActive, true)
+        )
+      )
+      .limit(1);
+
+    if (!participant.length) {
+      throw new Error("User not authorized to view this conversation");
+    }
+
+    const messageList = await db
+      .select({
+        id: messages.id,
+        conversationId: messages.conversationId,
+        senderId: messages.senderId,
+        content: messages.content,
+        messageType: messages.messageType,
+        attachmentUrl: messages.attachmentUrl,
+        attachmentMetadata: messages.attachmentMetadata,
+        isEdited: messages.isEdited,
+        editedAt: messages.editedAt,
+        isDeleted: messages.isDeleted,
+        deletedAt: messages.deletedAt,
+        replyToMessageId: messages.replyToMessageId,
+        createdAt: messages.createdAt,
+        updatedAt: messages.updatedAt,
+        senderName: users.username,
+        senderAvatar: users.profileImageUrl,
+      })
+      .from(messages)
+      .innerJoin(users, eq(messages.senderId, users.id))
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          eq(messages.isDeleted, false)
+        )
+      )
+      .orderBy(desc(messages.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return messageList.reverse(); // Return in chronological order
+  }
+
+  async sendMessage(data: InsertMessage): Promise<Message> {
+    const messageId = nanoid();
+    
+    const [message] = await db
+      .insert(messages)
+      .values({
+        ...data,
+        id: messageId,
+      })
+      .returning();
+
+    // Update conversation last message timestamp
+    await db
+      .update(conversations)
+      .set({ lastMessageAt: new Date() })
+      .where(eq(conversations.id, data.conversationId));
+
+    return message;
+  }
+
+  async markMessagesAsRead(userId: number, conversationId: string): Promise<void> {
+    // Get all unread messages in the conversation
+    const unreadMessages = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .leftJoin(
+        messageReadStatus,
+        and(
+          eq(messageReadStatus.messageId, messages.id),
+          eq(messageReadStatus.userId, userId)
+        )
+      )
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          isNull(messageReadStatus.id)
+        )
+      );
+
+    if (unreadMessages.length > 0) {
+      const readStatusData = unreadMessages.map(msg => ({
+        messageId: msg.id,
+        userId,
+      }));
+
+      await db.insert(messageReadStatus).values(readStatusData);
+    }
+
+    // Update participant's last seen timestamp
+    await db
+      .update(conversationParticipants)
+      .set({ lastSeenAt: new Date() })
+      .where(
+        and(
+          eq(conversationParticipants.conversationId, conversationId),
+          eq(conversationParticipants.userId, userId)
+        )
+      );
+  }
+
+  async getUnreadMessageCount(userId: number, conversationId: string): Promise<number> {
+    const unreadCount = await db
+      .select({ count: sql`count(*)`.as('count') })
+      .from(messages)
+      .leftJoin(
+        messageReadStatus,
+        and(
+          eq(messageReadStatus.messageId, messages.id),
+          eq(messageReadStatus.userId, userId)
+        )
+      )
+      .where(
+        and(
+          eq(messages.conversationId, conversationId),
+          ne(messages.senderId, userId), // Don't count own messages
+          isNull(messageReadStatus.id)
+        )
+      );
+
+    return parseInt(unreadCount[0]?.count as string) || 0;
+  }
+
+  async searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]> {
+    const whereClause = and(
+      or(
+        ilike(users.username, `%${query}%`),
+        ilike(users.displayName, `%${query}%`)
+      ),
+      ne(users.id, currentUserId)
+    );
+
+    return await db
+      .select({
+        id: users.id,
+        username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
+        isVerified: users.isVerified,
+      })
+      .from(users)
+      .where(whereClause)
+      .limit(10);
+  }
+
+  // Blockchain verification methods
+  async createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification> {
+    const [created] = await db
+      .insert(blockchainVerifications)
+      .values(verification)
+      .returning();
+    
+    return created;
+  }
+
+  async getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(blockchainVerifications)
+      .where(eq(blockchainVerifications.id, id));
+    
+    return verification;
+  }
+
+  async getBlockchainVerificationByFileHash(fileHash: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(blockchainVerifications)
+      .where(eq(blockchainVerifications.fileHash, fileHash));
+    
+    return verification;
+  }
+
+  async updateBlockchainVerification(id: string, updates: Partial<InsertBlockchainVerification>): Promise<BlockchainVerification> {
+    const [updated] = await db
+      .update(blockchainVerifications)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(blockchainVerifications.id, id))
+      .returning();
+    
+    return updated;
+  }
+
+  async logVerificationAttempt(log: InsertVerificationAuditLog): Promise<VerificationAuditLog> {
+    const [created] = await db
+      .insert(verificationAuditLog)
+      .values(log)
+      .returning();
+    
+    return created;
+  }
+
+  // Admin method implementations
+  async getSystemMetrics(): Promise<any> {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(users);
+    const activeUsers = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.lastLoginAt, thirtyDaysAgo));
+    const newSignups = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.createdAt, thirtyDaysAgo));
+    const totalWorks = await db.select({ count: sql<number>`count(*)` }).from(works);
+    const totalPosts = await db.select({ count: sql<number>`count(*)` }).from(posts);
+    const pendingReports = await db.select({ count: sql<number>`count(*)` }).from(contentReports).where(eq(contentReports.status, 'pending'));
+    
+    // Calculate storage used from file sizes
+    const storageQuery = await db.select({ 
+      totalSize: sql<number>`COALESCE(SUM(${works.fileSize}), 0)` 
+    }).from(works);
+    
+    // Calculate revenue from subscriptions (Starter: $9.99, Pro: $19.99)
+    const revenueData = await db.select({
+      starterCount: sql<number>`COUNT(CASE WHEN ${users.subscriptionTier} = 'starter' THEN 1 END)`,
+      proCount: sql<number>`COUNT(CASE WHEN ${users.subscriptionTier} = 'pro' THEN 1 END)`
+    }).from(users);
+    
+    const starterRevenue = (Number(revenueData[0]?.starterCount) || 0) * 999; // $9.99 in cents
+    const proRevenue = (Number(revenueData[0]?.proCount) || 0) * 1999; // $19.99 in cents
+    const totalRevenue = starterRevenue + proRevenue;
+
+    return {
+      totalUsers: totalUsers[0]?.count || 0,
+      activeUsers: activeUsers[0]?.count || 0,
+      newSignups: newSignups[0]?.count || 0,
+      totalWorks: totalWorks[0]?.count || 0,
+      totalPosts: totalPosts[0]?.count || 0,
+      totalRevenue: totalRevenue,
+      storageUsed: Number(storageQuery[0]?.totalSize) || 0,
+      blockchainVerifications: totalWorks[0]?.count || 0,
+      reportsPending: pendingReports[0]?.count || 0,
+      subscriptionBreakdown: {
+        free: Math.max(0, (totalUsers[0]?.count || 0) - (Number(revenueData[0]?.starterCount) || 0) - (Number(revenueData[0]?.proCount) || 0)),
+        starter: Number(revenueData[0]?.starterCount) || 0,
+        pro: Number(revenueData[0]?.proCount) || 0
+      }
+    };
+  }
+
+  async getAllUsers(filter?: string, search?: string): Promise<User[]> {
+    let query = db.select().from(users);
+    
+    const conditions = [];
+    
+    if (filter) {
+      switch (filter) {
+        case 'admin':
+          conditions.push(eq(users.role, 'admin'));
+          break;
+        case 'verified':
+          conditions.push(eq(users.isVerified, true));
+          break;
+        case 'banned':
+          conditions.push(eq(users.isBanned, true));
+          break;
+        case 'pro':
+          conditions.push(eq(users.subscriptionTier, 'pro'));
+          break;
+        case 'recent':
+          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          conditions.push(gte(users.createdAt, weekAgo));
+          break;
+      }
+    }
+
+    if (search) {
+      conditions.push(
+        or(
+          ilike(users.username, `%${search}%`),
+          ilike(users.email, `%${search}%`)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query.orderBy(desc(users.createdAt)).limit(100);
+  }
+
+  // ADMIN PRIVACY OVERRIDE: Get all users with complete private information
+  async getAllUsersWithPrivateInfo(filter?: string, search?: string): Promise<any[]> {
+    try {
+      let query = db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        displayName: users.displayName,
+        role: users.role,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
+        isVerified: users.isVerified,
+        isBanned: users.isBanned,
+        createdAt: users.createdAt,
+        lastLoginAt: users.lastLoginAt,
+        profileImageUrl: users.profileImageUrl,
+        bio: users.bio,
+        location: users.location,
+        website: users.website,
+        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks')
+      }).from(users);
+
+      const conditions = [];
+
+      if (search) {
+        conditions.push(
+          or(
+            ilike(users.username, `%${search}%`),
+            ilike(users.email, `%${search}%`),
+            ilike(users.displayName, `%${search}%`)
+          )
+        );
+      }
+
+      if (filter && filter !== 'all') {
+        switch (filter) {
+          case 'banned':
+            conditions.push(eq(users.isBanned, true));
+            break;
+          case 'verified':
+            conditions.push(eq(users.isVerified, true));
+            break;
+          case 'premium':
+            conditions.push(ne(users.subscriptionTier, 'free'));
+            break;
+          case 'admins':
+            conditions.push(eq(users.role, 'admin'));
+            break;
+        }
+      }
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+
+      return await query.orderBy(desc(users.createdAt));
+    } catch (error) {
+      console.error("Error getting users with private info:", error);
+      return [];
+    }
+  }
+
+  // ADMIN PRIVACY OVERRIDE: Get complete user information including all private data
+  async getUserWithAllPrivateInfo(userId: number): Promise<any> {
+    try {
+      const [user] = await db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        displayName: users.displayName,
+        role: users.role,
+        subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
+        isVerified: users.isVerified,
+        isBanned: users.isBanned,
+        createdAt: users.createdAt,
+        lastLoginAt: users.lastLoginAt,
+        profileImageUrl: users.profileImageUrl,
+        bio: users.bio,
+        location: users.location,
+        website: users.website,
+        birthDate: users.birthDate,
+        phone: users.phone,
+        socialLinks: users.socialLinks,
+        privacySettings: users.privacySettings,
+        passwordHash: users.passwordHash,
+        stripeCustomerId: users.stripeCustomerId,
+        uploadCount: users.uploadCount,
+        totalStorageUsed: users.totalStorageUsed,
+        followerCount: sql`(SELECT count(*) FROM ${follows} WHERE following_id = ${users.id})`.as('followerCount'),
+        followingCount: sql`(SELECT count(*) FROM ${follows} WHERE follower_id = ${users.id})`.as('followingCount'),
+        totalLikes: sql`(SELECT count(*) FROM ${postReactions} WHERE user_id = ${users.id})`.as('totalLikes'),
+        totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks'),
+        totalPosts: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('totalPosts')
+      }).from(users).where(eq(users.id, userId));
+
+      return user;
+    } catch (error) {
+      console.error("Error getting user with all private info:", error);
+      return null;
+    }
+  }
+
+  // Get user's complete activity log
+  async getUserActivityLog(userId: number): Promise<any[]> {
+    try {
+      const activities = await db.select().from(auditLogs)
+        .where(eq(auditLogs.targetId, userId.toString()))
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(100);
+
+      return activities;
+    } catch (error) {
+      console.error("Error getting user activity log:", error);
+      return [];
+    }
+  }
+
+  // ADMIN PRIVACY OVERRIDE: Get all user content including private posts/works
+  async getUserAllContent(userId: number): Promise<any> {
+    try {
+      const [userWorks, userPosts] = await Promise.all([
+        db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt)),
+        db.select().from(posts).where(eq(posts.userId, userId)).orderBy(desc(posts.createdAt))
+      ]);
+
+      return {
+        works: userWorks,
+        posts: userPosts,
+        totalContent: userWorks.length + userPosts.length
+      };
+    } catch (error) {
+      console.error("Error getting user content:", error);
+      return { works: [], posts: [], totalContent: 0 };
+    }
+  }
+
+  async banUser(userId: number, reason: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isBanned: true, banReason: reason })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async unbanUser(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isBanned: false, banReason: null })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async verifyUser(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isVerified: true })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async createContentReport(report: any): Promise<any> {
+    const [newReport] = await db
+      .insert(contentReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async getContentReports(status?: string): Promise<any[]> {
+    let query = db
+      .select({
+        id: contentReports.id,
+        reporterId: contentReports.reporterId,
+        reportedUserId: contentReports.reportedUserId,
+        contentType: contentReports.contentType,
+        contentId: contentReports.contentId,
+        reason: contentReports.reason,
+        description: contentReports.description,
+        status: contentReports.status,
+        createdAt: contentReports.createdAt,
+        reporterUsername: sql<string>`reporter.username`,
+        reportedUsername: sql<string>`reported.username`,
+      })
+      .from(contentReports)
+      .leftJoin(sql`${users} as reporter`, eq(contentReports.reporterId, sql`reporter.id`))
+      .leftJoin(sql`${users} as reported`, eq(contentReports.reportedUserId, sql`reported.id`));
+
+    if (status) {
+      query = query.where(eq(contentReports.status, status));
+    }
+
+    return await query.orderBy(desc(contentReports.createdAt));
+  }
+
+  async updateContentReport(reportId: number, updates: any): Promise<any> {
+    const [report] = await db
+      .update(contentReports)
+      .set(updates)
+      .where(eq(contentReports.id, reportId))
+      .returning();
+    return report;
+  }
+
+  async createAdminAuditLog(log: any): Promise<any> {
+    const [auditLog] = await db
+      .insert(adminAuditLogs)
+      .values(log)
+      .returning();
+    return auditLog;
+  }
+
+  async getAdminAuditLogs(): Promise<any[]> {
+    return await db
+      .select({
+        id: adminAuditLogs.id,
+        adminId: adminAuditLogs.adminId,
+        action: adminAuditLogs.action,
+        targetType: adminAuditLogs.targetType,
+        targetId: adminAuditLogs.targetId,
+        details: adminAuditLogs.details,
+        createdAt: adminAuditLogs.createdAt,
+        adminUsername: users.username,
+      })
+      .from(adminAuditLogs)
+      .innerJoin(users, eq(adminAuditLogs.adminId, users.id))
+      .orderBy(desc(adminAuditLogs.createdAt))
+      .limit(100);
+  }
+
+  // Additional moderation methods
+  async getAllFileHashes(): Promise<string[]> {
+    const result = await db.select({ fileHash: works.fileHash }).from(works);
+    return result.map(r => r.fileHash);
+  }
+
+  async getPendingModerationWorks(): Promise<Work[]> {
+    return await db
+      .select()
+      .from(works)
+      .where(eq(works.moderationStatus, 'pending'))
+      .orderBy(desc(works.createdAt));
+  }
+
+  async updateWorkModerationStatus(workId: number, status: string, reviewedBy: number, resolution?: string): Promise<Work> {
+    const [work] = await db
+      .update(works)
+      .set({ 
+        moderationStatus: status,
+        reviewedBy,
+        reviewedAt: new Date()
+      })
+      .where(eq(works.id, workId))
+      .returning();
+    return work;
+  }
+}
+
+export const storage = new DatabaseStorage();

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: loggin-backend
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production

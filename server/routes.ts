@@ -12,23 +12,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
-import { loginSchema, registerSchema, insertWorkSchema, type User } from "@shared/schema";
-
-// Session type extensions
-declare module 'express-session' {
-  interface SessionData {
-    userId: number;
-    user?: User;
-  }
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: number;
-    }
-  }
-}
+import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
@@ -40,8 +24,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: "2025-06-30.basil",
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-06-20",
 });
 
 const MemStore = MemoryStore(session);
