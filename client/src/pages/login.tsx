@@ -22,12 +22,34 @@ export default function Login() {
   const loginMutation = useMutation({
     mutationFn: async (data: { username: string; password: string }) => {
       console.log('Login attempt:', data);
-      const result = await apiRequest('/api/auth/login', {
-        method: 'POST',
-        body: data,
-      });
-      console.log('Login result:', result);
-      return result;
+      
+      try {
+        // Direct fetch to bypass apiRequest issues
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(errorText || `HTTP ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Login result:', result);
+        return result;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+      }
     },
     onSuccess: async (data) => {
       toast({

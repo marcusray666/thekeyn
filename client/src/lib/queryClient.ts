@@ -10,6 +10,7 @@ async function throwIfResNotOk(res: Response) {
   let message = res.statusText;
   try {
     const errorBody = await res.text();
+    console.log('Error response body:', errorBody);
     if (errorBody) {
       try {
         const errorJson = JSON.parse(errorBody);
@@ -18,11 +19,13 @@ async function throwIfResNotOk(res: Response) {
         message = errorBody;
       }
     }
-  } catch {
-    // ignore
+  } catch (e) {
+    console.error('Error parsing response:', e);
   }
 
-  throw new Error(`${res.status}: ${message}`);
+  const errorMessage = `${res.status}: ${message}`;
+  console.error('API Error:', errorMessage);
+  throw new Error(errorMessage);
 }
 
 export async function apiRequest(
