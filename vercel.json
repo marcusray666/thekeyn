@@ -32,10 +32,5 @@
   ],
   "env": {
     "VITE_API_URL": "https://loggin-64qr.onrender.com"
-  },
-  "functions": {
-    "client/dist/index.html": {
-      "maxDuration": 10
-    }
   }
 }
