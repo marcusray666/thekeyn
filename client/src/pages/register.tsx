@@ -22,10 +22,13 @@ export default function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { username: string; email: string; password: string }) => {
-      return await apiRequest('/api/auth/register', {
+      console.log('Registration attempt:', data);
+      const result = await apiRequest('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: data,
       });
+      console.log('Registration result:', result);
+      return result;
     },
     onSuccess: async () => {
       toast({
