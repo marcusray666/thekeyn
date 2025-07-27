@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, LogIn } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -129,13 +129,15 @@ export function Navigation() {
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link href="/login">
-                    <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5">
+                    <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+                      <LogIn className="h-4 w-4 mr-2" />
                       Login
                     </Button>
                   </Link>
                   <Link href="/register">
-                    <Button className="btn-glass">
-                      Sign Up
+                    <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700">
+                      <User className="h-4 w-4 mr-2" />
+                      Register
                     </Button>
                   </Link>
                 </div>

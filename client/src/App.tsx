@@ -47,8 +47,8 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
       
-      {/* Home route - always show Welcome for now */}
-      <Route path="/" component={Welcome} />
+      {/* Home route - dynamic based on auth status */}
+      <Route path="/" component={Home} />
       
       {/* Protected routes */}
       <Route path="/home" component={Home} />
