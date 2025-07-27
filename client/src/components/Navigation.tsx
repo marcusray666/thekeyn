@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Smartphone, Crown, Shield, LogIn } from "lucide-react";
+import { Menu, X, Home, Upload, Award, LogOut, User, Sparkles, Users, Settings, ChevronDown, Crown, Shield, LogIn } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -45,11 +45,8 @@ export function Navigation() {
     { href: "/", label: "Portfolio", icon: Home },
     { href: "/social", label: "Community", icon: Users },
     { href: "/studio", label: "Studio", icon: Upload },
-    { href: "/certificates", label: "My Certificates", icon: Award },
     { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    { href: "/mobile", label: "Mobile App", icon: Smartphone },
-
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
@@ -230,14 +227,7 @@ export function Navigation() {
                     <span>Settings</span>
                   </Link>
 
-                  <Link
-                    href="/report-theft"
-                    className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all text-lg"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Award className="h-6 w-6" />
-                    <span>Report Theft</span>
-                  </Link>
+
 
                   <Link
                     href="/analytics"

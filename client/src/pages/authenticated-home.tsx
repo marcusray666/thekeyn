@@ -35,13 +35,7 @@ export default function AuthenticatedHome() {
       href: "/social",
       color: "from-green-500 to-teal-600"
     },
-    {
-      title: "View Certificates",
-      description: "Manage your protections",
-      icon: Award,
-      href: "/certificates",
-      color: "from-yellow-500 to-orange-600"
-    },
+
     {
       title: "Verify Blockchain",
       description: "Advanced verification",
@@ -112,7 +106,7 @@ export default function AuthenticatedHome() {
         {/* Quick Actions */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {quickActions.map((action) => (
               <Link key={action.href} href={action.href}>
                 <GlassCard className="p-6 cursor-pointer hover:scale-105 transition-transform duration-200">
@@ -132,9 +126,9 @@ export default function AuthenticatedHome() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">Recent Works</h2>
-              <Link href="/certificates">
+              <Link href="/studio">
                 <Button variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
-                  View All
+                  Manage in Studio
                 </Button>
               </Link>
             </div>
