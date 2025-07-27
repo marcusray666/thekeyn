@@ -1,0 +1,48 @@
+[22:58:05.224] Running build in Washington, D.C., USA (East) – iad1
+[22:58:05.225] Build machine configuration: 2 cores, 8 GB
+[22:58:05.244] Cloning github.com/marcusray666/loggin (Branch: main, Commit: 9bef395)
+[22:58:07.910] Cloning completed: 2.666s
+[22:58:07.973] Found .vercelignore
+[22:58:07.992] Removed 134 ignored files defined in .vercelignore
+[22:58:07.992]   /.replit
+[22:58:07.992]   /ADMIN_ACCESS_INSTRUCTIONS.md
+[22:58:07.993]   /ALTERNATIVE_DEPLOYMENT_SOLUTION.md
+[22:58:07.993]   /ARCHITECTURE.md
+[22:58:07.993]   /backend/.dockerignore
+[22:58:07.993]   /backend/.env.example
+[22:58:07.993]   /backend/.gitignore
+[22:58:07.993]   /backend/.nvmrc
+[22:58:07.993]   /backend/Dockerfile
+[22:58:07.993]   /backend/drizzle.config.ts
+[22:58:08.057] Restored build cache from previous deployment (97tSDnK7ZiuyMy6PmhMFEwhJEy8w)
+[22:58:10.567] Running "vercel build"
+[22:58:11.050] Vercel CLI 44.5.0
+[22:58:11.668] Running "install" command: `echo 'Installing frontend dependencies' && cd client && npm ci`...
+[22:58:11.672] Installing frontend dependencies
+[22:58:12.594] npm error code EUSAGE
+[22:58:12.595] npm error
+[22:58:12.595] npm error The `npm ci` command can only install with an existing package-lock.json or
+[22:58:12.595] npm error npm-shrinkwrap.json with lockfileVersion >= 1. Run an install with npm@5 or
+[22:58:12.595] npm error later to generate a package-lock.json file, then try again.
+[22:58:12.596] npm error
+[22:58:12.596] npm error Clean install a project
+[22:58:12.596] npm error
+[22:58:12.596] npm error Usage:
+[22:58:12.596] npm error npm ci
+[22:58:12.597] npm error
+[22:58:12.597] npm error Options:
+[22:58:12.597] npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+[22:58:12.597] npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+[22:58:12.597] npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+[22:58:12.597] npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+[22:58:12.597] npm error [--no-bin-links] [--no-fund] [--dry-run]
+[22:58:12.597] npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+[22:58:12.598] npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+[22:58:12.598] npm error
+[22:58:12.598] npm error aliases: clean-install, ic, install-clean, isntall-clean
+[22:58:12.598] npm error
+[22:58:12.598] npm error Run "npm help ci" for more info
+[22:58:12.599] npm error A complete log of this run can be found in: /vercel/.npm/_logs/2025-07-27T05_58_12_028Z-debug-0.log
+[22:58:12.631] Error: Command "echo 'Installing frontend dependencies' && cd client && npm ci" exited with 1
+[22:58:13.067] 
+[22:58:16.107] Exiting build container
