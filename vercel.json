@@ -10,7 +10,11 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/css"
+          "value": "text/css; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -19,9 +23,35 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control", 
+          "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/(.*\\.css)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "lggn.net"
+        }
+      ],
+      "destination": "https://www.lggn.net/$1",
+      "permanent": true
     }
   ],
   "rewrites": [
