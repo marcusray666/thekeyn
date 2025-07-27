@@ -276,6 +276,20 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Basic health check endpoint
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
+
+  // Root endpoint
+  app.get("/", (_req, res) => {
+    res.json({ 
+      message: "Loggin Backend API",
+      status: "running",
+      version: "1.0.0",
+      endpoints: ["/api/health", "/api/auth/login", "/api/auth/register"]
+    });
+  });
   // Session middleware
   const sessionMiddleware = session({
     store: new MemStore({

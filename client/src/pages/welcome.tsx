@@ -2,6 +2,14 @@ import { Link } from "wouter";
 import { Shield, Upload, Link as LinkIcon, Gavel, Plus, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Force CSS to load properly in production
+if (typeof window !== 'undefined') {
+  const cssLink = document.querySelector('link[href*="index-"]');
+  if (cssLink) {
+    cssLink.setAttribute('type', 'text/css');
+  }
+}
+
 export default function Welcome() {
   const features = [
     {

@@ -29,8 +29,8 @@ export async function apiRequest(
   url: string,
   options: RequestInit = {}
 ): Promise<any> {
-  // Always use localhost for development
-  const API_BASE_URL = 'http://localhost:5000';
+  // Use environment variable for API URL, fallback to localhost for development
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
   
   // Don't set Content-Type for FormData - let the browser set it automatically
@@ -67,8 +67,8 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
-    // Always use localhost for development
-    const API_BASE_URL = 'http://localhost:5000';
+    // Use environment variable for API URL, fallback to localhost for development
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
     
     console.log('Query function called:', { url, fullUrl });
