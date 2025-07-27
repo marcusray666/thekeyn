@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Link } from "wouter";
-import { Shield, Upload, Link as LinkIcon, Gavel, Plus, Tag, User, LogIn } from "lucide-react";
+import { Shield, Upload, Link as LinkIcon, Gavel, Plus, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 

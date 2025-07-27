@@ -3,19 +3,15 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Navigation } from "@/components/ui/navigation";
-import { useAuth } from "@/hooks/useAuth";
-import { FullScreenLoader } from "@/components/ui/liquid-glass-loader";
+import { Navigation } from "@/components/Navigation";
 import { ThemeProvider } from "@/components/theme-provider";
-import { useEffect } from "react";
-import { useLocation } from "wouter";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
-import Certificates from "@/pages/certificates";
+
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
 import ReportTheft from "@/pages/report-theft";
@@ -29,7 +25,7 @@ import CertificateGuide from "@/pages/certificate-guide";
 import NFTMinting from "@/pages/nft-minting";
 import NFTStudio from "@/pages/nft-studio";
 import SimplifiedNFT from "@/pages/simplified-nft";
-import SubscriptionManagement from "@/pages/subscription-management";
+
 import Subscription from "@/pages/subscription";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import SubscriptionCancelled from "@/pages/subscription-cancelled";
@@ -88,12 +84,8 @@ function Router() {
       <Route path="/subscription/cancelled" component={SubscriptionCancelled} />
       
       {/* Legacy profile showcase routes - redirect to main profile */}
-      <Route path="/showcase/:username">
-        {({ username }) => <Profile />}
-      </Route>
-      <Route path="/portfolio/:username">
-        {({ username }) => <Profile />}
-      </Route>
+      <Route path="/showcase/:username" component={Profile} />
+      <Route path="/portfolio/:username" component={Profile} />
       
       <Route component={NotFound} />
     </Switch>
