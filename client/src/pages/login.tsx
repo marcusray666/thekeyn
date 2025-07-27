@@ -24,8 +24,9 @@ export default function Login() {
       console.log('Login attempt:', data);
       
       try {
-        // Direct fetch to bypass apiRequest issues
-        const response = await fetch('http://localhost:5000/api/auth/login', {
+        // Direct fetch using same origin since it's a unified server
+        console.log('Current origin:', window.location.origin);
+        const response = await fetch(`/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

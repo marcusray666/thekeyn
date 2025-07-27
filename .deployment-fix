@@ -5,3 +5,4 @@ COMPREHENSIVE FIXES APPLIED - Sun Jul 27 06:56:56 AM UTC 2025
 JSON syntax fixed - Sun Jul 27 07:02:14 AM UTC 2025
 Frontend authentication debugging added - Sun Jul 27 07:30:43 AM UTC 2025
 Direct fetch bypass added to registration - Sun Jul 27 07:33:56 AM UTC 2025
+Simplified to relative URLs for unified server - Sun Jul 27 07:36:05 AM UTC 2025
