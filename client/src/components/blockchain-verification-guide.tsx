@@ -278,6 +278,7 @@ export function BlockchainVerificationGuide({
           </div>
         </div>
       )}
-    </Card>
+    </div>
+  </Card>
   );
 }
