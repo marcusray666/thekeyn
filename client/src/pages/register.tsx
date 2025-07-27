@@ -22,36 +22,10 @@ export default function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { username: string; email: string; password: string }) => {
-      console.log('Registration attempt:', data);
-      
-      try {
-        // Direct fetch using same origin since it's a unified server
-        console.log('Current origin:', window.location.origin);
-        const response = await fetch(`/api/auth/register`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(data),
-        });
-        
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          throw new Error(errorText || `HTTP ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('Registration result:', result);
-        return result;
-      } catch (error) {
-        console.error('Fetch error:', error);
-        throw error;
-      }
+      return await apiRequest('/api/auth/register', {
+        method: 'POST',
+        body: data,
+      });
     },
     onSuccess: async () => {
       toast({
@@ -66,9 +40,8 @@ export default function Register() {
       setLocation('/dashboard');
     },
     onError: (error: Error) => {
-      console.error('Registration error:', error);
       toast({
-        title: "Registration failed", 
+        title: "Registration failed",
         description: error.message || "Please check your information and try again.",
         variant: "destructive",
       });

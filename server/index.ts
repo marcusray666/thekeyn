@@ -23,11 +23,10 @@ const corsOptions = {
         /https:\/\/.*\.netlify\.app$/,
         /https:\/\/.*\.pages\.dev$/
       ].filter(Boolean)
-    : true, // Allow all origins in development
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://127.0.0.1:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 };
 
 app.use(cors(corsOptions));

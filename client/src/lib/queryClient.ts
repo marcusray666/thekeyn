@@ -10,7 +10,6 @@ async function throwIfResNotOk(res: Response) {
   let message = res.statusText;
   try {
     const errorBody = await res.text();
-    console.log('Error response body:', errorBody);
     if (errorBody) {
       try {
         const errorJson = JSON.parse(errorBody);
@@ -19,24 +18,19 @@ async function throwIfResNotOk(res: Response) {
         message = errorBody;
       }
     }
-  } catch (e) {
-    console.error('Error parsing response:', e);
+  } catch {
+    // ignore
   }
 
-  const errorMessage = `${res.status}: ${message}`;
-  console.error('API Error:', errorMessage);
-  throw new Error(errorMessage);
+  throw new Error(`${res.status}: ${message}`);
 }
 
 export async function apiRequest(
   url: string,
   options: RequestInit = {}
 ): Promise<any> {
-  // Use environment variable for API URL, fallback to localhost for development
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
-  
-  console.log('API Request:', { fullUrl, options });
+  // Use relative URLs for unified server
+  const fullUrl = url.startsWith('/') ? url : `/${url}`;
   
   // Don't set Content-Type for FormData - let the browser set it automatically
   const headers: Record<string, string> = {};
@@ -56,8 +50,6 @@ export async function apiRequest(
           undefined,
   });
 
-  console.log('API Response:', { status: res.status, ok: res.ok, url: fullUrl });
-
   await throwIfResNotOk(res);
   
   if (res.headers.get("Content-Type")?.includes("application/json")) {
@@ -74,17 +66,14 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
-    // Use environment variable for API URL, fallback to localhost for development
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
-    
-    console.log('Query function called:', { url, fullUrl });
+    // Use relative URLs for unified server
+    const fullUrl = url.startsWith('/') ? url : `/${url}`;
     
     const res = await fetch(fullUrl, {
       credentials: "include",
     });
 
-    console.log('Fetch response:', { status: res.status, url: fullUrl });
+
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       console.log('Returning null for 401');
