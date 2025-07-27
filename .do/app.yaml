@@ -1,0 +1,24 @@
+name: loggin-fullstack
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/loggin
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: DATABASE_URL
+    value: ${db.DATABASE_URL}
+databases:
+- name: db
+  engine: PG
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "14"
