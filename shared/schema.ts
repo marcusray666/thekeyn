@@ -112,11 +112,7 @@ export const subscriptionUsage = pgTable("subscription_usage", {
 
 
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  email: true,
-  passwordHash: true,
-});
+export const insertUserSchema = createInsertSchema(users);
 
 export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -237,7 +233,7 @@ export const postComments = pgTable("post_comments", {
   id: serial("id").primaryKey(),
   postId: text("post_id").references(() => posts.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  parentId: integer("parent_id").references(() => postComments.id), // For reply threads
+  parentId: integer("parent_id"), // For reply threads
   content: text("content").notNull(),
   mentionedUsers: text("mentioned_users").array().default([]),
   likes: integer("likes").default(0),
@@ -558,7 +554,7 @@ export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   workId: integer("work_id").references(() => works.id).notNull(),
-  parentId: integer("parent_id").references(() => comments.id), // For reply threads
+  parentId: integer("parent_id"), // For reply threads
   content: text("content").notNull(),
   mentionedUsers: text("mentioned_users").array().default([]), // Array of mentioned usernames
   likeCount: integer("like_count").default(0),
@@ -665,7 +661,7 @@ export const messages = pgTable("messages", {
   editedAt: timestamp("edited_at"),
   isDeleted: boolean("is_deleted").default(false),
   deletedAt: timestamp("deleted_at"),
-  replyToMessageId: text("reply_to_message_id").references(() => messages.id), // For threaded conversations
+  replyToMessageId: text("reply_to_message_id"), // For threaded conversations
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

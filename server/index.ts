@@ -17,12 +17,14 @@ app.set('trust proxy', 1);
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        process.env.FRONTEND_URL,
+        process.env.FRONTEND_URL || 'https://www.lggn.net',
+        'https://lggn.net',
+        'https://www.lggn.net',
         // Add patterns for common hosting services
         /https:\/\/.*\.vercel\.app$/,
         /https:\/\/.*\.netlify\.app$/,
         /https:\/\/.*\.pages\.dev$/
-      ].filter(Boolean)
+      ].filter(Boolean) as (string | RegExp)[]
     : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://127.0.0.1:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

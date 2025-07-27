@@ -2,20 +2,22 @@ import { Link } from "wouter";
 import { Shield, Upload, Link as LinkIcon, Gavel, Plus, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Force CSS and JS to load properly in production
+// Mobile-first optimizations
+import { MobileUtils } from "@/mobile";
+
+// Initialize mobile features on welcome page
 if (typeof window !== 'undefined') {
-  const cssLink = document.querySelector('link[href*="index-"]');
-  if (cssLink) {
-    cssLink.setAttribute('type', 'text/css');
+  // Detect mobile and adjust UI accordingly
+  const isMobile = MobileUtils.isMobile();
+  const isPWA = MobileUtils.isPWA();
+  
+  if (isMobile) {
+    document.body.classList.add('mobile-optimized');
   }
   
-  // Debug deployment version
-  console.log('Deployment check:', {
-    timestamp: '2025-07-27T07:05:00Z',
-    build: 'latest-cache-bust',
-    cssLoaded: !!cssLink,
-    backdropSupport: CSS.supports('backdrop-filter', 'blur(10px)')
-  });
+  if (isPWA) {
+    document.body.classList.add('pwa-mode');
+  }
 }
 
 export default function Welcome() {

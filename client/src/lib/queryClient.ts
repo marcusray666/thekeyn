@@ -71,16 +71,11 @@ export const getQueryFn: <T>(options: {
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
     
-    console.log('Query function called:', { url, fullUrl });
-    
     const res = await fetch(fullUrl, {
       credentials: "include",
     });
 
-    console.log('Fetch response:', { status: res.status, url: fullUrl });
-
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      console.log('Returning null for 401');
       return null;
     }
 

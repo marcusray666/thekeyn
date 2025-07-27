@@ -87,7 +87,7 @@
     color: white !important;
   }
   
-  /* Disable iOS tap highlight for better mobile experience */
+  /* Mobile-optimized interactions */
   * {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
@@ -96,6 +96,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    touch-action: manipulation; /* Prevent zoom on double-tap */
   }
   
   /* Re-enable selection for text inputs and content areas */
@@ -105,6 +106,33 @@
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
+    touch-action: auto;
+  }
+
+  /* Mobile-specific styles */
+  .mobile-optimized {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .mobile-optimized input {
+    font-size: 16px; /* Prevent zoom on iOS inputs */
+  }
+
+  /* PWA-specific styles */
+  .pwa-mode {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Safe area handling for mobile apps */
+  @supports (padding: max(0px)) {
+    .safe-top {
+      padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    
+    .safe-bottom {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
   }
 
   /* Gradient text effect */

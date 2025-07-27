@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 export function Navigation() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
@@ -48,7 +48,7 @@ export function Navigation() {
     { href: "/certificates", label: "My Certificates", icon: Award },
     { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    { href: "/mobile", label: "Mobile App", icon: Smartphone },
+
 
   ];
 
