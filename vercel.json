@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm ci && npm run build",
+  "buildCommand": "cd client && npm ci && rm -rf dist && npm run build",
   "outputDirectory": "client/dist",
   "installCommand": "echo 'Dependencies will be installed via buildCommand'",
   "framework": null,

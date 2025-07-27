@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Debug Test</title>
+  <style>
+    /* Test inline CSS for glass morphism */
+    .test-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 20px;
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #9333ea, #06b6d4, #ec4899);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: gradientShift 3s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-card">
+    <h1 class="gradient-text">Test Glass Morphism Card</h1>
+    <p>If you can see this card with blur effect and gradient text, CSS is working properly.</p>
+    <p>This is testing the same styles that should appear on the welcome page.</p>
+  </div>
+  
+  <script>
+    console.log('Testing CSS loading...');
+    
+    // Check if external CSS loaded
+    const cssLink = document.querySelector('link[href*="index-"]');
+    if (cssLink) {
+      console.log('CSS link found:', cssLink.href);
+    } else {
+      console.log('No external CSS link found');
+    }
+    
+    // Test computed styles
+    setTimeout(() => {
+      const testCard = document.querySelector('.test-card');
+      const styles = window.getComputedStyle(testCard);
+      console.log('Backdrop filter:', styles.backdropFilter);
+      console.log('Background:', styles.background);
+      console.log('Border radius:', styles.borderRadius);
+    }, 100);
+  </script>
+</body>
+</html>
