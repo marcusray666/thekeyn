@@ -33,6 +33,8 @@ export async function apiRequest(
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
   
+  console.log('API Request:', { fullUrl, options });
+  
   // Don't set Content-Type for FormData - let the browser set it automatically
   const headers: Record<string, string> = {};
   if (!(options.body instanceof FormData)) {
@@ -50,6 +52,8 @@ export async function apiRequest(
           options.body ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : 
           undefined,
   });
+
+  console.log('API Response:', { status: res.status, ok: res.ok, url: fullUrl });
 
   await throwIfResNotOk(res);
   
