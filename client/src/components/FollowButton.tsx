@@ -40,7 +40,7 @@ export default function FollowButton({
     },
     onSuccess: () => {
       // Invalidate all relevant queries to refresh UI state
-      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
       queryClient.invalidateQueries({ queryKey: [`/api/social/users/${userId}/followers`] });
       queryClient.invalidateQueries({ queryKey: [`/api/social/users/${userId}/following`] });
       queryClient.invalidateQueries({ queryKey: [`/api/social/users/${userId}/follow-stats`] });

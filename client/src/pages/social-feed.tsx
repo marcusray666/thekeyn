@@ -78,7 +78,7 @@ export default function SocialFeed() {
 
   // Fetch public works feed
   const { data: feed, isLoading } = useQuery({
-    queryKey: ["/api/social/posts", filter, searchQuery, selectedTags],
+    queryKey: ["/api/social/feed", filter, searchQuery, selectedTags],
     queryParams: { filter, search: searchQuery, tags: selectedTags.join(',') }
   });
 
@@ -95,7 +95,7 @@ export default function SocialFeed() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
     },
     onError: (error: any) => {
       toast({
@@ -109,12 +109,19 @@ export default function SocialFeed() {
   // Follow/Unfollow mutation
   const followMutation = useMutation({
     mutationFn: async ({ userId, action }: { userId: number; action: 'follow' | 'unfollow' }) => {
-      return await apiRequest(`/api/social/users/${userId}/${action}`, {
-        method: 'POST'
-      });
+      if (action === 'unfollow') {
+        return await apiRequest(`/api/social/users/${userId}/follow`, {
+          method: 'DELETE'
+        });
+      } else {
+        return await apiRequest(`/api/social/users/${userId}/follow`, {
+          method: 'POST'
+        });
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social"] });
       toast({
         title: "Success",
         description: "Follow status updated",
@@ -138,7 +145,7 @@ export default function SocialFeed() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/feed"] });
       setShareText('');
       setSelectedWork(null);
       toast({

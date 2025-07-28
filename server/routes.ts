@@ -1795,6 +1795,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Cannot follow yourself' });
       }
       
+      // Check if already following
+      const isAlreadyFollowing = await storage.isFollowing(req.userId!, userId);
+      if (isAlreadyFollowing) {
+        return res.status(200).json({ message: 'Already following this user', alreadyFollowing: true });
+      }
+      
       const follow = await storage.followUser(req.userId!, userId);
       
       // Create notification
@@ -1809,11 +1815,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(follow);
     } catch (error) {
       console.error('Error following user:', error);
+      // Handle duplicate key error gracefully
+      if (error.code === '23505') {
+        return res.status(200).json({ message: 'Already following this user', alreadyFollowing: true });
+      }
       res.status(500).json({ message: 'Failed to follow user' });
     }
   });
 
-  app.post('/api/social/users/:userId/unfollow', requireAuth, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/social/users/:userId/follow', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = parseInt(req.params.userId);
       await storage.unfollowUser(req.userId!, userId);
