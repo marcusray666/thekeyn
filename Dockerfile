@@ -4,28 +4,27 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (for better Docker layer caching)
 COPY package*.json ./
 COPY client/package*.json ./client/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install root dependencies
+RUN npm ci
 
 # Install client dependencies
 WORKDIR /app/client
-RUN npm ci --only=production
+RUN npm ci
 
-# Build client
-RUN npm run build
-
-# Go back to app root
+# Go back to app root and copy all source code
 WORKDIR /app
-
-# Copy source code
 COPY . .
 
-# Install esbuild and build server
-RUN npm install esbuild
+# Build client
+WORKDIR /app/client
+RUN npm run build
+
+# Go back to app root and build server
+WORKDIR /app
 RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
 # Create uploads directory
