@@ -370,18 +370,25 @@ export default function StudioUnified() {
 
         {/* Main Content with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="glass-morphism border-purple-500/30 mb-8 w-full max-w-md mx-auto">
-            <TabsTrigger value="certificates" className="flex items-center gap-2 flex-1">
-              <Award className="h-4 w-4" />
-              My Certificates
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="flex items-center gap-2 flex-1">
-              <Upload className="h-4 w-4" />
-              Upload Work
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex justify-center w-full mb-8">
+            <TabsList className="grid w-full max-w-md grid-cols-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+              <TabsTrigger 
+                value="certificates" 
+                className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 hover:text-white transition-all duration-200 flex items-center gap-2"
+              >
+                <Award className="h-4 w-4" />
+                My Certificates
+              </TabsTrigger>
+              <TabsTrigger 
+                value="upload" 
+                className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 hover:text-white transition-all duration-200 flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Upload Work
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          {/* Upload Tab */}
           <TabsContent value="upload" className="space-y-6">
             {/* Subscription Usage Display */}
             {subscriptionData && (
