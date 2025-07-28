@@ -70,7 +70,17 @@ app.use('/api/works', uploadLimiter);
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ extended: false, limit: '500mb' }));
 
-// Session configuration
+// Session activity tracking middleware
+app.use((req, res, next) => {
+  if (req.session && (req.session as any).userId) {
+    // Update session activity timestamp on each authenticated request
+    (req.session as any).lastActivity = new Date();
+    console.log(`Session activity updated for user ${(req.session as any).userId}`);
+  }
+  next();
+});
+
+// Session configuration with 1-hour timeout
 const PgSession = ConnectPgSimple(session);
 
 app.use(session({
@@ -82,10 +92,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'development-secret-key',
   resave: false,
   saveUninitialized: false,
+  rolling: true, // Reset expiration on activity
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    maxAge: 60 * 60 * 1000, // 1 hour timeout
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
 }));

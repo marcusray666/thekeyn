@@ -345,6 +345,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   adminRoutes(app);
 
+  // Session heartbeat endpoint
+  app.post("/api/auth/heartbeat", async (req, res) => {
+    if (!req.session || !(req.session as any).userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
+    // Update session activity
+    (req.session as any).lastActivity = new Date();
+    console.log(`Heartbeat received for user ${(req.session as any).userId}`);
+    
+    res.json({ 
+      success: true, 
+      lastActivity: (req.session as any).lastActivity,
+      userId: (req.session as any).userId 
+    });
+  });
+
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {

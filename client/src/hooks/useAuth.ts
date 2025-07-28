@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useSessionTimeout } from "./useSessionTimeout";
 
 export function useAuth() {
   const { data: user, isLoading, error } = useQuery({
@@ -9,6 +10,12 @@ export function useAuth() {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+  // Initialize session timeout only when user is authenticated
+  const sessionTimeout = !!user ? useSessionTimeout({
+    timeoutMinutes: 60, // 1 hour
+    warningMinutes: 5,  // Warn 5 minutes before
+  }) : { logout: () => {}, updateActivity: () => {} };
+
   // Debug log to trace authentication state
   console.log('useAuth:', { user, isLoading, error });
 
@@ -17,5 +24,7 @@ export function useAuth() {
     isLoading,
     isAuthenticated: !!user,
     error,
+    logout: sessionTimeout.logout,
+    updateActivity: sessionTimeout.updateActivity,
   };
 }
