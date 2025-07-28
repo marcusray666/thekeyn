@@ -1032,18 +1032,39 @@ export default function StudioUnified() {
                             </p>
                             <div className="space-y-4">
                               <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-                                <h6 className="text-emerald-800 dark:text-emerald-300 font-semibold mb-2">OpenTimestamps Verification</h6>
+                                <h6 className="text-emerald-800 dark:text-emerald-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Download className="w-4 h-4" />
+                                  OpenTimestamps Verification
+                                </h6>
                                 <p className="text-sm text-emerald-700 dark:text-emerald-200 mb-3">
-                                  Visit <a href="https://opentimestamps.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-600">opentimestamps.org</a> and upload your original file to verify the timestamp.
+                                  Download your <strong>.ots file</strong> (OpenTimestamps proof) and upload it along with your original file to <a href="https://opentimestamps.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-600">opentimestamps.org</a> for independent verification.
                                 </p>
-                                <Button
-                                  size="sm"
-                                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                                  onClick={() => window.open('https://opentimestamps.org', '_blank')}
-                                >
-                                  <ExternalLink className="w-3 h-3 mr-2" />
-                                  Verify on OpenTimestamps
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    onClick={() => {
+                                      window.open(`/api/certificates/${showPreview.certificate.certificateId}/ots-download`, '_blank');
+                                    }}
+                                  >
+                                    <Download className="w-3 h-3 mr-2" />
+                                    Download .ots File
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                                    onClick={() => window.open('https://opentimestamps.org', '_blank')}
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-2" />
+                                    Verify on OpenTimestamps
+                                  </Button>
+                                </div>
+                                <div className="mt-3 p-3 bg-emerald-100 dark:bg-emerald-800/30 rounded-md">
+                                  <p className="text-xs text-emerald-800 dark:text-emerald-200">
+                                    <strong>How to verify:</strong> 1) Download the .ots file above, 2) Go to opentimestamps.org, 3) Upload both your original file and the .ots file for verification
+                                  </p>
+                                </div>
                               </div>
                               
                               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -1086,19 +1107,36 @@ export default function StudioUnified() {
                               <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                                 <h6 className="text-purple-800 dark:text-purple-300 font-semibold mb-2 flex items-center gap-2">
                                   <Download className="w-4 h-4" />
-                                  Download Certificate
+                                  Download Files
                                 </h6>
                                 <p className="text-sm text-purple-700 dark:text-purple-200 mb-3">
-                                  Get a professional PDF certificate with QR code for legal documentation.
+                                  Get your verification files for legal documentation and independent blockchain verification.
                                 </p>
-                                <Button
-                                  size="sm"
-                                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                                  onClick={() => handleDownloadCertificate(showPreview.certificate)}
-                                >
-                                  <Download className="w-3 h-3 mr-2" />
-                                  Download PDF Certificate
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                                    onClick={() => handleDownloadCertificate(showPreview.certificate)}
+                                  >
+                                    <Download className="w-3 h-3 mr-2" />
+                                    PDF Certificate
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-purple-300 text-purple-700 hover:bg-purple-100"
+                                    onClick={() => {
+                                      window.open(`/api/certificates/${showPreview.certificate.certificateId}/ots-download`, '_blank');
+                                      toast({
+                                        title: "Downloading .ots file",
+                                        description: "Use this file with your original work for OpenTimestamps verification",
+                                      });
+                                    }}
+                                  >
+                                    <Download className="w-3 h-3 mr-2" />
+                                    .ots Proof File
+                                  </Button>
+                                </div>
                               </div>
                               
                               <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">

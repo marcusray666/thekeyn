@@ -1157,6 +1157,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // Download OpenTimestamps .ots file
+  app.get("/api/certificates/:certificateId/ots-download", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { certificateId } = req.params;
+      const userId = req.session!.userId;
+
+      const certificate = await storage.getCertificate(certificateId);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+
+      const work = await storage.getWork(certificate.workId);
+      if (!work || work.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Get the OTS proof from the certificate's verification proof
+      const verificationProof = certificate.verificationProof ? JSON.parse(certificate.verificationProof) : null;
+      if (!verificationProof || !verificationProof.otsProof) {
+        return res.status(404).json({ error: "OpenTimestamps proof not found for this work" });
+      }
+
+      // Decode the OTS data and send as file
+      const otsBuffer = Buffer.from(verificationProof.otsProof, 'base64');
+      
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${work.title.replace(/[^a-zA-Z0-9]/g, '_')}.ots"`);
+      res.setHeader('Content-Length', otsBuffer.length);
+      
+      res.send(otsBuffer);
+    } catch (error) {
+      console.error('OTS download error:', error);
+      res.status(500).json({ error: "Failed to download OpenTimestamps file" });
+    }
+  });
+
   // NFT minting routes
   app.post('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
