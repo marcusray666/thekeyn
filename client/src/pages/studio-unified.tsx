@@ -370,13 +370,13 @@ export default function StudioUnified() {
         {/* Main Content with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="glass-morphism border-purple-500/30 mb-8 w-full max-w-md mx-auto">
-            <TabsTrigger value="upload" className="flex items-center gap-2 flex-1">
-              <Upload className="h-4 w-4" />
-              Upload Work
-            </TabsTrigger>
             <TabsTrigger value="certificates" className="flex items-center gap-2 flex-1">
               <Award className="h-4 w-4" />
               My Certificates
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="flex items-center gap-2 flex-1">
+              <Upload className="h-4 w-4" />
+              Upload Work
             </TabsTrigger>
           </TabsList>
 
