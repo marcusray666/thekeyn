@@ -7,12 +7,14 @@ interface UseSessionTimeoutOptions {
   timeoutMinutes?: number;
   warningMinutes?: number;
   checkInterval?: number;
+  enabled?: boolean;
 }
 
 export function useSessionTimeout({
   timeoutMinutes = 60, // 1 hour
   warningMinutes = 5, // Warn 5 minutes before timeout
   checkInterval = 60000, // Check every minute
+  enabled = true, // Enable/disable the timeout functionality
 }: UseSessionTimeoutOptions = {}) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -85,6 +87,8 @@ export function useSessionTimeout({
   }, [timeoutMinutes, warningMinutes, logout, showWarning]);
 
   useEffect(() => {
+    if (!enabled) return;
+
     // Activity event listeners
     const events = [
       'mousedown',
@@ -117,10 +121,12 @@ export function useSessionTimeout({
         clearTimeout(timeoutIdRef.current);
       }
     };
-  }, [updateActivity, checkActivity, checkInterval]);
+  }, [updateActivity, checkActivity, checkInterval, enabled]);
 
   // Handle page visibility change (when user closes laptop/switches tabs)
   useEffect(() => {
+    if (!enabled) return;
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Page is hidden - record current time
@@ -136,7 +142,7 @@ export function useSessionTimeout({
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [checkActivity]);
+  }, [checkActivity, enabled]);
 
   return {
     updateActivity,
