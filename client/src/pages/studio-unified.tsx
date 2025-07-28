@@ -116,6 +116,7 @@ export default function StudioUnified() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; certificate: Certificate | null }>({ show: false, certificate: null });
   const [showPreview, setShowPreview] = useState<{ show: boolean; certificate: Certificate | null }>({ show: false, certificate: null });
+  const [verificationTab, setVerificationTab] = useState<'how-it-works' | 'verify-proof' | 'tools'>('how-it-works');
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -961,44 +962,173 @@ export default function StudioUnified() {
 
                       {/* Tabs */}
                       <div className="flex gap-1 mb-6 p-1 bg-pink-100 dark:bg-pink-900/30 rounded-xl">
-                        <button className="flex-1 px-3 py-2 text-xs font-medium bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg shadow-sm">
+                        <button 
+                          onClick={() => setVerificationTab('how-it-works')}
+                          className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg shadow-sm transition-all ${
+                            verificationTab === 'how-it-works' 
+                              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white' 
+                              : 'text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30'
+                          }`}
+                        >
                           How It Works
                         </button>
-                        <button className="flex-1 px-3 py-2 text-xs font-medium text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => setVerificationTab('verify-proof')}
+                          className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg shadow-sm transition-all ${
+                            verificationTab === 'verify-proof' 
+                              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white' 
+                              : 'text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30'
+                          }`}
+                        >
                           Verify Your Proof
                         </button>
-                        <button className="flex-1 px-3 py-2 text-xs font-medium text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => setVerificationTab('tools')}
+                          className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg shadow-sm transition-all ${
+                            verificationTab === 'tools' 
+                              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white' 
+                              : 'text-pink-600 dark:text-pink-300 hover:bg-pink-200/50 dark:hover:bg-pink-800/30'
+                          }`}
+                        >
                           Verification Tools
                         </button>
                       </div>
 
                       {/* Content */}
                       <div className="space-y-4">
-                        <div className="bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-500 rounded-xl p-6 shadow-lg">
-                          <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Real Blockchain Timestamping</h5>
-                          <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
-                            Your work is protected using <strong className="text-blue-600 dark:text-blue-400">OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
-                          </p>
-                          <div className="space-y-3 text-sm">
-                            <div className="flex items-start gap-3">
-                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <span className="text-gray-900 dark:text-white font-semibold block mb-2">Your file's SHA-256 hash:</span>
-                                <div className="p-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
-                                  <span className="text-purple-700 dark:text-purple-300 font-mono text-xs break-all">{showPreview.certificate.work.fileHash}</span>
+                        {verificationTab === 'how-it-works' && (
+                          <div className="bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-500 rounded-xl p-6 shadow-lg">
+                            <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Real Blockchain Timestamping</h5>
+                            <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
+                              Your work is protected using <strong className="text-blue-600 dark:text-blue-400">OpenTimestamps</strong> - a real blockchain timestamping service that creates verifiable proofs on Bitcoin and Ethereum blockchains.
+                            </p>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex items-start gap-3">
+                                <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-gray-900 dark:text-white font-semibold block mb-2">Your file's SHA-256 hash:</span>
+                                  <div className="p-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                    <span className="text-purple-700 dark:text-purple-300 font-mono text-xs break-all">{showPreview.certificate.work.fileHash}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                                <span className="text-gray-900 dark:text-white font-semibold">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                                <span className="text-gray-900 dark:text-white font-semibold">Verifiable through multiple calendar servers and block explorers</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {verificationTab === 'verify-proof' && (
+                          <div className="bg-white dark:bg-gray-900 border-2 border-emerald-300 dark:border-emerald-500 rounded-xl p-6 shadow-lg">
+                            <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Verify Your Proof</h5>
+                            <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
+                              Use these tools to independently verify your work's blockchain timestamp and authenticity.
+                            </p>
+                            <div className="space-y-4">
+                              <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                                <h6 className="text-emerald-800 dark:text-emerald-300 font-semibold mb-2">OpenTimestamps Verification</h6>
+                                <p className="text-sm text-emerald-700 dark:text-emerald-200 mb-3">
+                                  Visit <a href="https://opentimestamps.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-600">opentimestamps.org</a> and upload your original file to verify the timestamp.
+                                </p>
+                                <Button
+                                  size="sm"
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  onClick={() => window.open('https://opentimestamps.org', '_blank')}
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-2" />
+                                  Verify on OpenTimestamps
+                                </Button>
+                              </div>
+                              
+                              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <h6 className="text-blue-800 dark:text-blue-300 font-semibold mb-2">Blockchain Explorer</h6>
+                                <p className="text-sm text-blue-700 dark:text-blue-200 mb-3">
+                                  View the actual blockchain transaction containing your file's hash.
+                                </p>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                                    onClick={() => window.open('https://blockstream.info', '_blank')}
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-2" />
+                                    Bitcoin Explorer
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                                    onClick={() => window.open('https://etherscan.io', '_blank')}
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-2" />
+                                    Ethereum Explorer
+                                  </Button>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-start gap-3">
-                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
-                              <span className="text-gray-900 dark:text-white font-semibold">OpenTimestamps proof anchored to Bitcoin/Ethereum blockchain</span>
-                            </div>
-                            <div className="flex items-start gap-3">
-                              <CheckCircle className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
-                              <span className="text-gray-900 dark:text-white font-semibold">Verifiable through multiple calendar servers and block explorers</span>
+                          </div>
+                        )}
+
+                        {verificationTab === 'tools' && (
+                          <div className="bg-white dark:bg-gray-900 border-2 border-purple-300 dark:border-purple-500 rounded-xl p-6 shadow-lg">
+                            <h5 className="text-gray-900 dark:text-white font-bold mb-3 text-base">Verification Tools</h5>
+                            <p className="text-gray-800 dark:text-gray-100 text-sm mb-4 leading-relaxed">
+                              Advanced tools and services for comprehensive work verification.
+                            </p>
+                            <div className="space-y-4">
+                              <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                                <h6 className="text-purple-800 dark:text-purple-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Download className="w-4 h-4" />
+                                  Download Certificate
+                                </h6>
+                                <p className="text-sm text-purple-700 dark:text-purple-200 mb-3">
+                                  Get a professional PDF certificate with QR code for legal documentation.
+                                </p>
+                                <Button
+                                  size="sm"
+                                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                                  onClick={() => handleDownloadCertificate(showPreview.certificate)}
+                                >
+                                  <Download className="w-3 h-3 mr-2" />
+                                  Download PDF Certificate
+                                </Button>
+                              </div>
+                              
+                              <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                                <h6 className="text-orange-800 dark:text-orange-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Copy className="w-4 h-4" />
+                                  Share Verification
+                                </h6>
+                                <p className="text-sm text-orange-700 dark:text-orange-200 mb-3">
+                                  Copy verification details to share with others or for legal purposes.
+                                </p>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                                  onClick={() => {
+                                    const verificationText = `Work: ${showPreview.certificate.work.title}\nCertificate ID: ${showPreview.certificate.certificateId}\nFile Hash: ${showPreview.certificate.work.fileHash}\nBlockchain Hash: ${showPreview.certificate.work.blockchainHash}`;
+                                    navigator.clipboard.writeText(verificationText);
+                                    toast({
+                                      title: "Copied to clipboard",
+                                      description: "Verification details copied successfully",
+                                    });
+                                  }}
+                                >
+                                  <Copy className="w-3 h-3 mr-2" />
+                                  Copy Verification Details
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
 
