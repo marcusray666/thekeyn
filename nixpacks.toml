@@ -1,14 +1,14 @@
 [phases.setup]
-nixPkgs = ["nodejs"]
+nixPkgs = ["nodejs", "bash"]
 
-[phases.install]
-cmds = ["npm ci", "cd client && npm ci && cd .."]
+[phases.install] 
+cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["cd client && npm run build && cd ..", "npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"]
+cmds = ["chmod +x build.sh", "./build.sh"]
 
 [start]
-cmd = "node dist/index.js"
+cmd = "NODE_ENV=production node dist/index.js"
 
 [variables]
 NODE_ENV = "production"

@@ -1,28 +1,18 @@
 #!/bin/bash
-set -e
 
-echo "Starting build process..."
+# Railway build script for unified architecture
+echo "🔧 Starting build process..."
 
-# Install root dependencies
-echo "Installing root dependencies..."
+# Install dependencies
+echo "📦 Installing dependencies..."
 npm ci
 
-# Install client dependencies
-echo "Installing client dependencies..."
-cd client && npm ci && cd ..
+# Build frontend with Vite
+echo "🏗️ Building frontend..."
+npx vite build
 
-# Build client
-echo "Building client..."
-cd client && npm run build && cd ..
-
-# Build server
-echo "Building server..."
+# Build backend with esbuild
+echo "⚙️ Building backend..."
 npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
-# Create uploads directory
-mkdir -p uploads
-
-echo "Build completed successfully!"
-echo "Built files:"
-ls -la dist/
-ls -la client/dist/
+echo "✅ Build completed successfully!"
