@@ -1,0 +1,110 @@
+▲ [WARNING] Duplicate member "getUserWorks" in class body [duplicate-class-member]
+
+    server/storage.ts:500:8:
+      500 │   async getUserWorks(userId: number): Promise<Work[]> {
+          ╵         ~~~~~~~~~~~~
+
+  The original member "getUserWorks" is here:
+
+    server/storage.ts:372:8:
+      372 │   async getUserWorks(userId: number): Promise<Work[]> {
+          ╵         ~~~~~~~~~~~~
+
+▲ [WARNING] Duplicate member "followUser" in class body [duplicate-class-member]
+
+    server/storage.ts:783:8:
+      783 │   async followUser(followerId: number, followingId: number): Prom...
+          ╵         ~~~~~~~~~~
+
+  The original member "followUser" is here:
+
+    server/storage.ts:378:8:
+      378 │   async followUser(followerId: number, followingId: number): Prom...
+          ╵         ~~~~~~~~~~
+
+▲ [WARNING] Duplicate member "unfollowUser" in class body [duplicate-class-member]
+
+    server/storage.ts:803:8:
+      803 │   async unfollowUser(followerId: number, followingId: number): Pr...
+          ╵         ~~~~~~~~~~~~
+
+  The original member "unfollowUser" is here:
+
+    server/storage.ts:386:8:
+      386 │   async unfollowUser(followerId: number, followingId: number): Pr...
+          ╵         ~~~~~~~~~~~~
+
+
+▲ [WARNING] Duplicate member "isFollowing" in class body [duplicate-class-member]
+
+    server/storage.ts:823:8:
+      823 │   async isFollowing(followerId: number, followingId: number): Pro...
+          ╵         ~~~~~~~~~~~
+
+  The original member "isFollowing" is here:
+
+    server/storage.ts:391:8:
+      391 │   async isFollowing(followerId: number, followingId: number): Pro...
+          ╵         ~~~~~~~~~~~
+
+▲ [WARNING] Duplicate member "createNotification" in class body [duplicate-class-member]
+
+    server/storage.ts:915:8:
+      915 │   async createNotification(notification: InsertUserNotification):...
+          ╵         ~~~~~~~~~~~~~~~~~~
+
+  The original member "createNotification" is here:
+
+    server/storage.ts:466:8:
+      466 │   async createNotification(notification: Partial<InsertNotificati...
+          ╵         ~~~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Duplicate member "getUserNotifications" in class body [duplicate-class-member]
+
+    server/storage.ts:924:8:
+      924 │   async getUserNotifications(userId: number, options: { unreadOnl...
+          ╵         ~~~~~~~~~~~~~~~~~~~~
+
+  The original member "getUserNotifications" is here:
+
+    server/storage.ts:473:8:
+      473 │   async getUserNotifications(userId: number, unreadOnly = false):...
+          ╵         ~~~~~~~~~~~~~~~~~~~~
+
+6 of 7 warnings shown (disable the message limit with --log-limit=0)
+
+  dist/index.js  250.0kb
+
+⚡ Done in 20ms
+
+[13/14] RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist  ✔ 670 ms
+
+[14/14] RUN mkdir -p uploads
+
+[14/14] RUN mkdir -p uploads  ✔ 110 ms
+
+exporting to docker image format
+
+exporting to image
+
+[auth] sharing credentials for production-us-west2.railway-registry.com
+
+[auth] sharing credentials for production-us-west2.railway-registry.com  ✔ 0 ms
+
+importing to docker
+
+importing to docker  ✔ 17 sec
+
+Build time: 89.22 seconds
+
+ 
+
+=========================
+
+Container failed to start
+
+=========================
+
+ 
+
+The executable `node_env=production` could not be found.

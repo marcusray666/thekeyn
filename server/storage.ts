@@ -375,23 +375,57 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(works.createdAt));
   }
 
-  async followUser(followerId: number, followingId: number): Promise<Follow> {
-    // Simple implementation for now
-    const [follow] = await db.insert(follows)
+  async followUser(followerId: number, followingId: number): Promise<UserFollow> {
+    const [follow] = await db
+      .insert(userFollows)
       .values({ followerId, followingId })
       .returning();
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`${users.followingCount} + 1` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`${users.followerCount} + 1` })
+      .where(eq(users.id, followingId));
+    
     return follow;
   }
 
   async unfollowUser(followerId: number, followingId: number): Promise<void> {
-    await db.delete(follows)
-      .where(eq(follows.followerId, followerId));
+    await db
+      .delete(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ));
+    
+    // Update follower counts
+    await db
+      .update(users)
+      .set({ followingCount: sql`GREATEST(${users.followingCount} - 1, 0)` })
+      .where(eq(users.id, followerId));
+    
+    await db
+      .update(users)
+      .set({ followerCount: sql`GREATEST(${users.followerCount} - 1, 0)` })
+      .where(eq(users.id, followingId));
   }
 
   async isFollowing(followerId: number, followingId: number): Promise<boolean> {
-    const result = await db.select().from(follows)
-      .where(eq(follows.followerId, followerId));
-    return result.length > 0;
+    const [follow] = await db
+      .select()
+      .from(userFollows)
+      .where(and(
+        eq(userFollows.followerId, followerId),
+        eq(userFollows.followingId, followingId)
+      ))
+      .limit(1);
+    
+    return !!follow;
   }
 
   async likeWork(userId: number, workId: number): Promise<Like> {
@@ -497,9 +531,7 @@ export class DatabaseStorage implements IStorage {
     return mockTags.slice(0, limit);
   }
 
-  async getUserWorks(userId: number): Promise<Work[]> {
-    return await db.select().from(works).where(eq(works.userId, userId)).orderBy(desc(works.createdAt));
-  }
+
 
   // Posts functionality implementation
   async createPost(postData: InsertPost & { userId: number }): Promise<Post> {
@@ -779,59 +811,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(postComments.id, commentId));
   }
 
-  // Following functionality
-  async followUser(followerId: number, followingId: number): Promise<UserFollow> {
-    const [follow] = await db
-      .insert(userFollows)
-      .values({ followerId, followingId })
-      .returning();
-    
-    // Update follower counts
-    await db
-      .update(users)
-      .set({ followingCount: sql`${users.followingCount} + 1` })
-      .where(eq(users.id, followerId));
-    
-    await db
-      .update(users)
-      .set({ followerCount: sql`${users.followerCount} + 1` })
-      .where(eq(users.id, followingId));
-    
-    return follow;
-  }
-
-  async unfollowUser(followerId: number, followingId: number): Promise<void> {
-    await db
-      .delete(userFollows)
-      .where(and(
-        eq(userFollows.followerId, followerId),
-        eq(userFollows.followingId, followingId)
-      ));
-    
-    // Update follower counts
-    await db
-      .update(users)
-      .set({ followingCount: sql`GREATEST(${users.followingCount} - 1, 0)` })
-      .where(eq(users.id, followerId));
-    
-    await db
-      .update(users)
-      .set({ followerCount: sql`GREATEST(${users.followerCount} - 1, 0)` })
-      .where(eq(users.id, followingId));
-  }
-
-  async isFollowing(followerId: number, followingId: number): Promise<boolean> {
-    const [follow] = await db
-      .select()
-      .from(userFollows)
-      .where(and(
-        eq(userFollows.followerId, followerId),
-        eq(userFollows.followingId, followingId)
-      ))
-      .limit(1);
-    
-    return !!follow;
-  }
+  // Following functionality - keep the more complete implementation
 
   async getFollowers(userId: number, options: { limit?: number; offset?: number } = {}): Promise<(User & { isFollowing?: boolean })[]> {
     const { limit = 50, offset = 0 } = options;
@@ -911,33 +891,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // Notifications functionality
-  async createNotification(notification: InsertUserNotification): Promise<UserNotification> {
-    const [newNotification] = await db
-      .insert(userNotifications)
-      .values(notification)
-      .returning();
-    
-    return newNotification;
-  }
-
-  async getUserNotifications(userId: number, options: { unreadOnly?: boolean; limit?: number; offset?: number } = {}): Promise<UserNotification[]> {
-    const { unreadOnly = false, limit = 50, offset = 0 } = options;
-    
-    let query = db
-      .select()
-      .from(userNotifications)
-      .where(eq(userNotifications.userId, userId));
-    
-    if (unreadOnly) {
-      query = query.where(eq(userNotifications.isRead, false));
-    }
-    
-    return await query
-      .orderBy(desc(userNotifications.createdAt))
-      .limit(limit)
-      .offset(offset);
-  }
+  // Notifications functionality - keep the more complete implementation
 
   async markNotificationRead(notificationId: number): Promise<void> {
     await db
