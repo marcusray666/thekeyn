@@ -23,7 +23,7 @@ export default function Login() {
     mutationFn: async (data: { username: string; password: string }) => {
       return await apiRequest('/api/auth/login', {
         method: 'POST',
-        body: data,
+        body: JSON.stringify(data),
       });
     },
     onSuccess: async (data) => {

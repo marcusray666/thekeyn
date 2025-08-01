@@ -24,7 +24,7 @@ export default function Register() {
     mutationFn: async (data: { username: string; email: string; password: string }) => {
       return await apiRequest('/api/auth/register', {
         method: 'POST',
-        body: data,
+        body: JSON.stringify(data),
       });
     },
     onSuccess: async () => {
