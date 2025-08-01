@@ -18,7 +18,14 @@ export function useAuth() {
   });
 
   // Debug log to trace authentication state
-  console.log('useAuth:', { user, isLoading, error });
+  console.log('useAuth STATE:', { 
+    hasUser: !!user, 
+    userId: user?.id,
+    username: user?.username,
+    isLoading, 
+    error: error?.message || error,
+    queryKey: '/api/auth/user'
+  });
 
   return {
     user: user || null,
