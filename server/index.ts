@@ -115,50 +115,55 @@ app.use(session({
     const fs = await import('fs');
     const express = await import('express');
     
-    const distPath = path.resolve(process.cwd(), "dist", "public");
+    // Check multiple possible build locations
+    const possiblePaths = [
+      path.resolve(process.cwd(), "dist", "public"),
+      path.resolve(process.cwd(), "client", "dist"),
+      path.resolve(process.cwd(), "public"),
+      path.resolve(process.cwd(), "build")
+    ];
     
-    console.log(`Looking for build directory: ${distPath}`);
     console.log('Current working directory:', process.cwd());
     console.log('Available files in root:', fs.readdirSync(process.cwd()));
     
     if (fs.existsSync('dist')) {
       console.log('Contents of dist directory:', fs.readdirSync('dist'));
     }
+    if (fs.existsSync('client/dist')) {
+      console.log('Contents of client/dist directory:', fs.readdirSync('client/dist'));
+    }
     
-    if (!fs.existsSync(distPath)) {
-      // Try alternative locations
-      const altPaths = [
-        path.resolve(process.cwd(), "client", "dist"),
-        path.resolve(process.cwd(), "public"),
-        path.resolve(process.cwd(), "build")
-      ];
-      
-      let foundPath = null;
-      for (const altPath of altPaths) {
-        if (fs.existsSync(altPath)) {
-          foundPath = altPath;
-          console.log(`Found alternative build directory: ${foundPath}`);
+    let foundPath = null;
+    for (const possiblePath of possiblePaths) {
+      console.log(`Checking: ${possiblePath}`);
+      if (fs.existsSync(possiblePath)) {
+        const files = fs.readdirSync(possiblePath);
+        console.log(`Found directory with files: ${files.join(', ')}`);
+        if (files.includes('index.html')) {
+          foundPath = possiblePath;
+          console.log(`✅ Using build directory: ${foundPath}`);
           break;
         }
       }
-      
-      if (foundPath) {
-        app.use(express.static(foundPath));
-        app.use("*", (_req, res) => {
-          res.sendFile(path.resolve(foundPath, "index.html"));
-        });
-      } else {
-        console.error(`Could not find any build directory. Checked: ${[distPath, ...altPaths].join(', ')}`);
-      }
-    } else {
-      app.use(express.static(distPath));
-      
-      // fall through to index.html if the file doesn't exist
+    }
+    
+    if (foundPath) {
+      app.use(express.static(foundPath));
       app.use("*", (_req, res) => {
-        res.sendFile(path.resolve(distPath, "index.html"));
+        res.sendFile(path.resolve(foundPath, "index.html"));
       });
-      
       console.log('📁 Static files configured for production');
+    } else {
+      console.error(`❌ Could not find build directory with index.html. Checked: ${possiblePaths.join(', ')}`);
+      // Serve a basic error page
+      app.use("*", (_req, res) => {
+        res.status(500).send(`
+          <h1>Build Error</h1>
+          <p>Could not find frontend build directory.</p>
+          <p>Checked paths: ${possiblePaths.join(', ')}</p>
+          <p>Available files: ${fs.existsSync('.') ? fs.readdirSync('.').join(', ') : 'none'}</p>
+        `);
+      });
     }
   }
 
