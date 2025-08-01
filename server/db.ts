@@ -23,14 +23,20 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Enhanced pool configuration for Replit environment
-export const pool = new Pool({ 
+// Enhanced pool configuration for production deployment
+const connectionConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
-});
+};
+
+// Add SSL configuration for production environments
+if (process.env.NODE_ENV === 'production') {
+  connectionConfig.ssl = { rejectUnauthorized: false };
+}
+
+export const pool = new Pool(connectionConfig);
 
 export const db = drizzle({ client: pool, schema: { ...schema, ...blockchainSchema } });
 

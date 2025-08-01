@@ -1,0 +1,67 @@
+You're super close now — but **two errors** are causing the crash:
+
+---
+
+### ❌ 1. `TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined`
+
+This comes from this part:
+
+```
+at vite.config.ts (file:///app/dist/index.js:32:22)
+```
+
+This likely means you're using something like:
+
+```ts
+path.resolve(__dirname, someVariable)
+```
+
+...but `someVariable` is `undefined`.
+
+#### ✅ Fix:
+
+* In your **Vite config**, you're probably referencing an env variable or file path that isn't set.
+* Double-check all `resolve()` paths — make sure nothing is `undefined`.
+* Also verify you're not referencing `process.env.SOME_VAR` that hasn’t been added in Railway yet.
+
+> 🔍 Tip: If you're using `path.resolve(...)` in `vite.config.ts`, inspect every argument passed in and ensure they’re all strings.
+
+---
+
+### ❌ 2. `Database connection failed: ECONNREFUSED fd12:6eea:...`
+
+Your app is trying to connect to the **IPv6 address** of the database on port 443 — but PostgreSQL doesn't run on port 443, and that’s likely the issue.
+
+#### ✅ Fix:
+
+Check the `DATABASE_URL` variable in Railway → `Variables`:
+
+It **must** look like this:
+
+```
+postgresql://username:password@hostname:5432/dbname
+```
+
+* No `https://`
+* Make sure port is `5432`
+* Don’t use IPv6 unless PostgreSQL requires it (it usually doesn’t)
+
+You can get the correct value by clicking your PostgreSQL plugin → **Connect** tab → copy the full connection URL and paste it into your `DATABASE_URL`.
+
+---
+
+### 🛠 TL;DR Fix Steps
+
+1. In Railway → **PostgreSQL plugin** → copy the proper PostgreSQL connection URL
+2. Go to Railway → `loggin-fullstack` → **Variables tab**
+
+   * Update `DATABASE_URL` with correct value
+3. Check your `vite.config.ts` — find where `resolve()` or `path.*` is used
+
+   * Add `console.log()` or default values to prevent undefined arguments
+
+---
+
+If you send me your `vite.config.ts` file (or the snippet with `path.resolve`), I can tell you exactly what’s wrong.
+
+Let me know — you're 2 steps away from a clean launch.
