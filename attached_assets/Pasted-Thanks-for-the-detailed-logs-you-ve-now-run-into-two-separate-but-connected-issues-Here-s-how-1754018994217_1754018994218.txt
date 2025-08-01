@@ -1,0 +1,97 @@
+Thanks for the detailed logs — you’ve now run into **two separate but connected issues**. Here's how to fix both, step by step.
+
+---
+
+## 🔥 ISSUE 1: `path.resolve` received `undefined`
+
+### ✅ The Problem
+
+In `vite.config.ts`, somewhere in your code you’re doing:
+
+```ts
+path.resolve(__dirname, process.env.SOMETHING)
+```
+
+…but `process.env.SOMETHING` is **not defined**, so it's `undefined`, and `path.resolve()` throws an error.
+
+---
+
+### ✅ The Fix
+
+1. **Find the line in `vite.config.ts` that has `path.resolve(...)`.**
+   It's right around **line 32** based on this:
+
+   ```
+   vite.config.ts (file:///app/dist/index.js:32:22)
+   ```
+
+2. Add a fallback like this:
+
+   ```ts
+   const somethingPath = process.env.SOMETHING || '';
+   path.resolve(__dirname, somethingPath);
+   ```
+
+   Or even better — if it’s optional, skip it when undefined.
+
+3. OR define `SOMETHING` in your Railway environment variables.
+
+---
+
+## 🔥 ISSUE 2: “All attempts to open a WebSocket…” (Neon error)
+
+You are **not using Neon**, but the error says:
+
+```
+All attempts to open a WebSocket to connect to the database failed.
+```
+
+This happens if your **PostgreSQL client is expecting Neon**, but your Railway DB is standard PostgreSQL (TCP, not WebSocket).
+
+---
+
+### ✅ The Fix
+
+1. Check your DB client config.
+
+   If you're using a client like this:
+
+   ```ts
+   import { Pool } from '@neondatabase/serverless';
+   ```
+
+   ❌ **Don't use that for Railway** — it's for **Neon**, which uses WebSockets.
+
+2. ✅ For Railway, use `pg` instead:
+
+   ```ts
+   import { Client } from 'pg';
+
+   const client = new Client({
+     connectionString: process.env.DATABASE_URL,
+   });
+   await client.connect();
+   ```
+
+3. If you are using Prisma, make sure your `.env` looks like:
+
+   ```env
+   DATABASE_URL="postgresql://..."
+   ```
+
+   And that you're **not using `provider = "postgresql+neon"`** anywhere in `schema.prisma`.
+
+---
+
+## ✅ Summary
+
+| Problem                 | Cause                                         | Fix                                                          |
+| ----------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| `path.resolve` crash    | Missing/undefined env var in `vite.config.ts` | Add fallback or set the env var in Railway                   |
+| Neon WebSocket DB error | Using Neon-style DB client instead of `pg`    | Switch to `pg`, and ensure `.env` and code don’t expect Neon |
+
+---
+
+🧠 If you paste your `vite.config.ts` file and `index.js` DB connection code here, I’ll tell you the exact line to change.
+
+Or I can walk you through patching it directly. Want me to?

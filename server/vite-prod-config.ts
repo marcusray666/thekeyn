@@ -2,22 +2,33 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { fileURLToPath } from 'url';
 
-// Production-safe __dirname equivalent
-const __dirname = process.cwd();
+// Production-safe directory resolution
+const getCurrentDir = () => {
+  try {
+    // Try to get current working directory
+    return process.cwd();
+  } catch {
+    // Fallback to file-based directory resolution
+    return path.dirname(fileURLToPath(import.meta.url));
+  }
+};
+
+const rootDir = getCurrentDir();
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "client", "src"),
-      "@shared": path.resolve(__dirname, "shared"),
-      "@assets": path.resolve(__dirname, "attached_assets"),
+      "@": path.resolve(rootDir, "client", "src"),
+      "@shared": path.resolve(rootDir, "shared"),
+      "@assets": path.resolve(rootDir, "attached_assets"),
     },
   },
-  root: path.resolve(__dirname, "client"),
+  root: path.resolve(rootDir, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: path.resolve(rootDir, "dist", "public"),
     emptyOutDir: true,
   },
   server: {

@@ -1,16 +1,9 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 import * as blockchainSchema from "@shared/blockchain-schema";
 
-// Configure WebSocket for Neon serverless (only for Neon databases)
-if (process.env.DATABASE_URL?.includes('neon.tech')) {
-  neonConfig.webSocketConstructor = ws;
-} else {
-  // For Railway/standard PostgreSQL, don't configure Neon settings
-  console.log("🔧 Using standard PostgreSQL connection (not Neon)");
-}
+console.log("🔧 Using standard PostgreSQL connection for Railway");
 
 // Debug environment variables for Railway deployment
 console.log("🔍 Environment check:");
@@ -49,22 +42,17 @@ if (urlHost && !urlHost.includes(':5432')) {
   console.warn("⚠️  DATABASE_URL should use port 5432 for PostgreSQL");
 }
 
-// Enhanced pool configuration for production deployment
-const connectionConfig: any = {
+// Standard PostgreSQL pool configuration for Railway
+const connectionConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 };
 
-// Add SSL configuration for production environments
-if (process.env.NODE_ENV === 'production') {
-  connectionConfig.ssl = { rejectUnauthorized: false };
-}
-
 export const pool = new Pool(connectionConfig);
-
-export const db = drizzle({ client: pool, schema: { ...schema, ...blockchainSchema } });
+export const db = drizzle(pool, { schema: { ...schema, ...blockchainSchema } });
 
 // Test database connection on startup
 pool.connect()
