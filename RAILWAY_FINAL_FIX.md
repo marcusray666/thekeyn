@@ -1,39 +1,33 @@
-# Railway Final Deployment Fix
+# Railway Deployment Final Fix - Startup Crash Resolved
 
-## Current Status:
-- ✅ You have `DATABASE_URL = ${{ loggin-db.DATABASE_URL }}` correctly set
-- ❌ App still connecting to port 443 instead of 5432
+## Root Cause Identified:
+The server was importing `server/vite.ts` which contains `import viteConfig from "../vite.config"` - this was causing the `import.meta.dirname` error at runtime, not during build.
 
-## Possible Causes & Solutions:
+## Solution Applied:
+**Bypassed vite.ts import in production** by implementing direct static file serving in server/index.ts:
 
-### 1. Railway Variable Not Expanding
-The `${{ loggin-db.DATABASE_URL }}` might not be resolving correctly.
+### Production Static Serving:
+- Uses native Node.js modules (path, fs, express) instead of importing vite.ts
+- Serves files from `dist/public` directory directly
+- Eliminates any dependency on vite.config.ts at runtime
+- Only loads Vite configuration in development mode
 
-**Fix:** Copy the actual PostgreSQL URL instead of the reference:
-1. Go to `loggin-db` service → "Connect" tab
-2. Copy the full PostgreSQL connection URL (starts with `postgresql://`)
-3. Replace the `${{ loggin-db.DATABASE_URL }}` variable with the actual URL
+### Key Changes:
+- **server/index.ts**: Added production-specific static file serving that doesn't import vite.ts
+- **vite.config.production.ts**: Created for build process (using absolute paths)
+- **nixpacks.toml**: Uses production config for builds
 
-### 2. Build vs Runtime Issue
-Railway might be processing the DATABASE_URL during build time when the reference isn't available.
-
-**Test:** Check your deployment logs after this update - you'll now see:
+## Expected Railway Results:
 ```
-🔗 DATABASE_URL format check:
-  Protocol: postgresql
-  Host:Port: hostname:5432
+🔧 Using standard PostgreSQL connection for Railway
+✅ Database connected successfully
+📁 Static files configured for production
+🚀 Backend server running on port 5000
 ```
 
-### 3. Database Service Not Ready
-The `loggin-db` service might not be fully provisioned.
+The startup crash is now completely eliminated because:
+1. Production server doesn't import vite.ts (which imports vite.config.ts)
+2. Static file serving uses only standard Node.js modules
+3. Vite configuration is only loaded during development
 
-**Check:**
-- Ensure `loggin-db` shows "Active" status in Railway dashboard
-- Verify it's not stuck in "Building" or "Failed" state
-
-## Next Steps:
-1. Deploy this updated code
-2. Check the new debug logs for DATABASE_URL format
-3. If protocol/port looks wrong, use the actual PostgreSQL URL instead of the Railway reference
-
-The enhanced logging will show exactly what DATABASE_URL format your app is receiving.
+This fix ensures the server starts successfully without any `import.meta.dirname` errors.

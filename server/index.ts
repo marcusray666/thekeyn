@@ -110,10 +110,26 @@ app.use(session({
     await setupVite(app, server);
     console.log('🎨 Vite development server configured');
   } else {
-    // In production, serve static files
-    const { serveStatic } = await import('./vite.js');
-    serveStatic(app);
-    console.log('📁 Static files configured for production');
+    // In production, serve static files directly without importing vite.ts
+    const path = await import('path');
+    const fs = await import('fs');
+    const express = await import('express');
+    
+    const distPath = path.resolve(process.cwd(), "dist", "public");
+    
+    if (!fs.existsSync(distPath)) {
+      console.error(`Could not find the build directory: ${distPath}`);
+      console.log('Available directories:', fs.readdirSync(process.cwd()));
+    } else {
+      app.use(express.static(distPath));
+      
+      // fall through to index.html if the file doesn't exist
+      app.use("*", (_req, res) => {
+        res.sendFile(path.resolve(distPath, "index.html"));
+      });
+      
+      console.log('📁 Static files configured for production');
+    }
   }
 
   // Health check endpoint
