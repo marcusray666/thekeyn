@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2025-06-30.basil",
 });
 
 const MemStore = MemoryStore(session);
@@ -166,7 +166,7 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role, // CRITICAL: Include role for admin access
+      role: user.role,
       subscriptionTier: user.subscriptionTier,
       subscriptionStatus: user.subscriptionStatus,
       monthlyUploads: user.monthlyUploads,
