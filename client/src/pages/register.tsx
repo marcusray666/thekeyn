@@ -40,6 +40,7 @@ export default function Register() {
       setLocation('/dashboard');
     },
     onError: (error: Error) => {
+      console.error('Registration error:', error);
       toast({
         title: "Registration failed",
         description: error.message || "Please check your information and try again.",

@@ -27,6 +27,7 @@ export default function Login() {
       });
     },
     onSuccess: async (data) => {
+      console.log('Login success data:', data);
       toast({
         title: "Welcome back!",
         description: "You've been logged in successfully.",
@@ -42,6 +43,7 @@ export default function Login() {
       setLocation('/');
     },
     onError: (error: Error) => {
+      console.error('Login error:', error);
       toast({
         title: "Login failed",
         description: error.message || "Invalid username or password.",

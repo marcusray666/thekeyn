@@ -6,8 +6,7 @@ import fs from "fs";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import multer from "multer";
-import session from "express-session";
-import MemoryStore from "memorystore";
+// Session middleware imports removed - already configured in server/index.ts
 import { z } from "zod";
 import Stripe from "stripe";
 import { fileURLToPath } from 'url';
@@ -28,7 +27,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
 
-const MemStore = MemoryStore(session);
+// MemStore removed - using PostgreSQL sessions from server/index.ts
 
 function generateCertificateId(): string {
   const timestamp = Date.now().toString(36);
@@ -282,24 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
-  // Session middleware
-  const sessionMiddleware = session({
-    store: new MemStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
-    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
-    name: "sessionId", // Don't use default session name
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-      sameSite: 'strict', // CSRF protection
-    },
-  });
-
-  app.use(sessionMiddleware);
+  // Session middleware is already configured in server/index.ts - do not duplicate
 
   // Serve uploaded files with proper headers
   app.use("/uploads", express.static("uploads", {
