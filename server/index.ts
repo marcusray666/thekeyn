@@ -117,9 +117,39 @@ app.use(session({
     
     const distPath = path.resolve(process.cwd(), "dist", "public");
     
+    console.log(`Looking for build directory: ${distPath}`);
+    console.log('Current working directory:', process.cwd());
+    console.log('Available files in root:', fs.readdirSync(process.cwd()));
+    
+    if (fs.existsSync('dist')) {
+      console.log('Contents of dist directory:', fs.readdirSync('dist'));
+    }
+    
     if (!fs.existsSync(distPath)) {
-      console.error(`Could not find the build directory: ${distPath}`);
-      console.log('Available directories:', fs.readdirSync(process.cwd()));
+      // Try alternative locations
+      const altPaths = [
+        path.resolve(process.cwd(), "client", "dist"),
+        path.resolve(process.cwd(), "public"),
+        path.resolve(process.cwd(), "build")
+      ];
+      
+      let foundPath = null;
+      for (const altPath of altPaths) {
+        if (fs.existsSync(altPath)) {
+          foundPath = altPath;
+          console.log(`Found alternative build directory: ${foundPath}`);
+          break;
+        }
+      }
+      
+      if (foundPath) {
+        app.use(express.static(foundPath));
+        app.use("*", (_req, res) => {
+          res.sendFile(path.resolve(foundPath, "index.html"));
+        });
+      } else {
+        console.error(`Could not find any build directory. Checked: ${[distPath, ...altPaths].join(', ')}`);
+      }
     } else {
       app.use(express.static(distPath));
       

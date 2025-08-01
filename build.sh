@@ -9,7 +9,7 @@ npm ci
 
 # Build frontend with production config that avoids import.meta.dirname
 echo "🏗️ Building frontend..."
-npx vite build --config vite.config.production.ts
+npx vite build --config vite.config.production.ts --outDir dist/public
 
 # Build backend with esbuild
 echo "⚙️ Building backend..."

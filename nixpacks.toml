@@ -7,7 +7,7 @@ cmds = ["npm ci"]
 [phases.build]
 cmds = [
   "npm ci",
-  "npx vite build --config vite.config.production.ts",
+  "npx vite build --config vite.config.production.ts --outDir dist/public",
   "npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
   "mkdir -p uploads"
 ]
