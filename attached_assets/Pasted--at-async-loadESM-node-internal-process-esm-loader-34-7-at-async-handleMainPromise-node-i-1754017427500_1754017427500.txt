@@ -1,0 +1,127 @@
+    at async loadESM (node:internal/process/esm_loader:34:7)
+
+    at async handleMainPromise (node:internal/modules/run_main:106:12)
+
+ 
+
+Node.js v18.20.8
+
+🔍 Environment check:
+
+  NODE_ENV: production
+
+  DATABASE_URL exists: false
+
+❌ DATABASE_URL environment variable is missing!
+
+🔧 To fix this on Replit:
+
+   1. Go to Secrets tab (🔒 icon in sidebar)
+
+   2. Add DATABASE_URL with your PostgreSQL connection string
+
+   3. Restart your Repl
+
+file:///app/dist/index.js:950
+
+  throw new Error(
+
+        ^
+
+ 
+
+Error: DATABASE_URL must be set. Please add it to Replit Secrets.
+
+    at file:///app/dist/index.js:950:9
+
+    at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+
+    at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+
+    at async loadESM (node:internal/process/esm_loader:34:7)
+
+    at async handleMainPromise (node:internal/modules/run_main:106:12)
+
+ 
+
+Node.js v18.20.8
+
+🔍 Environment check:
+
+  NODE_ENV: production
+
+  DATABASE_URL exists: false
+
+❌ DATABASE_URL environment variable is missing!
+
+🔧 To fix this on Replit:
+
+   1. Go to Secrets tab (🔒 icon in sidebar)
+
+   2. Add DATABASE_URL with your PostgreSQL connection string
+
+   3. Restart your Repl
+
+file:///app/dist/index.js:950
+
+  throw new Error(
+
+        ^
+
+ 
+
+Error: DATABASE_URL must be set. Please add it to Replit Secrets.
+
+    at file:///app/dist/index.js:950:9
+
+    at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+
+    at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+
+    at async loadESM (node:internal/process/esm_loader:34:7)
+
+    at async handleMainPromise (node:internal/modules/run_main:106:12)
+
+ 
+
+Node.js v18.20.8
+
+🔍 Environment check:
+
+  NODE_ENV: production
+
+  DATABASE_URL exists: false
+
+❌ DATABASE_URL environment variable is missing!
+
+🔧 To fix this on Replit:
+
+   1. Go to Secrets tab (🔒 icon in sidebar)
+
+   2. Add DATABASE_URL with your PostgreSQL connection string
+
+   3. Restart your Repl
+
+file:///app/dist/index.js:950
+
+  throw new Error(
+
+        ^
+
+ 
+
+Error: DATABASE_URL must be set. Please add it to Replit Secrets.
+
+    at file:///app/dist/index.js:950:9
+
+    at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+
+    at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+
+    at async loadESM (node:internal/process/esm_loader:34:7)
+
+    at async handleMainPromise (node:internal/modules/run_main:106:12)
+
+ 
+
+Node.js v18.20.8
