@@ -2,6 +2,8 @@
 
 A comprehensive social media platform for creators that combines digital art protection with community networking. Empowers artists, designers, musicians, and other creators to protect their work with blockchain certificates while connecting with a global community.
 
+*Platform Status: Active Development - August 2025*
+
 ## Features
 
 ### Core Platform
