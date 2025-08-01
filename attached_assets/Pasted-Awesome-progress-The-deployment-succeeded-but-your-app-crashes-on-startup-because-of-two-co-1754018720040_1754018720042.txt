@@ -1,0 +1,92 @@
+Awesome — progress! The deployment succeeded ✅ but your app **crashes on startup** because of two config issues in your code and env:
+
+---
+
+## 🔥 MAIN ISSUE 1: `path.resolve(...)` is using `undefined`
+
+### 🔍 The Error:
+
+```ts
+TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+```
+
+This points to:
+
+```
+vite.config.ts (file:///app/dist/index.js:32:22)
+```
+
+### ✅ How to fix it:
+
+You are doing something like this in `vite.config.ts`:
+
+```ts
+path.resolve(__dirname, process.env.SOME_PATH)
+```
+
+…but `process.env.SOME_PATH` is not defined in your Railway variables.
+
+### 👉 What to do:
+
+1. **Open `vite.config.ts`**
+2. Look for any `path.resolve(...)` lines
+3. Fix the issue like this:
+
+   ```ts
+   const myPath = process.env.SOME_PATH || 'fallback';
+   path.resolve(__dirname, myPath)
+   ```
+4. OR check your Railway `Variables` tab and **add the missing environment variable** (like `SOME_PATH`) if it’s supposed to be set.
+
+---
+
+## 🔥 MAIN ISSUE 2: Database connection trying IPv6 on port 443
+
+### 🧠 Log says:
+
+```txt
+DATABASE_URL exists: true
+Host:Port: loggin-db.railway.internal:5432
+...
+❌ Database connection failed: connect ECONNREFUSED fd12:...:443
+```
+
+So even though it shows:
+
+```
+Host:Port: loggin-db.railway.internal:5432
+```
+
+…it ends up trying to connect to port **443**, which is **HTTPS** — not PostgreSQL.
+
+### ✅ What to do:
+
+Check the actual code where you connect to the database. You're probably doing this somewhere:
+
+```js
+const dbUrl = process.env.DATABASE_URL;
+const client = new Client({ connectionString: dbUrl });
+```
+
+✅ Make sure:
+
+* You’re **not** overriding the port somewhere to `443`
+* You’re **using the full connection URL** from Railway (like `postgresql://...:5432/...`)
+* You’re not rewriting the host or port with another env var (like `PG_PORT` or `PG_HOST`)
+
+Also:
+
+* IPv6 can cause trouble sometimes in Railway. Stick to `.railway.internal` and port `5432`.
+
+---
+
+## ✅ Summary of What to Fix
+
+| 🔧 Issue                            | 💥 Error                                   | ✅ Fix                                                                        |
+| ----------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| Missing env var in `vite.config.ts` | `"paths[0]" must be string, got undefined` | Add fallback value or define the missing env var in Railway                  |
+| Wrong DB connection behavior        | `ECONNREFUSED` to IPv6:443                 | Ensure `DATABASE_URL` is complete and no other code overrides it to port 443 |
+
+---
+
+If you paste your `vite.config.ts` here, I can tell you the exact broken line. Or if you want, I can walk you through checking your DB connection code too.

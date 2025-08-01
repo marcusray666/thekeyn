@@ -4,8 +4,13 @@ import ws from "ws";
 import * as schema from "@shared/schema";
 import * as blockchainSchema from "@shared/blockchain-schema";
 
-// Configure WebSocket for Neon serverless (required for Replit)
-neonConfig.webSocketConstructor = ws;
+// Configure WebSocket for Neon serverless (only for Neon databases)
+if (process.env.DATABASE_URL?.includes('neon.tech')) {
+  neonConfig.webSocketConstructor = ws;
+} else {
+  // For Railway/standard PostgreSQL, don't configure Neon settings
+  console.log("🔧 Using standard PostgreSQL connection (not Neon)");
+}
 
 // Debug environment variables for Railway deployment
 console.log("🔍 Environment check:");

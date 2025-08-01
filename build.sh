@@ -9,7 +9,7 @@ npm ci
 
 # Build frontend with Vite
 echo "🏗️ Building frontend..."
-npx vite build
+npx vite build --config server/vite-prod-config.ts
 
 # Build backend with esbuild
 echo "⚙️ Building backend..."
