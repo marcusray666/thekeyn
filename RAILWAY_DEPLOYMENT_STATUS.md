@@ -37,3 +37,10 @@ dist/
 - Error handling provides clear diagnostics if build files are missing
 
 **Status**: Ready for production deployment on Railway with lggn.net domain.
+
+## 🔧 Latest Fix - August 1, 2025
+**Railway Start Command Error Fixed**
+- Removed problematic `NODE_ENV=production` from Railway start command
+- Set NODE_ENV programmatically in server code instead
+- Fixed "executable 'node_env=production' could not be found" error
+- Simplified start command to just `node dist/index.js`
