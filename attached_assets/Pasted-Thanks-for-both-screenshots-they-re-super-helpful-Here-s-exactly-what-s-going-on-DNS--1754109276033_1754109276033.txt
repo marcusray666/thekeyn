@@ -1,0 +1,119 @@
+Thanks for both screenshots — they’re super helpful. Here's exactly what's going on:
+
+---
+
+## ✅ DNS & Domain Setup: ✅ All Good
+
+From your Cloudflare + Railway setup:
+
+* ✅ Your domain `lggn.net` is correctly **CNAME’d** to `8onb9un6.up.railway.app`
+* ✅ Proxying via Cloudflare is active (that’s fine)
+* ✅ Railway recognizes the domain and is linking it to the correct service
+
+So the problem **isn’t DNS** — the domain is pointed correctly.
+
+---
+
+## ❌ The Real Problem: Nothing is Running or Listening at `/`
+
+That “train has not arrived” error from Railway means:
+
+> Your Railway project is live, **but there’s no app serving HTTP requests on port `5000` or `PORT`** (which is what Railway exposes).
+
+---
+
+## 🚨 What’s Likely Missing:
+
+### 1. **Your backend isn’t listening to `process.env.PORT`**
+
+This is *the most common mistake*. Your server might be using a hardcoded port like `3000`, `8080`, or `5173`.
+
+### ✅ Fix:
+
+In your backend `index.ts` or `server.ts` file, update this line:
+
+```ts
+const PORT = process.env.PORT || 3000;  // ✅ Must support Railway's dynamic port
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+---
+
+### 2. **Your start command isn’t running the backend correctly**
+
+Check the **Start Command** in Railway → **Deploy → Settings → Start Command**.
+
+If your backend is in `packages/server/`, it should be something like:
+
+```bash
+cd packages/server && npm run start
+```
+
+Also confirm that your `packages/server/package.json` includes a working start script:
+
+```json
+"scripts": {
+  "start": "node dist/index.js"
+}
+```
+
+If you’re using TypeScript directly, use:
+
+```json
+"start": "ts-node src/index.ts"
+```
+
+---
+
+### 3. **You never built the frontend or served it**
+
+If you’re trying to serve both the frontend and backend from the same service:
+
+* You must build the frontend:
+
+  ```bash
+  cd packages/web && npm run build
+  ```
+* Then serve the built files from backend (e.g., `Express`):
+
+```ts
+app.use(express.static(path.join(__dirname, "../web/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../web/dist/index.html"));
+});
+```
+
+---
+
+## 🔧 Step-by-Step Fix (Summary)
+
+1. **Fix the backend port**:
+
+   * Replace any `app.listen(3000)` or `app.listen(5173)` with:
+
+     ```ts
+     const PORT = process.env.PORT || 3000;
+     app.listen(PORT, () => console.log(`Running on ${PORT}`));
+     ```
+
+2. **Make sure you’re starting the right service**
+
+   * In Railway, go to Deploy → Settings
+   * Set start command to:
+
+     ```bash
+     cd packages/server && npm run start
+     ```
+
+3. **(Optional) Build frontend and serve it**
+
+   * If you're using one project to serve everything
+
+---
+
+Once done, **redeploy on Railway**. Your website `lggn.net` should go live in under a minute.
+
+Want me to review your actual `server.ts` or `index.ts` to give you the exact code? Just paste it.

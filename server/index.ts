@@ -115,10 +115,11 @@ app.use(session({
     const fs = await import('fs');
     const express = await import('express');
     
-    // Check multiple possible build locations
+    // Check multiple possible build locations (Railway uses dist/public)
     const possiblePaths = [
       path.resolve(process.cwd(), "dist", "public"),
       path.resolve(process.cwd(), "client", "dist"),
+      path.resolve(process.cwd(), "dist"),
       path.resolve(process.cwd(), "public"),
       path.resolve(process.cwd(), "build")
     ];
@@ -148,11 +149,20 @@ app.use(session({
     }
     
     if (foundPath) {
+      // Serve static files first
       app.use(express.static(foundPath));
-      app.use("*", (_req, res) => {
-        res.sendFile(path.resolve(foundPath, "index.html"));
+      
+      // Catch-all handler for SPA routing (must be last)
+      app.get("*", (_req, res) => {
+        const indexPath = path.resolve(foundPath, "index.html");
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).send('<h1>Frontend build not found</h1><p>index.html missing from build directory</p>');
+        }
       });
       console.log('📁 Static files configured for production');
+      console.log(`📂 Serving from: ${foundPath}`);
     } else {
       console.error(`❌ Could not find build directory with index.html. Checked: ${possiblePaths.join(', ')}`);
       // Serve a basic error page
