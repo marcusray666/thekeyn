@@ -11,9 +11,8 @@ npm ci
 echo "🏗️ Building frontend..."
 npx vite build --config vite.config.production.ts --outDir dist/public
 
-# Build backend with esbuild
-echo "⚙️ Building backend..."
-npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+# Backend runs directly with tsx in production - no build needed
+echo "⚙️ Backend ready - will run with tsx in production"
 
 # Push database schema to production
 echo "🗃️ Setting up production database..."
