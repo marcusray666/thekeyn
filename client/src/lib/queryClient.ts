@@ -32,6 +32,8 @@ export async function apiRequest(
   // Use relative URLs for unified server
   const fullUrl = url.startsWith('/') ? url : `/${url}`;
   
+  console.log('API REQUEST:', { url: fullUrl, method: options.method, hasBody: !!options.body });
+  
   // Don't set Content-Type for FormData - let the browser set it automatically
   const headers: Record<string, string> = {};
   if (!(options.body instanceof FormData)) {
@@ -49,6 +51,8 @@ export async function apiRequest(
           options.body ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : 
           undefined,
   });
+
+  console.log('API RESPONSE:', { status: res.status, headers: Object.fromEntries(res.headers.entries()) });
 
   await throwIfResNotOk(res);
   

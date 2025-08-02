@@ -45,9 +45,13 @@ if (urlHost && !urlHost.includes(':5432')) {
 // Standard PostgreSQL pool configuration for Railway
 const connectionConfig = {
   connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  max: 20,
+  idleTimeoutMillis: 60000,
+  connectionTimeoutMillis: 30000,
+  acquireTimeoutMillis: 30000,
+  statement_timeout: 30000,
+  query_timeout: 30000,
+  allowExitOnIdle: true,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 };
 
