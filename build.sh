@@ -17,11 +17,15 @@ npx esbuild server/index.ts --platform=node --packages=external --bundle --forma
 
 # Push database schema to production
 echo "🗃️ Setting up production database..."
-if [ "$NODE_ENV" = "production" ] || [ -n "$DATABASE_URL" ]; then
+if [ -n "$DATABASE_URL" ]; then
   echo "📊 Running database migrations..."
-  npx drizzle-kit push || echo "⚠️ Database push failed - may need manual setup"
+  NODE_ENV=production npx drizzle-kit push --verbose || echo "⚠️ Database push failed - will retry at runtime"
+  
+  # Also create the setup script for runtime execution
+  echo "📋 Creating database setup script..."
+  chmod +x scripts/setup-database.js || echo "⚠️ Could not make setup script executable"
 else
-  echo "🔧 Skipping database setup in development"
+  echo "🔧 Skipping database setup - no DATABASE_URL"
 fi
 
 echo "✅ Build completed successfully!"

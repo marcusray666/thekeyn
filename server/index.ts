@@ -197,6 +197,79 @@ app.use(session({
     process.env.NODE_ENV = 'production';
   }
   
+  // Attempt to create database schema if missing (Railway fix)
+  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+    await setupDatabaseSchema();
+  }
+  
+  async function setupDatabaseSchema() {
+    try {
+      console.log('🔧 Checking database schema...');
+      
+      // Quick check if users table exists
+      const testClient = await pool.connect();
+      try {
+        await testClient.query("SELECT COUNT(*) FROM users LIMIT 1");
+        console.log('✅ Database schema verified');
+        testClient.release();
+        return;
+      } catch (err) {
+        console.log('❌ Database schema missing - attempting to create...');
+        testClient.release();
+        
+        // Create schema using direct SQL commands
+        await createDatabaseSchema();
+      }
+    } catch (err) {
+      console.error('⚠️ Schema check failed:', err instanceof Error ? err.message : 'Unknown error');
+    }
+  }
+  
+  async function createDatabaseSchema() {
+    try {
+      console.log('📊 Creating database schema with SQL...');
+      const schemaClient = await pool.connect();
+      
+      // Create users table (core table needed for auth)
+      await schemaClient.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          username VARCHAR(255) UNIQUE NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          role VARCHAR(50) DEFAULT 'user',
+          subscription_tier VARCHAR(50) DEFAULT 'free',
+          subscription_status VARCHAR(50) DEFAULT 'active',
+          subscription_expires_at TIMESTAMP,
+          monthly_uploads INTEGER DEFAULT 0,
+          monthly_upload_limit INTEGER DEFAULT 3,
+          last_upload_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          wallet_address VARCHAR(255),
+          display_name VARCHAR(255),
+          bio TEXT,
+          profile_image_url VARCHAR(255),
+          website VARCHAR(255),
+          location VARCHAR(255),
+          is_verified BOOLEAN DEFAULT false,
+          follower_count INTEGER DEFAULT 0,
+          following_count INTEGER DEFAULT 0,
+          total_likes INTEGER DEFAULT 0,
+          theme_preference VARCHAR(50) DEFAULT 'liquid-glass',
+          settings JSONB DEFAULT '{}',
+          last_login_at TIMESTAMP,
+          is_banned BOOLEAN DEFAULT false,
+          ban_reason TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      console.log('✅ Database schema created successfully');
+      schemaClient.release();
+    } catch (schemaErr) {
+      console.error('❌ Failed to create schema:', schemaErr instanceof Error ? schemaErr.message : 'Unknown error');
+    }
+  }
+  
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Backend server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
