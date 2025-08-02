@@ -58,13 +58,27 @@ const connectionConfig = {
 export const pool = new Pool(connectionConfig);
 export const db = drizzle(pool, { schema: { ...schema, ...blockchainSchema } });
 
-// Test database connection on startup
+// Test database connection and verify schema on startup
 pool.connect()
-  .then(client => {
+  .then(async client => {
     console.log("✅ Database connected successfully");
+    
+    // Check if users table exists
+    try {
+      const result = await client.query("SELECT COUNT(*) FROM users LIMIT 1");
+      console.log("✅ Database schema verified - users table exists");
+    } catch (err) {
+      console.error("❌ Database schema missing - users table not found");
+      console.error("🔧 Run 'npm run db:push' to create database schema");
+      if (process.env.NODE_ENV === 'production') {
+        console.error("🚨 CRITICAL: Production database needs schema setup");
+        console.error("🔧 Railway fix: Add DATABASE_URL variable and run drizzle-kit push");
+      }
+    }
+    
     client.release();
   })
   .catch(err => {
     console.error("❌ Database connection failed:", err.message);
-    console.error("🔧 Check your DATABASE_URL in Replit Secrets");
+    console.error("🔧 Check your DATABASE_URL configuration");
   });
