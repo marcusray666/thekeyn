@@ -24,7 +24,9 @@ export function useAuth() {
     username: user?.username,
     isLoading, 
     error: error?.message || error,
-    queryKey: '/api/auth/user'
+    errorString: JSON.stringify(error),
+    queryKey: '/api/auth/user',
+    cookies: document.cookie
   });
 
   return {

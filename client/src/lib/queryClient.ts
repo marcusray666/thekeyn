@@ -52,7 +52,12 @@ export async function apiRequest(
           undefined,
   });
 
-  console.log('API RESPONSE:', { status: res.status, headers: Object.fromEntries(res.headers.entries()) });
+  console.log('API RESPONSE:', { 
+    status: res.status, 
+    url: fullUrl,
+    hasSetCookie: res.headers.get('Set-Cookie') ? 'yes' : 'no',
+    contentType: res.headers.get('Content-Type')
+  });
 
   await throwIfResNotOk(res);
   
