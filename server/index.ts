@@ -192,9 +192,11 @@ app.use(session({
 
   const PORT = parseInt(process.env.PORT || '5000');
   
-  // Set NODE_ENV to production if not already set (Railway requirement)
-  if (!process.env.NODE_ENV) {
+  // Railway automatically sets NODE_ENV=production in production environment
+  // Force production mode for Railway deployment
+  if (process.env.RAILWAY_ENVIRONMENT || !process.env.NODE_ENV) {
     process.env.NODE_ENV = 'production';
+    console.log('🚂 Railway deployment detected - forcing production mode');
   }
   
   // Attempt to create database schema if missing (Railway fix)
