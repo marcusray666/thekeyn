@@ -22,6 +22,45 @@ import { contentModerationService } from "./services/content-moderation";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Authentication types
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    subscriptionTier: string;
+    subscriptionStatus: string;
+    subscriptionExpiresAt: Date | null;
+    monthlyUploads: number;
+    monthlyUploadLimit: number;
+    lastUploadReset: Date;
+    walletAddress: string | null;
+    displayName: string | null;
+    bio: string | null;
+    profileImageUrl: string | null;
+    website: string | null;
+    location: string | null;
+    isVerified: boolean;
+    followerCount: number;
+    followingCount: number;
+    totalLikes: number;
+    themePreference: string;
+    settings: Record<string, any>;
+    lastLoginAt: Date | null;
+    isBanned: boolean;
+    banReason: string | null;
+    createdAt: Date;
+  };
+}
+
+// Extend express-session
+declare module 'express-session' {
+  interface SessionData {
+    userId: number;
+  }
+}
+
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -140,10 +179,7 @@ File Hash: ${work.fileHash}
 Registration Date: ${new Date(certificate.createdAt).toLocaleDateString()}`;
 }
 
-interface AuthenticatedRequest extends Request {
-  user?: { id: number; username: string; email: string };
-  userId?: number;
-}
+// AuthenticatedRequest already defined above
 
 const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {

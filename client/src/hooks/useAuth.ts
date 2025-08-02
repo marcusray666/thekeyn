@@ -20,8 +20,8 @@ export function useAuth() {
   // Debug log to trace authentication state
   console.log('useAuth STATE:', { 
     hasUser: !!user, 
-    userId: user?.id,
-    username: user?.username,
+    userId: (user as any)?.id,
+    username: (user as any)?.username,
     isLoading, 
     error: error?.message || error,
     errorString: JSON.stringify(error),

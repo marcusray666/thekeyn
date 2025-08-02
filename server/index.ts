@@ -274,5 +274,6 @@ app.use(session({
     console.log(`🚀 Backend server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
     console.log(`🔒 CORS origins: ${JSON.stringify(corsOptions.origin)}`);
+    console.log(`📍 Railway PORT binding: ${process.env.PORT ? 'USING process.env.PORT' : 'USING DEFAULT 5000'}`);
   });
 })().catch(console.error);
