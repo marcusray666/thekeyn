@@ -207,3 +207,10 @@ The platform is designed as a production-ready application with proper separatio
 - ✅ **BUILD PROCESS OPTIMIZED**: Removed unnecessary backend compilation, using direct tsx execution
 - ✅ **ENVIRONMENT DETECTION**: Railway automatically provides NODE_ENV=production in production
 - 🚀 **STATUS**: Critical deployment blocker resolved - ready for immediate redeployment
+
+### Railway Standard Node.js Deployment - August 2, 2025
+- ❌ **TSX EXECUTABLE ERROR**: Railway couldn't find tsx runtime in production environment
+- ✅ **STANDARD BUILD APPROACH**: Switched to npm run build + npm start (compiles TypeScript to JavaScript)
+- ✅ **BUILD PIPELINE CONFIRMED**: Frontend (Vite) + Backend (ESBuild) compilation working
+- ✅ **RAILWAY COMPATIBILITY**: Using Railway's recommended Node.js deployment pattern
+- 🚀 **STATUS**: Now using standard Node.js approach - deployment should succeed

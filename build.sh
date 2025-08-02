@@ -11,8 +11,9 @@ npm ci
 echo "🏗️ Building frontend..."
 npx vite build --config vite.config.production.ts --outDir dist/public
 
-# Backend runs directly with tsx in production - no build needed
-echo "⚙️ Backend ready - will run with tsx in production"
+# Ensure tsx is available in production
+echo "⚙️ Ensuring tsx is available for production..."
+npm list tsx || npm install tsx --save
 
 # Push database schema to production
 echo "🗃️ Setting up production database..."
