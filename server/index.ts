@@ -264,6 +264,27 @@ app.use(session({
       `);
       
       console.log('✅ Database schema created successfully');
+      
+      // Seed admin user if not exists
+      console.log('🔧 Checking admin user...');
+      const adminUser = 'vladislavdonighevici111307';
+      const adminPass = 'admin';
+      const adminEmail = 'admin@example.com';
+      
+      const adminCheck = await schemaClient.query(`SELECT 1 FROM users WHERE username=$1`, [adminUser]);
+      if (adminCheck.rowCount === 0) {
+        const bcrypt = await import('bcryptjs');
+        const hash = await bcrypt.hash(adminPass, 12);
+        await schemaClient.query(
+          `INSERT INTO users (username, email, password_hash, role, is_verified) 
+           VALUES ($1, $2, $3, 'admin', true)`, 
+          [adminUser, adminEmail, hash]
+        );
+        console.log('✅ Admin user seeded successfully');
+      } else {
+        console.log('✅ Admin user already exists');
+      }
+      
       schemaClient.release();
     } catch (schemaErr) {
       console.error('❌ Failed to create schema:', schemaErr instanceof Error ? schemaErr.message : 'Unknown error');
