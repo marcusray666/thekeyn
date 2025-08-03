@@ -21,6 +21,7 @@ import Settings from "@/pages/settings";
 import Security from "@/pages/security";
 import Profile from "@/pages/profile";
 import UserProfile from "@/pages/user-profile";
+import Portfolio from "@/pages/portfolio";
 import CertificateGuide from "@/pages/certificate-guide";
 
 import NFTMinting from "@/pages/nft-minting";
@@ -74,6 +75,8 @@ function Router() {
       <Route path="/certificate-guide" component={CertificateGuide} />
       <Route path="/report-theft" component={ReportTheft} />
       <Route path="/profile/:username" component={Profile} />
+      <Route path="/portfolio/:username" component={Portfolio} />
+      <Route path="/portfolio" component={Portfolio} />
       
       {/* Public certificate routes */}
       <Route path="/certificate/:id" component={CertificateDetail} />
@@ -86,7 +89,6 @@ function Router() {
       
       {/* Legacy profile showcase routes - redirect to main profile */}
       <Route path="/showcase/:username" component={Profile} />
-      <Route path="/portfolio/:username" component={Profile} />
       
       <Route component={NotFound} />
     </Switch>

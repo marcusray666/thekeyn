@@ -198,7 +198,7 @@ export function Navigation() {
                     {/* Navigation Items - Only Portfolio */}
                     <DropdownMenuItem asChild>
                       <Link 
-                        href={`/profile/${user?.username}`} 
+                        href={`/portfolio/${user?.username}`} 
                         className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
                         style={{ color: 'rgb(229, 231, 235)' }}
                         onMouseEnter={(e) => {
