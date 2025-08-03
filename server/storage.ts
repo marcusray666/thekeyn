@@ -552,7 +552,12 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    return post;
+    // Get user info to complete Post type
+    const user = await this.getUser(postData.userId);
+    return {
+      ...post,
+      username: user?.username || 'unknown',
+    };
   }
 
   async getPosts(options: { userId?: number; limit?: number; offset?: number; currentUserId?: number } = {}): Promise<(Post & { username: string })[]> {
