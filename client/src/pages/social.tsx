@@ -155,22 +155,17 @@ export default function Social() {
           formData.append('tags', JSON.stringify(postData.tags));
         }
         
-        const response = await fetch('/api/social/posts', {
+        return await apiRequest('/api/social/posts', {
           method: 'POST',
           body: formData,
         });
         
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Failed to create post');
-        }
-        
-        return response.json();
+
       } else {
         // Regular JSON request for text-only posts
         return await apiRequest('/api/social/posts', {
           method: 'POST',
-          body: JSON.stringify({ content: postData.content, tags: postData.tags }),
+          body: { content: postData.content, tags: postData.tags },
         });
       }
     },
