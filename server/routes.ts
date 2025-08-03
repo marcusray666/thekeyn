@@ -1104,11 +1104,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete work endpoint
   app.delete("/api/works/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const workId = parseInt(req.params.id);
+      const workIdParam = req.params.id;
       const userId = req.session!.userId;
       
-      if (isNaN(workId)) {
-        return res.status(400).json({ error: "Invalid work ID" });
+      console.log(`Raw work ID parameter: "${workIdParam}", type: ${typeof workIdParam}`);
+      
+      // Parse work ID, handling both string and numeric formats
+      const workId = parseInt(workIdParam);
+      
+      if (isNaN(workId) || workId <= 0) {
+        console.log(`Invalid work ID: ${workIdParam} -> ${workId}`);
+        return res.status(400).json({ error: "Invalid work ID format" });
       }
 
       console.log(`Delete request for work ${workId} by user ${userId}`);

@@ -29,6 +29,7 @@ export function DeleteWorkDialog({ work, open, onOpenChange }: DeleteWorkDialogP
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
+      console.log(`Deleting work with ID: ${work.id}, type: ${typeof work.id}`);
       return await apiRequest(`/api/works/${work.id}`, {
         method: "DELETE",
       });

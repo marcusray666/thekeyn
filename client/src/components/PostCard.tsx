@@ -336,7 +336,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {post.imageUrl && post.fileType === "image" && (
             <div className="mb-4">
               <img 
-                src={`/api/files/${post.imageUrl}`} 
+                src={`/uploads/${post.imageUrl}`} 
                 alt="Post content"
                 className="w-full max-h-96 object-cover rounded-lg border border-white/10 hover:border-purple-500/30 transition-colors"
                 onError={(e) => {
@@ -350,7 +350,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {post.fileType === "audio" && post.imageUrl && (
             <div className="mb-4">
               <AudioPlayer 
-                src={`/api/files/${post.imageUrl}`}
+                src={`/uploads/${post.imageUrl}`}
                 className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20"
               />
             </div>
@@ -359,7 +359,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {post.fileType === "video" && post.imageUrl && (
             <div className="mb-4">
               <video 
-                src={`/api/files/${post.imageUrl}`}
+                src={`/uploads/${post.imageUrl}`}
                 controls
                 className="w-full max-h-96 rounded-lg border border-white/10 hover:border-blue-500/30 transition-colors bg-gradient-to-r from-blue-500/10 to-green-500/10"
                 preload="metadata"
@@ -381,7 +381,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                     </p>
                     <div className="flex gap-2">
                       <a 
-                        href={`/api/files/${post.imageUrl}`}
+                        href={`/uploads/${post.imageUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-3 py-1 bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 hover:text-orange-200 rounded text-sm transition-colors"
@@ -391,7 +391,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                       </a>
                       {post.imageUrl.endsWith('.pdf') && (
                         <a 
-                          href={`/api/files/${post.imageUrl}`}
+                          href={`/uploads/${post.imageUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-200 rounded text-sm transition-colors"

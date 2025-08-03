@@ -25,7 +25,7 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     return (
       <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex items-center justify-center`}>
         <img
-          src={`/api/files/${filename}`}
+          src={`/uploads/${filename}`}
           alt={title}
           className="max-w-full max-h-full object-contain"
           onError={() => setImageError(true)}
