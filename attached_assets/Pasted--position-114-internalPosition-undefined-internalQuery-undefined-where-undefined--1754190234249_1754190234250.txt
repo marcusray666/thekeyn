@@ -1,0 +1,127 @@
+  position: '114',
+
+  internalPosition: undefined,
+
+  internalQuery: undefined,
+
+  where: undefined,
+
+  schema: undefined,
+
+  table: undefined,
+
+  column: undefined,
+
+  dataType: undefined,
+
+  constraint: undefined,
+
+  file: 'parse_relation.c',
+
+  line: '1449',
+
+  routine: 'parserOpenTable'
+
+}
+
+Error fetching posts: error: relation "posts" does not exist
+
+    at /app/node_modules/pg-pool/index.js:45:11
+
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+    at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+
+    at async DatabaseStorage.getPosts (file:///app/dist/index.js:1255:12)
+
+    at async file:///app/dist/index.js:5449:22 {
+
+  length: 105,
+
+  severity: 'ERROR',
+
+  code: '42P01',
+
+  detail: undefined,
+
+  hint: undefined,
+
+  position: '530',
+
+  internalPosition: undefined,
+
+  internalQuery: undefined,
+
+  where: undefined,
+
+  schema: undefined,
+
+  table: undefined,
+
+  column: undefined,
+
+  dataType: undefined,
+
+  constraint: undefined,
+
+  file: 'parse_relation.c',
+
+  line: '1449',
+
+  routine: 'parserOpenTable'
+
+}
+
+Error getting unread notification count: error: relation "user_notifications" does not exist
+
+    at /app/node_modules/pg-pool/index.js:45:11
+
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+    at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+
+    at async DatabaseStorage.getUnreadNotificationCount (file:///app/dist/index.js:1446:20)
+
+    at async file:///app/dist/index.js:5801:21 {
+
+  length: 117,
+
+  severity: 'ERROR',
+
+  code: '42P01',
+
+  detail: undefined,
+
+  hint: undefined,
+
+  position: '22',
+
+  internalPosition: undefined,
+
+  internalQuery: undefined,
+
+  where: undefined,
+
+  schema: undefined,
+
+  table: undefined,
+
+  column: undefined,
+
+  dataType: undefined,
+
+  constraint: undefined,
+
+  file: 'parse_relation.c',
+
+  line: '1449',
+
+  routine: 'parserOpenTable'
+
+}
+
+Heartbeat received for user 2
+
+Heartbeat received for user 2
+
+Heartbeat received for user 2
