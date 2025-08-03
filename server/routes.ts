@@ -1135,23 +1135,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete the physical file
       try {
         const filePath = path.join(__dirname, "../uploads", work.filename);
+        console.log(`Attempting to delete file: ${filePath}`);
+        
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
-          console.log(`Deleted file: ${filePath}`);
+          console.log(`Successfully deleted file: ${filePath}`);
+        } else {
+          console.log(`File not found, skipping deletion: ${filePath}`);
         }
       } catch (fileError) {
-        console.error('Error deleting file:', fileError);
+        console.error('Error deleting physical file:', fileError);
+        console.error('File deletion error details:', {
+          filename: work.filename,
+          errorMessage: fileError.message,
+          errorStack: fileError.stack
+        });
         // Continue with database deletion even if file deletion fails
       }
 
       // Delete associated certificate first
-      const certificate = await storage.getCertificateByWorkId(workId);
-      if (certificate) {
-        await storage.deleteCertificate(certificate.id);
+      try {
+        const certificate = await storage.getCertificateByWorkId(workId);
+        if (certificate) {
+          console.log(`Deleting certificate: ${certificate.id}`);
+          await storage.deleteCertificate(certificate.id);
+          console.log(`Certificate deleted successfully`);
+        } else {
+          console.log(`No certificate found for work ${workId}`);
+        }
+      } catch (certError) {
+        console.error('Error deleting certificate:', certError);
+        // Continue with work deletion even if certificate deletion fails
       }
 
       // Delete the work from database
-      await storage.deleteWork(workId);
+      try {
+        console.log(`Deleting work from database: ${workId}`);
+        await storage.deleteWork(workId);
+        console.log(`Work deleted from database successfully`);
+      } catch (dbError) {
+        console.error('Error deleting work from database:', dbError);
+        throw new Error(`Failed to delete work from database: ${dbError.message}`);
+      }
 
       // Log the deletion for audit purposes
       console.log(`Work deletion completed:`, {

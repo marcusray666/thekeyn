@@ -333,6 +333,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           </div>
 
           {/* Media Content */}
+          {console.log(`PostCard Debug - imageUrl: "${post.imageUrl}", fileType: "${post.fileType}", showing image:`, !!(post.imageUrl && post.fileType === "image"))}
           {post.imageUrl && post.fileType === "image" && (
             <div className="mb-4">
               <img 
@@ -342,6 +343,9 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                 onError={(e) => {
                   console.error("Image failed to load:", post.imageUrl);
                   e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => {
+                  console.log("Image loaded successfully:", post.imageUrl);
                 }}
               />
             </div>
@@ -353,6 +357,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                 src={`/uploads/${post.imageUrl}`}
                 className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20"
               />
+              {console.log(`Audio player rendered with src: /uploads/${post.imageUrl}`)}
             </div>
           )}
 
