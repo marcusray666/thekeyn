@@ -5,6 +5,13 @@ import ConnectPgSimple from "connect-pg-simple";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+// Add environment variable debugging for Railway
+console.log('🔍 Environment variables check:');
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('Available DB variables:', Object.keys(process.env).filter(key => 
+  key.includes('DATABASE') || key.includes('POSTGRES') || key.includes('PG')
+));
+
 import { pool } from "./db.js";
 import { registerRoutes } from "./routes.js";
 
