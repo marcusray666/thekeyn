@@ -305,7 +305,8 @@ const upload = multer({
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Unsupported file type"));
+      console.log('Rejected file type:', file.mimetype, 'Available types:', allowedTypes.slice(0, 10));
+      cb(new Error(`Unsupported file type: ${file.mimetype}. Please use images, videos, audio, or documents.`));
     }
   },
 });
