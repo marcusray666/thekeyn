@@ -42,7 +42,7 @@ export function Navigation() {
   ];
 
   const authenticatedNavItems = [
-    { href: "/", label: "Portfolio", icon: Home },
+    { href: `/profile/${user?.username}`, label: "Profile", icon: User },
     { href: "/social", label: "Community", icon: Users },
     { href: "/studio", label: "Studio", icon: Upload },
     { href: "/blockchain-verification", label: "Blockchain Verification", icon: Shield },
