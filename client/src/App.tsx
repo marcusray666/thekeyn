@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/Navigation";
 import { ThemeProvider } from "@/components/theme-provider";
-import Welcome from "@/pages/welcome";
+
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import UploadPage from "@/pages/upload";
@@ -20,6 +20,7 @@ import BulkOperations from "@/pages/bulk-operations";
 import Settings from "@/pages/settings";
 import Security from "@/pages/security";
 import Profile from "@/pages/profile";
+import UserProfile from "@/pages/user-profile";
 import CertificateGuide from "@/pages/certificate-guide";
 
 import NFTMinting from "@/pages/nft-minting";
@@ -48,7 +49,7 @@ function Router() {
       <Route path="/upload" component={UploadPage} />
       
       {/* Home route - dynamic based on auth status */}
-      <Route path="/" component={Home} />
+      <Route path="/" component={UserProfile} />
       
       {/* Protected routes */}
       <Route path="/home" component={Home} />

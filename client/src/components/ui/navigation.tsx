@@ -63,13 +63,12 @@ export function Navigation() {
   }
 
   const authenticatedNavItems = [
-    { href: "/", label: "Portfolio", icon: Home },
+    { href: `/profile/${user?.username}`, label: "Profile", icon: User },
     { href: "/social", label: "Community", icon: Users },
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/studio", label: "Studio", icon: Upload },
     { href: "/certificate-guide", label: "Certificate Guide", icon: BookOpen },
     { href: "/subscription", label: "Subscription", icon: Crown },
-    { href: `/profile/${user?.username}`, label: "Profile", icon: User },
     ...(user?.role === 'admin' ? [{ href: "/admin-dashboard", label: "Admin Panel", icon: Shield }] : []),
   ];
 
@@ -196,7 +195,7 @@ export function Navigation() {
 
                     <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
                     
-                    {/* Navigation Items */}
+                    {/* Navigation Items - Only Portfolio */}
                     <DropdownMenuItem asChild>
                       <Link 
                         href={`/profile/${user?.username}`} 
@@ -213,82 +212,6 @@ export function Navigation() {
                       >
                         <Eye className="mr-3 h-4 w-4" />
                         Portfolio
-                      </Link>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/settings" 
-                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
-                        style={{ color: 'rgb(229, 231, 235)' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
-                        }}
-                      >
-                        <Settings className="mr-3 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/security" 
-                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
-                        style={{ color: 'rgb(229, 231, 235)' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
-                        }}
-                      >
-                        <Shield className="mr-3 h-4 w-4" />
-                        Security
-                      </Link>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/report-theft" 
-                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
-                        style={{ color: 'rgb(229, 231, 235)' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
-                        }}
-                      >
-                        <AlertTriangle className="mr-3 h-4 w-4" />
-                        Report Theft
-                      </Link>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/analytics" 
-                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
-                        style={{ color: 'rgb(229, 231, 235)' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
-                        }}
-                      >
-                        <BarChart3 className="mr-3 h-4 w-4" />
-                        Analytics
                       </Link>
                     </DropdownMenuItem>
 
