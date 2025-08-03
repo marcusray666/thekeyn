@@ -16,19 +16,19 @@ export default function Portfolio() {
   const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'carousel' | 'timeline'>('grid');
 
   // If no username in URL and user is logged in, redirect to their portfolio
-  if (!username && currentUser) {
+  if (!username && currentUser?.username) {
     setLocation(`/portfolio/${currentUser.username}`);
     return null;
   }
 
-  // Fetch user profile
-  const { data: profile, isLoading: isLoadingProfile } = useQuery<User>({
-    queryKey: [`/api/users/profile/${username}`],
+  // Fetch user profile (using same endpoint as profile page)
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['/api/profile', username],
     enabled: !!username,
   });
 
-  // Fetch user's works
-  const { data: works = [], isLoading: isLoadingWorks } = useQuery<Work[]>({
+  // Fetch user's works (using same endpoint as profile page)
+  const { data: works = [], isLoading: isLoadingWorks } = useQuery({
     queryKey: [`/api/users/${profile?.id}/works`],
     enabled: !!profile?.id,
   });
@@ -79,7 +79,12 @@ export default function Portfolio() {
             </div>
           ) : (
             <AnimatedShowcase
-              works={works}
+              works={works.map((work: any) => ({
+                ...work,
+                fileType: work.mimeType?.split('/')[0] || 'file',
+                likes: work.likes || 0,
+                views: work.views || 0
+              }))}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
               autoplay={false}
