@@ -139,9 +139,34 @@ app.use(session({
     }
   }
 
+  // Runtime database schema verification
+  async function ensureSchema() {
+    try {
+      // Test if critical tables exist by attempting a simple query
+      await pool.query('SELECT 1 FROM users LIMIT 1');
+      await pool.query('SELECT 1 FROM posts LIMIT 1');
+      await pool.query('SELECT 1 FROM works LIMIT 1');
+      console.log('✅ Database schema verified - all tables exist');
+    } catch (error) {
+      console.warn('⚠️ Database schema missing, attempting to create tables...');
+      try {
+        const { execSync } = await import('child_process');
+        execSync('npm run db:push', { stdio: 'inherit' });
+        console.log('✅ Database schema created successfully');
+      } catch (migrationError) {
+        console.error('❌ Failed to create database schema:', migrationError);
+      }
+    }
+  }
+
   // Initialize admin user after database connection
   if (process.env.NODE_ENV === 'production') {
-    setTimeout(ensureAdminUser, 2000); // Wait for DB connection
+    setTimeout(async () => {
+      await ensureSchema();
+      await ensureAdminUser();
+    }, 2000); // Wait for DB connection
+  } else {
+    setTimeout(ensureSchema, 1000); // Also check in development
   }
 
   // Set up Vite middleware for development
