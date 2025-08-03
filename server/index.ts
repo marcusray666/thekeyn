@@ -115,13 +115,13 @@ app.use(session({
     const fs = await import('fs');
     const express = await import('express');
     
-    // Check multiple possible build locations (Railway uses dist/public)
+    // Check multiple possible build locations (Railway production uses dist/public)
     const possiblePaths = [
       path.resolve(process.cwd(), "dist", "public"),
-      path.resolve(process.cwd(), "client", "dist"),
+      path.resolve(process.cwd(), "client", "dist"), 
       path.resolve(process.cwd(), "dist"),
-      path.resolve(process.cwd(), "public"),
-      path.resolve(process.cwd(), "build")
+      path.resolve(process.cwd(), "build"),
+      path.resolve(process.cwd(), "public")
     ];
     
     console.log('Current working directory:', process.cwd());
