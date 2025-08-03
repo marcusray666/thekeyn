@@ -855,7 +855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check subscription limits
       const userId = req.session!.userId;
       console.log('Checking upload limits for user:', userId);
-      const uploadCheck = await storage.checkUploadLimit(userId);
+      const uploadCheck = await storage.checkUploadLimit(userId!);
       console.log('Upload limit check result:', uploadCheck);
       
       if (!uploadCheck.canUpload) {
@@ -967,7 +967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileHash,
         certificateId,
         blockchainHash,
-        userId: userId, // Add userId to properly associate work with user
+        userId: userId!, // Add userId to properly associate work with user
         moderationStatus,
         moderationFlags,
         moderationScore,
@@ -977,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get user's subscription limits for certificate features
       console.log('Getting subscription limits...');
-      const limits = await storage.getUserSubscriptionLimits(userId);
+      const limits = await storage.getUserSubscriptionLimits(userId!);
       console.log('Subscription limits:', limits);
       
       // Read file buffer for verification proof

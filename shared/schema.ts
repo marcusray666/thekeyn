@@ -130,6 +130,7 @@ export const registerSchema = z.object({
 });
 
 export const insertWorkSchema = createInsertSchema(works).pick({
+  userId: true,
   title: true,
   description: true,
   filename: true,
@@ -141,6 +142,9 @@ export const insertWorkSchema = createInsertSchema(works).pick({
   blockchainHash: true,
   creatorName: true,
   collaborators: true,
+  moderationStatus: true,
+  moderationFlags: true,
+  moderationScore: true,
 });
 
 export const insertCertificateSchema = createInsertSchema(certificates).pick({
@@ -149,6 +153,8 @@ export const insertCertificateSchema = createInsertSchema(certificates).pick({
   pdfPath: true,
   qrCode: true,
   shareableLink: true,
+  verificationProof: true,
+  isDownloadable: true,
 });
 
 export const nftMints = pgTable("nft_mints", {
