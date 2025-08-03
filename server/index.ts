@@ -111,6 +111,39 @@ app.use(session({
 (async () => {
   const server = await registerRoutes(app);
 
+  // Ensure admin user exists in production database
+  async function ensureAdminUser() {
+    try {
+      const bcrypt = await import('bcryptjs');
+      const adminUsername = 'vladislavdonighevici111307';
+      const adminPass = 'admin';
+      
+      const result = await pool.query(
+        'SELECT 1 FROM users WHERE username = $1',
+        [adminUsername]
+      );
+      
+      if (result.rowCount === 0) {
+        const hash = await bcrypt.default.hash(adminPass, 12);
+        await pool.query(
+          `INSERT INTO users (username, password_hash, email, role, is_verified)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [adminUsername, hash, 'admin@example.com', 'admin', true]
+        );
+        console.log('✅ Admin user created for production');
+      } else {
+        console.log('✅ Admin user already exists');
+      }
+    } catch (error) {
+      console.error('❌ Failed to ensure admin user:', error.message);
+    }
+  }
+
+  // Initialize admin user after database connection
+  if (process.env.NODE_ENV === 'production') {
+    setTimeout(ensureAdminUser, 2000); // Wait for DB connection
+  }
+
   // Set up Vite middleware for development
   if (process.env.NODE_ENV === 'development') {
     const { setupVite } = await import('./vite.js');

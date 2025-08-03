@@ -1,0 +1,121 @@
+Understood. Let’s fix this now — no guessing, just clear steps based on everything you've shared.
+
+---
+
+## 🔥 You're Facing 2 Ongoing Issues:
+
+### 1. ❌ `https://lggn.net` still shows "Train has not arrived"
+
+### 2. ❌ Admin login `vladislavdonighevici111307` / `admin` still returns 401
+
+I’ll walk you through **how to fix both**, based on what your current code and logs show.
+
+---
+
+## ✅ 1. FIX THE "TRAIN NOT ARRIVED" ERROR
+
+### 🔍 Root Cause
+
+Your backend **isn't running or listening properly**, which means Railway has nothing to serve — that’s why you still see that screen.
+
+### ✅ 3-Point Checklist:
+
+#### ✅ A. `DATABASE_URL` is missing — **you must add it**
+
+Go to:
+
+* **Railway → Your Project → Variables**
+* Add this:
+
+```env
+DATABASE_URL=your_postgres_connection_string
+```
+
+**If you're using Railway’s PostgreSQL plugin:**
+
+* Click the plugin (the DB service)
+* Copy the `DATABASE_URL`
+* Paste it into your web service's Variables tab
+
+#### ✅ B. You must **redeploy the project**
+
+Once the variable is set:
+
+* Go to your main app service
+* Click **“Deployments” → “Redeploy”**
+* It must boot up without crashing
+
+#### ✅ C. Make sure Express server is using the correct port
+
+In `server/index.ts` you already have:
+
+```ts
+const PORT = parseInt(process.env.PORT || '5000');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server listening on port ${PORT}`);
+});
+```
+
+✅ That’s good — no changes needed there as long as it deploys successfully.
+
+---
+
+## ✅ 2. FIX ADMIN LOGIN `401 Unauthorized`
+
+### 🔍 Root Cause
+
+The admin user **was never inserted into the production DB**, even though your code has seeding logic.
+
+### ✅ Fix It Like This:
+
+#### 🔧 A. Open your `server/index.ts`
+
+Make sure this logic exists (after DB init):
+
+```ts
+const adminUsername = 'vladislavdonighevici111307';
+const adminPass = 'admin';
+
+const result = await pool.query(
+  'SELECT 1 FROM users WHERE username = $1',
+  [adminUsername]
+);
+
+if (result.rowCount === 0) {
+  const hash = await bcrypt.hash(adminPass, 12);
+  await pool.query(
+    `INSERT INTO users (username, password_hash, email, role, is_verified)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [adminUsername, hash, 'admin@example.com', 'admin', true]
+  );
+  console.log('✅ Admin user created');
+}
+```
+
+> ✅ From what you’ve shared, this code *is* in your repo — so no changes needed *if it's running*.
+
+#### 🔧 B. But… it only runs if the server starts successfully
+
+That’s why you need to fix issue #1 first — your server isn’t even running long enough to insert the admin user.
+
+---
+
+## ✅ Summary: Here's What to Do Now
+
+| Step | Task                                                                    |
+| ---- | ----------------------------------------------------------------------- |
+| 1    | Go to Railway → Variables tab                                           |
+| 2    | Add your `DATABASE_URL` exactly                                         |
+| 3    | Redeploy your service                                                   |
+| 4    | Wait for server logs to show “✅ Admin user created”                     |
+| 5    | Visit `https://lggn.net` and try logging in with your admin credentials |
+
+---
+
+💬 **If that doesn’t work**, send me:
+
+* A screenshot of your Railway **Variables tab**
+* The **deploy logs after the fix**
+* Confirmation of whether you see `✅ Admin user created` in logs
+
+And I’ll walk you through the exact fix live. You're just one config away from being live.
