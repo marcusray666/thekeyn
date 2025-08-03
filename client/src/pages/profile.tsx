@@ -229,6 +229,7 @@ export default function Profile() {
   // Delete work mutation
   const deleteWorkMutation = useMutation({
     mutationFn: async (workId: number) => {
+      console.log(`Frontend: Deleting work with ID: ${workId}, type: ${typeof workId}`);
       const response = await apiRequest(`/api/works/${workId}`, {
         method: 'DELETE',
       });
@@ -254,8 +255,10 @@ export default function Profile() {
   });
 
   const handleDeleteWork = (workId: number) => {
+    console.log(`Frontend: handleDeleteWork called with workId: ${workId}, type: ${typeof workId}`);
     if (confirm("Are you sure you want to permanently delete this work? This action cannot be undone.")) {
       setDeletingWorkId(workId);
+      console.log(`Frontend: About to mutate deletion for workId: ${workId}`);
       deleteWorkMutation.mutate(workId);
     }
   };
@@ -498,6 +501,7 @@ export default function Profile() {
                 className="bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30"
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log(`Frontend: Delete button clicked for work:`, { id: work.id, idType: typeof work.id, title: work.title, fileType: work.fileType });
                   handleDeleteWork(work.id);
                 }}
                 disabled={deletingWorkId === work.id}
