@@ -206,7 +206,32 @@ export default function Settings() {
     },
   });
 
-  const handleSaveProfile = () => {
+  const checkUsernameAvailability = useMutation({
+    mutationFn: async (username: string) => {
+      const response = await apiRequest(`/api/auth/check-username`, {
+        method: 'POST',
+        body: JSON.stringify({ username }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response;
+    },
+  });
+
+  const handleSaveProfile = async () => {
+    // Check if username changed and validate availability
+    if (profileSettings.username !== user?.username) {
+      try {
+        await checkUsernameAvailability.mutateAsync(profileSettings.username);
+      } catch (error: any) {
+        toast({
+          title: "Username unavailable",
+          description: error.message || "Username is already taken. Please choose a different one.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
     const updates = {
       username: profileSettings.username,
       email: profileSettings.email,

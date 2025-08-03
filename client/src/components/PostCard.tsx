@@ -122,6 +122,28 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
     },
   });
 
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      return await apiRequest(`/api/social/posts/${postId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/social/posts'] });
+      toast({
+        title: "Post deleted",
+        description: "Your post has been removed successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete failed",
+        description: error.message || "Failed to delete post",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleLike = () => {
     likePostMutation.mutate(post.id);
   };
@@ -139,6 +161,12 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
       title: "Report submitted",
       description: "We'll review this content and take appropriate action",
     });
+  };
+
+  const handleDeletePost = () => {
+    if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+      deletePostMutation.mutate(post.id);
+    }
   };
 
   const formatContent = (content: string) => {
@@ -222,7 +250,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
                         Edit Post
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => onDelete?.(post.id)} 
+                        onClick={handleDeletePost} 
                         className="!text-red-400 hover:!bg-red-500/20 hover:!text-red-300 focus:!bg-red-500/20 focus:!text-red-300"
                         style={{ color: 'rgb(248, 113, 113)' }}
                       >

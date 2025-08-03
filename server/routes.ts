@@ -1466,6 +1466,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check username availability endpoint
+  app.post('/api/auth/check-username', async (req, res) => {
+    try {
+      const { username } = req.body;
+      
+      if (!username || username.length < 3) {
+        return res.status(400).json({ error: "Username must be at least 3 characters long" });
+      }
+      
+      // Check if username exists (case insensitive)
+      const existingUser = await storage.getUserByUsername(username.toLowerCase());
+      
+      if (existingUser) {
+        return res.status(400).json({ error: "Username is already taken" });
+      }
+      
+      res.json({ available: true, message: "Username is available" });
+    } catch (error) {
+      console.error("Error checking username:", error);
+      res.status(500).json({ error: "Failed to check username availability" });
+    }
+  });
+
   app.patch('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const updates = req.body;
@@ -1473,13 +1496,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Profile update request:', { userId, updates });
       
+      // Check username uniqueness if username is being updated
+      if (updates.username !== undefined) {
+        const currentUser = await storage.getUser(userId);
+        if (currentUser && updates.username.toLowerCase() !== currentUser.username.toLowerCase()) {
+          const existingUser = await storage.getUserByUsername(updates.username.toLowerCase());
+          if (existingUser) {
+            return res.status(400).json({ message: "Username is already taken" });
+          }
+        }
+      }
+      
       // Filter out undefined values and update user profile
       const filteredUpdates: any = {};
       if (updates.displayName !== undefined) filteredUpdates.displayName = updates.displayName;
       if (updates.bio !== undefined) filteredUpdates.bio = updates.bio;
       if (updates.website !== undefined) filteredUpdates.website = updates.website;
       if (updates.location !== undefined) filteredUpdates.location = updates.location;
-      if (updates.username !== undefined) filteredUpdates.username = updates.username;
+      if (updates.username !== undefined) filteredUpdates.username = updates.username.toLowerCase();
       if (updates.email !== undefined) filteredUpdates.email = updates.email;
       
       await storage.updateUser(userId, filteredUpdates);

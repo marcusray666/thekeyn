@@ -73,8 +73,27 @@
   .light,
   .light body,
   .light #root {
-    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9);
-    color: #1a1a1a;
+    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
+    color: #1a1a1a !important;
+  }
+  
+  .light .cosmic-bg {
+    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
+  }
+  
+  .light .glass-card,
+  .light .bg-white\/5 {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .light .text-white {
+    color: #1a1a1a !important;
+  }
+  
+  .light .text-gray-300,
+  .light .text-gray-400 {
+    color: #666666 !important;
   }
 
   /* Dark theme styling */
