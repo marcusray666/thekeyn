@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import Login from "@/pages/login-clean";
 import Register from "@/pages/register-clean";
@@ -20,7 +21,7 @@ import CertificateDetail from "@/pages/certificate-detail";
 import ReportTheft from "@/pages/report-theft";
 import Analytics from "@/pages/analytics";
 import BulkOperations from "@/pages/bulk-operations";
-import Settings from "@/pages/settings";
+import PremiumSettings from "@/pages/premium-settings";
 import Security from "@/pages/security";
 import Profile from "@/pages/profile";
 import UserProfile from "@/pages/user-profile";
@@ -78,7 +79,7 @@ function Router() {
       <Route path="/social" component={Social} />
       <Route path="/messages" component={Messages} />
       <Route path="/followers" component={Followers} />
-      <Route path="/settings" component={Settings} />
+      <Route path="/settings" component={PremiumSettings} />
       <Route path="/security" component={Security} />
       <Route path="/certificate-guide" component={CertificateGuide} />
       <Route path="/report-theft" component={ReportTheft} />
@@ -128,7 +129,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

@@ -1,0 +1,374 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, User, Bell, Lock, Save, Eye, EyeOff, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+export default function PremiumSettings() {
+  const [, setLocation] = useLocation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [profileSettings, setProfileSettings] = useState({
+    username: user?.username || "",
+    email: user?.email || "",
+    displayName: user?.displayName || "",
+    bio: user?.bio || "",
+    website: "",
+    location: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: true,
+    pushNotifications: true,
+    certificateAlerts: true,
+    theftReports: true,
+    socialInteractions: true,
+    marketingEmails: false,
+    likes: true,
+    comments: true,
+    follows: true,
+    mentions: true,
+    workViews: false,
+    weeklyDigest: true,
+    newFeatures: true,
+  });
+  
+  const [privacySettings, setPrivacySettings] = useState({
+    publicProfile: true,
+    showStatistics: true,
+    allowIndexing: false,
+    showFollowers: true,
+    showFollowing: true,
+    allowDirectMessages: true,
+    showOnlineStatus: true,
+    showLastSeen: false,
+    allowTagging: true,
+    allowMentions: true,
+    requireApprovalForTags: false,
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("/api/user/profile", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/profile"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update profile.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleProfileUpdate = () => {
+    const { currentPassword, newPassword, confirmPassword, ...profileData } = profileSettings;
+    
+    if (newPassword && newPassword !== confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "New password and confirmation don't match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const updateData = {
+      ...profileData,
+      ...(newPassword && { currentPassword, newPassword })
+    };
+
+    updateProfileMutation.mutate(updateData);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => setLocation('/profile')}
+            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back to Profile</span>
+          </button>
+          
+          <h1 className="text-3xl font-bold text-white">Settings</h1>
+          
+          <div className="w-20" />
+        </div>
+
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Tab Navigation */}
+            <div className="border-b border-white/10 px-6">
+              <TabsList className="grid w-full grid-cols-4 bg-transparent gap-4 py-6">
+                <TabsTrigger 
+                  value="profile" 
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                    activeTab === 'profile' 
+                      ? 'bg-[#FE3F5E] text-white' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <User className="h-4 w-4" />
+                  <span>Profile</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notifications"
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                    activeTab === 'notifications' 
+                      ? 'bg-[#FE3F5E] text-white' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Bell className="h-4 w-4" />
+                  <span>Notifications</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="privacy"
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                    activeTab === 'privacy' 
+                      ? 'bg-[#FE3F5E] text-white' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Privacy</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="security"
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                    activeTab === 'security' 
+                      ? 'bg-[#FE3F5E] text-white' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Lock className="h-4 w-4" />
+                  <span>Security</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="p-8 space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Profile Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="username" className="text-white font-medium">Username</Label>
+                    <Input
+                      id="username"
+                      value={profileSettings.username}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, username: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email" className="text-white font-medium">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profileSettings.email}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, email: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="displayName" className="text-white font-medium">Display Name</Label>
+                    <Input
+                      id="displayName"
+                      value={profileSettings.displayName}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, displayName: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="website" className="text-white font-medium">Website</Label>
+                    <Input
+                      id="website"
+                      value={profileSettings.website}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, website: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                      placeholder="https://yourwebsite.com"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <Label htmlFor="bio" className="text-white font-medium">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={profileSettings.bio}
+                    onChange={(e) => setProfileSettings(prev => ({ ...prev, bio: e.target.value }))}
+                    className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    rows={4}
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+              </div>
+
+              {/* Password Change */}
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Change Password</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <Label htmlFor="currentPassword" className="text-white font-medium">Current Password</Label>
+                    <div className="relative mt-2">
+                      <Input
+                        id="currentPassword"
+                        type={showPassword ? "text" : "password"}
+                        value={profileSettings.currentPassword}
+                        onChange={(e) => setProfileSettings(prev => ({ ...prev, currentPassword: e.target.value }))}
+                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="newPassword" className="text-white font-medium">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      type={showPassword ? "text" : "password"}
+                      value={profileSettings.newPassword}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, newPassword: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPassword" className="text-white font-medium">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      value={profileSettings.confirmPassword}
+                      onChange={(e) => setProfileSettings(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="mt-2 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleProfileUpdate}
+                disabled={updateProfileMutation.isPending}
+                className="accent-button"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </TabsContent>
+
+            {/* Notifications Tab */}
+            <TabsContent value="notifications" className="p-8 space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Email Notifications</h3>
+                <div className="space-y-4">
+                  {Object.entries(notificationSettings).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <Label htmlFor={key} className="text-white font-medium capitalize">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </Label>
+                      <Switch
+                        id={key}
+                        checked={value}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, [key]: checked }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Privacy Tab */}
+            <TabsContent value="privacy" className="p-8 space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Privacy Settings</h3>
+                <div className="space-y-4">
+                  {Object.entries(privacySettings).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <Label htmlFor={key} className="text-white font-medium capitalize">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </Label>
+                      <Switch
+                        id={key}
+                        checked={value}
+                        onCheckedChange={(checked) => 
+                          setPrivacySettings(prev => ({ ...prev, [key]: checked }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Security Tab */}
+            <TabsContent value="security" className="p-8 space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Security & Access</h3>
+                <div className="space-y-6">
+                  <div className="bg-white/5 rounded-2xl p-6">
+                    <h4 className="text-white font-medium mb-2">Two-Factor Authentication</h4>
+                    <p className="text-white/70 text-sm mb-4">Add an extra layer of security to your account</p>
+                    <Button className="glass-button">
+                      Enable 2FA
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-2xl p-6">
+                    <h4 className="text-white font-medium mb-2">Active Sessions</h4>
+                    <p className="text-white/70 text-sm mb-4">Manage devices that are signed into your account</p>
+                    <Button className="glass-button">
+                      View Sessions
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-2xl p-6">
+                    <h4 className="text-white font-medium mb-2">Download Your Data</h4>
+                    <p className="text-white/70 text-sm mb-4">Get a copy of your protected works and account data</p>
+                    <Button className="glass-button">
+                      Request Export
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+}
