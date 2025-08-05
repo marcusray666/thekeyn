@@ -75,7 +75,24 @@ export default function Analytics() {
   const analytics: AnalyticsData = analyticsData || mockAnalytics;
 
   if (isLoading) {
-    return <LiquidGlassLoader size="xl" text="Loading analytics..." />;
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+        
+        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 relative">
+              <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+            </div>
+            <p className="text-white/60 text-sm">Loading analytics...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const exportAnalytics = () => {
