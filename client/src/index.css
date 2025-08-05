@@ -5,57 +5,59 @@
 
 @layer base {
   :root {
-    /* Billion-Dollar Color Palette */
-    --background: 215 27% 6%;           /* Deep slate #0D1117 */
-    --foreground: 0 0% 98%;
-    --card: 215 27% 6%;
+    /* Clean Dark Theme (Default) */
+    --background: 217 33% 7%;           /* #121212 */
+    --foreground: 0 0% 98%;             /* #F9FAFB */
+    --card: 217 33% 7%;
     --card-foreground: 0 0% 98%;
-    --popover: 215 27% 6%;
+    --popover: 217 33% 7%;
     --popover-foreground: 0 0% 98%;
-    --primary: 262 83% 58%;             /* Vivid violet #7C3AED */
+    --primary: 237 55% 62%;             /* #6366F1 Indigo 500 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 262 83% 58%;              /* Vivid violet accent */
+    --secondary: 142 76% 73%;           /* #4ADE80 Green 400 */
+    --secondary-foreground: 217 33% 7%;
+    --muted: 217 15% 15%;
+    --muted-foreground: 217 15% 70%;
+    --accent: 237 55% 62%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 58%;           /* Strong red #EF4444 */
+    --destructive: 0 84% 58%;           /* #EF4444 Red 500 */
     --destructive-foreground: 0 0% 100%;
-    --success: 158 64% 52%;             /* Mint green #10B981 */
-    --warning: 43 90% 58%;              /* Amber #FBBF24 */
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 262 83% 58%;
+    --success: 142 76% 73%;             /* #4ADE80 Green 400 */
+    --warning: 43 90% 58%;
+    --border: 217 15% 20%;
+    --input: 217 15% 20%;
+    --ring: 237 55% 62%;
     --radius: 0.75rem;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --chart-1: 237 55% 62%;
+    --chart-2: 142 76% 73%;
+    --chart-3: 0 84% 58%;
+    --chart-4: 43 90% 58%;
+    --chart-5: 280 65% 60%;
   }
 
   .light {
-    /* Light theme colors - matching the clean light palette */
-    --background: 0 0% 98%;
-    --foreground: 220 14% 16%;
+    /* Clean Light Theme */
+    --background: 0 0% 98%;             /* #FAFAFA */
+    --foreground: 222 23% 11%;          /* #111827 */
     --card: 0 0% 100%;
-    --card-foreground: 220 14% 16%;
+    --card-foreground: 222 23% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 14% 16%;
-    --primary: 263.4 70% 50.4%;
+    --popover-foreground: 222 23% 11%;
+    --primary: 237 55% 62%;             /* #6366F1 Indigo 500 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 9% 46%;
+    --secondary: 142 76% 73%;           /* #4ADE80 Green 400 */
+    --secondary-foreground: 222 23% 11%;
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 220 9% 46%;
-    --destructive: 0 84% 60%;
+    --accent: 237 55% 62%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;           /* #EF4444 Red 500 */
     --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 73%;             /* #4ADE80 Green 400 */
+    --warning: 43 90% 58%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 263.4 70% 50.4%;
+    --ring: 237 55% 62%;
   }
 }
 
@@ -64,14 +66,18 @@
     @apply border-border;
   }
 
-  /* Base body styling with billion-dollar aesthetics */
+  /* Clean body styling */
   body {
-    background: linear-gradient(135deg, #0D1117 0%, #161B22 50%, #0D1117 100%) !important;
-    color: white !important;
+    @apply bg-background text-foreground;
     min-height: 100vh;
-    font-family: 'Inter', 'Urbanist', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
+  }
+  
+  .light body {
+    background: #FAFAFA !important;
+    color: #111827 !important;
   }
 
   /* Light theme styling */

@@ -3,14 +3,15 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Navigation } from "@/components/ui/navigation";
+import { CleanHeader } from "@/components/clean-header";
 import { ThemeProvider } from "@/components/theme-provider";
 
-import Login from "@/pages/login";
-import Register from "@/pages/register";
+import Login from "@/pages/login-clean";
+import Register from "@/pages/register-clean";
 import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
+import ProtectClean from "@/pages/protect-clean";
 
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -52,9 +53,10 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
+      <Route path="/protect" component={ProtectClean} />
       
       {/* Home route - dynamic based on auth status */}
-      <Route path="/" component={UserProfile} />
+      <Route path="/" component={Home} />
       
       {/* Protected routes */}
       <Route path="/home" component={Home} />
@@ -102,25 +104,17 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="light" storageKey="loggin-ui-theme">
         <TooltipProvider>
-          <div 
-            className="min-h-screen text-foreground" 
-            style={{ 
-              background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%)',
-              color: 'white',
-              minHeight: '100vh'
-            }}
-          >
+          <div className="min-h-screen bg-background text-foreground">
             {/* Skip Links for Screen Readers */}
-            <a href="#main-content" className="skip-link">
+            <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded">
               Skip to main content
             </a>
-            <Navigation />
+            <CleanHeader />
             <main id="main-content">
               <Router />
             </main>
-
           </div>
           <Toaster />
         </TooltipProvider>
