@@ -2,13 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   ArrowLeft,
-  Calendar,
   Download,
   TrendingUp,
-  Users,
   Eye,
   Share2,
-  Filter,
   RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,9 +30,9 @@ interface AnalyticsData {
 export default function Analytics() {
   const [, setLocation] = useLocation();
   const [timeRange, setTimeRange] = useState("6m");
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  const { data: analyticsData, isLoading, refetch } = useQuery({
+  const { data: analyticsData, isLoading, refetch } = useQuery<AnalyticsData>({
     queryKey: ["/api/analytics", timeRange],
     enabled: isAuthenticated,
   });
@@ -75,7 +72,7 @@ export default function Analytics() {
     ]
   };
 
-  const analytics = analyticsData || mockAnalytics;
+  const analytics: AnalyticsData = analyticsData || mockAnalytics;
 
   if (isLoading) {
     return <LiquidGlassLoader size="xl" text="Loading analytics..." />;
@@ -263,7 +260,7 @@ export default function Analytics() {
             <div className="p-4 sm:p-6">
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Geographic Distribution</h3>
               <div className="space-y-4">
-                {analytics.geographicData.map((country, index) => (
+                {analytics.geographicData.map((country) => (
                   <div key={country.country} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>

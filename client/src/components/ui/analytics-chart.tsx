@@ -59,7 +59,7 @@ export function AnalyticsChart({
               paddingAngle={2}
               dataKey={dataKey}
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
               ))}
             </Pie>
