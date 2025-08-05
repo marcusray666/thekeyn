@@ -267,6 +267,9 @@ const upload = multer({
       "image/svg+xml",
       "image/bmp",
       "image/tiff",
+      "image/heic",
+      "image/heif",
+      "image/avif",
       // Audio
       "audio/mpeg",
       "audio/wav",

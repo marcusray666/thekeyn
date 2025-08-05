@@ -81,9 +81,22 @@ export function FileUpload({
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) return <Image size={20} />;
+    const imageTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+      'image/webp', 'image/svg+xml', 'image/bmp', 'image/tiff',
+      'image/heic', 'image/heif', 'image/avif'
+    ];
+    
+    if (imageTypes.includes(file.type) || file.type.startsWith('image/')) return <Image size={20} />;
     if (file.type.startsWith('audio/')) return <Music size={20} />;
     return <File size={20} />;
+  };
+
+  const getFileTypeDisplay = (file: File) => {
+    if (file.type === 'image/heic' || file.type === 'image/heif') {
+      return 'HEIC Image (iPhone Photo)';
+    }
+    return file.type || 'Unknown type';
   };
 
   return (
@@ -116,7 +129,7 @@ export function FileUpload({
           Drag & drop or click to select files
         </p>
         <p className="text-sm text-gray-500">
-          Supports images, documents, audio files (max {maxSize}MB)
+          Supports images (including HEIC), documents, audio files (max {maxSize}MB)
         </p>
       </div>
 
@@ -135,7 +148,7 @@ export function FileUpload({
                 <div>
                   <p className="text-sm font-medium text-white">{file.name}</p>
                   <p className="text-xs text-gray-400">
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB • {getFileTypeDisplay(file)}
                   </p>
                 </div>
               </div>

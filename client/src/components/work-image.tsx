@@ -20,6 +20,18 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     return <File className="h-12 w-12 text-gray-400" />;
   };
 
+  // Special handling for HEIC/HEIF files (not directly supported by browsers)
+  if (mimeType && (mimeType === 'image/heic' || mimeType === 'image/heif') && filename) {
+    return (
+      <div className={`${className} flex flex-col items-center justify-center bg-gray-800/50 rounded-lg border-2 border-dashed border-yellow-600`}>
+        <ImageIcon className="h-12 w-12 text-yellow-400" />
+        <p className="text-yellow-400 text-sm mt-2 text-center px-2">{title}</p>
+        <p className="text-yellow-300 text-xs mt-1">HEIC Image (iPhone Photo)</p>
+        <p className="text-gray-400 text-xs mt-1 text-center px-2">File uploaded successfully - preview not available</p>
+      </div>
+    );
+  }
+
   // If it's an image and we have a filename, try to display it
   if (mimeType && mimeType.startsWith('image/') && filename && !imageError) {
     return (
