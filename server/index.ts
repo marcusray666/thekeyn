@@ -135,7 +135,7 @@ app.use(session({
         console.log('✅ Admin user already exists');
       }
     } catch (error) {
-      console.error('❌ Failed to ensure admin user:', error.message);
+      console.error('❌ Failed to ensure admin user:', error instanceof Error ? error.message : String(error));
     }
   }
 
