@@ -1,17 +1,17 @@
 import { useAuth } from "@/hooks/useAuth";
 import WelcomeClean from "@/pages/welcome-clean";
-import DashboardCleanNew from "@/pages/dashboard-clean-new";
+import PremiumHome from "@/pages/premium-home";
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-foreground">Loading...</div>
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+        <div className="text-white">Loading...</div>
       </div>
     );
   }
 
-  return isAuthenticated ? <DashboardCleanNew /> : <WelcomeClean />;
+  return isAuthenticated ? <PremiumHome /> : <WelcomeClean />;
 }

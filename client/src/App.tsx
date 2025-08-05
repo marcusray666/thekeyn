@@ -12,7 +12,7 @@ import UploadPage from "@/pages/upload";
 import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
 import ProtectClean from "@/pages/protect-clean";
-import DashboardCleanNew from "@/pages/dashboard-clean-new";
+import PremiumHome from "@/pages/premium-home";
 import FeedClean from "@/pages/feed-clean";
 
 import MyCertificates from "@/pages/my-certificates";
@@ -63,7 +63,7 @@ function Router() {
       
       {/* Protected routes */}
       <Route path="/home" component={Home} />
-      <Route path="/dashboard" component={DashboardCleanNew} />
+      <Route path="/dashboard" component={PremiumHome} />
       <Route path="/studio" component={Studio} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />

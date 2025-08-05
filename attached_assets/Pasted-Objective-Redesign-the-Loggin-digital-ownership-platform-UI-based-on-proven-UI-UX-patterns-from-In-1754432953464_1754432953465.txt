@@ -1,0 +1,279 @@
+Objective:
+Redesign the Loggin' digital ownership platform UI based on proven UI/UX patterns from Instagram — minimalist, emotionally engaging, intuitive — but adapted to our blockchain + certificate utility use case.
+
+APP ARCHITECTURE:
+Framework: React + TypeScript (preferred)Styling: Tailwind CSS (mobile-first)Routing: React Router DOMPages: MPA (Multi-Page Application)Design Language: Instagram-inspired layout (cards, icon nav, swipeable interface)
+
+COLOR & DESIGN PSYCHOLOGY (2025 Trend)
+
+Background: #0F0F0F (dark charcoal for immersive visual focus)
+
+Accent 1: #FE3F5E (active, bold — buttons, icons)
+
+Accent 2: #FFD200 (calls-to-action — Upload, Share)
+
+Text Primary: #FFFFFF (bright white for clarity)
+
+Secondary Text: #AAAAAA (muted grey)
+
+Font: "Inter" or "Urbanist", crisp and modern
+
+Components: Card-based layout, swipeable modals, rounded buttons, subtle shadows
+
+Style: Minimalist + social (with engaging hover/tap states)
+
+MOBILE vs. DESKTOP INTERACTION GUIDE
+
+Mobile:
+
+Bottom Navigation Bar with icons for Home, Upload, Certs, Verify, Profile
+
+Swipeable tabs and modals for fluid UX
+
+Tappable card actions (short tap = open, long press = preview)
+
+Upload experience modeled after Instagram Story UX (full screen, slide up to confirm)
+
+Desktop:
+
+Top Navigation Bar with logo, search, and dropdown menus
+
+Split-view layouts (e.g. /verify, /certificates)
+
+Hover states for previews, tooltips, and button animations
+
+FAB (floating action button) in bottom right for fast upload access
+
+Drag-and-drop upload zones
+
+Theme Toggling Support:
+
+Detect system preference using prefers-color-scheme
+
+Default to dark mode if undetectable
+
+All pages must support Tailwind's dark mode classes
+
+Implement a toggle switch in settings for manual override
+
+Example: dark:bg-zinc-900 bg-white, dark:text-white text-black
+
+Hover State UX:
+
+Buttons: Subtle shadow & scale on hover
+
+Cards: Border glow or highlight on hover (for preview)
+
+Upload zones: Highlight border on hover/drag
+
+Microanimations (Framer Motion or Tailwind Transitions):
+
+Page transitions: Fade or slide
+
+Modal open/close: Scale & opacity fade
+
+Button hover: Bounce or pulse
+
+Confirmation animations: Sparkle or badge success pop-in
+
+PAGE STRUCTURE & INTERACTION FLOW
+
+1. /home (Feed-Based Dashboard)
+
+Web View Layout:
+
+Top Navigation Bar:
+
+Left: App logo
+
+Center: 🔍 Search bar with rounded input field
+
+Right: ☰ Menu dropdown with Settings / Logout
+
+Center Feed (Card Layout):
+
+Creator Upload Cards (scrollable feed)
+
+Thumbnail/Preview
+
+Username
+
+Timestamp
+
+SHA-256 hash snippet
+
+“Verified on-chain” badge (tooltip on hover)
+
+Floating "Protect Work" button (bottom right)
+
+Side Panel (Desktop only):
+
+Recent Activity
+
+Quick links (Upload / Verify / Certificates)
+
+User Actions:
+
+Click post → Opens CertDetailModal
+
+Hover → Preview info overlay
+
+FAB → Starts /upload flow
+
+2. /upload
+
+Full-screen modal (story-style overlay)
+
+Upload options:
+
+Drag-and-drop zone
+
+Button: "Choose File"
+
+Auto-generate file hash + chain selection
+
+Chain toggle: Bitcoin / Ethereum / Both
+
+CTA: Protect My Work (Accent color)
+
+Animation confirmation screen with "Download Certificate" / "Share Proof"
+
+3. /certificates
+
+Web Layout: Horizontal tabbed interface (My Uploads | Downloads | Verifications)
+
+List/Grid toggle view
+
+Certificate Cards:
+
+Thumbnail preview
+
+Filename
+
+Status: Protected / Pending / Error (with icons)
+
+Actions: View, Download .PDF / .OTS
+
+Click → Expand blockchain proof modal
+
+4. /verify
+
+Web View with Split Panel Layout:
+
+Left Panel: Upload file or paste SHA-256
+
+Right Panel: Result Output
+
+Match result (✔ / ✘)
+
+Blockchain timestamp
+
+Creator info (if public)
+
+Certificate preview + download
+
+5. /profile
+
+Header:
+
+Avatar + Display Name
+
+Bio / Creator Tags
+
+Stats: # Protected Works, # Verifications
+
+Button: "Edit Profile"
+
+Tabs:
+
+Grid View (thumbnails)
+
+List View (certificates)
+
+Settings Icon → Account Preferences
+
+6. /community
+
+Discovery Feed Layout:
+
+Explore Cards:
+
+Public content thumbnails
+
+Creator badge
+
+Likes / Views
+
+Explore Tags Section:
+
+Trending hashtags
+
+Categories (Art, Music, Writing, etc)
+
+Sort/Filter Bar (Date, Popularity, Type)
+
+NAVIGATION (Responsive)
+
+Desktop Top Nav:
+
+Logo | Search | Navigation Links | Upload Button | Profile Dropdown
+
+Mobile Bottom Tab Bar:
+
+🏠 Home
+
+➕ Upload
+
+📜 Certs
+
+🛡️ Verify
+
+👤 Profile
+
+COMPONENTS TO BUILD
+
+PostCard
+
+UploadModal
+
+CertDetailModal
+
+VerifyResultCard
+
+BottomNavBar
+
+FloatingActionButton
+
+SwipeableTabs
+
+TopNavBar
+
+ExploreCard
+
+REPLIT IMPLEMENTATION TASKS
+
+Redesign layout using feed + card architecture for both mobile and desktop
+
+Rebuild /dashboard as responsive Home Feed
+
+Convert upload to full-screen modal with chain toggles
+
+Add swipe gestures (mobile) + hover states (desktop)
+
+Add responsive nav (TopNavBar for desktop, BottomNavBar for mobile)
+
+Apply Tailwind CSS theme based on above color palette
+
+Replace all buttons with glassmorphic + rounded style
+
+Apply consistent theme mode:
+
+Detect user theme (dark/light) using prefers-color-scheme
+
+Ensure all pages and components adapt accordingly
+
+Fix inconsistent pages using Tailwind’s dark/light mode utilities (e.g. dark:bg-gray-800, text-white)
+
+Add hover states and microanimations as described
+
+Enable light/dark mode switching via toggle in profile/settings

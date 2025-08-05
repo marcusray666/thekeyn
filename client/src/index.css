@@ -1,16 +1,91 @@
-/* Fonts are loaded via Google Fonts in index.html */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Urbanist:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Glass morphism utilities */
-@layer components {
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+/* Instagram-inspired premium theme */
+@layer base {
+  :root {
+    --background: #0F0F0F;
+    --foreground: #FFFFFF;
+    --accent-primary: #FE3F5E;
+    --accent-secondary: #FFD200;
+    --text-secondary: #AAAAAA;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 255, 255, 0.1);
   }
   
-  .glass-sidebar {
-    @apply bg-gradient-to-b from-[#0f2027]/90 via-[#203a43]/90 to-[#2c5364]/90 backdrop-blur-xl;
+  body {
+    @apply bg-[#0F0F0F] text-white font-inter antialiased;
+    font-family: 'Inter', 'Urbanist', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Premium card components */
+  .post-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 
+           transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 
+           hover:border-white/20 hover:shadow-2xl cursor-pointer;
+  }
+  
+  .glass-button {
+    @apply bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 
+           rounded-full px-6 py-3 text-white font-medium transition-all duration-200 
+           hover:scale-105 active:scale-95;
+  }
+  
+  .accent-button {
+    @apply bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white font-semibold 
+           rounded-full px-8 py-4 transition-all duration-200 hover:scale-105 
+           active:scale-95 shadow-lg hover:shadow-xl;
+  }
+  
+  .secondary-button {
+    @apply bg-[#FFD200] hover:bg-[#FFD200]/90 text-black font-semibold 
+           rounded-full px-8 py-4 transition-all duration-200 hover:scale-105 
+           active:scale-95 shadow-lg hover:shadow-xl;
+  }
+  
+  .upload-zone {
+    @apply border-2 border-dashed border-white/20 rounded-3xl p-12 
+           transition-all duration-300 hover:border-[#FE3F5E] hover:bg-[#FE3F5E]/5
+           text-center cursor-pointer;
+  }
+  
+  .nav-item {
+    @apply flex flex-col items-center space-y-1 p-3 rounded-2xl transition-all duration-200
+           hover:bg-white/10 active:scale-95;
+  }
+  
+  .feed-container {
+    @apply max-w-2xl mx-auto space-y-6 px-4;
+  }
+  
+  .floating-action {
+    @apply fixed bottom-6 right-6 w-16 h-16 bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 
+           rounded-full flex items-center justify-center text-white shadow-2xl 
+           transition-all duration-300 hover:scale-110 active:scale-95 z-50;
+  }
+  
+  .story-modal {
+    @apply fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center;
+  }
+  
+  .verification-badge {
+    @apply inline-flex items-center space-x-1 bg-green-500/20 text-green-400 
+           px-3 py-1 rounded-full text-xs font-medium border border-green-500/30;
+  }
+  
+  .creator-avatar {
+    @apply w-12 h-12 rounded-full bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] 
+           p-0.5 cursor-pointer hover:scale-110 transition-transform duration-200;
+  }
+  
+  .avatar-inner {
+    @apply w-full h-full rounded-full bg-[#0F0F0F] flex items-center justify-center 
+           text-white font-semibold;
   }
 }
 
