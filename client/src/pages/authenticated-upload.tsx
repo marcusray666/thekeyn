@@ -59,28 +59,61 @@ export default function AuthenticatedUpload() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch('/api/works', {
-        method: 'POST',
-        body: data,
-        credentials: 'include',
+      console.log('Starting upload mutation with FormData:', {
+        hasFile: data.has('file'),
+        title: data.get('title'),
+        creatorName: data.get('creatorName'),
+        description: data.get('description'),
+      });
+
+      // Create an AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
+      try {
+        const response = await fetch('/api/works', {
+          method: 'POST',
+          body: data,
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Upload timed out. Please try again with a smaller file.');
+        }
+        throw error;
+      }
+      
+      console.log('Upload response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
       });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Upload error data:', errorData);
         throw new Error(errorData.error || `${response.status}: ${response.statusText}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      console.log('Upload success result:', result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log('Upload mutation success:', data);
       toast({
         title: "Work protected successfully!",
-        description: `Certificate ID: ${data.certificateId}`,
+        description: `Certificate ID: ${data.certificate?.certificateId || data.certificateId}`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/works'] });
       setLocation('/dashboard');
     },
     onError: (error: Error) => {
+      console.error('Upload mutation error:', error);
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload and protect your work.",

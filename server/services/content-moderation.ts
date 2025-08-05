@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { GoogleGenAI } from "@google/genai";
 
 export interface ModerationResult {
   isApproved: boolean;
@@ -18,6 +19,7 @@ export interface ContentAnalysis {
 }
 
 class ContentModerationService {
+  private ai: GoogleGenAI;
   private bannedWords: string[] = [
     // Explicit content
     'porn', 'nude', 'naked', 'sex', 'xxx', 'adult', 'erotic',
@@ -35,14 +37,18 @@ class ContentModerationService {
     /\b(stolen|pirated|copyright\s+violation)\b/i,
   ];
 
-  // Text content moderation using keyword filtering and pattern matching
+  constructor() {
+    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  }
+
+  // Text content moderation using AI-powered analysis with Gemini
   async moderateText(text: string, title?: string): Promise<ModerationResult> {
     const flags: string[] = [];
     let confidence = 0;
     
     const fullText = `${title || ''} ${text}`.toLowerCase();
     
-    // Check for banned words
+    // First, do basic keyword filtering for obvious cases
     const foundBannedWords = this.bannedWords.filter(word => 
       fullText.includes(word.toLowerCase())
     );
@@ -60,6 +66,68 @@ class ContentModerationService {
     if (foundPatterns.length > 0) {
       flags.push('suspicious_content');
       confidence += foundPatterns.length * 0.4;
+    }
+
+    // Enhanced AI moderation using Gemini
+    try {
+      if (this.ai && (title || text) && (title?.length > 5 || text?.length > 10)) {
+        const prompt = `Analyze this content for appropriateness in a creative work protection platform:
+
+Title: "${title || 'No title'}"
+Description: "${text || 'No description'}"
+
+Please evaluate for:
+1. Inappropriate content (violence, adult content, hate speech)
+2. Spam or promotional content
+3. Copyright violations or plagiarism indicators
+4. Harmful or misleading information
+
+Respond with JSON in this format:
+{
+  "isAppropriate": true/false,
+  "confidenceScore": 0.0-1.0,
+  "issues": ["list", "of", "issues"],
+  "reasoning": "brief explanation"
+}`;
+
+        const response = await this.ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "object",
+              properties: {
+                isAppropriate: { type: "boolean" },
+                confidenceScore: { type: "number" },
+                issues: { type: "array", items: { type: "string" } },
+                reasoning: { type: "string" }
+              },
+              required: ["isAppropriate", "confidenceScore", "issues", "reasoning"]
+            }
+          },
+          contents: prompt
+        });
+
+        const aiResult = JSON.parse(response.text || '{}');
+        
+        if (aiResult.issues && aiResult.issues.length > 0) {
+          flags.push(...aiResult.issues.map((issue: string) => `ai_detected_${issue.replace(/\s+/g, '_').toLowerCase()}`));
+        }
+        
+        // Combine AI confidence with basic analysis
+        const aiConfidence = aiResult.confidenceScore || 0;
+        confidence = Math.max(confidence, aiConfidence);
+        
+        console.log('AI Content Moderation Result:', {
+          isAppropriate: aiResult.isAppropriate,
+          confidence: aiConfidence,
+          issues: aiResult.issues,
+          reasoning: aiResult.reasoning
+        });
+      }
+    } catch (error) {
+      console.warn('AI moderation failed, falling back to basic analysis:', error);
+      // Continue with basic analysis
     }
 
     // Check for excessive caps (potential spam/shouting)
@@ -88,7 +156,7 @@ class ContentModerationService {
     };
   }
 
-  // Image content moderation using file analysis
+  // Image content moderation using AI-powered analysis with Gemini
   async moderateImage(filePath: string): Promise<ModerationResult> {
     const flags: string[] = [];
     let confidence = 0;
@@ -119,10 +187,78 @@ class ContentModerationService {
         confidence += 0.4;
       }
 
-      // Check image dimensions (if it's an image)
+      // AI-powered image analysis for images
       const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+      if (imageExtensions.includes(fileExtension) && this.ai) {
+        try {
+          const imageBytes = fs.readFileSync(filePath);
+          const mimeType = `image/${fileExtension.slice(1) === 'jpg' ? 'jpeg' : fileExtension.slice(1)}`;
+          
+          const contents = [
+            {
+              inlineData: {
+                data: imageBytes.toString("base64"),
+                mimeType: mimeType,
+              },
+            },
+            `Analyze this image for content appropriateness in a creative work protection platform. Look for:
+1. Inappropriate content (nudity, violence, hate symbols)
+2. Copyright violations (logos, branded content)
+3. Spam or promotional content
+4. Low quality or suspicious images
+
+Respond with JSON:
+{
+  "isAppropriate": true/false,
+  "confidenceScore": 0.0-1.0,
+  "issues": ["list", "of", "issues"],
+  "reasoning": "brief explanation"
+}`,
+          ];
+
+          const response = await this.ai.models.generateContent({
+            model: "gemini-2.5-pro",
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "object",
+                properties: {
+                  isAppropriate: { type: "boolean" },
+                  confidenceScore: { type: "number" },
+                  issues: { type: "array", items: { type: "string" } },
+                  reasoning: { type: "string" }
+                },
+                required: ["isAppropriate", "confidenceScore", "issues", "reasoning"]
+              }
+            },
+            contents: contents,
+          });
+
+          const aiResult = JSON.parse(response.text || '{}');
+          
+          if (aiResult.issues && aiResult.issues.length > 0) {
+            flags.push(...aiResult.issues.map((issue: string) => `ai_image_${issue.replace(/\s+/g, '_').toLowerCase()}`));
+          }
+          
+          const aiConfidence = aiResult.confidenceScore || 0;
+          confidence = Math.max(confidence, aiConfidence);
+          
+          console.log('AI Image Moderation Result:', {
+            filename: path.basename(filePath),
+            isAppropriate: aiResult.isAppropriate,
+            confidence: aiConfidence,
+            issues: aiResult.issues,
+            reasoning: aiResult.reasoning
+          });
+          
+        } catch (aiError) {
+          console.warn('AI image analysis failed, falling back to basic analysis:', aiError);
+          // Continue with basic checks
+        }
+      }
+
+      // Basic size checks for images
       if (imageExtensions.includes(fileExtension)) {
-        // For now, we'll do basic checks. In future, could integrate with image analysis APIs
         if (stats.size < 1024) { // Very small images might be suspicious
           flags.push('suspicious_image_size');
           confidence += 0.2;
