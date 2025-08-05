@@ -42,8 +42,18 @@ export default function Login() {
       // Force a refetch to ensure the user data is loaded
       await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
       
-      // Navigate to profile directly for authenticated users
-      setLocation('/');
+      // Check if there's a pending upload to continue
+      const pendingUpload = localStorage.getItem('pendingUpload');
+      if (pendingUpload) {
+        toast({
+          title: "Continuing upload...",
+          description: "Taking you to complete your work upload.",
+        });
+        setLocation('/upload-work');
+      } else {
+        // Navigate to profile directly for authenticated users
+        setLocation('/');
+      }
     },
     onError: (error: Error) => {
       console.error('Login error:', error);

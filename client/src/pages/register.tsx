@@ -36,8 +36,18 @@ export default function Register() {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
-      // Navigate to dashboard
-      setLocation('/dashboard');
+      // Check if there's a pending upload to continue
+      const pendingUpload = localStorage.getItem('pendingUpload');
+      if (pendingUpload) {
+        toast({
+          title: "Continuing upload...",
+          description: "Taking you to complete your work upload.",
+        });
+        setLocation('/upload-work');
+      } else {
+        // Navigate to dashboard
+        setLocation('/dashboard');
+      }
     },
     onError: (error: Error) => {
       console.error('Registration error:', error);

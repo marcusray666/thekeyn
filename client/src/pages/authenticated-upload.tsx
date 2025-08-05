@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload, FileText, Music, Image, Video, X, ArrowLeft, Shield, Award, Plus } from "lucide-react";
@@ -26,6 +26,36 @@ export default function AuthenticatedUpload() {
     collaborators: [] as string[]
   });
   const [newCollaborator, setNewCollaborator] = useState("");
+
+  // Check for pending upload data when component mounts
+  useEffect(() => {
+    const pendingUpload = localStorage.getItem('pendingUpload');
+    if (pendingUpload) {
+      try {
+        const uploadData = JSON.parse(pendingUpload);
+        const { formData: pendingFormData } = uploadData;
+        
+        // Restore form data
+        setFormData(prev => ({
+          ...prev,
+          title: pendingFormData.title || "",
+          description: pendingFormData.description || "",
+          creatorName: user?.username || pendingFormData.creatorName || "",
+        }));
+
+        // Clear the pending upload data since we've restored it
+        localStorage.removeItem('pendingUpload');
+        
+        toast({
+          title: "Upload data restored",
+          description: "Your upload information has been restored. Please select your file again to continue.",
+        });
+      } catch (error) {
+        console.error('Error restoring pending upload:', error);
+        localStorage.removeItem('pendingUpload');
+      }
+    }
+  }, [user, toast]);
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
