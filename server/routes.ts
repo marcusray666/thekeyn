@@ -1652,79 +1652,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUserId = req.user!.id;
       
-      // Create mock users for testing since we don't have a full user system yet
-      const mockUsers = [
-        {
-          id: 101,
-          username: "artist_emma",
-          displayName: "Emma Rodriguez",
-          bio: "Digital artist creating vibrant illustrations and concept art",
-          avatar: null,
-          followerCount: 142,
-          followingCount: 89,
-          workCount: 23,
-          isFollowing: false,
-          isOnline: true,
-          lastSeen: new Date().toISOString()
-        },
-        {
-          id: 102,
-          username: "photographer_mike",
-          displayName: "Mike Chen",
-          bio: "Street photographer capturing urban life and culture",
-          avatar: null,
-          followerCount: 89,
-          followingCount: 156,
-          workCount: 47,
-          isFollowing: false,
-          isOnline: false,
-          lastSeen: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: 103,
-          username: "designer_sarah",
-          displayName: "Sarah Williams",
-          bio: "UI/UX designer with a passion for clean, modern interfaces",
-          avatar: null,
-          followerCount: 67,
-          followingCount: 43,
-          workCount: 18,
-          isFollowing: true,
-          isOnline: true,
-          lastSeen: new Date().toISOString()
-        },
-        {
-          id: 104,
-          username: "musician_alex",
-          displayName: "Alex Thompson",
-          bio: "Electronic music producer and sound designer",
-          avatar: null,
-          followerCount: 234,
-          followingCount: 78,
-          workCount: 31,
-          isFollowing: false,
-          isOnline: false,
-          lastSeen: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: 105,
-          username: "writer_jane",
-          displayName: "Jane Foster",
-          bio: "Creative writer and storyteller sharing original narratives",
-          avatar: null,
-          followerCount: 156,
-          followingCount: 92,
-          workCount: 12,
-          isFollowing: false,
-          isOnline: true,
-          lastSeen: new Date().toISOString()
-        }
-      ];
-
-      // Filter out current user if they somehow match the mock IDs
-      const filteredUsers = mockUsers.filter(user => user.id !== currentUserId);
+      // Get all real users from database
+      const allUsers = await storage.getAllUsers();
       
-      res.json(filteredUsers);
+      // Filter out current user and transform to expected format
+      const discoveryUsers = await Promise.all(
+        allUsers
+          .filter(user => user.id !== currentUserId)
+          .map(async (user) => {
+            // Get user's work count
+            const userWorks = await storage.getUserWorks(user.id);
+            
+            return {
+              id: user.id,
+              username: user.username,
+              displayName: user.username, // Using username as display name
+              bio: user.bio || `Creator on Loggin' protecting digital works`,
+              avatar: user.profileImageUrl,
+              followerCount: 0, // Real follower system not implemented yet
+              followingCount: 0, // Real following system not implemented yet
+              workCount: userWorks.length, // Real work count from database
+              isFollowing: false, // Real follow status not implemented yet
+              isOnline: Math.random() > 0.5, // Random online status for now
+              lastSeen: user.lastLoginAt || user.createdAt || new Date().toISOString()
+            };
+          })
+      );
+      
+      res.json(discoveryUsers);
     } catch (error) {
       console.error("Error fetching users for discovery:", error);
       res.status(500).json({ error: "Failed to fetch users" });
