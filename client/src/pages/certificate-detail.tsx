@@ -109,9 +109,15 @@ export default function CertificateDetail() {
       if (certificate.verificationProof) {
         try {
           const proof = JSON.parse(certificate.verificationProof);
-          // Use blockchainAnchor if available, otherwise fallback to current value
-          if (proof.blockchainAnchor && proof.blockchainAnchor !== certificate.work.fileHash) {
+          console.log('Verification proof:', proof);
+          
+          // Check for different possible blockchain anchor fields
+          if (proof.verificationHash && proof.verificationHash !== certificate.work.fileHash) {
+            blockchainAnchorHash = proof.verificationHash;
+          } else if (proof.blockchainAnchor && proof.blockchainAnchor !== certificate.work.fileHash) {
             blockchainAnchorHash = proof.blockchainAnchor;
+          } else if (proof.blockHash) {
+            blockchainAnchorHash = proof.blockHash;
           }
         } catch (parseError) {
           console.log('Could not parse verification proof, using existing blockchain hash');
