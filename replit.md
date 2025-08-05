@@ -16,6 +16,8 @@ Preferred communication style: Simple, everyday language.
 - **Certification Integration**: Added comprehensive certification functionality to profile dropdown menu
 - **Community Focus**: Main feed displays only community posts, with user certificates accessible via dedicated page
 - **Enhanced Navigation**: Profile dropdown includes certificates, analytics, blockchain verification, and settings
+- **Consistent Gradient Backgrounds**: Applied unified pink/yellow gradient atmospheric effects across all pages
+- **Blockchain-Inspired Animations**: Implemented smooth page transitions with digital particle effects, network visualizations, and blockchain-themed motion graphics using Framer Motion
 
 ## System Architecture
 The application is architected for separate hosting with distinct frontend and backend applications, designed for scalability and maintainability.
@@ -26,6 +28,7 @@ The application is architected for separate hosting with distinct frontend and b
 - **Blockchain**: Ethereum mainnet integration with Ethers.js
 - **Authentication**: Session-based with secure cookies
 - **File Storage**: Local filesystem with blockchain anchoring
+- **Animations**: Framer Motion for blockchain-inspired page transitions and micro-interactions
 
 ### Key Features and Design Decisions
 - **Authentication & User Management**: Session-based authentication with secure cookie handling, role-based access control (user, admin, moderator), and tiered subscription models (Free, Starter, Pro) with upload limits. An admin system provides a comprehensive dashboard for user management.

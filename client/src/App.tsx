@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
+import PageTransition from "@/components/animations/PageTransition";
 
 import Login from "@/pages/login-clean";
 import Register from "@/pages/register-clean";
@@ -118,7 +119,9 @@ function AppContent() {
         </a>
         {isAuthenticated && <TopNav />}
         <main id="main-content">
-          <Router />
+          <PageTransition>
+            <Router />
+          </PageTransition>
         </main>
         {isAuthenticated && <BottomNav />}
       </div>
