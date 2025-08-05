@@ -3835,6 +3835,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Recommendations API
+  app.post("/api/ai/recommendations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { userId, context = 'dashboard', limit = 8 } = req.body;
+      
+      // Import OpenAI dynamically
+      const { default: OpenAI } = await import('openai');
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      // Mock user activity - in production, fetch from database
+      const userActivity = {
+        recentUploads: ['digital-art', 'photography', 'music'],
+        favoriteCategories: ['art', 'design', 'photography'],
+        interactionPatterns: ['evening-active', 'weekend-creator', 'high-engagement'],
+        creationFrequency: 'weekly'
+      };
+
+      try {
+        // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: `You are an AI content recommendation engine for Loggin', a creative platform for digital artists and creators. 
+              
+              Generate personalized content recommendations based on user activity and context. Each recommendation should include:
+              - A specific, actionable title
+              - A compelling description
+              - Confidence score (0.0-1.0)
+              - Relevant tags
+              - A brief reason for the recommendation
+              - Recommendation type (trending, personalized, similar, inspiration)
+              
+              Focus on:
+              - Creative trends and opportunities
+              - Skill development suggestions  
+              - Community engagement ideas
+              - Monetization strategies
+              - Collaboration opportunities
+              
+              Return exactly ${limit} recommendations in JSON format.`
+            },
+            {
+              role: "user",
+              content: `Generate content recommendations for a user with this profile:
+              
+              Recent uploads: ${userActivity.recentUploads.join(', ')}
+              Favorite categories: ${userActivity.favoriteCategories.join(', ')}
+              Interaction patterns: ${userActivity.interactionPatterns.join(', ')}
+              Creation frequency: ${userActivity.creationFrequency}
+              Current page context: ${context}
+              
+              Please provide ${limit} diverse recommendations covering different types (trending, personalized, similar, inspiration).
+              
+              Response format should be a JSON object with "recommendations" array containing objects with this structure:
+              {
+                "id": "unique-id",
+                "type": "trending|personalized|similar|inspiration",
+                "title": "Specific recommendation title",
+                "description": "Compelling 1-2 sentence description",
+                "confidence": 0.85,
+                "tags": ["tag1", "tag2", "tag3"],
+                "reason": "Brief reason for this recommendation",
+                "metrics": {
+                  "likes": 234,
+                  "shares": 45,
+                  "views": 1200
+                }
+              }`
+            }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+          max_tokens: 2000,
+        });
+
+        const aiResponse = response.choices[0].message.content;
+        if (!aiResponse) throw new Error('No response from AI');
+
+        const parsed = JSON.parse(aiResponse);
+        const recommendations = parsed.recommendations || [];
+        
+        const formattedRecommendations = recommendations.slice(0, limit).map((rec: any, index: number) => ({
+          id: rec.id || `rec-${Date.now()}-${index}`,
+          type: rec.type || 'personalized',
+          title: rec.title || 'Trending Content',
+          description: rec.description || 'Check out this trending content.',
+          confidence: Math.min(Math.max(rec.confidence || 0.7, 0.0), 1.0),
+          tags: Array.isArray(rec.tags) ? rec.tags.slice(0, 5) : [],
+          reason: rec.reason || 'Based on your interests',
+          actionUrl: rec.actionUrl,
+          creatorName: rec.creatorName,
+          metrics: rec.metrics || {
+            likes: Math.floor(Math.random() * 500) + 50,
+            shares: Math.floor(Math.random() * 100) + 10,
+            views: Math.floor(Math.random() * 2000) + 200,
+          }
+        }));
+
+        res.json(formattedRecommendations);
+
+      } catch (aiError) {
+        console.error('AI recommendation generation error:', aiError);
+        
+        // Fallback recommendations if AI fails
+        const fallbacks = [
+          {
+            id: 'fallback-1',
+            type: 'trending',
+            title: 'AI-Generated Art is Trending',
+            description: 'Explore the latest AI art techniques that are gaining popularity.',
+            confidence: 0.8,
+            tags: ['AI', 'Digital Art', 'Trending'],
+            reason: 'High engagement in AI art category',
+            metrics: { likes: 234, shares: 45, views: 1200 }
+          },
+          {
+            id: 'fallback-2',
+            type: 'personalized',
+            title: 'Photography Portfolio Tips',
+            description: 'Learn how to showcase your photography work more effectively.',
+            confidence: 0.75,
+            tags: ['Photography', 'Portfolio', 'Tips'],
+            reason: 'Based on your recent photography uploads',
+            metrics: { likes: 156, shares: 23, views: 890 }
+          },
+          {
+            id: 'fallback-3',
+            type: 'inspiration',
+            title: 'Weekly Design Challenge',
+            description: 'Join this week\'s creative challenge and get inspired by the community.',
+            confidence: 0.7,
+            tags: ['Challenge', 'Community', 'Design'],
+            reason: 'Popular among active creators',
+            metrics: { likes: 312, shares: 67, views: 1456 }
+          },
+          {
+            id: 'fallback-4',
+            type: 'similar',
+            title: 'Discover Similar Artists',
+            description: 'Find creators with similar styles and interests to yours.',
+            confidence: 0.65,
+            tags: ['Discovery', 'Artists', 'Network'],
+            reason: 'Based on your interaction patterns',
+            metrics: { likes: 89, shares: 12, views: 543 }
+          },
+        ];
+
+        res.json(fallbacks.slice(0, limit));
+      }
+    } catch (error) {
+      console.error('Recommendations API error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate recommendations',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

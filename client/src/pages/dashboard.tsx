@@ -3,6 +3,7 @@ import { Plus, Share2, Download, Flag, Tag, Upload } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
+import { RecommendationSidebar } from '@/components/RecommendationSidebar';
 
 interface Work {
   id: number;
@@ -199,6 +200,14 @@ export default function Dashboard() {
             </div>
           </div>
         </GlassCard>
+      </div>
+      
+      {/* AI Recommendations Sidebar */}
+      <div className="fixed right-4 top-24 hidden xl:block z-10">
+        <RecommendationSidebar 
+          userId="31" 
+          currentPage="dashboard"
+        />
       </div>
     </div>
   );
