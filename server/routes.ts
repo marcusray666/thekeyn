@@ -1647,6 +1647,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get users for discovery (social page)
+  app.get("/api/users/discover", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const currentUserId = req.user!.id;
+      
+      // Create mock users for testing since we don't have a full user system yet
+      const mockUsers = [
+        {
+          id: 101,
+          username: "artist_emma",
+          displayName: "Emma Rodriguez",
+          bio: "Digital artist creating vibrant illustrations and concept art",
+          avatar: null,
+          followerCount: 142,
+          followingCount: 89,
+          workCount: 23,
+          isFollowing: false,
+          isOnline: true,
+          lastSeen: new Date().toISOString()
+        },
+        {
+          id: 102,
+          username: "photographer_mike",
+          displayName: "Mike Chen",
+          bio: "Street photographer capturing urban life and culture",
+          avatar: null,
+          followerCount: 89,
+          followingCount: 156,
+          workCount: 47,
+          isFollowing: false,
+          isOnline: false,
+          lastSeen: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 103,
+          username: "designer_sarah",
+          displayName: "Sarah Williams",
+          bio: "UI/UX designer with a passion for clean, modern interfaces",
+          avatar: null,
+          followerCount: 67,
+          followingCount: 43,
+          workCount: 18,
+          isFollowing: true,
+          isOnline: true,
+          lastSeen: new Date().toISOString()
+        },
+        {
+          id: 104,
+          username: "musician_alex",
+          displayName: "Alex Thompson",
+          bio: "Electronic music producer and sound designer",
+          avatar: null,
+          followerCount: 234,
+          followingCount: 78,
+          workCount: 31,
+          isFollowing: false,
+          isOnline: false,
+          lastSeen: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 105,
+          username: "writer_jane",
+          displayName: "Jane Foster",
+          bio: "Creative writer and storyteller sharing original narratives",
+          avatar: null,
+          followerCount: 156,
+          followingCount: 92,
+          workCount: 12,
+          isFollowing: false,
+          isOnline: true,
+          lastSeen: new Date().toISOString()
+        }
+      ];
+
+      // Filter out current user if they somehow match the mock IDs
+      const filteredUsers = mockUsers.filter(user => user.id !== currentUserId);
+      
+      res.json(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users for discovery:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
   // Get user recent activity
   app.get("/api/user/activity", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

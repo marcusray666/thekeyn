@@ -37,7 +37,7 @@ export default function Social() {
 
   // Fetch users/creators
   const { data: users, isLoading } = useQuery<UserProfile[]>({
-    queryKey: ["/api/users/discover", searchQuery, filter],
+    queryKey: ["/api/users/discover"],
     enabled: isAuthenticated,
   });
 
@@ -88,13 +88,16 @@ export default function Social() {
           </div>
 
           <div className="flex items-center justify-center min-h-[40vh]">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <div className="text-center max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
                 <Users className="h-8 w-8 text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No Users Found</h3>
-              <p className="text-white/60 text-sm mb-4">Try adjusting your search or check back later for new creators.</p>
-              <Button onClick={() => setLocation('/dashboard')} className="accent-button">
+              <h3 className="text-xl font-semibold text-white mb-3">No Users Found</h3>
+              <p className="text-white/60 text-sm mb-6">Try adjusting your search or check back later for new creators.</p>
+              <Button 
+                onClick={() => setLocation('/dashboard')} 
+                className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] hover:from-[#FE3F5E]/90 hover:to-[#FF6B8A]/90 text-white font-semibold px-6 py-3 rounded-xl border-0"
+              >
                 Explore Community Posts
               </Button>
             </div>
