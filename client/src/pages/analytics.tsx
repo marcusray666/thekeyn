@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { AnalyticsChart } from "@/components/ui/analytics-chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
+
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -32,47 +32,61 @@ export default function Analytics() {
   const [timeRange, setTimeRange] = useState("6m");
   const { isAuthenticated } = useAuth();
 
-  const { data: analyticsData, isLoading, refetch } = useQuery<AnalyticsData>({
+  const { data: analyticsData, isLoading, refetch, error } = useQuery<AnalyticsData>({
     queryKey: ["/api/analytics", timeRange],
     enabled: isAuthenticated,
   });
 
-  // Mock analytics data for demonstration
-  const mockAnalytics: AnalyticsData = {
-    totalViews: 15847,
-    totalShares: 1204,
-    totalDownloads: 892,
-    growthRate: 23.5,
-    monthlyViews: [
-      { month: 'Jan', views: 1200, shares: 89 },
-      { month: 'Feb', views: 1890, shares: 145 },
-      { month: 'Mar', views: 2100, shares: 178 },
-      { month: 'Apr', views: 2800, shares: 201 },
-      { month: 'May', views: 3200, shares: 287 },
-      { month: 'Jun', views: 4657, shares: 304 },
-    ],
-    topWorks: [
-      { title: 'Digital Landscape #1', views: 2847, certificateId: 'PRF-2025-ABC123' },
-      { title: 'Abstract Portrait Series', views: 1923, certificateId: 'PRF-2025-DEF456' },
-      { title: 'Urban Photography Collection', views: 1654, certificateId: 'PRF-2025-GHI789' },
-      { title: 'Minimalist Design Pack', views: 1432, certificateId: 'PRF-2025-JKL012' },
-      { title: 'Nature Concept Art', views: 1201, certificateId: 'PRF-2025-MNO345' },
-    ],
-    deviceTypes: [
-      { name: 'Desktop', value: 45 },
-      { name: 'Mobile', value: 35 },
-      { name: 'Tablet', value: 20 },
-    ],
-    geographicData: [
-      { country: 'United States', views: 5847 },
-      { country: 'United Kingdom', views: 2104 },
-      { country: 'Germany', views: 1923 },
-      { country: 'Canada', views: 1654 },
-      { country: 'Australia', views: 1432 },
-    ]
-  };
+  // Handle error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+        
+        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+              <RefreshCw className="h-8 w-8 text-red-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">Unable to Load Analytics</h3>
+            <p className="text-white/60 text-sm mb-4">There was an error loading your analytics data.</p>
+            <Button onClick={() => refetch()} className="glass-button">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const analytics: AnalyticsData = analyticsData || mockAnalytics;
+  // Show no data state if user has no analytics data
+  if (!isLoading && analyticsData && analyticsData.totalViews === 0 && analyticsData.topWorks.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+        
+        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+              <TrendingUp className="h-8 w-8 text-blue-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">No Analytics Data Yet</h3>
+            <p className="text-white/60 text-sm mb-4">Upload and share your work to start seeing analytics.</p>
+            <Button onClick={() => setLocation('/upload')} className="accent-button">
+              Upload Your First Work
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -96,19 +110,21 @@ export default function Analytics() {
   }
 
   const exportAnalytics = () => {
+    if (!analyticsData) return;
+    
     const exportData = {
       timeRange,
       generatedAt: new Date().toISOString(),
       summary: {
-        totalViews: analytics.totalViews,
-        totalShares: analytics.totalShares,
-        totalDownloads: analytics.totalDownloads,
-        growthRate: analytics.growthRate
+        totalViews: analyticsData.totalViews,
+        totalShares: analyticsData.totalShares,
+        totalDownloads: analyticsData.totalDownloads,
+        growthRate: analyticsData.growthRate
       },
-      monthlyData: analytics.monthlyViews,
-      topPerformingWorks: analytics.topWorks,
-      deviceBreakdown: analytics.deviceTypes,
-      geographicBreakdown: analytics.geographicData
+      monthlyData: analyticsData.monthlyViews,
+      topPerformingWorks: analyticsData.topWorks,
+      deviceBreakdown: analyticsData.deviceTypes,
+      geographicBreakdown: analyticsData.geographicData
     };
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
@@ -191,7 +207,7 @@ export default function Analytics() {
           <GlassCard className="text-center py-4 sm:py-6">
             <Eye className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-cyan-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-1">
-              {analytics.totalViews.toLocaleString()}
+              {analyticsData?.totalViews.toLocaleString()}
             </div>
             <div className="text-gray-400 text-xs sm:text-sm">Total Views</div>
           </GlassCard>
@@ -199,7 +215,7 @@ export default function Analytics() {
           <GlassCard className="text-center py-4 sm:py-6">
             <Share2 className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-purple-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-1">
-              {analytics.totalShares.toLocaleString()}
+              {analyticsData?.totalShares.toLocaleString()}
             </div>
             <div className="text-gray-400 text-xs sm:text-sm">Total Shares</div>
           </GlassCard>
@@ -207,7 +223,7 @@ export default function Analytics() {
           <GlassCard className="text-center py-4 sm:py-6">
             <Download className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-emerald-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-emerald-400 mb-1">
-              {analytics.totalDownloads.toLocaleString()}
+              {analyticsData?.totalDownloads.toLocaleString()}
             </div>
             <div className="text-gray-400 text-xs sm:text-sm">Downloads</div>
           </GlassCard>
@@ -215,7 +231,7 @@ export default function Analytics() {
           <GlassCard className="text-center py-4 sm:py-6">
             <TrendingUp className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-orange-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-orange-400 mb-1">
-              +{analytics.growthRate}%
+              +{analyticsData?.growthRate}%
             </div>
             <div className="text-gray-400 text-xs sm:text-sm">Growth Rate</div>
           </GlassCard>
@@ -228,7 +244,7 @@ export default function Analytics() {
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Views & Shares Over Time</h3>
               <AnalyticsChart
                 type="line"
-                data={analytics.monthlyViews}
+                data={analyticsData?.monthlyViews || []}
                 dataKey="views"
                 xAxisKey="month"
                 colors={['#06B6D4']}
@@ -242,7 +258,7 @@ export default function Analytics() {
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Device Types</h3>
               <AnalyticsChart
                 type="pie"
-                data={analytics.deviceTypes}
+                data={analyticsData?.deviceTypes || []}
                 dataKey="value"
                 colors={['#8B5CF6', '#06B6D4', '#10B981']}
                 className="h-80"
@@ -257,7 +273,7 @@ export default function Analytics() {
             <div className="p-4 sm:p-6">
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Top Performing Works</h3>
               <div className="space-y-4">
-                {analytics.topWorks.map((work, index) => (
+                {analyticsData?.topWorks.map((work, index) => (
                   <div key={work.certificateId} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -282,7 +298,7 @@ export default function Analytics() {
             <div className="p-4 sm:p-6">
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Geographic Distribution</h3>
               <div className="space-y-4">
-                {analytics.geographicData.map((country) => (
+                {analyticsData?.geographicData.map((country) => (
                   <div key={country.country} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
