@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
 import { PostCard } from "@/components/premium/post-card";
-import { Plus, TrendingUp, Clock, Users } from "lucide-react";
+import { Plus, MessageCircle, TrendingUp, Clock, Users } from "lucide-react";
 import { Link } from "wouter";
 
 
@@ -108,32 +108,16 @@ export default function PremiumHome() {
               </div>
             </Link>
             
-            <div className="flex-shrink-0 flex flex-col items-center space-y-2">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full p-0.5">
-                <div className="w-full h-full bg-[#0F0F0F] rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-white" />
+            <Link href="/messages">
+              <div className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full p-0.5">
+                  <div className="w-full h-full bg-[#0F0F0F] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                    <MessageCircle className="h-6 w-6 text-white" />
+                  </div>
                 </div>
+                <span className="text-xs text-white/70">Messages</span>
               </div>
-              <span className="text-xs text-white/70">Trending</span>
-            </div>
-            
-            <div className="flex-shrink-0 flex flex-col items-center space-y-2">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full p-0.5">
-                <div className="w-full h-full bg-[#0F0F0F] rounded-full flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <span className="text-xs text-white/70">Recent</span>
-            </div>
-            
-            <div className="flex-shrink-0 flex flex-col items-center space-y-2">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full p-0.5">
-                <div className="w-full h-full bg-[#0F0F0F] rounded-full flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <span className="text-xs text-white/70">Community</span>
-            </div>
+            </Link>
           </div>
         </div>
 
