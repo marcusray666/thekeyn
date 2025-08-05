@@ -103,6 +103,21 @@ export default function CertificateDetail() {
     if (!certificate) return;
     
     try {
+      // Extract blockchain anchor hash from verification proof
+      let blockchainAnchorHash = certificate.work.blockchainHash;
+      
+      if (certificate.verificationProof) {
+        try {
+          const proof = JSON.parse(certificate.verificationProof);
+          // Use blockchainAnchor if available, otherwise fallback to current value
+          if (proof.blockchainAnchor && proof.blockchainAnchor !== certificate.work.fileHash) {
+            blockchainAnchorHash = proof.blockchainAnchor;
+          }
+        } catch (parseError) {
+          console.log('Could not parse verification proof, using existing blockchain hash');
+        }
+      }
+      
       const { generateCertificatePDF } = await import('@/lib/certificateGenerator');
       await generateCertificatePDF({
         certificateId: certificate.certificateId,
@@ -113,7 +128,7 @@ export default function CertificateDetail() {
         mimeType: certificate.work.mimeType,
         fileSize: certificate.work.fileSize,
         fileHash: certificate.work.fileHash,
-        blockchainHash: certificate.work.blockchainHash,
+        blockchainHash: blockchainAnchorHash,
         createdAt: certificate.work.createdAt,
         shareableLink: certificate.shareableLink,
       });

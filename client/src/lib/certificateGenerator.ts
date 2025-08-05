@@ -148,10 +148,28 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
   pdf.setTextColor(99, 102, 241); // Indigo for distinction
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('(OpenTimestamps proof - different from file hash)', leftColumn, yPos);
-  yPos += 7;
-  pdf.setTextColor(55, 65, 81); // Back to dark gray
-  pdf.text(data.blockchainHash, leftColumn, yPos);
+  
+  // Check if blockchain hash is different from file hash
+  if (data.blockchainHash === data.fileHash) {
+    pdf.text('(Same as file hash - dual verification system)', leftColumn, yPos);
+    yPos += 7;
+    pdf.setTextColor(55, 65, 81); // Back to dark gray
+    pdf.text(data.blockchainHash, leftColumn, yPos);
+    yPos += 10;
+    pdf.setFontSize(10);
+    pdf.setTextColor(156, 163, 175); // Gray
+    pdf.text('Note: This file uses blockchain block anchoring for timestamp verification.', leftColumn, yPos);
+    pdf.text('Verify at: etherscan.io or opentimestamps.org', leftColumn, yPos + 7);
+  } else {
+    pdf.text('(OpenTimestamps proof - different from file hash)', leftColumn, yPos);
+    yPos += 7;
+    pdf.setTextColor(55, 65, 81); // Back to dark gray
+    pdf.text(data.blockchainHash, leftColumn, yPos);
+    yPos += 10;
+    pdf.setFontSize(10);
+    pdf.setTextColor(156, 163, 175); // Gray
+    pdf.text('Verify timestamp proof at: opentimestamps.org', leftColumn, yPos);
+  }
   
   // QR Code Section
   try {
