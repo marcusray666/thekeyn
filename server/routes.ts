@@ -1110,11 +1110,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Raw work ID parameter: "${workIdParam}", type: ${typeof workIdParam}`);
       
       // Parse work ID, handling both string and numeric formats
-      const workId = parseInt(workIdParam);
+      let workId: number;
+      
+      // Handle different possible ID formats
+      if (typeof workIdParam === 'string') {
+        // Remove any non-numeric characters except for decimal points
+        const cleanParam = workIdParam.replace(/[^\d.-]/g, '');
+        workId = parseInt(cleanParam, 10);
+      } else {
+        workId = parseInt(String(workIdParam), 10);
+      }
+      
+      console.log(`Parsing work ID: original="${workIdParam}", cleaned="${workId}", isValid=${!isNaN(workId) && workId > 0}`);
       
       if (isNaN(workId) || workId <= 0) {
-        console.log(`Invalid work ID: ${workIdParam} -> ${workId}`);
-        return res.status(400).json({ error: "Invalid work ID format" });
+        console.error(`Invalid work ID format: "${workIdParam}" -> ${workId}`);
+        return res.status(400).json({ 
+          error: "Invalid work ID format",
+          received: workIdParam,
+          parsed: workId,
+          details: "Work ID must be a positive integer"
+        });
       }
 
       console.log(`Delete request for work ${workId} by user ${userId}`);
