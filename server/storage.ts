@@ -662,6 +662,61 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePost(id: string, userId: number): Promise<void> {
+    // First get the post to check for associated files
+    const [post] = await db
+      .select()
+      .from(posts)
+      .where(eq(posts.id, id));
+    
+    if (!post) {
+      throw new Error('Post not found');
+    }
+    
+    // Delete associated files if they exist
+    if (post.imageUrl) {
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        
+        // Extract filename from URL and construct file path
+        let filePath: string;
+        
+        if (post.imageUrl.startsWith('/uploads/')) {
+          // File stored locally in uploads directory
+          filePath = path.join(process.cwd(), post.imageUrl);
+        } else if (post.filename && post.imageUrl.includes('/uploads/')) {
+          // Use filename if available
+          filePath = path.join(process.cwd(), 'uploads', post.filename);
+        } else {
+          // Skip deletion for external URLs or non-local files
+          console.log(`Skipping file deletion for external URL: ${post.imageUrl}`);
+          filePath = '';
+        }
+        
+        if (filePath && fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file: ${filePath}`);
+        } else if (filePath) {
+          console.log(`File not found, skipping deletion: ${filePath}`);
+        }
+      } catch (error) {
+        console.error('Error deleting file:', error);
+        // Continue with database deletion even if file deletion fails
+      }
+    }
+    
+    // Delete related data first (foreign key constraints)
+    // Delete post reactions (likes, etc.)
+    await db
+      .delete(postReactions)
+      .where(eq(postReactions.postId, id));
+    
+    // Delete post comments
+    await db
+      .delete(postComments)
+      .where(eq(postComments.postId, id));
+    
+    // Finally delete the post
     await db
       .delete(posts)
       .where(eq(posts.id, id));
