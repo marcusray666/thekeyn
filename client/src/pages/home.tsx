@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import WelcomeClean from "@/pages/welcome-clean";
-import DashboardClean from "@/pages/dashboard-clean";
+import DashboardCleanNew from "@/pages/dashboard-clean-new";
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -13,5 +13,5 @@ export default function Home() {
     );
   }
 
-  return isAuthenticated ? <DashboardClean /> : <WelcomeClean />;
+  return isAuthenticated ? <DashboardCleanNew /> : <WelcomeClean />;
 }
