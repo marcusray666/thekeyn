@@ -37,7 +37,7 @@ export default function LoginClean() {
       if (pendingUpload) {
         setLocation('/authenticated-upload');
       } else {
-        setLocation('/dashboard');
+        setLocation('/');
       }
     },
     onError: (error: any) => {

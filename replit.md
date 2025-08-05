@@ -6,6 +6,13 @@ Loggin' is a comprehensive digital art protection platform that combines blockch
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 2025)
+- **UI Redesign Completed**: Implemented clean, minimalist design inspired by Notion/Instagram
+- **AI Migration**: Successfully switched from OpenAI to Google Gemini AI for content moderation
+- **Color System**: Updated to clean palette (#FAFAFA light, #121212 dark, #6366F1 primary, #4ADE80 secondary)
+- **Navigation**: Simplified navigation with clean header and minimal routing
+- **Upload Flow**: Fixed upload issues and integrated Gemini AI for enhanced content analysis
+
 ## System Architecture
 The application is architected for separate hosting with distinct frontend and backend applications, designed for scalability and maintainability.
 
@@ -25,7 +32,13 @@ The application is architected for separate hosting with distinct frontend and b
 - **Data Flow**: The system ensures a streamlined flow for uploads (validation → moderation → hash generation → blockchain anchoring → certificate creation → database storage) and social interactions (post creation → content screening → database storage → real-time updates → notification dispatch). Authentication follows a secure flow of credential validation → session creation → role verification → access control.
 
 ### UI/UX Decisions
-The frontend leverages Tailwind CSS for a utility-first approach to styling, ensuring a consistent and responsive design across the platform. Conditional navigation is implemented to provide different experiences for authenticated and unauthenticated users, streamlining the user journey.
+The frontend follows a clean, minimalist design approach inspired by successful products like Notion and Instagram. Key design principles include:
+- **Focused Screens**: Each page has one primary action to reduce cognitive load
+- **Generous White Space**: Clean layouts with ample spacing for better readability
+- **Minimal Navigation**: Simple header with theme toggle and essential user actions
+- **Typography**: Inter font throughout for clean, modern appearance
+- **Color System**: Light/dark theme support with professional color palette
+- **Mobile-First**: Fully responsive design with large touch targets
 
 ### Security Measures
 Security is paramount, with measures like Helmet.js for security headers, rate limiting for API protection, trust proxy configuration, and secure session cookies with proper CORS policies.

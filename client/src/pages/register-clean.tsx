@@ -38,7 +38,7 @@ export default function RegisterClean() {
       if (pendingUpload) {
         setLocation('/authenticated-upload');
       } else {
-        setLocation('/dashboard');
+        setLocation('/');
       }
     },
     onError: (error: any) => {
