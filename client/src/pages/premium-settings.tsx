@@ -132,53 +132,53 @@ export default function PremiumSettings() {
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation */}
-            <div className="border-b border-white/10 px-6">
-              <TabsList className="grid w-full grid-cols-4 bg-transparent gap-4 py-6">
-                <TabsTrigger 
-                  value="profile" 
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+            <div className="border-b border-white/10 px-0">
+              <div className="grid w-full grid-cols-4 bg-transparent py-0">
+                <button
+                  onClick={() => setActiveTab('profile')}
+                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
                     activeTab === 'profile' 
-                      ? 'bg-[#FE3F5E] text-white' 
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
+                      : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <User className="h-4 w-4" />
-                  <span>Profile</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="notifications"
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                  <span className="font-medium">Profile</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('notifications')}
+                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
                     activeTab === 'notifications' 
-                      ? 'bg-[#FE3F5E] text-white' 
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
+                      : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Bell className="h-4 w-4" />
-                  <span>Notifications</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="privacy"
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                  <span className="font-medium">Notifications</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('privacy')}
+                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
                     activeTab === 'privacy' 
-                      ? 'bg-[#FE3F5E] text-white' 
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
+                      : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Shield className="h-4 w-4" />
-                  <span>Privacy</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="security"
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all ${
+                  <span className="font-medium">Privacy</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('security')}
+                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
                     activeTab === 'security' 
-                      ? 'bg-[#FE3F5E] text-white' 
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
+                      : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Lock className="h-4 w-4" />
-                  <span>Security</span>
-                </TabsTrigger>
-              </TabsList>
+                  <span className="font-medium">Security</span>
+                </button>
+              </div>
             </div>
 
             {/* Profile Tab */}
