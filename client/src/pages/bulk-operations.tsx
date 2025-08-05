@@ -212,20 +212,20 @@ export default function BulkOperations() {
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => setLocation('/dashboard')}
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+              className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-white">Bulk Operations</h1>
-              <p className="text-gray-400">Manage multiple works efficiently</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">Bulk Operations</h1>
+              <p className="text-white/60 text-lg">Manage multiple works efficiently</p>
             </div>
           </div>
           
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-white/60">
             {selectedWorks.size} of {filteredWorks.length} works selected
           </div>
         </div>
@@ -237,12 +237,12 @@ export default function BulkOperations() {
               <h3 className="text-lg font-semibold text-white mb-4">Search & Filter</h3>
               <div className="space-y-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
                   <Input
                     placeholder="Search by title or certificate ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 glass-morphism border-gray-600 text-white placeholder-gray-400"
+                    className="pl-10 bg-black/20 backdrop-blur-sm border-white/10 text-white placeholder-white/60"
                   />
                 </div>
                 

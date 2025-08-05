@@ -148,7 +148,7 @@ export default function ReportTheft() {
           <Button
             variant="ghost"
             onClick={() => setLocation(formData.certificateId ? `/certificate/${formData.certificateId}` : '/')}
-            className="text-gray-400 hover:text-gray-300 hover:bg-white hover:bg-opacity-5 mb-4"
+            className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {formData.certificateId ? 'Back to Certificate' : 'Back to Dashboard'}
@@ -158,7 +158,7 @@ export default function ReportTheft() {
             <AlertTriangle className="h-8 w-8 text-red-400 mr-3" />
             <div>
               <h1 className="text-4xl font-bold text-white">Report Theft</h1>
-              <p className="text-gray-400">
+              <p className="text-white/60">
                 Generate a professional takedown notice for copyright infringement
               </p>
             </div>

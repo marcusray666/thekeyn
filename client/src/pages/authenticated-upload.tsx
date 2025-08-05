@@ -223,7 +223,7 @@ export default function AuthenticatedUpload() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
             <h2 className="text-2xl font-bold text-white mb-2">Protect Your Work</h2>
-            <p className="text-gray-400">Upload your creative work to generate a blockchain certificate</p>
+            <p className="text-white/60">Upload your creative work to generate a blockchain certificate</p>
           </div>
 
           {/* Protection Info */}
@@ -232,7 +232,7 @@ export default function AuthenticatedUpload() {
               <Shield className="h-6 w-6 mt-1 flex-shrink-0" />
               <div>
                 <p className="font-medium mb-1">Instant Protection</p>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-white/70">
                   Your work will be secured with a blockchain certificate, providing legal proof of creation and ownership.
                 </p>
               </div>
@@ -259,7 +259,7 @@ export default function AuthenticatedUpload() {
                       </div>
                       <div>
                         <p className="text-white font-medium">{selectedFile.name}</p>
-                        <p className="text-gray-400 text-sm">{formatFileSize(selectedFile.size)}</p>
+                        <p className="text-white/60 text-sm">{formatFileSize(selectedFile.size)}</p>
                       </div>
                     </div>
                     <Button

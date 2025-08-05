@@ -86,7 +86,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold text-white">Recent Works</h3>
                   <Link href="/">
-                    <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300">
+                    <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10">
                       <Plus className="h-5 w-5" />
                     </Button>
                   </Link>
@@ -109,10 +109,10 @@ export default function Dashboard() {
                           <p className="text-xs text-purple-400">ID: #{work.certificateId}</p>
                         </div>
                         <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300">
+                          <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-cyan-400 hover:text-white hover:bg-white/10">
                             <Share2 className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-emerald-400 hover:text-emerald-300">
+                          <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-emerald-400 hover:text-white hover:bg-white/10">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -121,8 +121,8 @@ export default function Dashboard() {
                   ) : (
                     <div className="text-center py-12">
                       <Upload className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-400 mb-2">No works yet</h4>
-                      <p className="text-gray-500 mb-4">Upload your first creative work to get started</p>
+                      <h4 className="text-lg font-medium text-white/70 mb-2">No works yet</h4>
+                      <p className="text-white/60 mb-4">Upload your first creative work to get started</p>
                       <Link href="/">
                         <Button className="btn-glass">
                           <Plus className="mr-2 h-4 w-4" />

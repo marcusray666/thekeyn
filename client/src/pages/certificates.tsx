@@ -62,7 +62,7 @@ export default function Certificates() {
           <h1 className="text-4xl font-bold gradient-text mb-4">
             Your Certificates
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-white/60">
             Blockchain-verified certificates for all your protected works
           </p>
         </div>
@@ -71,15 +71,15 @@ export default function Certificates() {
         <GlassCard className="mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60" size={20} />
               <Input
                 placeholder="Search by title, creator, or certificate ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder-gray-400"
+                className="pl-10 bg-black/20 backdrop-blur-sm border-white/10 text-white placeholder-white/60"
               />
             </div>
-            <Button variant="outline" className="glass-morphism">
+            <Button variant="ghost" className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10">
               <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>

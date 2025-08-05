@@ -134,26 +134,26 @@ export default function MyCertificates() {
       <div className="max-w-6xl mx-auto px-6 py-8 relative z-10 pt-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">My Certificates</h1>
-          <p className="text-gray-400">Manage and view all your registered creative works</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">My Certificates</h1>
+          <p className="text-white/60 text-lg">Manage and view all your registered creative works</p>
         </div>
 
         {/* Search and Controls */}
         <GlassCard className="p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
               <Input
                 placeholder="Search certificates..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="glass-input pl-10"
+                className="pl-10 bg-black/20 backdrop-blur-sm border-white/10 text-white placeholder-white/60"
               />
             </div>
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setLocation('/studio')}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] hover:from-[#FE3F5E]/90 hover:to-[#FF6B8A]/90 text-white font-semibold px-4 py-2 rounded-xl border-0"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Upload Work
@@ -171,7 +171,7 @@ export default function MyCertificates() {
           <GlassCard className="p-12 text-center">
             <Award className="h-16 w-16 text-gray-500 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Certificates Yet</h3>
-            <p className="text-gray-400 mb-6">
+            <p className="text-white/60 mb-6">
               {searchTerm ? 'No certificates match your search.' : 'Upload your first work to get started!'}
             </p>
             {!searchTerm && (

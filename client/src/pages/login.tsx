@@ -98,17 +98,17 @@ export default function Login() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
             <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-gray-400">Sign in to your Loggin' account</p>
+            <p className="text-white/60">Sign in to your Loggin' account</p>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-300">
+              <Label htmlFor="username" className="text-white/70">
                 Username
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/60" />
                 <Input
                   id="username"
                   name="username"
@@ -123,11 +123,11 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-300">
+              <Label htmlFor="password" className="text-white/70">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/60" />
                 <Input
                   id="password"
                   name="password"

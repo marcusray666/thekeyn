@@ -275,7 +275,7 @@ export default function CertificateDetail() {
         <GlassCard className="text-center py-16 max-w-md">
           <AlertTriangle className="mx-auto h-16 w-16 text-red-400 mb-4" />
           <h2 className="text-xl font-semibold text-white mb-2">Certificate Not Found</h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-white/60 mb-6">
             The certificate you're looking for doesn't exist or has been removed.
           </p>
           <Button
@@ -303,7 +303,7 @@ export default function CertificateDetail() {
           <Button
             variant="ghost"
             onClick={() => setLocation('/certificates')}
-            className="text-gray-400 hover:text-gray-300 hover:bg-white hover:bg-opacity-5 mb-4"
+            className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Certificates
@@ -314,7 +314,7 @@ export default function CertificateDetail() {
               <h1 className="text-4xl font-bold text-white mb-2">
                 {certificate.work.title}
               </h1>
-              <p className="text-gray-400">
+              <p className="text-white/60">
                 Certificate of Authenticity
               </p>
             </div>
