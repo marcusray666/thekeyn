@@ -13,6 +13,7 @@ import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
 import ProtectClean from "@/pages/protect-clean";
 import DashboardClean from "@/pages/dashboard-clean";
+import FeedClean from "@/pages/feed-clean";
 
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
       <Route path="/protect" component={ProtectClean} />
+      <Route path="/feed" component={FeedClean} />
       
       {/* Home route - dynamic based on auth status */}
       <Route path="/" component={Home} />

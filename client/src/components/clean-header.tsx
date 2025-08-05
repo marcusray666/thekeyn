@@ -29,8 +29,8 @@ export function CleanHeader() {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  // Don't show header on welcome/login/register pages
-  if (location === "/" || location === "/login" || location === "/register") {
+  // Don't show header on welcome/login/register pages for unauthenticated users
+  if (!isAuthenticated && (location === "/" || location === "/login" || location === "/register")) {
     return null;
   }
 
