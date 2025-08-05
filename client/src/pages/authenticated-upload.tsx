@@ -211,8 +211,13 @@ export default function AuthenticatedUpload() {
   };
 
   return (
-    <div className="min-h-screen px-4 pt-20 py-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="max-w-2xl mx-auto px-4 py-8 relative z-10 pt-24">
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">

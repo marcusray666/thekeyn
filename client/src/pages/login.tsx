@@ -86,8 +86,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden flex items-center justify-center px-4 py-16">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="w-full max-w-md relative z-10">
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
