@@ -15,7 +15,7 @@ export default function PremiumHome() {
     queryFn: () => apiRequest("/api/works"),
   });
 
-  // Mock community posts for feed
+  // Community posts for feed (not showing user's certificates)
   const communityPosts = [
     {
       id: 1,
@@ -27,7 +27,8 @@ export default function PremiumHome() {
       mimeType: "image/jpeg",
       isVerified: true,
       likesCount: 42,
-      commentsCount: 8
+      commentsCount: 8,
+      description: "Abstract digital artwork exploring color theory and emotion"
     },
     {
       id: 2,
@@ -39,18 +40,52 @@ export default function PremiumHome() {
       mimeType: "audio/mpeg",
       isVerified: true,
       likesCount: 156,
-      commentsCount: 23
+      commentsCount: 23,
+      description: "Electronic beat with complex layering and unique drops"
+    },
+    {
+      id: 3,
+      title: "Photography Series: Urban Nights",
+      filename: "urban_nights_01.jpg",
+      creatorName: "NightLens",
+      createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      sha256Hash: "c3d4e5f6789012345678901234567890abcdef12",
+      mimeType: "image/jpeg",
+      isVerified: true,
+      likesCount: 89,
+      commentsCount: 15,
+      description: "Capturing the essence of city life after dark"
+    },
+    {
+      id: 4,
+      title: "3D Animation: Cosmic Journey",
+      filename: "cosmic_journey.mp4",
+      creatorName: "DigitalVoyager",
+      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      sha256Hash: "d4e5f6789012345678901234567890abcdef123",
+      mimeType: "video/mp4",
+      isVerified: true,
+      likesCount: 234,
+      commentsCount: 31,
+      description: "3D animation exploring space and time through visual storytelling"
+    },
+    {
+      id: 5,
+      title: "Indie Folk Album",
+      filename: "autumn_whispers.mp3",
+      creatorName: "AcousticSoul",
+      createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+      sha256Hash: "e5f6789012345678901234567890abcdef1234",
+      mimeType: "audio/mpeg",
+      isVerified: true,
+      likesCount: 178,
+      commentsCount: 42,
+      description: "Heartfelt indie folk songs about change and growth"
     }
   ];
 
-  const allPosts = [
-    ...works.map(work => ({
-      ...work,
-      likesCount: Math.floor(Math.random() * 100),
-      commentsCount: Math.floor(Math.random() * 20)
-    })),
-    ...communityPosts
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // Display only community posts in the main feed
+  const allPosts = communityPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0">
@@ -109,7 +144,7 @@ export default function PremiumHome() {
                 </div>
               ))}
             </div>
-          ) : allPosts.length > 0 ? (
+          ) : (
             allPosts.map((post) => (
               <PostCard
                 key={`${post.id}-${post.creatorName || 'user'}`}
@@ -120,23 +155,24 @@ export default function PremiumHome() {
                 }}
               />
             ))
-          ) : (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
-                <Plus className="h-12 w-12 text-white/50" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Start Your Journey</h3>
-              <p className="text-white/50 mb-6 max-w-sm mx-auto">
-                Upload your first digital work to protect it on the blockchain and join our creator community.
-              </p>
-              <Link href="/upload">
-                <button className="accent-button">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Protect Your First Work
-                </button>
-              </Link>
-            </div>
           )}
+          
+          {/* Show upload prompt after community posts */}
+          <div className="text-center py-12 bg-white/5 rounded-3xl">
+            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center mb-6">
+              <Plus className="h-12 w-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Join the Community</h3>
+            <p className="text-white/50 mb-6 max-w-sm mx-auto">
+              Upload your digital work to protect it on the blockchain and share it with creators worldwide.
+            </p>
+            <Link href="/upload">
+              <button className="accent-button">
+                <Plus className="h-5 w-5 mr-2" />
+                Protect Your Work
+              </button>
+            </Link>
+          </div>
         </div>
       </main>
 

@@ -16,7 +16,7 @@ import PremiumHome from "@/pages/premium-home";
 import PremiumUpload from "@/pages/premium-upload";
 import PremiumProfile from "@/pages/premium-profile";
 
-import MyCertificates from "@/pages/my-certificates";
+import PremiumCertificates from "@/pages/premium-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
 import ReportTheft from "@/pages/report-theft";
 import Analytics from "@/pages/analytics";
@@ -67,7 +67,7 @@ function Router() {
       <Route path="/studio" component={Studio} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
-      <Route path="/certificates" component={MyCertificates} />
+      <Route path="/certificates" component={PremiumCertificates} />
       <Route path="/upload-work" component={PremiumUpload} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/bulk-operations" component={BulkOperations} />

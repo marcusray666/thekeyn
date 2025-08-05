@@ -13,6 +13,9 @@ Preferred communication style: Simple, everyday language.
 - **Dopamine-Driven UX**: Added like buttons, hover animations, premium transitions, and engaging interactions
 - **Mobile-First Design**: Responsive layout with bottom navigation for mobile and top navigation for desktop
 - **AI Migration**: Successfully switched from OpenAI to Google Gemini AI for content moderation
+- **Certification Integration**: Added comprehensive certification functionality to profile dropdown menu
+- **Community Focus**: Main feed displays only community posts, with user certificates accessible via dedicated page
+- **Enhanced Navigation**: Profile dropdown includes certificates, analytics, blockchain verification, and settings
 
 ## System Architecture
 The application is architected for separate hosting with distinct frontend and backend applications, designed for scalability and maintainability.
