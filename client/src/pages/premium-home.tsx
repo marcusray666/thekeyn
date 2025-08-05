@@ -54,12 +54,11 @@ export default function PremiumHome() {
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0">
-      <TopNav />
       
-      <main className="pt-6">
+      <main className="pt-24">
         {/* Stories Section */}
-        <div className="px-4 mb-6">
-          <div className="flex space-x-4 overflow-x-auto pb-2">
+        <div className="px-6 mb-8">
+          <div className="flex space-x-6 overflow-x-auto pb-4">
             <Link href="/upload">
               <div className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer">
                 <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
@@ -99,9 +98,9 @@ export default function PremiumHome() {
         </div>
 
         {/* Feed */}
-        <div className="feed-container">
+        <div className="px-6 space-y-8">
           {isLoading ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {[1, 2, 3].map(i => (
                 <div key={i} className="post-card animate-pulse">
                   <div className="h-16 bg-white/10 rounded-xl mb-4"></div>

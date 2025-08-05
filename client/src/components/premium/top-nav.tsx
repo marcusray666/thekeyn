@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Search, Menu, Plus, Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
@@ -20,9 +20,18 @@ export function TopNav() {
     },
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setIsMenuOpen(false);
+    if (isMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [isMenuOpen]);
 
   return (
-    <nav className="hidden md:flex items-center justify-between px-6 py-4 bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+    <nav className="hidden md:flex items-center justify-between px-8 py-6 bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
       {/* Logo */}
       <Link href="/">
         <div className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform">
@@ -50,7 +59,7 @@ export function TopNav() {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
         <Link href="/upload">
           <Button className="glass-button !px-4 !py-2">
             <Plus className="h-5 w-5 mr-2" />
@@ -65,7 +74,10 @@ export function TopNav() {
         {/* Profile Menu */}
         <div className="relative">
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
+            }}
             className="creator-avatar"
           >
             <div className="avatar-inner">
@@ -74,20 +86,29 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50">
               <Link href="/profile">
-                <div className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer">
+                <div 
+                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   <span className="text-white font-medium">Profile</span>
                 </div>
               </Link>
               <Link href="/settings">
-                <div className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer">
+                <div 
+                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   <span className="text-white font-medium">Settings</span>
                 </div>
               </Link>
               <div className="border-t border-white/10 mt-2">
                 <button
-                  onClick={() => logoutMutation.mutate()}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logoutMutation.mutate();
+                  }}
                   className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors text-red-400"
                 >
                   Sign Out
