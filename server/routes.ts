@@ -1686,6 +1686,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get conversations for messaging
+  app.get("/api/messages/conversations", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // For now, return empty array since we don't have a full messaging system
+      // In a real implementation, you'd query a conversations table
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+
+  // Get messages for a specific conversation
+  app.get("/api/messages/:conversationId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const conversationId = parseInt(req.params.conversationId);
+      const userId = req.user!.id;
+      
+      // For now, return empty array since we don't have a full messaging system
+      // In a real implementation, you'd query a messages table
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  // Start a conversation with a user
+  app.post("/api/messages/start", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { recipientId } = req.body;
+      
+      if (!recipientId || recipientId === userId) {
+        return res.status(400).json({ error: "Invalid recipient" });
+      }
+
+      // Check if recipient exists
+      const recipient = await storage.getUser(recipientId);
+      if (!recipient) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // For now, return a mock conversation ID
+      // In a real implementation, you'd create or find an existing conversation
+      const conversationId = Date.now(); // Simple ID generation
+      
+      res.json({
+        conversationId,
+        recipient: {
+          id: recipient.id,
+          username: recipient.username,
+          displayName: recipient.username,
+          avatar: recipient.profileImageUrl
+        }
+      });
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      res.status(500).json({ error: "Failed to start conversation" });
+    }
+  });
+
+  // Send a message
+  app.post("/api/messages/send", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { conversationId, content } = req.body;
+      
+      if (!conversationId || !content?.trim()) {
+        return res.status(400).json({ error: "Invalid message data" });
+      }
+
+      // For now, return a mock message
+      // In a real implementation, you'd save to a messages table
+      const message = {
+        id: Date.now(),
+        senderId: userId,
+        conversationId,
+        content: content.trim(),
+        timestamp: new Date().toISOString(),
+        isRead: false
+      };
+      
+      res.json(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  // Get user info for conversations
+  app.get("/api/users/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Return basic user info for conversations
+      res.json({
+        id: user.id,
+        username: user.username,
+        displayName: user.username,
+        profileImageUrl: user.profileImageUrl,
+        isOnline: Math.random() > 0.5 // Mock online status
+      });
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   // Get user recent activity
   app.get("/api/user/activity", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

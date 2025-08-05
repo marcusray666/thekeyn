@@ -120,9 +120,31 @@ export default function Social() {
     console.log('Following user:', userId);
   };
 
-  const messageUser = (userId: number) => {
-    // Navigate to messages with this user
-    setLocation(`/messages?user=${userId}`);
+  const messageUser = async (userId: number) => {
+    try {
+      // Start a conversation with the user
+      const response = await fetch('/api/messages/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ recipientId: userId })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Navigate to messages with the conversation ID
+        setLocation(`/messages?conversation=${data.conversationId}&user=${userId}`);
+      } else {
+        console.error('Failed to start conversation');
+        // Fallback to just navigating to messages
+        setLocation('/messages');
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+      setLocation('/messages');
+    }
   };
 
   return (

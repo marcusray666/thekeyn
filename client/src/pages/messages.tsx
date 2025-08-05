@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Search, 
@@ -42,7 +43,40 @@ export default function Messages() {
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeConversation, setActiveConversation] = useState<any>(null);
   const { isAuthenticated } = useAuth();
+
+  // Check URL parameters for direct conversation access
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const conversationId = urlParams.get('conversation');
+    const userId = urlParams.get('user');
+    
+    if (conversationId && userId) {
+      setSelectedConversation(parseInt(conversationId));
+      
+      // Fetch user info for the conversation
+      fetch(`/api/users/${userId}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(user => {
+          setActiveConversation({
+            id: parseInt(conversationId),
+            participantName: user.username || `User ${userId}`,
+            participantId: parseInt(userId),
+            isOnline: true
+          });
+        })
+        .catch(() => {
+          // Fallback if user fetch fails
+          setActiveConversation({
+            id: parseInt(conversationId),
+            participantName: `User ${userId}`,
+            participantId: parseInt(userId),
+            isOnline: true
+          });
+        });
+    }
+  }, []);
 
   // Fetch conversations
   const { data: conversations, isLoading: loadingConversations } = useQuery<Conversation[]>({
@@ -56,8 +90,8 @@ export default function Messages() {
     enabled: isAuthenticated && !!selectedConversation,
   });
 
-  // Show no data state if user has no conversations
-  if (!loadingConversations && (!conversations || conversations.length === 0)) {
+  // Show no data state if user has no conversations and no active conversation
+  if (!loadingConversations && (!conversations || conversations.length === 0) && !activeConversation) {
     return (
       <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
         {/* Background gradients */}
@@ -121,14 +155,35 @@ export default function Messages() {
     conv.participantName.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
-  const selectedConv = conversations?.find(c => c.id === selectedConversation);
+  const selectedConv = conversations?.find(c => c.id === selectedConversation) || activeConversation;
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
     
-    // Here you would typically send the message via API
-    console.log('Sending message:', newMessage, 'to conversation:', selectedConversation);
-    setNewMessage("");
+    try {
+      const response = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          conversationId: selectedConversation,
+          content: newMessage
+        })
+      });
+      
+      if (response.ok) {
+        const message = await response.json();
+        console.log('Message sent:', message);
+        setNewMessage("");
+        // In a real app, you'd update the messages list here
+      } else {
+        console.error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   return (
