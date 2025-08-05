@@ -73,12 +73,6 @@ export default function PremiumProfile() {
                   <p className="text-white/70">@{profile?.username}</p>
                 </div>
                 <div className="flex space-x-3 mt-4 sm:mt-0">
-                  <Link href="/settings">
-                    <Button className="glass-button">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-                  </Link>
                   <Button className="glass-button">
                     <Share2 className="h-4 w-4" />
                   </Button>
