@@ -170,10 +170,13 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
             </div>
 
             <Button
-              onClick={handleClose}
-              className="w-full glass-button"
+              onClick={() => {
+                handleClose();
+                window.location.href = '/upload';
+              }}
+              className="w-full accent-button"
             >
-              Done
+              Upload Another Work
             </Button>
           </div>
         )}

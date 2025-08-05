@@ -41,6 +41,10 @@ export function TopNav() {
             type="text"
             placeholder="Search creators, works..."
             className="w-full bg-white/10 border border-white/20 rounded-full py-3 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-[#FE3F5E] transition-colors"
+            onChange={(e) => {
+              // Search functionality would go here
+              console.log('Search:', e.target.value);
+            }}
           />
         </div>
       </div>
@@ -48,7 +52,7 @@ export function TopNav() {
       {/* Actions */}
       <div className="flex items-center space-x-4">
         <Link href="/upload">
-          <Button className="accent-button">
+          <Button className="glass-button !px-4 !py-2">
             <Plus className="h-5 w-5 mr-2" />
             Upload
           </Button>

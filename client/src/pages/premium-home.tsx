@@ -4,11 +4,10 @@ import { apiRequest } from "@/lib/queryClient";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
 import { PostCard } from "@/components/premium/post-card";
-import { UploadModal } from "@/components/premium/upload-modal";
 import { Plus, TrendingUp, Clock, Users } from "lucide-react";
+import { Link } from "wouter";
 
 export default function PremiumHome() {
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // Fetch user's protected works to display as feed
   const { data: works = [], isLoading } = useQuery({
@@ -61,15 +60,14 @@ export default function PremiumHome() {
         {/* Stories Section */}
         <div className="px-4 mb-6">
           <div className="flex space-x-4 overflow-x-auto pb-2">
-            <button
-              onClick={() => setUploadModalOpen(true)}
-              className="flex-shrink-0 flex flex-col items-center space-y-2"
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
-                <Plus className="h-8 w-8 text-white" />
+            <Link href="/upload">
+              <div className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                  <Plus className="h-8 w-8 text-white" />
+                </div>
+                <span className="text-xs text-white/70">Upload</span>
               </div>
-              <span className="text-xs text-white/70">Upload</span>
-            </button>
+            </Link>
             
             <div className="flex-shrink-0 flex flex-col items-center space-y-2">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full p-0.5">
@@ -132,31 +130,25 @@ export default function PremiumHome() {
               <p className="text-white/50 mb-6 max-w-sm mx-auto">
                 Upload your first digital work to protect it on the blockchain and join our creator community.
               </p>
-              <button
-                onClick={() => setUploadModalOpen(true)}
-                className="accent-button"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Protect Your First Work
-              </button>
+              <Link href="/upload">
+                <button className="accent-button">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Protect Your First Work
+                </button>
+              </Link>
             </div>
           )}
         </div>
       </main>
 
       {/* Floating Action Button */}
-      <button
-        onClick={() => setUploadModalOpen(true)}
-        className="floating-action"
-      >
-        <Plus className="h-8 w-8" />
-      </button>
+      <Link href="/upload">
+        <button className="floating-action">
+          <Plus className="h-8 w-8" />
+        </button>
+      </Link>
 
       <BottomNav />
-      <UploadModal 
-        isOpen={uploadModalOpen} 
-        onClose={() => setUploadModalOpen(false)} 
-      />
     </div>
   );
 }

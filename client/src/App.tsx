@@ -3,17 +3,17 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CleanHeader } from "@/components/clean-header";
-import { ThemeProvider } from "@/components/theme-provider";
+import { useAuth } from "@/hooks/useAuth";
+import { TopNav } from "@/components/premium/top-nav";
+import { BottomNav } from "@/components/premium/bottom-nav";
 
 import Login from "@/pages/login-clean";
 import Register from "@/pages/register-clean";
 import UploadPage from "@/pages/upload";
-import AuthenticatedUpload from "@/pages/authenticated-upload";
 import Home from "@/pages/home";
-import ProtectClean from "@/pages/protect-clean";
 import PremiumHome from "@/pages/premium-home";
-import FeedClean from "@/pages/feed-clean";
+import PremiumUpload from "@/pages/premium-upload";
+import PremiumProfile from "@/pages/premium-profile";
 
 import MyCertificates from "@/pages/my-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -54,9 +54,8 @@ function Router() {
       <Route path="/welcome" component={Welcome} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/upload" component={UploadPage} />
-      <Route path="/protect" component={ProtectClean} />
-      <Route path="/feed" component={FeedClean} />
+      <Route path="/upload" component={PremiumUpload} />
+
       
       {/* Home route - dynamic based on auth status */}
       <Route path="/" component={Home} />
@@ -68,7 +67,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/certificates" component={MyCertificates} />
-      <Route path="/upload-work" component={AuthenticatedUpload} />
+      <Route path="/upload-work" component={PremiumUpload} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/bulk-operations" component={BulkOperations} />
 
@@ -83,7 +82,8 @@ function Router() {
       <Route path="/security" component={Security} />
       <Route path="/certificate-guide" component={CertificateGuide} />
       <Route path="/report-theft" component={ReportTheft} />
-      <Route path="/profile/:username" component={Profile} />
+      <Route path="/profile/:username" component={PremiumProfile} />
+      <Route path="/profile" component={PremiumProfile} />
       <Route path="/portfolio/:username" component={Portfolio} />
       <Route path="/portfolio" component={Portfolio} />
       
@@ -104,24 +104,31 @@ function Router() {
   );
 }
 
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+  
+  return (
+    <TooltipProvider>
+      <div className="min-h-screen bg-[#0F0F0F] text-white font-inter">
+        {/* Skip Links for Screen Readers */}
+        <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#FE3F5E] text-white px-4 py-2 rounded">
+          Skip to main content
+        </a>
+        {isAuthenticated && <TopNav />}
+        <main id="main-content">
+          <Router />
+        </main>
+        {isAuthenticated && <BottomNav />}
+      </div>
+      <Toaster />
+    </TooltipProvider>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="loggin-ui-theme">
-        <TooltipProvider>
-          <div className="min-h-screen bg-background text-foreground">
-            {/* Skip Links for Screen Readers */}
-            <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded">
-              Skip to main content
-            </a>
-            <CleanHeader />
-            <main id="main-content">
-              <Router />
-            </main>
-          </div>
-          <Toaster />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AppContent />
     </QueryClientProvider>
   );
 }
