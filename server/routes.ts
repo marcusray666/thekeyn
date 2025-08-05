@@ -942,8 +942,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: Date.now()
       });
       
-      // Use the file hash as blockchain hash for blockchain.com verification
-      const blockchainHash = fileHash;
+      // Use the verification hash from Ethereum anchoring as blockchain hash
+      const blockchainHash = ethereumResult.verificationHash || ethereumResult.blockHash || fileHash;
       
       console.log('Generated IDs:', { 
         fileHash, 

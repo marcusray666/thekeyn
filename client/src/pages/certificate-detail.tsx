@@ -414,6 +414,9 @@ export default function CertificateDetail() {
                     <p className="font-mono text-sm text-gray-300 bg-gray-800 px-3 py-2 rounded mt-1 break-all">
                       {certificate.work.fileHash}
                     </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Unique cryptographic fingerprint of your original file content
+                    </p>
                   </div>
                   
                   {/* Parse verification proof for new dual blockchain data */}
@@ -552,11 +555,21 @@ export default function CertificateDetail() {
                     );
                   })()}
                   
-                  {/* Legacy blockchain hash display */}
+                  {/* Blockchain verification hash display */}
                   <div>
-                    <label className="text-sm text-gray-400">Legacy Blockchain Hash</label>
+                    <label className="text-sm text-gray-400">Blockchain Verification Hash</label>
                     <p className="font-mono text-sm text-cyan-400 bg-cyan-900/20 px-3 py-2 rounded mt-1 break-all">
                       {certificate.work.blockchainHash}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Unique hash proving your file is anchored to Ethereum blockchain (block {(() => {
+                        try {
+                          const proof = JSON.parse(certificate.verificationProof || '{}');
+                          return proof.blockNumber || 'N/A';
+                        } catch {
+                          return 'N/A';
+                        }
+                      })()})
                     </p>
                   </div>
                 </div>

@@ -88,6 +88,7 @@ export class AdvancedBlockchainVerification {
     gasUsed?: string;
     verificationUrl?: string;
     proofFile?: string;
+    verificationHash?: string;
     error?: string;
   }> {
     try {
@@ -174,6 +175,11 @@ export class AdvancedBlockchainVerification {
       const proofPath = path.join(process.cwd(), 'proofs', proofFilename);
       fs.writeFileSync(proofPath, JSON.stringify(proofData, null, 2));
       
+      // Generate verification hash combining file hash and blockchain data
+      const verificationHash = crypto.createHash('sha256')
+        .update(fileHash + receipt.blockHash + receipt.blockNumber.toString())
+        .digest('hex');
+
       return {
         success: true,
         transactionHash: receipt.hash,
@@ -182,7 +188,8 @@ export class AdvancedBlockchainVerification {
         blockTimestamp: block.timestamp,
         gasUsed: receipt.gasUsed.toString(),
         verificationUrl: `https://etherscan.io/tx/${receipt.hash}`,
-        proofFile: proofFilename
+        proofFile: proofFilename,
+        verificationHash
       };
       
     } catch (error) {
@@ -212,6 +219,7 @@ export class AdvancedBlockchainVerification {
     blockTimestamp?: number;
     verificationUrl?: string;
     proofFile?: string;
+    verificationHash?: string;
   }> {
     try {
       const provider = this.networks.get('ethereum');
@@ -251,13 +259,19 @@ export class AdvancedBlockchainVerification {
       
       console.log('Created Ethereum block anchor for hash:', commitment);
       
+      // Generate verification hash combining file hash and blockchain data
+      const verificationHash = crypto.createHash('sha256')
+        .update(fileHash + currentBlock.hash + currentBlock.number.toString())
+        .digest('hex');
+
       return {
         success: true,
         blockNumber: currentBlock.number,
         blockHash: currentBlock.hash,
         blockTimestamp: currentBlock.timestamp,
         verificationUrl: `https://etherscan.io/block/${currentBlock.number}`,
-        proofFile: proofFilename
+        proofFile: proofFilename,
+        verificationHash
       };
       
     } catch (error) {
