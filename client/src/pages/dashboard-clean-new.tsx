@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -58,19 +58,14 @@ export default function DashboardCleanNew() {
       <PageWrapper>
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Welcome Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center space-y-4"
-          >
+          <div className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
             <h1 className="text-4xl font-bold text-white">
               Welcome back, {(user as any)?.username || "Creator"}!
             </h1>
             <p className="text-xl text-gray-300">
               Ready to secure your next masterpiece?
             </p>
-          </motion.div>
+          </div>
 
           {/* Main Action Tiles */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -84,11 +79,7 @@ export default function DashboardCleanNew() {
           </div>
 
           {/* Stats Overview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-          >
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <GlassCard>
               <h3 className="text-2xl font-bold text-white mb-6">Your Digital Empire</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -122,15 +113,11 @@ export default function DashboardCleanNew() {
                 </div>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
 
           {/* Recent Activity & Community Highlights */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-            >
+            <div className="animate-in fade-in slide-in-from-left-4 duration-700">
               <GlassCard>
                 <h3 className="text-xl font-bold text-white mb-6 flex items-center">
                   <Clock className="h-5 w-5 mr-2 text-[#9146FF]" />
@@ -154,13 +141,9 @@ export default function DashboardCleanNew() {
                   ))}
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-            >
+            <div className="animate-in fade-in slide-in-from-right-4 duration-700">
               <GlassCard>
                 <h3 className="text-xl font-bold text-white mb-6 flex items-center">
                   <TrendingUp className="h-5 w-5 mr-2 text-[#10B981]" />
@@ -196,7 +179,7 @@ export default function DashboardCleanNew() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           </div>
         </div>
       </PageWrapper>

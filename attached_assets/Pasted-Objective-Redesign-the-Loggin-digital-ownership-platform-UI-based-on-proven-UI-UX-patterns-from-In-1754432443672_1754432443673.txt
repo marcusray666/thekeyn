@@ -1,0 +1,169 @@
+Objective:
+Redesign the Loggin' digital ownership platform UI based on proven UI/UX patterns from Instagram — minimalist, emotionally engaging, intuitive — but adapted to our blockchain + certificate utility use case.
+
+APP ARCHITECTURE:
+Framework: React + TypeScript (preferred)
+Styling: Tailwind CSS (mobile-first)
+Routing: React Router DOM
+Pages: MPA (Multi-Page Application)
+Design Language: Instagram-inspired layout (cards, icon nav, swipeable interface)
+
+COLOR & DESIGN PSYCHOLOGY (2025 Trend)
+
+Background: #0F0F0F (dark charcoal for immersive visual focus)
+
+Accent 1: #FE3F5E (active, bold — buttons, icons)
+
+Accent 2: #FFD200 (calls-to-action — Upload, Share)
+
+Text Primary: #FFFFFF (bright white for clarity)
+
+Secondary Text: #AAAAAA (muted grey)
+
+Font: "Inter" or "Urbanist", crisp and modern
+
+Components: Card-based layout, swipeable modals, rounded buttons, subtle shadows
+
+Style: Minimalist + social (with engaging hover/tap states)
+
+PAGE STRUCTURE & INTERACTION FLOW
+
+1. /home (Feed-Based Dashboard)
+
+Top bar: App logo left, 🔍 Search center, ☰ Menu right
+
+Feed-style layout:
+
+Creator Upload Cards
+
+Preview image
+
+Timestamp
+
+Hash snippet
+
+“Verified on-chain” badge
+
+Floating 🔘 Protect Work button
+
+Scroll behavior: Infinite scroll
+
+User Actions:
+
+Tap post → Opens details modal (cert info, hash, view on blockchain)
+
+Long press → Quick preview
+
+FAB → Upload flow
+
+2. /upload
+
+Full-screen modal (Instagram story style)
+
+Drag/drop or tap to upload
+
+Preview auto-hash and chain options
+
+Chain toggle: Bitcoin / Ethereum / Both
+
+CTA: Protect My Work
+
+Confirmation screen with ✨ animation + download options
+
+3. /certificates
+
+Tabbed layout (My Uploads | Downloads | Verifications)
+
+Each card:
+
+Thumbnail (if image/audio)
+
+Filename
+
+Status (protected, pending, error)
+
+Download .PDF / .OTS
+
+Tap to expand full blockchain data
+
+4. /verify
+
+Upload file or paste SHA-256
+
+Autodetect .ots
+
+Display result:
+
+Green check / red cross
+
+Blockchain timestamp
+
+Match status
+
+Creator info (if public)
+
+5. /profile
+
+Header: Avatar, bio, # protected works, # verifications
+
+Tabs:
+
+Grid view (like IG posts)
+
+List view (certs)
+
+Settings gear → account management
+
+6. /community
+
+Discovery feed of public files
+
+Trending tags, featured creators
+
+Explore by category (music, art, writing, etc)
+
+NAVIGATION (Mobile-First Instagram Style)
+
+Bottom tab bar:
+
+🏠 Home
+
+➕ Upload
+
+📜 Certs
+
+🛡️ Verify
+
+👤 Profile
+
+COMPONENTS TO BUILD
+
+PostCard
+
+UploadModal
+
+CertDetailModal
+
+VerifyResultCard
+
+BottomNavBar
+
+FloatingActionButton
+
+SwipeableTabs
+
+REPLIT IMPLEMENTATION TASKS
+
+Redesign layout using feed + card architecture
+
+Rebuild /dashboard as Home Feed
+
+Convert upload to full-screen modal
+
+Add swipe gestures for mobile
+
+Refactor bottom nav bar to match Instagram UX patterns
+
+Apply Tailwind color scheme and social layout
+
+Replace all buttons with rounded glass-effect UI

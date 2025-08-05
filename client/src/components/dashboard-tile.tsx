@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { GlassCard } from "./glass-card";
 import { LucideIcon } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface DashboardTileProps {
   title: string;
@@ -21,11 +20,7 @@ export function DashboardTile({
   delay = 0
 }: DashboardTileProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5, ease: "easeOut" }}
-    >
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${delay * 100}ms` }}>
       <Link href={route}>
         <GlassCard hover clickable className="h-full group">
           <div className="flex flex-col items-center text-center space-y-4">
@@ -43,6 +38,6 @@ export function DashboardTile({
           </div>
         </GlassCard>
       </Link>
-    </motion.div>
+    </div>
   );
 }
