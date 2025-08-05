@@ -455,6 +455,8 @@ export default function CertificateDetail() {
                                   ? '✅ Bitcoin timestamp confirmed'
                                   : verificationData?.hasBitcoinTimestamp 
                                   ? '⚡ OpenTimestamps active'
+                                  : verificationData?.anchorType === 'ethereum_confirmed'
+                                  ? '🕒 Bitcoin anchoring in progress'
                                   : '❌ Not available'
                                 }
                               </p>
@@ -478,7 +480,7 @@ export default function CertificateDetail() {
                               <Coins className="h-5 w-5 text-blue-500 mr-2" />
                               <h3 className="text-lg font-semibold text-blue-300">Ethereum Blockchain</h3>
                             </div>
-                            {verificationData?.ethereum?.success && (
+                            {(verificationData?.network === 'ethereum' && verificationData?.blockNumber) && (
                               <Button
                                 size="sm"
                                 onClick={handleDownloadEthereumProof}
@@ -493,7 +495,9 @@ export default function CertificateDetail() {
                             <div>
                               <label className="text-xs text-gray-400">Status</label>
                               <p className="text-sm text-white">
-                                {verificationData?.ethereum?.success 
+                                {verificationData?.network === 'ethereum' && verificationData?.blockNumber 
+                                  ? '✅ Ethereum anchor confirmed'
+                                  : verificationData?.ethereum?.success 
                                   ? '✅ Ethereum anchor confirmed'
                                   : verificationData?.hasImmediateVerification
                                   ? '⚡ Immediate verification available'
@@ -501,24 +505,24 @@ export default function CertificateDetail() {
                                 }
                               </p>
                             </div>
-                            {verificationData?.ethereum?.transactionHash && (
+                            {verificationData?.blockHash && (
                               <div>
-                                <label className="text-xs text-gray-400">Transaction</label>
+                                <label className="text-xs text-gray-400">Block Hash</label>
                                 <p className="text-sm text-blue-300 font-mono">
-                                  {verificationData.ethereum.transactionHash.substring(0, 20)}...
+                                  {verificationData.blockHash.substring(0, 20)}...
                                 </p>
                               </div>
                             )}
-                            {verificationData?.ethereum?.blockNumber && (
+                            {verificationData?.blockNumber && (
                               <div>
                                 <label className="text-xs text-gray-400">Block Number</label>
-                                <p className="text-sm text-blue-300">{verificationData.ethereum.blockNumber}</p>
+                                <p className="text-sm text-blue-300">{verificationData.blockNumber}</p>
                               </div>
                             )}
                             <p className="text-xs text-gray-500">
-                              Verify at: {verificationData?.ethereum?.verificationUrl ? (
-                                <a href={verificationData.ethereum.verificationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                                  Etherscan
+                              Verify at: {verificationData?.blockNumber ? (
+                                <a href={`https://etherscan.io/block/${verificationData.blockNumber}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                                  Etherscan Block {verificationData.blockNumber}
                                 </a>
                               ) : (
                                 <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">etherscan.io</a>
@@ -531,7 +535,9 @@ export default function CertificateDetail() {
                         <div className="bg-gray-800/50 rounded-lg p-4">
                           <h4 className="text-white font-semibold mb-2">Verification Summary</h4>
                           <div className="text-sm">
-                            {verificationData?.dualAnchorComplete ? (
+                            {verificationData?.anchorType === 'ethereum_confirmed' && verificationData?.isRealBlockchain ? (
+                              <p className="text-blue-400">⚡ Ethereum verified - Bitcoin anchoring in progress</p>
+                            ) : verificationData?.dualAnchorComplete ? (
                               <p className="text-green-400">✅ DUAL BLOCKCHAIN VERIFICATION COMPLETE</p>
                             ) : verificationData?.hasImmediateVerification ? (
                               <p className="text-blue-400">⚡ Ethereum verified - Bitcoin pending</p>
