@@ -8,10 +8,12 @@ import {
   Phone, 
   Video,
   MessageCircle,
-  User
+  User,
+  Users,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
+
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,15 +66,30 @@ export default function Messages() {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
         
         <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-6">
+            <div className="w-16 h-16 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
               <MessageCircle className="h-8 w-8 text-blue-400" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Messages Yet</h3>
-            <p className="text-white/60 text-sm mb-4">Connect with other creators to start messaging.</p>
-            <Button onClick={() => setLocation('/dashboard')} className="accent-button">
-              Explore Community
-            </Button>
+            <h3 className="text-xl font-semibold text-white mb-3">No Messages Yet</h3>
+            <p className="text-white/60 text-sm mb-8">Connect with other creators to start messaging and build your network.</p>
+            
+            <div className="space-y-3">
+              <Button 
+                onClick={() => setLocation('/social')} 
+                className="w-full bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] hover:from-[#FE3F5E]/90 hover:to-[#FF6B8A]/90 text-white font-semibold px-6 py-3 rounded-xl border-0"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Find People to Connect
+              </Button>
+              
+              <Button 
+                onClick={() => setLocation('/dashboard')} 
+                className="w-full bg-black/20 backdrop-blur-sm border border-white/10 text-white hover:bg-white/10 px-6 py-3 rounded-xl"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Explore Community
+              </Button>
+            </div>
           </div>
         </div>
       </div>
