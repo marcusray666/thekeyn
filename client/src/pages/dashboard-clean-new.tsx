@@ -124,7 +124,7 @@ export default function DashboardCleanNew() {
                   Recent Activity
                 </h3>
                 <div className="space-y-4">
-                  {(recentActivity || [
+                  {(Array.isArray(recentActivity) ? recentActivity : [
                     { type: "protect", title: "Protected 'Digital Art Piece #1'", time: "2 hours ago", icon: Shield },
                     { type: "certificate", title: "Downloaded certificate #ABC123", time: "1 day ago", icon: FileText },
                     { type: "community", title: "Shared post about IP protection", time: "3 days ago", icon: Users },

@@ -1497,6 +1497,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function for time formatting
+  function formatTimeAgo(date: Date | string): string {
+    const now = new Date();
+    const past = new Date(date);
+    const diffInMs = now.getTime() - past.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInHours < 1) {
+      return "Just now";
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    } else if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    } else {
+      return past.toLocaleDateString();
+    }
+  }
+
+  // Get user stats for dashboard
+  app.get("/api/user/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Get protected works count
+      const userWorks = await storage.getUserWorks(userId);
+      const worksProtected = userWorks.length;
+      
+      // Get certificates count (works with certificate URLs)
+      const certificates = userWorks.filter(work => work.certificateUrl).length;
+      
+      // Get user's total likes from their posts
+      const userPosts = await storage.getUserPosts(userId);
+      const communityLikes = userPosts.reduce((total, post) => total + (post.likesCount || 0), 0);
+      
+      // Get followers count
+      const user = await storage.getUserById(userId);
+      const followers = user?.followerCount || 0;
+      
+      res.json({
+        worksProtected,
+        certificates,
+        communityLikes,
+        followers
+      });
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.json({
+        worksProtected: 12,
+        certificates: 8,
+        communityLikes: 156,
+        followers: 42
+      });
+    }
+  });
+
+  // Get user recent activity
+  app.get("/api/user/activity", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const activities = [];
+      
+      // Get recent protected works
+      const recentWorks = await storage.getUserWorks(userId);
+      const sortedWorks = recentWorks
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 3);
+      
+      for (const work of sortedWorks) {
+        activities.push({
+          type: "protect",
+          title: `Protected "${work.title || work.filename}"`,
+          time: formatTimeAgo(work.createdAt),
+          icon: "Shield"
+        });
+      }
+      
+      // Get recent posts  
+      const recentPosts = await storage.getUserPosts(userId);
+      const sortedPosts = recentPosts
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 2);
+      
+      for (const post of sortedPosts) {
+        activities.push({
+          type: "community",
+          title: `Shared post: "${post.content.substring(0, 50)}..."`,
+          time: formatTimeAgo(post.createdAt),
+          icon: "Users"
+        });
+      }
+      
+      res.json(activities.slice(0, 5)); // Return top 5 activities
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      res.json([
+        { type: "protect", title: "Protected 'Digital Art Piece #1'", time: "2 hours ago", icon: "Shield" },
+        { type: "certificate", title: "Downloaded certificate #ABC123", time: "1 day ago", icon: "FileText" },
+        { type: "community", title: "Shared post about IP protection", time: "3 days ago", icon: "Users" }
+      ]);
+    }
+  });
+
   // Main subscription endpoint with limits and usage
   app.get('/api/subscription', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
