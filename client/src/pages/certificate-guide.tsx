@@ -71,15 +71,20 @@ export default function CertificateGuide() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="container max-w-6xl mx-auto px-4 py-8 relative z-10 pt-24">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/")}
-            className="text-white hover:bg-white/10"
+            onClick={() => setLocation("/dashboard")}
+            className="text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -88,107 +93,111 @@ export default function CertificateGuide() {
 
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-4">
-            <Shield className="h-8 w-8 text-emerald-400" />
+            <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-2xl flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
             <h1 className="text-4xl font-bold text-white">Certificate ID Usage Guide</h1>
           </div>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-white/60 max-w-3xl mx-auto">
             Your Certificate ID is a unique, blockchain-verified proof of ownership for your digital creations. 
             Here's how to use it for maximum protection and credibility.
           </p>
         </div>
 
         {/* Certificate ID Example */}
-        <Card className="mb-12 bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Shield className="h-5 w-5 text-emerald-400" />
+        <div className="mb-12 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+          <div className="mb-4">
+            <h3 className="text-white flex items-center gap-2 text-xl font-semibold mb-2">
+              <Shield className="h-5 w-5 text-[#FE3F5E]" />
               Certificate ID Format
-            </CardTitle>
-            <CardDescription className="text-gray-300">
+            </h3>
+            <p className="text-white/60">
               All Loggin Certificate IDs follow this secure format
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+            </p>
+          </div>
+          <div>
+            <div className="bg-black/40 rounded-xl p-6 border border-white/5">
               <div className="text-center">
-                <div className="text-2xl font-mono text-emerald-400 mb-4">
+                <div className="text-2xl font-mono text-[#FFD200] mb-4">
                   CERT-MDGX1PKF-796E636273939F7F
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
-                    <Badge variant="outline" className="mb-2 text-blue-400 border-blue-400">Prefix</Badge>
-                    <div className="text-gray-300">CERT-</div>
+                    <Badge variant="outline" className="mb-2 text-[#FE3F5E] border-[#FE3F5E]/50 bg-[#FE3F5E]/10">Prefix</Badge>
+                    <div className="text-white/70">CERT-</div>
                   </div>
                   <div className="text-center">
-                    <Badge variant="outline" className="mb-2 text-purple-400 border-purple-400">Identifier</Badge>
-                    <div className="text-gray-300">MDGX1PKF</div>
+                    <Badge variant="outline" className="mb-2 text-[#FFD200] border-[#FFD200]/50 bg-[#FFD200]/10">Identifier</Badge>
+                    <div className="text-white/70">MDGX1PKF</div>
                   </div>
                   <div className="text-center">
-                    <Badge variant="outline" className="mb-2 text-emerald-400 border-emerald-400">Hash</Badge>
-                    <div className="text-gray-300">796E636273939F7F</div>
+                    <Badge variant="outline" className="mb-2 text-[#00D4AA] border-[#00D4AA]/50 bg-[#00D4AA]/10">Hash</Badge>
+                    <div className="text-white/70">796E636273939F7F</div>
                   </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Use Cases Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {useCases.map((useCase, index) => (
-            <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-3">
-                  <useCase.icon className="h-6 w-6 text-emerald-400" />
+            <div key={index} className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+              <div className="mb-4">
+                <h3 className="text-white flex items-center gap-3 text-xl font-semibold mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-xl flex items-center justify-center">
+                    <useCase.icon className="h-4 w-4 text-white" />
+                  </div>
                   {useCase.title}
-                </CardTitle>
-                <CardDescription className="text-gray-300">
+                </h3>
+                <p className="text-white/60">
                   {useCase.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </p>
+              </div>
+              <div>
                 <ul className="space-y-2">
                   {useCase.examples.map((example, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-300">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                    <li key={idx} className="flex items-center gap-2 text-white/70">
+                      <CheckCircle className="h-4 w-4 text-[#00D4AA] flex-shrink-0" />
                       {example}
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
 
         {/* Quick Verification */}
-        <Card className="mb-12 bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">Quick Verification</CardTitle>
-            <CardDescription className="text-gray-300">
+        <div className="mb-12 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+          <div className="mb-4">
+            <h3 className="text-white text-xl font-semibold mb-2">Quick Verification</h3>
+            <p className="text-white/60">
               Anyone can verify your Certificate ID instantly
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div>
             <div className="space-y-4">
-              <div className="flex items-center gap-2 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
-                <span className="text-gray-300">Visit:</span>
-                <code className="text-emerald-400 font-mono flex-1">
+              <div className="flex items-center gap-2 p-4 bg-black/40 rounded-xl border border-white/5">
+                <span className="text-white/70">Visit:</span>
+                <code className="text-[#FFD200] font-mono flex-1">
                   https://loggin.com/certificate/[YOUR-CERTIFICATE-ID]
                 </code>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => copyToClipboard("https://loggin.com/certificate/", "Verification URL")}
-                  className="border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black"
+                  className="border-[#FFD200]/50 text-[#FFD200] hover:bg-[#FFD200]/10 bg-[#FFD200]/5"
                 >
                   {copiedText === "Verification URL" ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               
               <div className="text-center">
-                <Separator className="my-4 bg-gray-700" />
-                <p className="text-gray-300 mb-4">Or verify manually:</p>
-                <div className="space-y-2 text-sm text-gray-400">
+                <Separator className="my-4 bg-white/10" />
+                <p className="text-white/70 mb-4">Or verify manually:</p>
+                <div className="space-y-2 text-sm text-white/50">
                   <p>1. Go to Loggin.com</p>
                   <p>2. Click "Verify Certificate"</p>
                   <p>3. Enter your Certificate ID</p>
@@ -196,68 +205,68 @@ export default function CertificateGuide() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* What's Verified */}
-        <Card className="mb-12 bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">What Your Certificate ID Verifies</CardTitle>
-            <CardDescription className="text-gray-300">
+        <div className="mb-12 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+          <div className="mb-6">
+            <h3 className="text-white text-xl font-semibold mb-2">What Your Certificate ID Verifies</h3>
+            <p className="text-white/60">
               Each certificate provides comprehensive proof of authenticity
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">Original File Hash</div>
-                    <div className="text-gray-400 text-sm">Proves file hasn't been modified</div>
+                    <div className="text-white/50 text-sm">Proves file hasn't been modified</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">Blockchain Timestamp</div>
-                    <div className="text-gray-400 text-sm">Shows exact creation time</div>
+                    <div className="text-white/50 text-sm">Shows exact creation time</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">Creator Identity</div>
-                    <div className="text-gray-400 text-sm">Confirms who uploaded the work</div>
+                    <div className="text-white/50 text-sm">Confirms who uploaded the work</div>
                   </div>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">File Metadata</div>
-                    <div className="text-gray-400 text-sm">Type, size, and technical details</div>
+                    <div className="text-white/50 text-sm">Type, size, and technical details</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">Blockchain Anchor</div>
-                    <div className="text-gray-400 text-sm">Real blockchain verification proof</div>
+                    <div className="text-white/50 text-sm">Real blockchain verification proof</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 text-[#00D4AA]" />
                   <div>
                     <div className="text-white font-medium">Legal Proof</div>
-                    <div className="text-gray-400 text-sm">Court-admissible evidence</div>
+                    <div className="text-white/50 text-sm">Court-admissible evidence</div>
                   </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Best Practices */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">

@@ -104,17 +104,22 @@ export default function Analytics() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-8 relative overflow-hidden">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
+    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 pt-24 pb-8">
         {/* Header */}
         <div className="space-y-4 mb-8">
           {/* Back Button */}
           <div className="flex items-center">
             <Button
               onClick={() => setLocation('/dashboard')}
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+              className="text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
@@ -123,17 +128,17 @@ export default function Analytics() {
           
           {/* Title Section */}
           <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-gray-400 text-sm sm:text-base">Track your creative work performance and engagement</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Analytics Dashboard</h1>
+            <p className="text-white/60 text-lg">Track your creative work performance and engagement</p>
           </div>
           
           {/* Controls */}
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:justify-end">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-full sm:w-32 glass-morphism border-gray-600 text-white">
+              <SelectTrigger className="w-full sm:w-32 bg-black/20 backdrop-blur-sm border-white/10 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-[#0F0F0F] border-white/10 backdrop-blur-xl">
                 <SelectItem value="1m">1 Month</SelectItem>
                 <SelectItem value="3m">3 Months</SelectItem>
                 <SelectItem value="6m">6 Months</SelectItem>
@@ -144,9 +149,9 @@ export default function Analytics() {
             <div className="flex gap-3 w-full sm:w-auto">
               <Button
                 onClick={() => refetch()}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 flex-1 sm:flex-none"
+                className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 flex-1 sm:flex-none"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
@@ -154,7 +159,7 @@ export default function Analytics() {
               
               <Button
                 onClick={exportAnalytics}
-                className="btn-glass px-4 py-2 rounded-2xl font-semibold text-white flex-1 sm:flex-none"
+                className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] hover:from-[#FE3F5E]/90 hover:to-[#FF6B8A]/90 text-white font-semibold px-4 py-2 rounded-xl border-0 flex-1 sm:flex-none"
               >
                 <Download className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Export Data</span>

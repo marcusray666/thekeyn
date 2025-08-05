@@ -228,16 +228,26 @@ export default function BlockchainVerification() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-24 pb-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-24 pb-12">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl font-bold gradient-text mb-4">Advanced Blockchain Verification</h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-2xl flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-white">Advanced Blockchain Verification</h1>
+          </div>
+          <p className="text-xl text-white/60 max-w-3xl mx-auto">
             Generate cryptographically secure verification proofs for your digital works with multi-level security
           </p>
         </motion.div>
