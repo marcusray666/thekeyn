@@ -141,17 +141,15 @@ export default function PremiumHome() {
         {/* Feed */}
         <div className="px-6">
           {isLoading ? (
-            <AnimatedCardList className="space-y-8">
-              {[1, 2, 3].map(i => (
-                <AnimatedCard key={i} delay={i * 0.1} hover={false}>
-                  <div className="post-card animate-pulse">
-                    <div className="h-16 bg-white/10 rounded-xl mb-4"></div>
-                    <div className="h-24 bg-white/10 rounded-xl mb-4"></div>
-                    <div className="h-8 bg-white/10 rounded-xl"></div>
-                  </div>
-                </AnimatedCard>
-              ))}
-            </AnimatedCardList>
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 relative">
+                  <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
+                  <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+                </div>
+                <p className="text-white/60 text-sm">Loading your feed...</p>
+              </div>
+            </div>
           ) : (
             <AnimatedCardList className="space-y-8">
               {allPosts.map((post, index) => (
