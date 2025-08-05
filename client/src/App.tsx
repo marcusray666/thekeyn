@@ -59,15 +59,16 @@ function Router() {
 
       
       {/* Home route - dynamic based on auth status */}
-      <Route path="/" component={Home} />
+      <Route path="/" component={PremiumHome} />
       
       {/* Protected routes */}
-      <Route path="/home" component={Home} />
+      <Route path="/home" component={PremiumHome} />
       <Route path="/dashboard" component={PremiumHome} />
       <Route path="/studio" component={Studio} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/certificates" component={PremiumCertificates} />
+      <Route path="/my-certificates" component={PremiumCertificates} />
       <Route path="/upload-work" component={PremiumUpload} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/bulk-operations" component={BulkOperations} />

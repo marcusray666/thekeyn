@@ -46,8 +46,13 @@ export default function PremiumProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32">
-      <div className="max-w-4xl mx-auto px-4 space-y-8">
+    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="max-w-4xl mx-auto px-4 space-y-8 relative z-10">
         {/* Profile Header */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
           <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">

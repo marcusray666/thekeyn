@@ -88,9 +88,13 @@ export default function PremiumHome() {
   const allPosts = communityPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
       
-      <main className="pt-24">
+      <main className="pt-24 relative z-10">
         {/* Stories Section */}
         <div className="px-6 mb-8">
           <div className="flex space-x-6 overflow-x-auto pb-4">
