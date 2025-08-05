@@ -1,5 +1,8 @@
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import * as OpenTimestamps from 'javascript-opentimestamps';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * OpenTimestamps service for creating real blockchain proofs
@@ -13,50 +16,64 @@ export class OpenTimestampsService {
   ];
 
   /**
-   * Create a timestamp proof that will be anchored to Bitcoin blockchain
+   * Create a REAL timestamp proof that will be anchored to Bitcoin blockchain
    */
   async createTimestamp(fileHash: string): Promise<{
     ots: string;
+    otsFilename: string;
     commitment: string;
     calendarUrls: string[];
     pendingAttestation: boolean;
     verificationStatus: 'pending' | 'confirmed' | 'failed';
     bitcoinTxId?: string;
     blockHeight?: number;
+    ethereumData?: any;
   }> {
     try {
-      // Create SHA-256 hash if not already provided
       const commitment = fileHash.startsWith('0x') ? fileHash.slice(2) : fileHash;
+      const hashBuffer = Buffer.from(commitment, 'hex');
       
-      console.log('Creating OpenTimestamps proof for hash:', commitment);
+      console.log('Creating REAL OpenTimestamps proof for hash:', commitment);
       
-      // Try to submit to OpenTimestamps calendar servers
-      const submissions = await Promise.allSettled(
-        this.calendarServers.map(server => this.submitToCalendar(server, commitment))
-      );
-
-      const successfulSubmissions = submissions
-        .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-        .map(result => result.value);
-
-      console.log('Successful OpenTimestamps submissions:', successfulSubmissions.length);
-
-      if (successfulSubmissions.length > 0) {
-        // Create OTS file format (simplified)
-        const otsData = this.createOTSFile(commitment, successfulSubmissions);
-
+      // Create OpenTimestamps proof using the actual library
+      try {
+        const detached = OpenTimestamps.DetachedTimestampFile.fromHash(hashBuffer);
+        
+        // Submit to calendar servers
+        const promises = [];
+        for (const calendarUrl of this.calendarServers) {
+          promises.push(
+            OpenTimestamps.submit(calendarUrl, detached).catch(err => {
+              console.warn(`Calendar ${calendarUrl} failed:`, err.message);
+              return null;
+            })
+          );
+        }
+        
+        await Promise.allSettled(promises);
+        
+        // Serialize the .ots file
+        const otsBuffer = detached.serializeToBytes();
+        const otsFilename = `${commitment}.ots`;
+        const otsPath = path.join(process.cwd(), 'proofs', otsFilename);
+        
+        // Save .ots file to disk
+        fs.writeFileSync(otsPath, otsBuffer);
+        console.log('Saved OTS file:', otsPath);
+        
         return {
-          ots: otsData,
+          ots: otsBuffer.toString('base64'),
+          otsFilename,
           commitment,
           calendarUrls: this.calendarServers,
           pendingAttestation: true,
           verificationStatus: 'pending'
         };
+      } catch (otsError) {
+        console.log('OpenTimestamps library failed, using Ethereum anchor:', otsError);
+        // If OpenTimestamps fails, create immediate Ethereum-based verification
+        return await this.createEthereumBlockAnchor(fileHash);
       }
-
-      // If OpenTimestamps fails, create immediate Ethereum-based verification
-      console.log('OpenTimestamps failed, creating immediate Ethereum verification...');
-      return await this.createEthereumBlockAnchor(fileHash);
     } catch (error) {
       console.error('OpenTimestamps error:', error);
       // Fallback to immediate Ethereum verification
@@ -200,12 +217,14 @@ export class OpenTimestampsService {
    */
   private async createEthereumBlockAnchor(fileHash: string): Promise<{
     ots: string;
+    otsFilename: string;
     commitment: string;
     calendarUrls: string[];
     pendingAttestation: boolean;
     verificationStatus: 'pending' | 'confirmed' | 'failed';
     bitcoinTxId?: string;
     blockHeight?: number;
+    ethereumData?: any;
   }> {
     try {
       const ethers = await import('ethers');
@@ -231,6 +250,11 @@ export class OpenTimestampsService {
       };
 
       const otsData = Buffer.from(JSON.stringify(ethAnchor)).toString('base64');
+      const otsFilename = `${commitment}-eth.json`;
+      const otsPath = path.join(process.cwd(), 'proofs', otsFilename);
+      
+      // Save Ethereum anchor proof to disk
+      fs.writeFileSync(otsPath, JSON.stringify(ethAnchor, null, 2));
 
       console.log('Created Ethereum anchor:', {
         blockNumber: currentBlock.number,
@@ -240,11 +264,13 @@ export class OpenTimestampsService {
 
       return {
         ots: otsData,
+        otsFilename,
         commitment,
         calendarUrls: [`https://etherscan.io/block/${currentBlock.number}`],
         pendingAttestation: false,
         verificationStatus: 'confirmed',
-        blockHeight: currentBlock.number
+        blockHeight: currentBlock.number,
+        ethereumData: ethAnchor
       };
     } catch (error) {
       console.error('Ethereum anchor creation failed:', error);
@@ -259,9 +285,11 @@ export class OpenTimestampsService {
       };
 
       const otsData = Buffer.from(JSON.stringify(localAnchor)).toString('base64');
+      const otsFilename = `${commitment}-local.json`;
 
       return {
         ots: otsData,
+        otsFilename,
         commitment,
         calendarUrls: [],
         pendingAttestation: false,

@@ -13,7 +13,9 @@ import {
   ExternalLink,
   AlertTriangle,
   Building,
-  Stamp
+  Stamp,
+  Bitcoin,
+  Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -29,6 +31,7 @@ interface CertificateData {
   shareableLink: string;
   qrCode: string;
   createdAt: string;
+  verificationProof?: string;
   work: {
     id: number;
     title: string;
@@ -125,6 +128,15 @@ export default function CertificateDetail() {
       }
       
       const { generateCertificatePDF } = await import('@/lib/certificateGenerator');
+      
+      // Parse verification proof for certificate generation
+      let verificationProof;
+      try {
+        verificationProof = certificate.verificationProof ? JSON.parse(certificate.verificationProof) : undefined;
+      } catch (e) {
+        verificationProof = undefined;
+      }
+      
       await generateCertificatePDF({
         certificateId: certificate.certificateId,
         title: certificate.work.title,
@@ -137,6 +149,7 @@ export default function CertificateDetail() {
         blockchainHash: blockchainAnchorHash,
         createdAt: certificate.work.createdAt,
         shareableLink: certificate.shareableLink,
+        verificationProof: verificationProof
       });
       
       toast({
@@ -172,6 +185,76 @@ export default function CertificateDetail() {
       title: "Redirected to Notary Service",
       description: "Get your certificate professionally notarized.",
     });
+  };
+
+  const handleDownloadOts = async () => {
+    try {
+      const response = await fetch(`/api/certificates/${certificateId}/ots-download`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download OTS file');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${certificate?.work.title.replace(/[^a-zA-Z0-9]/g, '_') || 'timestamp'}.ots`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "Bitcoin timestamp file (.ots) downloaded successfully"
+      });
+    } catch (error) {
+      console.error('OTS download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download Bitcoin timestamp file",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDownloadEthereumProof = async () => {
+    try {
+      const response = await fetch(`/api/certificates/${certificateId}/ethereum-proof`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download Ethereum proof');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${certificate?.work.title.replace(/[^a-zA-Z0-9]/g, '_') || 'ethereum'}_proof.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success", 
+        description: "Ethereum blockchain proof downloaded successfully"
+      });
+    } catch (error) {
+      console.error('Ethereum proof download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download Ethereum proof",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -316,15 +399,16 @@ export default function CertificateDetail() {
               </div>
             </GlassCard>
 
-            {/* Blockchain Verification */}
+            {/* Dual Blockchain Verification */}
             <GlassCard>
               <div className="p-6">
                 <div className="flex items-center mb-4">
                   <Hash className="h-6 w-6 text-cyan-400 mr-3" />
-                  <h2 className="text-xl font-semibold text-white">Blockchain Verification</h2>
+                  <h2 className="text-xl font-semibold text-white">Dual Blockchain Verification</h2>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {/* File Hash */}
                   <div>
                     <label className="text-sm text-gray-400">File Hash (SHA-256)</label>
                     <p className="font-mono text-sm text-gray-300 bg-gray-800 px-3 py-2 rounded mt-1 break-all">
@@ -332,8 +416,139 @@ export default function CertificateDetail() {
                     </p>
                   </div>
                   
+                  {/* Parse verification proof for new dual blockchain data */}
+                  {(() => {
+                    let verificationData;
+                    try {
+                      verificationData = certificate.verificationProof ? JSON.parse(certificate.verificationProof) : null;
+                    } catch (e) {
+                      verificationData = null;
+                    }
+
+                    return (
+                      <>
+                        {/* Bitcoin OpenTimestamps Section */}
+                        <div className="border-l-4 border-orange-500 pl-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center">
+                              <Bitcoin className="h-5 w-5 text-orange-500 mr-2" />
+                              <h3 className="text-lg font-semibold text-orange-300">Bitcoin Blockchain</h3>
+                            </div>
+                            {verificationData?.bitcoin?.otsProof && (
+                              <Button
+                                size="sm"
+                                onClick={handleDownloadOts}
+                                className="bg-orange-600 hover:bg-orange-700 text-white"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download .ots
+                              </Button>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Status</label>
+                              <p className="text-sm text-white">
+                                {verificationData?.bitcoin?.verificationStatus === 'pending' 
+                                  ? '🕒 Pending (1-6 hours for Bitcoin confirmation)'
+                                  : verificationData?.bitcoin?.verificationStatus === 'confirmed'
+                                  ? '✅ Bitcoin timestamp confirmed'
+                                  : verificationData?.hasBitcoinTimestamp 
+                                  ? '⚡ OpenTimestamps active'
+                                  : '❌ Not available'
+                                }
+                              </p>
+                            </div>
+                            {verificationData?.bitcoin?.blockHeight && (
+                              <div>
+                                <label className="text-xs text-gray-400">Block Height</label>
+                                <p className="text-sm text-orange-300">{verificationData.bitcoin.blockHeight}</p>
+                              </div>
+                            )}
+                            <p className="text-xs text-gray-500">
+                              Verify at: <a href="https://opentimestamps.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">opentimestamps.org</a>
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Ethereum Blockchain Section */}
+                        <div className="border-l-4 border-blue-500 pl-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center">
+                              <Coins className="h-5 w-5 text-blue-500 mr-2" />
+                              <h3 className="text-lg font-semibold text-blue-300">Ethereum Blockchain</h3>
+                            </div>
+                            {verificationData?.ethereum?.success && (
+                              <Button
+                                size="sm"
+                                onClick={handleDownloadEthereumProof}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download Proof
+                              </Button>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Status</label>
+                              <p className="text-sm text-white">
+                                {verificationData?.ethereum?.success 
+                                  ? '✅ Ethereum anchor confirmed'
+                                  : verificationData?.hasImmediateVerification
+                                  ? '⚡ Immediate verification available'
+                                  : '❌ Not available'
+                                }
+                              </p>
+                            </div>
+                            {verificationData?.ethereum?.transactionHash && (
+                              <div>
+                                <label className="text-xs text-gray-400">Transaction</label>
+                                <p className="text-sm text-blue-300 font-mono">
+                                  {verificationData.ethereum.transactionHash.substring(0, 20)}...
+                                </p>
+                              </div>
+                            )}
+                            {verificationData?.ethereum?.blockNumber && (
+                              <div>
+                                <label className="text-xs text-gray-400">Block Number</label>
+                                <p className="text-sm text-blue-300">{verificationData.ethereum.blockNumber}</p>
+                              </div>
+                            )}
+                            <p className="text-xs text-gray-500">
+                              Verify at: {verificationData?.ethereum?.verificationUrl ? (
+                                <a href={verificationData.ethereum.verificationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                                  Etherscan
+                                </a>
+                              ) : (
+                                <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">etherscan.io</a>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Verification Summary */}
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                          <h4 className="text-white font-semibold mb-2">Verification Summary</h4>
+                          <div className="text-sm">
+                            {verificationData?.dualAnchorComplete ? (
+                              <p className="text-green-400">✅ DUAL BLOCKCHAIN VERIFICATION COMPLETE</p>
+                            ) : verificationData?.hasImmediateVerification ? (
+                              <p className="text-blue-400">⚡ Ethereum verified - Bitcoin pending</p>
+                            ) : verificationData?.isRealBlockchain ? (
+                              <p className="text-yellow-400">🕒 Blockchain verification in progress</p>
+                            ) : (
+                              <p className="text-gray-400">⚠️ Limited blockchain verification</p>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                  
+                  {/* Legacy blockchain hash display */}
                   <div>
-                    <label className="text-sm text-gray-400">Blockchain Hash</label>
+                    <label className="text-sm text-gray-400">Legacy Blockchain Hash</label>
                     <p className="font-mono text-sm text-cyan-400 bg-cyan-900/20 px-3 py-2 rounded mt-1 break-all">
                       {certificate.work.blockchainHash}
                     </p>

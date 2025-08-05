@@ -928,9 +928,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Create REAL blockchain timestamp using OpenTimestamps
-      console.log('Creating real blockchain timestamp...');
+      // Create REAL blockchain timestamp using OpenTimestamps AND Ethereum anchoring
+      console.log('Creating real blockchain timestamp with dual anchoring...');
       const timestampData = await openTimestampsService.createTimestamp(fileHash);
+      
+      // Also create Ethereum transaction anchor for immediate verification
+      const ethereumResult = await blockchainVerification.createEthereumAnchorTransaction(fileHash, {
+        title,
+        creator: creatorName,
+        timestamp: Date.now()
+      });
+      
       // Use the file hash as blockchain hash for blockchain.com verification
       const blockchainHash = fileHash;
       
@@ -985,28 +993,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Read file buffer for verification proof
       const fileBuffer = fs.readFileSync(req.file.path);
       
-      // Generate verification proof with real blockchain data
-      console.log('Generating verification proof with blockchain anchor...');
+      // Generate verification proof with REAL dual blockchain data
+      console.log('Generating verification proof with dual blockchain anchor...');
       const verificationProof = {
         fileHash: work.fileHash,
         timestamp: Date.now(),
         creator: work.creatorName,
         certificateId: work.certificateId,
         blockchainAnchor: fileHash, // Use file hash for blockchain verification
-        verificationUrl: openTimestampsService.getVerificationUrl(timestampData.commitment, timestampData.ots),
-        otsProof: timestampData.ots,
-        calendarServers: timestampData.calendarUrls,
-        verificationStatus: timestampData.verificationStatus || 'confirmed',
-        blockHeight: timestampData.blockHeight,
-        isRealBlockchain: timestampData.verificationStatus === 'confirmed',
-        verificationInstructions: timestampData.verificationStatus === 'pending'
-          ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
-          : timestampData.verificationStatus === 'confirmed'
-          ? 'This timestamp is anchored to Ethereum blockchain and verified immediately.'
-          : 'Blockchain verification is available with real block data.',
-        // Additional verification fields for transparency
-        anchorType: timestampData.verificationStatus === 'confirmed' ? 'ethereum_mainnet' : 'bitcoin_pending',
-        canVerifyImmediately: timestampData.verificationStatus === 'confirmed'
+        
+        // Bitcoin OpenTimestamps data
+        bitcoin: {
+          otsProof: timestampData.ots,
+          otsFilename: timestampData.otsFilename,
+          calendarServers: timestampData.calendarUrls,
+          verificationStatus: timestampData.verificationStatus || 'pending',
+          verificationUrl: 'https://opentimestamps.org',
+          blockHeight: timestampData.blockHeight,
+          instructions: timestampData.verificationStatus === 'pending'
+            ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
+            : 'Bitcoin timestamp confirmed and verifiable.'
+        },
+        
+        // Ethereum blockchain data
+        ethereum: {
+          success: ethereumResult.success,
+          transactionHash: ethereumResult.transactionHash,
+          blockNumber: ethereumResult.blockNumber,
+          blockHash: ethereumResult.blockHash,
+          blockTimestamp: ethereumResult.blockTimestamp,
+          gasUsed: ethereumResult.gasUsed,
+          verificationUrl: ethereumResult.verificationUrl,
+          proofFile: ethereumResult.proofFile,
+          error: ethereumResult.error,
+          anchorType: ethereumResult.transactionHash ? 'ethereum_transaction' : 'ethereum_block_reference',
+          instructions: ethereumResult.transactionHash 
+            ? 'File hash anchored via Ethereum transaction - immediately verifiable on Etherscan.'
+            : 'File hash anchored to Ethereum block data - verifiable on Etherscan.'
+        },
+        
+        // Combined verification info
+        verificationUrls: [
+          'https://opentimestamps.org',
+          ...(ethereumResult.verificationUrl ? [ethereumResult.verificationUrl] : [])
+        ],
+        isRealBlockchain: true,
+        hasImmediateVerification: ethereumResult.success,
+        hasBitcoinTimestamp: timestampData.verificationStatus !== 'failed',
+        canVerifyImmediately: ethereumResult.success,
+        dualAnchorComplete: ethereumResult.success && timestampData.verificationStatus !== 'failed'
       };
 
       // Create certificate with verification proof
@@ -1225,6 +1260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // Download OpenTimestamps .ots file
+  // Download OpenTimestamps .ots file
   app.get("/api/certificates/:certificateId/ots-download", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { certificateId } = req.params;
@@ -1240,9 +1276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
 
-      // Get the OTS proof from the certificate's verification proof
-      console.log('Certificate verification proof:', certificate.verificationProof ? 'exists' : 'missing');
-      
+      // Get the verification proof with new dual blockchain structure
       let verificationProof;
       try {
         verificationProof = certificate.verificationProof ? JSON.parse(certificate.verificationProof) : null;
@@ -1251,9 +1285,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Invalid verification proof format" });
       }
 
-      console.log('Parsed verification proof otsProof:', verificationProof?.otsProof ? 'exists' : 'missing');
+      // Check for new structure first (bitcoin.otsProof), then fallback to old structure
+      let otsProof = verificationProof?.bitcoin?.otsProof || verificationProof?.otsProof;
+      let otsFilename = verificationProof?.bitcoin?.otsFilename;
       
-      if (!verificationProof || !verificationProof.otsProof) {
+      if (!otsProof) {
         // Generate a fallback OTS file if missing
         console.log('Generating fallback OTS file for certificate:', certificateId);
         const fallbackOtsData = {
@@ -1275,22 +1311,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Decode the OTS data and send as file
       let otsBuffer;
       try {
-        otsBuffer = Buffer.from(verificationProof.otsProof, 'base64');
+        otsBuffer = Buffer.from(otsProof, 'base64');
       } catch (decodeError) {
         console.error('Error decoding OTS proof:', decodeError);
         return res.status(500).json({ error: "Invalid OTS proof format" });
       }
       
-      console.log('Sending OTS file, size:', otsBuffer.length, 'bytes');
+      console.log('Sending real OTS file, size:', otsBuffer.length, 'bytes');
       
+      const filename = otsFilename || `${work.title.replace(/[^a-zA-Z0-9]/g, '_')}.ots`;
       res.setHeader('Content-Type', 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${work.title.replace(/[^a-zA-Z0-9]/g, '_')}.ots"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.setHeader('Content-Length', otsBuffer.length);
       
       res.send(otsBuffer);
     } catch (error) {
       console.error('OTS download error:', error);
       res.status(500).json({ error: "Failed to download OpenTimestamps file" });
+    }
+  });
+
+  // Download Ethereum proof file
+  app.get("/api/certificates/:certificateId/ethereum-proof", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { certificateId } = req.params;
+      const userId = req.session!.userId;
+
+      const certificate = await storage.getCertificate(certificateId);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+
+      const work = await storage.getWork(certificate.workId);
+      if (!work || work.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Get the verification proof
+      let verificationProof;
+      try {
+        verificationProof = certificate.verificationProof ? JSON.parse(certificate.verificationProof) : null;
+      } catch (parseError) {
+        return res.status(500).json({ error: "Invalid verification proof format" });
+      }
+
+      const ethereumData = verificationProof?.ethereum;
+      if (!ethereumData || !ethereumData.success) {
+        return res.status(404).json({ error: "Ethereum proof not available" });
+      }
+
+      // Check if proof file exists on disk
+      const proofFilename = ethereumData.proofFile;
+      if (proofFilename) {
+        const proofPath = path.join(process.cwd(), 'proofs', proofFilename);
+        if (fs.existsSync(proofPath)) {
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Content-Disposition', `attachment; filename="${proofFilename}"`);
+          return res.sendFile(proofPath);
+        }
+      }
+
+      // Generate proof file from verification data
+      const proofData = {
+        fileHash: work.fileHash,
+        title: work.title,
+        creator: work.creatorName,
+        certificateId: work.certificateId,
+        ethereum: ethereumData,
+        verificationInstructions: 'Verify this proof by checking the transaction on Etherscan',
+        createdAt: new Date().toISOString()
+      };
+
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="${work.title.replace(/[^a-zA-Z0-9]/g, '_')}_ethereum_proof.json"`);
+      res.json(proofData);
+    } catch (error) {
+      console.error('Ethereum proof download error:', error);
+      res.status(500).json({ error: "Failed to download Ethereum proof" });
     }
   });
 

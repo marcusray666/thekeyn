@@ -13,6 +13,30 @@ interface CertificateData {
   blockchainHash: string;
   createdAt: string;
   shareableLink: string;
+  verificationProof?: {
+    bitcoin?: {
+      otsProof?: string;
+      otsFilename?: string;
+      verificationStatus?: string;
+      verificationUrl?: string;
+      blockHeight?: number;
+      instructions?: string;
+    };
+    ethereum?: {
+      success?: boolean;
+      transactionHash?: string;
+      blockNumber?: number;
+      blockHash?: string;
+      verificationUrl?: string;
+      anchorType?: string;
+      instructions?: string;
+    };
+    isRealBlockchain?: boolean;
+    hasImmediateVerification?: boolean;
+    hasBitcoinTimestamp?: boolean;
+    dualAnchorComplete?: boolean;
+    verificationUrls?: string[];
+  };
 }
 
 export async function generateCertificatePDF(data: CertificateData): Promise<void> {
@@ -122,11 +146,11 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
     yPos += splitDescription.length * 5;
   }
   
-  // Verification Section
+  // Dual Blockchain Verification Section
   yPos += 20;
   pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Blockchain Verification', leftColumn, yPos);
+  pdf.text('Dual Blockchain Verification', leftColumn, yPos);
   
   pdf.setDrawColor(156, 163, 175);
   pdf.line(20, yPos + 5, pageWidth - 20, yPos + 5);
@@ -140,35 +164,106 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
   pdf.setFontSize(10);
   pdf.text(data.fileHash, leftColumn, yPos);
   
-  yPos += 15;
+  // Bitcoin OpenTimestamps Section
+  yPos += 20;
+  if (data.verificationProof?.bitcoin && data.verificationProof.hasBitcoinTimestamp) {
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(255, 140, 0); // Bitcoin orange
+    pdf.text('⛏ Bitcoin Blockchain (OpenTimestamps)', leftColumn, yPos);
+    
+    yPos += 10;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(55, 65, 81);
+    
+    const btcStatus = data.verificationProof.bitcoin.verificationStatus === 'pending' ? 'Pending (1-6 hours)' : 'Confirmed';
+    pdf.text(`Status: ${btcStatus}`, leftColumn, yPos);
+    
+    if (data.verificationProof.bitcoin.blockHeight) {
+      yPos += 6;
+      pdf.text(`Block Height: ${data.verificationProof.bitcoin.blockHeight}`, leftColumn, yPos);
+    }
+    
+    if (data.verificationProof.bitcoin.otsFilename) {
+      yPos += 6;
+      pdf.text(`OTS File: ${data.verificationProof.bitcoin.otsFilename}`, leftColumn, yPos);
+    }
+    
+    yPos += 6;
+    pdf.setTextColor(255, 140, 0);
+    pdf.text('Verify: https://opentimestamps.org', leftColumn, yPos);
+  } else {
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(156, 163, 175);
+    pdf.text('Bitcoin timestamp: Not available', leftColumn, yPos);
+  }
+  
+  // Ethereum Blockchain Section
+  yPos += 20;
+  if (data.verificationProof?.ethereum && data.verificationProof.ethereum.success) {
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(99, 102, 241); // Ethereum blue
+    pdf.text('⟠ Ethereum Blockchain', leftColumn, yPos);
+    
+    yPos += 10;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(55, 65, 81);
+    
+    if (data.verificationProof.ethereum.transactionHash) {
+      pdf.text('Type: Transaction Anchor', leftColumn, yPos);
+      yPos += 6;
+      pdf.text(`Tx Hash: ${data.verificationProof.ethereum.transactionHash.substring(0, 20)}...`, leftColumn, yPos);
+    } else {
+      pdf.text('Type: Block Reference Anchor', leftColumn, yPos);
+    }
+    
+    if (data.verificationProof.ethereum.blockNumber) {
+      yPos += 6;
+      pdf.text(`Block: ${data.verificationProof.ethereum.blockNumber}`, leftColumn, yPos);
+    }
+    
+    yPos += 6;
+    pdf.text('Status: Confirmed', leftColumn, yPos);
+    
+    yPos += 6;
+    pdf.setTextColor(99, 102, 241);
+    if (data.verificationProof.ethereum.verificationUrl) {
+      const shortUrl = data.verificationProof.ethereum.verificationUrl.replace('https://', '');
+      pdf.text(`Verify: ${shortUrl}`, leftColumn, yPos);
+    } else {
+      pdf.text('Verify: etherscan.io', leftColumn, yPos);
+    }
+  } else {
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(156, 163, 175);
+    pdf.text('Ethereum anchor: Not available', leftColumn, yPos);
+  }
+  
+  // Verification Summary
+  yPos += 20;
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Blockchain Verification Hash:', leftColumn, yPos);
-  yPos += 5;
-  pdf.setTextColor(99, 102, 241); // Indigo for distinction
-  pdf.setFontSize(10);
-  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(55, 65, 81);
   
-  // Check if blockchain hash is different from file hash
-  if (data.blockchainHash === data.fileHash) {
-    pdf.text('(Same as file hash - dual verification system)', leftColumn, yPos);
-    yPos += 7;
-    pdf.setTextColor(55, 65, 81); // Back to dark gray
-    pdf.text(data.blockchainHash, leftColumn, yPos);
-    yPos += 10;
-    pdf.setFontSize(10);
-    pdf.setTextColor(156, 163, 175); // Gray
-    pdf.text('Note: This file uses blockchain block anchoring for timestamp verification.', leftColumn, yPos);
-    pdf.text('Verify at: etherscan.io or opentimestamps.org', leftColumn, yPos + 7);
+  if (data.verificationProof?.isRealBlockchain) {
+    if (data.verificationProof.dualAnchorComplete) {
+      pdf.setTextColor(0, 128, 0); // Green
+      pdf.text('✓ DUAL BLOCKCHAIN VERIFICATION COMPLETE', leftColumn, yPos);
+    } else if (data.verificationProof.hasImmediateVerification) {
+      pdf.setTextColor(0, 128, 0); // Green  
+      pdf.text('✓ ETHEREUM VERIFIED - Bitcoin pending', leftColumn, yPos);
+    } else {
+      pdf.setTextColor(255, 140, 0); // Orange
+      pdf.text('⏳ Blockchain verification in progress', leftColumn, yPos);
+    }
   } else {
-    pdf.text('(OpenTimestamps proof - different from file hash)', leftColumn, yPos);
-    yPos += 7;
-    pdf.setTextColor(55, 65, 81); // Back to dark gray
-    pdf.text(data.blockchainHash, leftColumn, yPos);
-    yPos += 10;
-    pdf.setFontSize(10);
     pdf.setTextColor(156, 163, 175); // Gray
-    pdf.text('Verify timestamp proof at: opentimestamps.org', leftColumn, yPos);
+    pdf.text('⚠ Limited blockchain verification', leftColumn, yPos);
   }
   
   // QR Code Section
