@@ -1,163 +1,296 @@
+import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { Shield, Upload, Link as LinkIcon, Gavel, Plus, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Force CSS to load properly in production
-if (typeof window !== 'undefined') {
-  const cssLink = document.querySelector('link[href*="index-"]');
-  if (cssLink) {
-    cssLink.setAttribute('type', 'text/css');
-  }
-}
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Shield, 
+  Zap, 
+  Crown, 
+  ChevronRight, 
+  Play, 
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Eye
+} from "lucide-react";
 
 export default function Welcome() {
-  const features = [
-    {
-      icon: Upload,
-      title: "Upload Instantly",
-      description: "Upload your art, music, or designs and create a digital certificate within seconds.",
-      variant: "purple" as const,
-    },
-    {
-      icon: LinkIcon,
-      title: "Blockchain Proof",
-      description: "Every work is timestamped and anchored to the blockchain for permanent verification.",
-      variant: "blue" as const,
-    },
-    {
-      icon: Shield,
-      title: "Share Everywhere",
-      description: "Share certificates as PDF, QR code, or secure link for legal protection.",
-      variant: "cyan" as const,
-    },
-    {
-      icon: Gavel,
-      title: "Enforce Rights",
-      description: "Generate takedown notices for platforms like Instagram, YouTube, and TikTok.",
-      variant: "emerald" as const,
-    },
-  ];
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
 
-  const glassCardStyle = {
-    backdropFilter: 'blur(20px) saturate(150%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+  const itemVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24
+      }
+    }
+  };
+
+  const floatAnimation = {
+    y: [0, -20, 0],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  };
+
+  const pulseAnimation = {
+    scale: [1, 1.05, 1],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
   };
 
   return (
-    <div className="pt-24 min-h-screen" style={{ 
-      background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%)',
-      color: 'white'
-    }}>
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl bg-white/10 p-8 md:p-12 mb-8 hover:translate-y-[-4px] transition-transform duration-300" 
-               style={glassCardStyle}>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="gradient-text">Protect. Create.</span><br/>
-              <span className="text-white">Own Your Art.</span>
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Instantly secure, prove, and defend your creative work with blockchain-powered certificates. 
-              Right from your phone or browser.
-            </p>
-            
-            {/* Auth Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <Link href="/login">
-                <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button
-                  variant="outline"
-                  className="glass-morphism px-8 py-4 rounded-2xl font-semibold text-white text-lg hover:bg-opacity-80 transition-all"
-                >
-                  <User className="mr-2 h-5 w-5" />
-                  Register
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-violet-900/20 to-slate-900"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/5 rounded-full blur-3xl animate-pulse"></div>
+      </div>
 
-      {/* Features Grid */}
-      <section className="py-20 px-4">
+      {/* Content */}
+      <div className="relative z-10 pt-20 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-            How Loggin Works
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="backdrop-blur-xl border rounded-2xl shadow-2xl bg-white/10 backdrop-saturate-150 border-white/20 hover:translate-y-[-4px] transition-transform duration-300 p-6 text-center"
-                style={glassCardStyle}
-              >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${
-                  feature.variant === 'purple' ? 'from-purple-500 to-purple-600' :
-                  feature.variant === 'blue' ? 'from-blue-500 to-blue-600' :
-                  feature.variant === 'cyan' ? 'from-cyan-500 to-cyan-600' :
-                  'from-emerald-500 to-emerald-600'
-                } flex items-center justify-center mb-4 mx-auto`}>
-                  <feature.icon className="text-2xl text-white" size={32} />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-white">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-300 text-sm">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-center mb-20"
+          >
+            {/* Hero Section */}
+            <motion.div variants={itemVariants} className="mb-8">
+              <Badge className="mb-4 bg-gradient-to-r from-violet-600/20 to-emerald-500/20 border-violet-500/30 text-violet-300 px-4 py-2">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Billion-Dollar Creator Protection Platform
+              </Badge>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-urbanist font-bold mb-6">
+                <span className="bg-gradient-to-r from-violet-400 via-white to-emerald-400 bg-clip-text text-transparent">
+                  Protect Your
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-emerald-400 via-violet-400 to-white bg-clip-text text-transparent">
+                  Digital Empire
+                </span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+                The world's most advanced blockchain-powered platform for digital creators.
+                <br />
+                <span className="text-violet-300">Secure, verify, and monetize your creative works with military-grade protection.</span>
+              </p>
+            </motion.div>
 
-      {/* Call to Action */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl bg-white/10 p-8 md:p-12" 
-               style={glassCardStyle}>
-            <h2 className="text-4xl font-bold mb-6">
-              <span className="gradient-text">Ready to Protect</span><br/>
-              <span className="text-white">Your Creative Work?</span>
+            {/* CTA Buttons */}
+            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+              <Link href="/upload">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-violet-500/25 transition-all duration-300 group"
+                >
+                  <Shield className="h-6 w-6 mr-3 group-hover:animate-glow" />
+                  Protect Now
+                  <ArrowRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm group"
+              >
+                <Play className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform" />
+                See How It Works
+              </Button>
+            </motion.div>
+
+            {/* Trust Indicators */}
+            <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 mb-16">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <span>Ethereum Verified</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <span>Bitcoin Anchored</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <span>Military-Grade Security</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <span>Legal Protection</span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Feature Cards */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+          >
+            {/* Protect Now Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="h-full bg-gradient-to-br from-violet-600/10 to-violet-800/10 border-violet-500/20 backdrop-blur-xl hover:from-violet-600/20 hover:to-violet-800/20 transition-all duration-500 group cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <motion.div
+                    animate={floatAnimation}
+                    className="w-20 h-20 bg-gradient-to-br from-violet-600 to-violet-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-violet-500/25 transition-shadow"
+                  >
+                    <Shield className="h-10 w-10 text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Instant Protection</h3>
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    Upload your work and get blockchain-verified certificates within seconds. Military-grade security meets creator convenience.
+                  </p>
+                  <Link href="/upload">
+                    <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+                      Start Protecting
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* See How It Works Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="h-full bg-gradient-to-br from-emerald-500/10 to-emerald-700/10 border-emerald-500/20 backdrop-blur-xl hover:from-emerald-500/20 hover:to-emerald-700/20 transition-all duration-500 group cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <motion.div
+                    animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 0.5}}}
+                    className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-emerald-500/25 transition-shadow"
+                  >
+                    <Zap className="h-10 w-10 text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Dual Blockchain</h3>
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    Your work is anchored to both Ethereum and Bitcoin blockchains, creating an immutable record that lasts forever.
+                  </p>
+                  <Button variant="outline" className="w-full border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
+                    Learn More
+                    <Play className="h-4 w-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* View Example Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="h-full bg-gradient-to-br from-amber-500/10 to-orange-600/10 border-amber-500/20 backdrop-blur-xl hover:from-amber-500/20 hover:to-orange-600/20 transition-all duration-500 group cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <motion.div
+                    animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 1}}}
+                    className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-amber-500/25 transition-shadow"
+                  >
+                    <Eye className="h-10 w-10 text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Live Examples</h3>
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    See real certificates from creators worldwide. Explore the future of digital ownership protection.
+                  </p>
+                  <Link href="/certificates">
+                    <Button variant="outline" className="w-full border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
+                      View Gallery
+                      <Eye className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+
+          {/* Stats Section */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-center mb-20"
+          >
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <motion.div animate={pulseAnimation} className="text-4xl md:text-5xl font-bold text-violet-400 mb-2">
+                  10K+
+                </motion.div>
+                <p className="text-gray-400">Works Protected</p>
+              </div>
+              <div className="text-center">
+                <motion.div animate={pulseAnimation} className="text-4xl md:text-5xl font-bold text-emerald-400 mb-2">
+                  $2.5M+
+                </motion.div>
+                <p className="text-gray-400">IP Value Secured</p>
+              </div>
+              <div className="text-center">
+                <motion.div animate={pulseAnimation} className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+                  50K+
+                </motion.div>
+                <p className="text-gray-400">Blockchain Anchors</p>
+              </div>
+              <div className="text-center">
+                <motion.div animate={pulseAnimation} className="text-4xl md:text-5xl font-bold text-amber-400 mb-2">
+                  99.9%
+                </motion.div>
+                <p className="text-gray-400">Success Rate</p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Ready to Join the Creator Revolution?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of creators who trust Loggin' to secure their digital assets with blockchain technology.
+              Start protecting your creative works today with the world's most trusted blockchain platform.
             </p>
-            
-            <div className="flex justify-center items-center mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register">
-                <Button className="btn-glass px-8 py-4 rounded-2xl font-semibold text-white text-lg">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Get Started Free
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-violet-600 to-emerald-500 hover:from-violet-700 hover:to-emerald-600 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-violet-500/25 transition-all duration-300"
+                >
+                  <Crown className="h-6 w-6 mr-3" />
+                  Start Your Empire
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm"
+                >
+                  Sign In
                 </Button>
               </Link>
             </div>
-            
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-400">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-                <span>No Credit Card Required</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                <span>Blockchain Secured</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-purple-400"></div>
-                <span>Works Everywhere</span>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

@@ -39,12 +39,16 @@ import Followers from "@/pages/followers";
 import Studio from "@/pages/studio";
 import AdminDashboard from "@/pages/admin-dashboard";
 
+import EnhancedDashboard from "@/pages/enhanced-dashboard";
+import Welcome from "@/pages/welcome";
+
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       {/* Public routes - accessible to everyone */}
+      <Route path="/welcome" component={Welcome} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={UploadPage} />
@@ -54,7 +58,7 @@ function Router() {
       
       {/* Protected routes */}
       <Route path="/home" component={Home} />
-      <Route path="/dashboard" component={Home} />
+      <Route path="/dashboard" component={EnhancedDashboard} />
       <Route path="/studio" component={Studio} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />

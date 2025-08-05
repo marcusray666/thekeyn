@@ -1,30 +1,38 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/urbanist/400.css';
+@import '@fontsource/urbanist/500.css';
+@import '@fontsource/urbanist/600.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Dark theme colors (default for Loggin' design) */
-    --background: 220 27% 8%;
+    /* Billion-Dollar Color Palette */
+    --background: 215 27% 6%;           /* Deep slate #0D1117 */
     --foreground: 0 0% 98%;
-    --card: 220 27% 8%;
+    --card: 215 27% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 27% 8%;
+    --popover: 215 27% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 262 83% 58%;             /* Vivid violet #7C3AED */
+    --primary-foreground: 0 0% 100%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
+    --accent: 262 83% 58%;              /* Vivid violet accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 58%;           /* Strong red #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+    --success: 158 64% 52%;             /* Mint green #10B981 */
+    --warning: 43 90% 58%;              /* Amber #FBBF24 */
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
-    --radius: 0.5rem;
+    --ring: 262 83% 58%;
+    --radius: 0.75rem;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -61,12 +69,14 @@
     @apply border-border;
   }
 
-  /* Base body styling */
+  /* Base body styling with billion-dollar aesthetics */
   body {
-    background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%) !important;
+    background: linear-gradient(135deg, #0D1117 0%, #161B22 50%, #0D1117 100%) !important;
     color: white !important;
     min-height: 100vh;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Urbanist', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
   }
 
   /* Light theme styling */

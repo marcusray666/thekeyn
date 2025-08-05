@@ -63,6 +63,7 @@ export function Navigation() {
   }
 
   const authenticatedNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { href: `/profile/${user?.username}`, label: "Profile", icon: User },
     { href: "/social", label: "Community", icon: Users },
     { href: "/messages", label: "Messages", icon: MessageCircle },
