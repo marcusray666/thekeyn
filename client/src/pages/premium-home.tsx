@@ -6,8 +6,7 @@ import { BottomNav } from "@/components/premium/bottom-nav";
 import { PostCard } from "@/components/premium/post-card";
 import { Plus, TrendingUp, Clock, Users } from "lucide-react";
 import { Link } from "wouter";
-import AnimatedCard, { AnimatedCardList } from "@/components/animations/AnimatedCard";
-import { BlockchainFAB } from "@/components/animations/AnimatedButton";
+
 
 export default function PremiumHome() {
 
@@ -151,46 +150,45 @@ export default function PremiumHome() {
               </div>
             </div>
           ) : (
-            <AnimatedCardList className="space-y-8">
-              {allPosts.map((post, index) => (
-                <AnimatedCard key={`${post.id}-${post.creatorName || 'user'}`} delay={index * 0.1}>
-                  <PostCard
-                    post={post}
-                    onDetailsClick={() => {
-                      // Open post details modal
-                      console.log('Open details for:', post);
-                    }}
-                  />
-                </AnimatedCard>
+            <div className="space-y-8">
+              {allPosts.map((post) => (
+                <PostCard
+                  key={`${post.id}-${post.creatorName || 'user'}`}
+                  post={post}
+                  onDetailsClick={() => {
+                    // Open post details modal
+                    console.log('Open details for:', post);
+                  }}
+                />
               ))}
-            </AnimatedCardList>
+            </div>
           )}
           
           {/* Show upload prompt after community posts */}
-          <AnimatedCard delay={0.5} className="mt-8">
-            <div className="text-center py-12 bg-white/5 rounded-3xl">
-              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center mb-6">
-                <Plus className="h-12 w-12 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Join the Community</h3>
-              <p className="text-white/50 mb-6 max-w-sm mx-auto">
-                Upload your digital work to protect it on the blockchain and share it with creators worldwide.
-              </p>
-              <Link href="/upload">
-                <button className="accent-button">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Protect Your Work
-                </button>
-              </Link>
+          <div className="mt-8 text-center py-12 bg-white/5 rounded-3xl">
+            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center mb-6">
+              <Plus className="h-12 w-12 text-white" />
             </div>
-          </AnimatedCard>
+            <h3 className="text-2xl font-bold text-white mb-2">Join the Community</h3>
+            <p className="text-white/50 mb-6 max-w-sm mx-auto">
+              Upload your digital work to protect it on the blockchain and share it with creators worldwide.
+            </p>
+            <Link href="/upload">
+              <button className="accent-button">
+                <Plus className="h-5 w-5 mr-2" />
+                Protect Your Work
+              </button>
+            </Link>
+          </div>
         </div>
       </main>
 
-      {/* Blockchain Floating Action Button */}
-      <BlockchainFAB onClick={() => window.location.href = '/upload'}>
-        <Plus className="h-8 w-8" />
-      </BlockchainFAB>
+      {/* Floating Action Button */}
+      <Link href="/upload">
+        <button className="floating-action">
+          <Plus className="h-8 w-8" />
+        </button>
+      </Link>
 
       <BottomNav />
     </div>
