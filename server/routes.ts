@@ -1269,7 +1269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { certificateId } = req.params;
       const userId = req.session!.userId;
 
-      const certificate = await storage.getCertificate(certificateId);
+      const certificate = await storage.getCertificateByStringId(certificateId);
       if (!certificate) {
         return res.status(404).json({ error: "Certificate not found" });
       }
@@ -1340,7 +1340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { certificateId } = req.params;
       const userId = req.session!.userId;
 
-      const certificate = await storage.getCertificate(certificateId);
+      const certificate = await storage.getCertificateByStringId(certificateId);
       if (!certificate) {
         return res.status(404).json({ error: "Certificate not found" });
       }

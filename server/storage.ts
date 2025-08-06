@@ -269,6 +269,17 @@ export class DatabaseStorage implements IStorage {
     return certificate || undefined;
   }
 
+  async getCertificateByStringId(certificateId: string): Promise<Certificate | undefined> {
+    // First find the work by certificateId, then get the certificate by workId
+    const work = await this.getWorkByCertificateId(certificateId);
+    if (!work) {
+      return undefined;
+    }
+    
+    const [certificate] = await db.select().from(certificates).where(eq(certificates.workId, work.id));
+    return certificate || undefined;
+  }
+
   async getCertificateByWorkId(workId: number): Promise<Certificate | undefined> {
     const [certificate] = await db.select().from(certificates).where(eq(certificates.workId, workId));
     return certificate || undefined;
