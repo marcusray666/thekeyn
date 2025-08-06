@@ -179,15 +179,9 @@ function WelcomePage() {
                 </Button>
               </Link>
               <Link href="/login">
-                <button className="text-white hover:bg-white/10 px-8 py-4 text-lg font-medium transition-colors" style={{
-                  background: 'transparent',
-                  border: 'none',
-                  boxShadow: 'none',
-                  outline: 'none',
-                  borderRadius: '0.5rem'
-                }}>
+                <Button variant="outline" className="border-transparent text-white hover:bg-white/10 px-8 py-4 text-lg">
                   Sign In
-                </button>
+                </Button>
               </Link>
             </div>
           </div>
