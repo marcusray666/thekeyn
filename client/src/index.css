@@ -151,8 +151,31 @@
     color: #FFFFFF !important;
   }
   
-  /* Card backgrounds */
-  .post-card, .glass-card, .bg-white\/5 {
+  /* Card backgrounds - Force dark glassmorphic styling */
+  .post-card, .glass-card, .bg-white\/5, 
+  .bg-white\/10, .backdrop-blur-xl {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  
+  /* Force all cards to be dark */
+  .rounded-3xl, .rounded-2xl, .border,
+  [class*="bg-white"], [class*="bg-gray"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  /* Override any light backgrounds */
+  .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-gray-300 {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+  
+  /* Ensure all content areas are dark */
+  .feed-container .space-y-6 > div,
+  .max-w-2xl > div,
+  .mx-auto > div {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
