@@ -59,6 +59,8 @@ function Router() {
       <Route path="/welcome" component={Welcome} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      
+      {/* Protected routes */}
       <Route path="/upload" component={PremiumUpload} />
       <Route path="/create-post" component={CreatePost} />
 

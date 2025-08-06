@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Upload, Image, Music, Video, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,58 @@ import { useToast } from "@/hooks/use-toast";
 import { LocationPicker } from "@/components/premium/location-picker";
 
 export default function CreatePost() {
+  // Check authentication status
+  const { data: currentUser, isLoading: isAuthLoading } = useQuery({
+    queryKey: ["/api/auth/user"],
+    queryFn: () => apiRequest("/api/auth/user"),
+    retry: false,
+  });
+  
+  // Redirect to login if not authenticated
+  if (!isAuthLoading && !currentUser) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center relative overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+
+        <div className="text-center relative z-10 p-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
+            <ArrowLeft className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-white font-bold text-2xl mb-4">Authentication Required</h2>
+          <p className="text-white/60 mb-6">You need to log in to create posts</p>
+          <div className="flex gap-4 justify-center">
+            <Link href="/login">
+              <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white font-semibold hover:opacity-90 transition-opacity">
+                Log In
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                Sign Up
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 relative">
+            <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+          </div>
+          <p className="text-white/60">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();

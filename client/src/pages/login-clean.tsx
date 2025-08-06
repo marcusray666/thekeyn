@@ -13,7 +13,7 @@ export default function LoginClean() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
