@@ -9,12 +9,13 @@ import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CreatePost() {
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ export default function CreatePost() {
         description: "Your post has been shared with the community.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
-      setLocation("/");
+      navigate("/");
     },
     onError: (error: any) => {
       toast({
@@ -68,6 +69,7 @@ export default function CreatePost() {
     const formData = new FormData();
     formData.append("title", title.trim());
     formData.append("description", description.trim());
+    formData.append("location", location.trim());
     formData.append("isProtected", "false"); // Community posts are not protected
     
     if (selectedFile) {
@@ -136,13 +138,26 @@ export default function CreatePost() {
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell the community about your creation..."
+                placeholder="Tell the community about your creation... Use #hashtags and @mentions"
                 className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl min-h-[100px] resize-none"
                 maxLength={500}
               />
               <p className="text-white/50 text-sm mt-1">
-                {description.length}/500 characters
+                {description.length}/500 characters • Use #hashtags and @username for mentions
               </p>
+            </div>
+
+            {/* Location */}
+            <div>
+              <label className="text-white font-medium mb-2 block">Location (Optional)</label>
+              <Input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Where did you create this? (e.g., New York, Studio)"
+                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                maxLength={100}
+              />
             </div>
 
             {/* File Upload */}

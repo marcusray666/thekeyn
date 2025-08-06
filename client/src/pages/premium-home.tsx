@@ -1,96 +1,26 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-// Navigation is now handled at the App level
-import { PostCard } from "@/components/premium/post-card";
+import { CommunityPostCard } from "@/components/premium/community-post-card";
 import { Plus, MessageCircle, TrendingUp, Clock, Users } from "lucide-react";
 import { Link } from "wouter";
 
 
 export default function PremiumHome() {
+  // Get current user data
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/user"],
+    queryFn: () => apiRequest("/api/auth/user"),
+    retry: false,
+  });
 
-  // Fetch community posts (public posts shared by users)
+  // Fetch community posts (real data from API)
   const { data: communityPosts = [], isLoading } = useQuery({
     queryKey: ["/api/community/posts"],
     queryFn: () => apiRequest("/api/community/posts"),
   });
 
-  // Mock community posts for now (will be replaced with real API data)
-  const mockCommunityPosts = [
-    {
-      id: 1,
-      title: "Digital Art Collection #1",
-      filename: "abstract_art.jpg",
-      creatorName: "CreativePro",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      sha256Hash: "a1b2c3d4e5f6789012345678901234567890abcdef",
-      mimeType: "image/jpeg",
-      isVerified: true,
-      isProtected: true,
-      likesCount: 42,
-      commentsCount: 8,
-      description: "Abstract digital artwork exploring color theory and emotion"
-    },
-    {
-      id: 2,
-      title: "Original Music Track",
-      filename: "beat_drop.mp3",
-      creatorName: "SoundMaster",
-      createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      sha256Hash: "b2c3d4e5f6789012345678901234567890abcdef1",
-      mimeType: "audio/mpeg",
-      isVerified: true,
-      isProtected: false,
-      likesCount: 156,
-      commentsCount: 23,
-      description: "Electronic beat with complex layering and unique drops"
-    },
-    {
-      id: 3,
-      title: "Photography Series: Urban Nights",
-      filename: "urban_nights_01.jpg",
-      creatorName: "NightLens",
-      createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      sha256Hash: "c3d4e5f6789012345678901234567890abcdef12",
-      mimeType: "image/jpeg",
-      isVerified: true,
-      isProtected: true,
-      likesCount: 89,
-      commentsCount: 15,
-      description: "Capturing the essence of city life after dark"
-    },
-    {
-      id: 4,
-      title: "3D Animation: Cosmic Journey",
-      filename: "cosmic_journey.mp4",
-      creatorName: "DigitalVoyager",
-      createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-      sha256Hash: "d4e5f6789012345678901234567890abcdef123",
-      mimeType: "video/mp4",
-      isVerified: true,
-      isProtected: false,
-      likesCount: 234,
-      commentsCount: 31,
-      description: "3D animation exploring space and time through visual storytelling"
-    },
-    {
-      id: 5,
-      title: "Indie Folk Album",
-      filename: "autumn_whispers.mp3",
-      creatorName: "AcousticSoul",
-      createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-      sha256Hash: "e5f6789012345678901234567890abcdef1234",
-      mimeType: "audio/mpeg",
-      isVerified: true,
-      isProtected: true,
-      likesCount: 178,
-      commentsCount: 42,
-      description: "Heartfelt indie folk songs about change and growth"
-    }
-  ];
-
-  // Use real community posts if available, otherwise show mock posts
-  const allPosts = communityPosts.length > 0 ? communityPosts : mockCommunityPosts;
+  // Use real API data only
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">
@@ -119,16 +49,28 @@ export default function PremiumHome() {
                 <p className="text-white/60 text-sm">Loading your feed...</p>
               </div>
             </div>
+          ) : communityPosts.length === 0 ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
+                  <Plus className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-white font-semibold text-xl mb-2">Welcome to the Community</h3>
+                <p className="text-white/60 text-sm mb-4">Be the first to share your creative work!</p>
+                <Link href="/create-post">
+                  <button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity">
+                    Create Your First Post
+                  </button>
+                </Link>
+              </div>
+            </div>
           ) : (
-            <div className="space-y-8">
-              {allPosts.map((post) => (
-                <PostCard
-                  key={`${post.id}-${post.creatorName || 'user'}`}
+            <div className="space-y-6">
+              {communityPosts.map((post) => (
+                <CommunityPostCard
+                  key={post.id}
                   post={post}
-                  onDetailsClick={() => {
-                    // Open post details modal
-                    console.log('Open details for:', post);
-                  }}
+                  currentUserId={currentUser?.id}
                 />
               ))}
             </div>

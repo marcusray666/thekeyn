@@ -207,32 +207,49 @@ export type InsertNftMint = z.infer<typeof insertNftMintSchema>;
 export const posts = pgTable("posts", {
   id: text("id").primaryKey().notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
   filename: text("filename"),
   fileType: text("file_type"), // 'image', 'audio', 'video', etc.
   mimeType: text("mime_type"),
   fileSize: integer("file_size"),
+  hashtags: text("hashtags").array().default([]), // Hashtag functionality
+  location: text("location"), // Location where photo/content was created
+  mentionedUsers: text("mentioned_users").array().default([]), // User mentions
+  isProtected: boolean("is_protected").default(false), // For shared protected works
+  protectedWorkId: integer("protected_work_id").references(() => works.id), // Reference to protected work if shared
   tags: text("tags").array().default([]),
   likes: integer("likes").default(0),
   comments: integer("comments").default(0),
   shares: integer("shares").default(0),
+  views: integer("views").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertPostSchema = createInsertSchema(posts).pick({
+  title: true,
+  description: true,
   content: true,
   imageUrl: true,
   filename: true,
   fileType: true,
   mimeType: true,
   fileSize: true,
+  hashtags: true,
+  location: true,
+  mentionedUsers: true,
+  isProtected: true,
+  protectedWorkId: true,
   tags: true,
 });
 
 export type Post = typeof posts.$inferSelect & {
   username: string;
+  displayName?: string;
+  profileImageUrl?: string;
   userEmail?: string;
   isLiked?: boolean;
 };

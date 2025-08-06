@@ -550,21 +550,50 @@ export class DatabaseStorage implements IStorage {
       .values({
         id: postId,
         userId: postData.userId,
+        title: postData.title,
+        description: postData.description,
         content: postData.content,
         imageUrl: postData.imageUrl,
         filename: postData.filename,
         fileType: postData.fileType,
         mimeType: postData.mimeType,
         fileSize: postData.fileSize,
+        hashtags: postData.hashtags || [],
+        location: postData.location,
+        mentionedUsers: postData.mentionedUsers || [],
+        isProtected: postData.isProtected || false,
+        protectedWorkId: postData.protectedWorkId,
         tags: postData.tags || [],
       })
       .returning();
+    
+    // Send notifications to mentioned users
+    if (postData.mentionedUsers && postData.mentionedUsers.length > 0) {
+      for (const mentionedUsername of postData.mentionedUsers) {
+        const mentionedUser = await this.getUserByUsername(mentionedUsername);
+        if (mentionedUser && mentionedUser.id !== postData.userId) {
+          await this.createNotification({
+            userId: mentionedUser.id,
+            type: 'mention',
+            title: 'You were mentioned in a post',
+            content: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content.substring(0, 50)}..."`,
+            data: {
+              postId: postId,
+              mentionedBy: postData.userId,
+              postTitle: postData.title
+            }
+          });
+        }
+      }
+    }
     
     // Get user info to complete Post type
     const user = await this.getUser(postData.userId);
     return {
       ...post,
       username: user?.username || 'unknown',
+      displayName: user?.displayName,
+      profileImageUrl: user?.profileImageUrl,
     };
   }
 
@@ -575,19 +604,29 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: posts.id,
         userId: posts.userId,
+        title: posts.title,
+        description: posts.description,
         content: posts.content,
         imageUrl: posts.imageUrl,
         filename: posts.filename,
         fileType: posts.fileType,
         mimeType: posts.mimeType,
         fileSize: posts.fileSize,
+        hashtags: posts.hashtags,
+        location: posts.location,
+        mentionedUsers: posts.mentionedUsers,
+        isProtected: posts.isProtected,
+        protectedWorkId: posts.protectedWorkId,
         tags: posts.tags,
         likes: posts.likes,
         comments: posts.comments,
         shares: posts.shares,
+        views: posts.views,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
         isLiked: sql<boolean>`EXISTS (
           SELECT 1 FROM ${postReactions} 
           WHERE ${postReactions.postId} = ${posts.id} 
@@ -667,6 +706,82 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedPost;
+  }
+
+  async searchPostsByHashtag(hashtag: string): Promise<(Post & { username: string })[]> {
+    const results = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        title: posts.title,
+        description: posts.description,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        filename: posts.filename,
+        fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
+        hashtags: posts.hashtags,
+        location: posts.location,
+        mentionedUsers: posts.mentionedUsers,
+        isProtected: posts.isProtected,
+        protectedWorkId: posts.protectedWorkId,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        views: posts.views,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(sql`${hashtag.toLowerCase()} = ANY(${posts.hashtags})`)
+      .orderBy(desc(posts.createdAt))
+      .limit(50);
+    
+    return results as (Post & { username: string })[];
+  }
+
+  async getPostsByLocation(location: string): Promise<(Post & { username: string })[]> {
+    const results = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        title: posts.title,
+        description: posts.description,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        filename: posts.filename,
+        fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
+        hashtags: posts.hashtags,
+        location: posts.location,
+        mentionedUsers: posts.mentionedUsers,
+        isProtected: posts.isProtected,
+        protectedWorkId: posts.protectedWorkId,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        views: posts.views,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(ilike(posts.location, `%${location}%`))
+      .orderBy(desc(posts.createdAt))
+      .limit(50);
+    
+    return results as (Post & { username: string })[];
   }
 
   async deletePost(id: string, userId: number): Promise<void> {

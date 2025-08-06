@@ -4463,6 +4463,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community Posts Routes
+  const postUpload = multer({
+    dest: "uploads/",
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    fileFilter: (req, file, cb) => {
+      // Allow all media types for community posts
+      const allowedMimes = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml',
+        'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm',
+        'audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/aac', 'audio/ogg', 'audio/flac',
+        'application/pdf', 'text/plain',
+        'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      
+      if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error(`File type ${file.mimetype} not allowed for community posts`));
+      }
+    }
+  });
+
+  // Create community post
+  app.post("/api/community/posts", requireAuth, postUpload.single("file"), async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      const { title, description, location } = req.body;
+      
+      if (!title || !title.trim()) {
+        return res.status(400).json({ error: "Title is required" });
+      }
+
+      // Process hashtags from title and description
+      const extractHashtags = (text: string): string[] => {
+        const hashtagRegex = /#(\w+)/g;
+        const matches = [];
+        let match;
+        while ((match = hashtagRegex.exec(text)) !== null) {
+          matches.push(match[1].toLowerCase());
+        }
+        return [...new Set(matches)]; // Remove duplicates
+      };
+
+      // Process user mentions from title and description
+      const extractMentions = (text: string): string[] => {
+        const mentionRegex = /@(\w+)/g;
+        const matches = [];
+        let match;
+        while ((match = mentionRegex.exec(text)) !== null) {
+          matches.push(match[1]);
+        }
+        return [...new Set(matches)]; // Remove duplicates
+      };
+
+      const fullText = `${title} ${description || ''}`;
+      const hashtags = extractHashtags(fullText);
+      const mentions = extractMentions(fullText);
+
+      let imageUrl = null;
+      let fileType = null;
+      let filename = null;
+      let mimeType = null;
+      let fileSize = null;
+
+      if (req.file) {
+        imageUrl = `/api/files/${req.file.filename}`;
+        filename = req.file.filename;
+        mimeType = req.file.mimetype;
+        fileSize = req.file.size;
+        
+        // Determine file type category
+        if (mimeType.startsWith('image/')) fileType = 'image';
+        else if (mimeType.startsWith('video/')) fileType = 'video';
+        else if (mimeType.startsWith('audio/')) fileType = 'audio';
+        else if (mimeType === 'application/pdf') fileType = 'pdf';
+        else if (mimeType.startsWith('text/')) fileType = 'text';
+        else fileType = 'document';
+      }
+
+      const post = await storage.createPost({
+        userId,
+        title: title.trim(),
+        description: description?.trim(),
+        content: title.trim(), // Use title as content for now
+        imageUrl,
+        filename,
+        fileType,
+        mimeType,
+        fileSize,
+        hashtags,
+        location: location || null,
+        mentionedUsers: mentions,
+        isProtected: false, // Community posts are public
+        tags: hashtags, // Also store as tags for compatibility
+      });
+
+      res.json(post);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      res.status(500).json({ error: "Failed to create post" });
+    }
+  });
+
+  // Get community posts (feed)
+  app.get("/api/community/posts", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      const currentUserId = req.session?.userId;
+      
+      const posts = await storage.getPosts({ 
+        userId, 
+        limit, 
+        offset, 
+        currentUserId 
+      });
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).json({ error: "Failed to fetch posts" });
+    }
+  });
+
+  // Get single post
+  app.get("/api/community/posts/:id", async (req, res) => {
+    try {
+      const post = await storage.getPost(req.params.id);
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching post:", error);
+      res.status(500).json({ error: "Failed to fetch post" });
+    }
+  });
+
+  // Like/unlike post
+  app.post("/api/community/posts/:id/like", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      const postId = req.params.id;
+      
+      await storage.likePost(userId, postId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error liking post:", error);
+      res.status(500).json({ error: "Failed to like post" });
+    }
+  });
+
+  // Delete post
+  app.delete("/api/community/posts/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.session!.userId;
+      const postId = req.params.id;
+      
+      await storage.deletePost(postId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
