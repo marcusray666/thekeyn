@@ -344,6 +344,42 @@ export default function setupAdminRoutes(app: Express) {
     }
   });
 
+  // Get all content/works
+  app.get("/api/admin/content", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const works = await storage.getAllWorks();
+      res.json(works);
+    } catch (error) {
+      console.error("Failed to get content:", error);
+      res.status(500).json({ error: "Failed to get content" });
+    }
+  });
+
+  // Delete content
+  app.delete("/api/admin/content/:workId/delete", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const workId = parseInt(req.params.workId);
+      
+      await storage.deleteWork(workId);
+      
+      // Log admin action
+      await storage.createAdminAuditLog({
+        adminId: req.session!.userId!,
+        action: 'content_deleted',
+        targetType: 'work',
+        targetId: workId.toString(),
+        details: JSON.stringify({ reason: 'Admin deletion' }),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      res.json({ success: true, message: 'Content deleted successfully' });
+    } catch (error) {
+      console.error("Failed to delete content:", error);
+      res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
+
   // Get pending moderation works
   app.get("/api/admin/moderation/pending", requireAdmin, async (req: Request, res: Response) => {
     try {

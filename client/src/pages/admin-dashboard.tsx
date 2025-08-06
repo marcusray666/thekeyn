@@ -28,6 +28,11 @@ import {
   Globe,
   Check,
   X,
+  File,
+  Music,
+  Trash2,
+  Video as VideoIcon,
+  UserX,
 } from "lucide-react";
 
 interface SystemMetrics {
@@ -168,6 +173,12 @@ export default function AdminDashboard() {
     enabled: selectedTab === "audit",
   });
 
+  // Fetch all content/works
+  const { data: allWorks, isLoading: worksLoading, refetch: refetchWorks } = useQuery<any[]>({
+    queryKey: ["/api/admin/content"],
+    enabled: selectedTab === "content",
+  });
+
   const handleUserAction = async (userId: number, action: string, reason?: string) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}/${action}`, {
@@ -256,6 +267,25 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error(`Failed to execute system action ${action}:`, error);
       alert(`Failed to execute ${action}. Please try again.`);
+    }
+  };
+
+  const handleContentAction = async (workId: number, action: string) => {
+    try {
+      const response = await fetch(`/api/admin/content/${workId}/${action}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (response.ok) {
+        refetchWorks();
+        alert('Content deleted successfully');
+      } else {
+        alert('Failed to delete content');
+      }
+    } catch (error) {
+      console.error(`Failed to ${action} content:`, error);
+      alert(`Failed to ${action} content. Please try again.`);
     }
   };
 
@@ -824,6 +854,118 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="text-center py-8 text-yellow-300/80">
                     No users found matching the current filters.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Content Tab */}
+          <TabsContent value="content" className="space-y-6">
+            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-[#FE3F5E]">Content Management</CardTitle>
+                <CardDescription className="text-white/60">View and manage all uploaded works and certificates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {worksLoading ? (
+                  <div className="space-y-3">
+                    <div className="text-center py-4 text-[#FFD200]">Loading content...</div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-16 bg-gray-700/50 rounded animate-pulse"></div>
+                    ))}
+                  </div>
+                ) : allWorks && allWorks.length > 0 ? (
+                  <div className="space-y-3">
+                    {allWorks.map((work) => (
+                      <div key={work.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-xl flex items-center justify-center">
+                              {work.mimeType?.startsWith('image/') ? <Eye className="h-6 w-6 text-white" /> : 
+                               work.mimeType?.startsWith('video/') ? <VideoIcon className="h-6 w-6 text-white" /> :
+                               work.mimeType?.startsWith('audio/') ? <Music className="h-6 w-6 text-white" /> :
+                               <File className="h-6 w-6 text-white" />}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-white">{work.title}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {work.status || 'uploaded'}
+                                </Badge>
+                                {work.blockchainTxHash && (
+                                  <Badge variant="secondary" className="text-xs bg-green-600/20 text-green-300">
+                                    Blockchain Verified
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-white/60 mb-1">By: {work.creatorName || work.username}</p>
+                              <div className="flex items-center gap-4 text-xs text-white/40">
+                                <span>Size: {formatBytes(work.fileSize || 0)}</span>
+                                <span>Type: {work.mimeType}</span>
+                                <span>Uploaded: {new Date(work.createdAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/5 border-white/20 text-blue-400 hover:bg-white/10 backdrop-blur-xl rounded-xl"
+                              onClick={() => window.open(`/certificate/${work.id}`, '_blank')}
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </Button>
+                            {work.filename && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="bg-white/5 border-white/20 text-green-400 hover:bg-white/10 backdrop-blur-xl rounded-xl"
+                                onClick={() => window.open(`/uploads/${work.filename}`, '_blank')}
+                              >
+                                <Download className="h-4 w-4" />
+                                File
+                              </Button>
+                            )}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="bg-red-600/20 border-red-500/50 text-red-300 hover:bg-red-500/30 backdrop-blur-xl rounded-xl"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-gray-800 border-gray-700">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Content</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently delete "{work.title}" and its certificate. This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    className="bg-red-600 hover:bg-red-700"
+                                    onClick={() => handleContentAction(work.id, 'delete')}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-white/40">
+                    <Eye className="h-12 w-12 mx-auto mb-4 text-white/20" />
+                    <p>No content uploaded yet</p>
+                    <p className="text-sm">Users haven't uploaded any works or certificates to the platform.</p>
                   </div>
                 )}
               </CardContent>
