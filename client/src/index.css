@@ -172,12 +172,33 @@
     background: rgba(255, 255, 255, 0.05) !important;
   }
   
-  /* Ensure all content areas are dark */
+  /* Force all post cards to be dark glassmorphic */
   .feed-container .space-y-6 > div,
   .max-w-2xl > div,
-  .mx-auto > div {
+  .mx-auto > div,
+  .post-card,
+  div[class*="rounded-3xl"],
+  div[class*="bg-white"] {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  
+  /* Make sure all text on cards is white */
+  .post-card * {
+    color: #FFFFFF !important;
+  }
+  
+  /* Navigation logo text visibility */
+  nav span[class*="text-2xl"], .text-2xl {
+    color: #FFFFFF !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Loggin text specific */
+  a span, nav span {
+    color: #FFFFFF !important;
   }
   
   /* Dropdown menu styling */

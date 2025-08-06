@@ -177,7 +177,7 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a] backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a]/95 backdrop-blur-xl border border-white/30 rounded-2xl py-2 shadow-2xl z-50" style={{background: 'rgba(26, 26, 26, 0.95)', border: '1px solid rgba(255, 255, 255, 0.3)'}}>
               <Link href="/profile">
                 <div 
                   className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"

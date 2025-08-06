@@ -42,7 +42,17 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
   };
 
   return (
-    <div className="post-card bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6" style={{background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)'}} onClick={onDetailsClick}>
+    <div 
+      className="post-card bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6" 
+      style={{
+        background: 'rgba(255, 255, 255, 0.05) !important', 
+        border: '1px solid rgba(255, 255, 255, 0.1) !important',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        color: '#FFFFFF'
+      }} 
+      onClick={onDetailsClick}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div 
