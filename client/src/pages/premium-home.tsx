@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CommunityPostCard } from "@/components/premium/community-post-card";
 import { Plus, Users, Paintbrush, Sparkles, Zap, Crown, CheckCircle2 } from "lucide-react";
+import { LogoIcon } from "@/components/ui/logo-icon";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -142,7 +143,7 @@ function WelcomePage() {
         <header className="px-6 py-4 flex items-center justify-center">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
-              <Paintbrush className="h-4 w-4 text-white" />
+              <LogoIcon size="sm" className="text-white" />
             </div>
             <span className="text-white font-bold text-xl">Loggin'</span>
           </div>
@@ -208,7 +209,7 @@ function WelcomePage() {
                 outline: 'none'
               }}>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-xl flex items-center justify-center mb-6">
-                  <Paintbrush className="h-6 w-6 text-white" />
+                  <LogoIcon size="lg" className="text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-4">Blockchain Certificates</h3>
                 <p className="text-white/60 mb-6">
@@ -335,7 +336,7 @@ function WelcomePage() {
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
               <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
-                <Paintbrush className="h-4 w-4 text-white" />
+                <LogoIcon size="sm" className="text-white" />
               </div>
               <span className="text-white font-bold text-xl">Loggin'</span>
             </div>

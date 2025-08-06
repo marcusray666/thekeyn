@@ -34,6 +34,7 @@ import {
   Video as VideoIcon,
   UserX,
 } from "lucide-react";
+import { LogoIcon } from "@/components/ui/logo-icon";
 
 interface SystemMetrics {
   totalUsers: number;
@@ -337,7 +338,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Paintbrush className="h-8 w-8 text-[#FE3F5E]" />
+                <LogoIcon size="lg" className="text-[#FE3F5E]" />
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent">
                   Admin Dashboard
                 </h1>
