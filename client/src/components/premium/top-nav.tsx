@@ -1,9 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, Bell, MessageCircle, Upload } from "lucide-react";
+import { Search, Menu, Bell, MessageCircle, Upload, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
 export function TopNav() {
@@ -22,6 +22,15 @@ export function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  // Search users query
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ["/api/users/search", searchQuery],
+    queryFn: () => apiRequest(`/api/users/search?q=${encodeURIComponent(searchQuery)}`),
+    enabled: searchQuery.length >= 2,
+  });
   
   // Close menu when clicking outside
   useEffect(() => {
@@ -73,12 +82,64 @@ export function TopNav() {
           <input
             type="text"
             placeholder="Search creators, works..."
+            value={searchQuery}
             className="w-full bg-white/10 border border-white/20 rounded-full py-3 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-[#FE3F5E] transition-colors"
             onChange={(e) => {
-              // Search functionality would go here
-              console.log('Search:', e.target.value);
+              setSearchQuery(e.target.value);
+              setShowSearchResults(e.target.value.length >= 2);
+            }}
+            onFocus={() => {
+              if (searchQuery.length >= 2) {
+                setShowSearchResults(true);
+              }
+            }}
+            onBlur={() => {
+              // Delay hiding to allow clicks on results
+              setTimeout(() => setShowSearchResults(false), 200);
             }}
           />
+          
+          {/* Search Results Dropdown */}
+          {showSearchResults && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
+              <div className="p-3">
+                <div className="text-sm text-white/50 mb-3 px-2">Users</div>
+                {searchResults.map((user: any) => (
+                  <Link
+                    key={user.id}
+                    href={`/user/${user.id}`}
+                    className="flex items-center space-x-3 p-3 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                    onClick={() => {
+                      setShowSearchResults(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
+                      {user.profileImageUrl ? (
+                        <img src={user.profileImageUrl} alt={user.username} className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        <User className="h-5 w-5 text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-medium">{user.displayName || user.username}</div>
+                      <div className="text-white/50 text-sm">@{user.username}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* No Results */}
+          {showSearchResults && searchQuery.length >= 2 && searchResults.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50">
+              <div className="p-6 text-center">
+                <User className="h-8 w-8 text-white/30 mx-auto mb-2" />
+                <div className="text-white/50 text-sm">No users found for "{searchQuery}"</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

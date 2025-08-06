@@ -85,7 +85,7 @@ function Router() {
       <Route path="/blockchain-verification" component={BlockchainVerification} />
       <Route path="/social" component={Social} />
       <Route path="/messages" component={Messages} />
-      <Route path="/user/:userId" component={UserProfilePage} />
+      <Route path="/user/:userId" component={UserProfile} />
       <Route path="/followers" component={Followers} />
       <Route path="/share-demo" component={ShareDemo} />
       <Route path="/settings" component={PremiumSettings} />
