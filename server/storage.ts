@@ -152,7 +152,7 @@ export interface IStorage {
   searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
   findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null>;
   getUserProfile(userId: number, currentUserId: number): Promise<any | null>;
-  getUserWorks(userId: number): Promise<any[]>;
+  getUserWorks(userId: number): Promise<Work[]>;
   followUser(followerId: number, followingId: number): Promise<any>;
   unfollowUser(followerId: number, followingId: number): Promise<void>;
   discoverUsers(currentUserId: number): Promise<any[]>;
@@ -378,9 +378,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserWorks(userId: number): Promise<Work[]> {
-    return await db.select().from(works)
-      .where(eq(works.userId, userId))
-      .orderBy(desc(works.createdAt));
+    try {
+      const userWorks = await db.select().from(works)
+        .where(eq(works.userId, userId))
+        .orderBy(desc(works.createdAt));
+      
+      console.log(`Found ${userWorks.length} works for user ${userId}:`, userWorks.map(w => ({ id: w.id, title: w.title, certificateId: w.certificateId })));
+      return userWorks;
+    } catch (error) {
+      console.error("Error getting user works:", error);
+      return [];
+    }
   }
 
   async followUser(followerId: number, followingId: number): Promise<UserFollow> {
@@ -2229,26 +2237,13 @@ export class DatabaseStorage implements IStorage {
   async getUserWorks(userId: number): Promise<any[]> {
     try {
       const userWorks = await db
-        .select({
-          id: works.id,
-          title: works.title,
-          filename: works.filename,
-          thumbnailUrl: works.thumbnailUrl,
-          mimeType: works.mimeType,
-          createdAt: works.createdAt,
-          likes: sql`0`.as('likes'), // Simplified - would come from likes table
-          views: sql`0`.as('views'), // Simplified - would come from views table
-        })
+        .select()
         .from(works)
         .where(eq(works.userId, userId))
         .orderBy(desc(works.createdAt))
         .limit(20);
 
-      return userWorks.map(work => ({
-        ...work,
-        likes: Number(work.likes),
-        views: Number(work.views)
-      }));
+      return userWorks;
     } catch (error) {
       console.error("Error getting user works:", error);
       return [];
