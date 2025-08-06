@@ -4,26 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ULTIMATE BORDER ELIMINATION */
+/* Clean border reset */
 * {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  outline: 0 !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
+  border: none !important;
+  outline: none !important;
   box-shadow: none !important;
-}
-
-/* CSS VARIABLE OVERRIDE */
-:root {
-  --tw-border-opacity: 0 !important;
-  --tw-ring-opacity: 0 !important;
-  --tw-shadow: none !important;
-  --tw-ring-shadow: none !important;
-  --tw-shadow-colored: none !important;
-  --border: transparent !important;
-  --input: transparent !important;
 }
 
 /* Global border reset - highest priority but preserve input functionality */
