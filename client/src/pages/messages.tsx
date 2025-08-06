@@ -290,10 +290,10 @@ export default function Messages() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Button
-                      onClick={() => setSelectedConversation(null)}
+                      onClick={() => setLocation('/social')}
                       variant="ghost"
                       size="sm"
-                      className="text-white/70 hover:text-white hover:bg-white/10 md:hidden"
+                      className="text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10"
                     >
                       <ArrowLeft className="h-4 w-4" />
                     </Button>
