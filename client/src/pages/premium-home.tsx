@@ -167,12 +167,7 @@ export default function PremiumHome() {
         </div>
       </main>
 
-      {/* Floating Action Button */}
-      <Link href="/upload">
-        <button className="floating-action">
-          <Plus className="h-8 w-8" />
-        </button>
-      </Link>
+
 
       <BottomNav />
     </div>
