@@ -229,6 +229,22 @@ export function TopNav() {
                   <span style={{color: '#FFFFFF'}} className="font-medium">Certificate Guide</span>
                 </div>
               </Link>
+
+              {/* Admin Dashboard - Only for admin users */}
+              {(user as any)?.role === 'admin' && (
+                <>
+                  <div className="border-t border-white/10 my-2"></div>
+                  <Link href="/admin-dashboard">
+                    <div 
+                      className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="text-lg">🔧</span>
+                      <span style={{color: '#FE3F5E'}} className="font-medium">Admin Dashboard</span>
+                    </div>
+                  </Link>
+                </>
+              )}
               
               <div className="border-t border-white/10 my-2"></div>
               
