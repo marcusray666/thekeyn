@@ -160,14 +160,14 @@ function WelcomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register">
                 <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white px-8 py-4 text-lg font-semibold hover:opacity-90 transition-opacity">
-                  Start Protecting Your Work
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  Sign up to start protecting your work
                 </Button>
               </Link>
-              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg">
-                <Play className="mr-2 h-5 w-5" />
-                Watch Demo
-              </Button>
+              <Link href="/login">
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg">
+                  Sign In
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
