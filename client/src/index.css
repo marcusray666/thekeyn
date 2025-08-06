@@ -124,6 +124,26 @@
   * {
     @apply border-transparent;
   }
+  
+  /* Remove borders from containers but keep form elements */
+  div, section, article, header, footer, main, nav, aside,
+  .glass-morphism, .btn-glass, .glass-button, .post-card,
+  .bg-white\/5, .bg-white\/10, .rounded-3xl, .rounded-2xl,
+  [class*="bg-white/"], [class*="rounded-"], [class*="backdrop-blur"] {
+    border: none !important;
+  }
+  
+  /* Specifically target welcome page elements */
+  .bg-white\/5.rounded-2xl,
+  .bg-white\/5.backdrop-blur-sm,
+  section.bg-white\/5 {
+    border: none !important;
+  }
+  
+  /* Nuclear option - Remove ALL borders globally except form elements */
+  *:not(input):not(textarea):not(select):not(button[type="submit"]):not([role="button"]) {
+    border: none !important;
+  }
 
   /* Force dark theme globally - Instagram style */
   html,
@@ -218,7 +238,7 @@
   .light .bg-white\/5,
   .light-theme .bg-white\/5 {
     background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
     color: #FFFFFF !important;
   }
   
@@ -253,7 +273,7 @@
   .light .glass-card,
   .light .bg-white\/5 {
     background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
   }
   
   .light .text-white {
@@ -315,7 +335,7 @@
   .btn-glass {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
@@ -328,7 +348,7 @@
   .glass-morphism {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
@@ -346,7 +366,7 @@
   .modal-content {
     position: relative;
     background: var(--background);
-    border: 1px solid var(--border);
+    border: none;
     border-radius: 0.5rem;
     padding: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -361,20 +381,20 @@
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     border-radius: 12px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   }
 
   .light .glass-morphism {
     background-color: rgba(255, 255, 255, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: none;
     color: #1a1a1a;
   }
 
   .dark .glass-morphism {
     background-color: rgba(17, 25, 40, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    border: none;
     color: white;
   }
 
@@ -419,7 +439,7 @@
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: none;
   border-radius: 8px;
   color: #1a1a1a;
 }
@@ -434,7 +454,7 @@
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   border-radius: 8px;
   color: white;
 }
@@ -500,20 +520,20 @@
 .light-theme .btn-glass {
   background: rgba(255, 255, 255, 0.8);
   color: #1a1a1a !important;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: none;
   backdrop-filter: blur(8px);
 }
 
 .light-theme .btn-glass:hover {
   background: rgba(255, 255, 255, 0.9);
   color: #1a1a1a !important;
-  border-color: rgba(0, 0, 0, 0.15);
+  border: none;
 }
 
 .light-theme .glass-button {
   background: rgba(255, 255, 255, 0.8);
   color: #1a1a1a !important;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
 .light-theme .glass-button:hover {
@@ -524,7 +544,7 @@
 /* Light theme navigation */
 .light-theme nav {
   background: rgba(255, 255, 255, 0.98) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-bottom: none !important;
   backdrop-filter: blur(20px);
 }
 
@@ -543,7 +563,7 @@
 /* Light theme cards and components */
 .light-theme .bg-white\/5 {
   background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border: none !important;
 }
 
 .light-theme .border-white\/10 {
@@ -600,7 +620,7 @@
 /* Light theme dropdowns and modals */
 .light-theme .bg-gray-800 {
   background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
 }
 
 .light-theme .border-gray-700 {
@@ -614,7 +634,7 @@
 /* Light theme specific component overrides */
 .light-theme [data-radix-popper-content-wrapper] {
   background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -669,28 +689,28 @@
 /* Light theme glass variants */
 .light-theme .glass-purple {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  border: none;
   backdrop-filter: blur(16px);
   box-shadow: 0 2px 16px rgba(124, 58, 237, 0.08);
 }
 
 .light-theme .glass-blue {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  border: none;
   backdrop-filter: blur(16px);
   box-shadow: 0 2px 16px rgba(59, 130, 246, 0.08);
 }
 
 .light-theme .glass-cyan {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(6, 182, 212, 0.15);
+  border: none;
   backdrop-filter: blur(16px);
   box-shadow: 0 2px 16px rgba(6, 182, 212, 0.08);
 }
 
 .light-theme .glass-emerald {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  border: none;
   backdrop-filter: blur(16px);
   box-shadow: 0 2px 16px rgba(16, 185, 129, 0.08);
 }
@@ -1399,12 +1419,12 @@ select:focus-visible {
 @media (prefers-contrast: high) {
   .glass-morphism {
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: none;
   }
   
   .glass-input {
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: none;
   }
 }
 /* Onboarding highlight styles - ONLY apply when .onboarding-active is present */
