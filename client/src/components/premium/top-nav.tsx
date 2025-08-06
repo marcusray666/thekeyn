@@ -177,14 +177,14 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a] backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50">
               <Link href="/profile">
                 <div 
                   className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">👤</span>
-                  <span className="text-white font-medium">Profile</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">Profile</span>
                 </div>
               </Link>
               
@@ -196,7 +196,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">🛡️</span>
-                  <span className="text-white font-medium">My Certificates</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">My Certificates</span>
                 </div>
               </Link>
               
@@ -206,7 +206,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">📊</span>
-                  <span className="text-white font-medium">Analytics</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">Analytics</span>
                 </div>
               </Link>
               
@@ -216,7 +216,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⛓️</span>
-                  <span className="text-white font-medium">Blockchain Verification</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">Blockchain Verification</span>
                 </div>
               </Link>
               
@@ -226,7 +226,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">📖</span>
-                  <span className="text-white font-medium">Certificate Guide</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">Certificate Guide</span>
                 </div>
               </Link>
               
@@ -238,7 +238,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⚙️</span>
-                  <span className="text-white font-medium">Settings</span>
+                  <span style={{color: '#FFFFFF'}} className="font-medium">Settings</span>
                 </div>
               </Link>
               
@@ -248,10 +248,10 @@ export function TopNav() {
                     setIsMenuOpen(false);
                     logoutMutation.mutate();
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors text-red-400 flex items-center space-x-3"
+                  className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors flex items-center space-x-3"
                 >
                   <span className="text-lg">🚪</span>
-                  <span>Sign Out</span>
+                  <span style={{color: '#FF6B6B'}} className="font-medium">Sign Out</span>
                 </button>
               </div>
             </div>

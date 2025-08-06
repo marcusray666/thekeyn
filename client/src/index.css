@@ -157,6 +157,12 @@
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
   
+  /* Dropdown menu styling */
+  .absolute.right-0.top-full span,
+  .absolute.right-0.top-full div {
+    color: #FFFFFF !important;
+  }
+  
   /* Light theme override for testing */
   .light body,
   .light #root {
