@@ -10,14 +10,14 @@ import { Link } from "wouter";
 
 export default function PremiumHome() {
 
-  // Fetch user's protected works to display as feed
-  const { data: works = [], isLoading } = useQuery({
-    queryKey: ["/api/works"],
-    queryFn: () => apiRequest("/api/works"),
+  // Fetch community posts (public posts shared by users)
+  const { data: communityPosts = [], isLoading } = useQuery({
+    queryKey: ["/api/community/posts"],
+    queryFn: () => apiRequest("/api/community/posts"),
   });
 
-  // Community posts for feed (not showing user's certificates)
-  const communityPosts = [
+  // Mock community posts for now (will be replaced with real API data)
+  const mockCommunityPosts = [
     {
       id: 1,
       title: "Digital Art Collection #1",
@@ -27,6 +27,7 @@ export default function PremiumHome() {
       sha256Hash: "a1b2c3d4e5f6789012345678901234567890abcdef",
       mimeType: "image/jpeg",
       isVerified: true,
+      isProtected: true,
       likesCount: 42,
       commentsCount: 8,
       description: "Abstract digital artwork exploring color theory and emotion"
@@ -40,6 +41,7 @@ export default function PremiumHome() {
       sha256Hash: "b2c3d4e5f6789012345678901234567890abcdef1",
       mimeType: "audio/mpeg",
       isVerified: true,
+      isProtected: false,
       likesCount: 156,
       commentsCount: 23,
       description: "Electronic beat with complex layering and unique drops"
@@ -53,6 +55,7 @@ export default function PremiumHome() {
       sha256Hash: "c3d4e5f6789012345678901234567890abcdef12",
       mimeType: "image/jpeg",
       isVerified: true,
+      isProtected: true,
       likesCount: 89,
       commentsCount: 15,
       description: "Capturing the essence of city life after dark"
@@ -66,6 +69,7 @@ export default function PremiumHome() {
       sha256Hash: "d4e5f6789012345678901234567890abcdef123",
       mimeType: "video/mp4",
       isVerified: true,
+      isProtected: false,
       likesCount: 234,
       commentsCount: 31,
       description: "3D animation exploring space and time through visual storytelling"
@@ -79,14 +83,15 @@ export default function PremiumHome() {
       sha256Hash: "e5f6789012345678901234567890abcdef1234",
       mimeType: "audio/mpeg",
       isVerified: true,
+      isProtected: true,
       likesCount: 178,
       commentsCount: 42,
       description: "Heartfelt indie folk songs about change and growth"
     }
   ];
 
-  // Display only community posts in the main feed
-  const allPosts = communityPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // Use real community posts if available, otherwise show mock posts
+  const allPosts = communityPosts.length > 0 ? communityPosts : mockCommunityPosts;
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">

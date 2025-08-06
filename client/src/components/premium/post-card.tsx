@@ -9,12 +9,14 @@ interface PostCardProps {
     filename: string;
     creatorName: string;
     createdAt: string;
-    sha256Hash: string;
+    sha256Hash?: string;
     mimeType: string;
     thumbnailUrl?: string;
     isVerified: boolean;
+    isProtected?: boolean;
     likesCount?: number;
     commentsCount?: number;
+    description?: string;
   };
   onDetailsClick?: () => void;
 }
@@ -51,12 +53,19 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
             <p className="text-white/50 text-sm">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
-        {post.isVerified && (
-          <div className="verification-badge">
-            <Shield className="h-3 w-3" />
-            <span>Verified</span>
-          </div>
-        )}
+        <div className="flex items-center space-x-2">
+          {post.isProtected && (
+            <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
+              <span className="text-white text-xs font-semibold">PROTECTED</span>
+            </div>
+          )}
+          {post.isVerified && (
+            <div className="verification-badge">
+              <Shield className="h-3 w-3" />
+              <span>Verified</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content Preview */}
@@ -65,9 +74,14 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
           <div className="text-4xl">{getFileIcon()}</div>
           <div className="flex-1">
             <h4 className="text-white font-medium truncate">{post.title || post.filename}</h4>
-            <p className="text-white/50 text-sm font-mono truncate">
-              {post.sha256Hash.substring(0, 16)}...
-            </p>
+            {post.description && (
+              <p className="text-white/70 text-sm mt-1">{post.description}</p>
+            )}
+            {post.sha256Hash && (
+              <p className="text-white/50 text-sm font-mono truncate">
+                {post.sha256Hash.substring(0, 16)}...
+              </p>
+            )}
           </div>
         </div>
       </div>

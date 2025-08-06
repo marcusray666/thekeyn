@@ -553,6 +553,24 @@ export const follows = pgTable("follows", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Community posts table - for posts shared to the public feed
+export const communityPosts = pgTable("community_posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workId: integer("work_id").references(() => works.id), // Optional - if sharing protected work
+  title: text("title").notNull(),
+  description: text("description"),
+  filename: text("filename"),
+  mimeType: text("mime_type"),
+  isProtected: boolean("is_protected").default(false), // True if shared from protected works
+  likesCount: integer("likes_count").default(0),
+  commentsCount: integer("comments_count").default(0),
+  shareCount: integer("share_count").default(0),
+  viewCount: integer("view_count").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const likes = pgTable("likes", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),

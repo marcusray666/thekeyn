@@ -1,4 +1,4 @@
-import { Download, Share2, QrCode, ExternalLink } from "lucide-react";
+import { Download, Share2, QrCode, ExternalLink, Users } from "lucide-react";
 import { GlassCard } from "./glass-card";
 import { Button } from "./button";
 import type { Work, Certificate } from "@shared/schema";
@@ -6,9 +6,10 @@ import type { Work, Certificate } from "@shared/schema";
 interface CertificateCardProps {
   work: Work;
   certificate?: Certificate;
+  onShareToCommunity?: () => void;
 }
 
-export function CertificateCard({ work, certificate }: CertificateCardProps) {
+export function CertificateCard({ work, certificate, onShareToCommunity }: CertificateCardProps) {
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -80,7 +81,18 @@ export function CertificateCard({ work, certificate }: CertificateCardProps) {
                 {work.blockchainHash}
               </p>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 flex-wrap">
+              {onShareToCommunity && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white border-0 hover:from-[#FE3F5E]/80 hover:to-[#FF6B8A]/80"
+                  onClick={onShareToCommunity}
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  Share to Community
+                </Button>
+              )}
               {certificate?.qrCode && (
                 <Button
                   variant="outline"

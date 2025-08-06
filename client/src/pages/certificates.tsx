@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tag as CertificateIcon, Search, Filter } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { CertificateCard } from "@/components/ui/certificate-card";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import type { Work, Tag } from "@shared/schema";
 
 interface WorkWithCertificate {
@@ -14,6 +16,34 @@ interface WorkWithCertificate {
 
 export default function Certificates() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const shareToCommunityMutation = useMutation({
+    mutationFn: (workId: number) => 
+      apiRequest("/api/community/share", {
+        method: "POST",
+        body: { workId }
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Shared to Community",
+        description: "Your protected work has been shared to the community feed with PROTECTED marking."
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+    },
+    onError: () => {
+      toast({
+        title: "Share Failed",
+        description: "Unable to share to community. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleShareToCommunity = (workId: number) => {
+    shareToCommunityMutation.mutate(workId);
+  };
   
   const { data: works, isLoading: worksLoading } = useQuery<Work[]>({
     queryKey: ["/api/works"],
@@ -93,7 +123,8 @@ export default function Certificates() {
               <CertificateCard 
                 key={work.id} 
                 work={work} 
-                certificate={certificate} 
+                certificate={certificate}
+                onShareToCommunity={() => handleShareToCommunity(work.id)}
               />
             ))}
           </div>

@@ -1870,6 +1870,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community posts API
+  app.get("/api/community/posts", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Get all public community posts (not private certificates)
+      // For now, return empty array since we need to implement community post storage
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+      res.status(500).json({ error: "Failed to fetch community posts" });
+    }
+  });
+
+  // Share protected work to community
+  app.post("/api/community/share", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { workId, description } = req.body;
+      
+      if (!workId) {
+        return res.status(400).json({ error: "Work ID is required" });
+      }
+
+      // Get the work from user's certificates
+      const work = await storage.getWork(workId);
+      if (!work || work.userId !== userId) {
+        return res.status(404).json({ error: "Work not found or access denied" });
+      }
+
+      // Create community post entry (simplified for now)
+      const communityPost = {
+        id: Date.now(),
+        workId: work.id,
+        userId,
+        username: req.user!.username,
+        title: work.originalName,
+        description: description || work.description || "Shared from protected works",
+        isProtected: true, // Mark as protected work
+        createdAt: new Date().toISOString(),
+        likesCount: 0,
+        commentsCount: 0
+      };
+      
+      // In a real implementation, you'd store this in a community_posts table
+      console.log('Community post created:', communityPost);
+      
+      res.json(communityPost);
+    } catch (error) {
+      console.error("Error sharing to community:", error);
+      res.status(500).json({ error: "Failed to share to community" });
+    }
+  });
+
   // Get user recent activity
   app.get("/api/user/activity", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
