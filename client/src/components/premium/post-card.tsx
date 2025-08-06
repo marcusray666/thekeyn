@@ -59,11 +59,11 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
         >
           <div className="creator-avatar">
             <div className="avatar-inner">
-              {post.creatorName.charAt(0).toUpperCase()}
+              {(post.creatorName || post.username || "U").charAt(0).toUpperCase()}
             </div>
           </div>
           <div>
-            <h3 className="text-white font-semibold hover:text-[#FE3F5E] transition-colors">{post.creatorName}</h3>
+            <h3 className="text-white font-semibold hover:text-[#FE3F5E] transition-colors">{post.creatorName || post.username || "Unknown User"}</h3>
             <p className="text-white/50 text-sm">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
