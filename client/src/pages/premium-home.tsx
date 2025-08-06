@@ -17,7 +17,20 @@ export default function PremiumHome() {
   // Fetch community posts (real data from API) - always call hooks at top level
   const { data: communityPosts = [], isLoading, error } = useQuery({
     queryKey: ["/api/community/posts"],
-    queryFn: () => apiRequest("/api/community/posts"),
+    queryFn: async () => {
+      const response = await fetch("/api/community/posts", {
+        credentials: "include", // Include session cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     enabled: !!currentUser, // Only fetch when user is authenticated
     retry: 1,
   });
