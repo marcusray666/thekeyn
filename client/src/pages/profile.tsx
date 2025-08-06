@@ -58,13 +58,19 @@ export default function UserProfilePage() {
   const queryClient = useQueryClient();
   
   const userId = params?.userId ? parseInt(params.userId) : null;
+  
+  // Debug: Log the route params
+  console.log("Profile route params:", { match, params, userId });
   const isOwnProfile = currentUser && userId === currentUser.id;
 
   // Fetch user profile
-  const { data: profile, isLoading: loadingProfile } = useQuery<UserProfile>({
-    queryKey: ["/api/users", userId],
+  const { data: profile, isLoading: loadingProfile, error } = useQuery<UserProfile>({
+    queryKey: [`/api/users/${userId}`],
     enabled: !!userId,
   });
+  
+  // Debug: Log query state
+  console.log("Profile query state:", { userId, profile, loadingProfile, error });
 
   // Fetch user works
   const { data: works, isLoading: loadingWorks } = useQuery<UserWork[]>({

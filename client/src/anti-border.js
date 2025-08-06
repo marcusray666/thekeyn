@@ -1,35 +1,31 @@
-// Anti-border runtime injection - executed after all CSS loads
+// Ultra-aggressive border removal
 (function() {
-  function removeBorders() {
-    // Get all elements
-    const allElements = document.querySelectorAll('*');
-    
-    // Override computed styles
-    allElements.forEach(el => {
-      if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && el.tagName !== 'SELECT') {
-        el.style.setProperty('border', 'none', 'important');
-        el.style.setProperty('outline', 'none', 'important');
+  function nukeBorders() {
+    const all = document.querySelectorAll('*');
+    all.forEach(el => {
+      if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) {
+        el.style.setProperty('border', '0px solid transparent', 'important');
+        el.style.setProperty('border-width', '0px', 'important');
+        el.style.setProperty('border-style', 'none', 'important');
+        el.style.setProperty('outline', '0px solid transparent', 'important');
+        el.style.setProperty('outline-width', '0px', 'important');
+        el.style.setProperty('outline-style', 'none', 'important');
         el.style.setProperty('box-shadow', 'none', 'important');
         
-        // Also override any CSS variables
-        const computedStyle = window.getComputedStyle(el);
-        if (computedStyle.border !== 'none' && computedStyle.border !== '0px none') {
-          el.style.setProperty('border', '0px solid transparent', 'important');
-        }
-        if (computedStyle.outline !== 'none' && computedStyle.outline !== '0px none') {
-          el.style.setProperty('outline', '0px solid transparent', 'important');
+        // Remove Tailwind classes
+        if (el.className) {
+          el.className = el.className.replace(/border[-\w]*/g, '').replace(/ring[-\w]*/g, '').trim();
         }
       }
     });
   }
   
-  // Run immediately
-  removeBorders();
+  // Execute aggressively
+  nukeBorders();
+  new MutationObserver(nukeBorders).observe(document.body, { childList: true, subtree: true, attributes: true });
+  setInterval(nukeBorders, 50);
   
-  // Run after DOM changes
-  const observer = new MutationObserver(removeBorders);
-  observer.observe(document.body, { childList: true, subtree: true });
-  
-  // Run periodically to catch any dynamic styling
-  setInterval(removeBorders, 100);
+  // Override on load
+  window.addEventListener('load', nukeBorders);
+  document.addEventListener('DOMContentLoaded', nukeBorders);
 })();
