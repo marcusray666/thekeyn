@@ -121,11 +121,11 @@ function AppContent() {
         <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#FE3F5E] text-white px-4 py-2 rounded">
           Skip to main content
         </a>
-        {isAuthenticated && <TopNav />}
+        <TopNav />
         <main id="main-content">
           <Router />
         </main>
-        {isAuthenticated && <BottomNav />}
+        <BottomNav />
       </div>
       <Toaster />
     </TooltipProvider>

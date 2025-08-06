@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { TopNav } from "@/components/premium/top-nav";
-import { BottomNav } from "@/components/premium/bottom-nav";
+// Navigation is now handled at the App level
 import { PostCard } from "@/components/premium/post-card";
 import { Plus, MessageCircle, TrendingUp, Clock, Users } from "lucide-react";
 import { Link } from "wouter";
@@ -141,7 +140,6 @@ export default function PremiumHome() {
 
 
 
-      <BottomNav />
     </div>
   );
 }
