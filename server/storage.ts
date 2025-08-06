@@ -156,6 +156,8 @@ export interface IStorage {
   followUser(followerId: number, followingId: number): Promise<any>;
   unfollowUser(followerId: number, followingId: number): Promise<void>;
   discoverUsers(currentUserId: number): Promise<any[]>;
+  getPostPreview(postId: number): Promise<any | null>;
+  getWorkPreview(workId: number): Promise<any | null>;
   
   // Admin functions
   getSystemMetrics(): Promise<any>;
@@ -2224,6 +2226,86 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error discovering users:", error);
       return [];
+    }
+  }
+
+  async getPostPreview(postId: number): Promise<any | null> {
+    try {
+      // This would get community post data for preview
+      // For now, return a mock response since posts system isn't fully implemented
+      return {
+        id: postId,
+        title: `Community Post #${postId}`,
+        description: "This is a community post shared on Loggin' platform",
+        type: 'post',
+        creatorName: "Community User",
+        creatorId: 1,
+        createdAt: new Date().toISOString(),
+        isVerified: true,
+        stats: {
+          views: Math.floor(Math.random() * 1000),
+          likes: Math.floor(Math.random() * 100),
+          shares: Math.floor(Math.random() * 50)
+        }
+      };
+    } catch (error) {
+      console.error("Error getting post preview:", error);
+      return null;
+    }
+  }
+
+  async getWorkPreview(workId: number): Promise<any | null> {
+    try {
+      const work = await db
+        .select({
+          id: works.id,
+          title: works.title,
+          filename: works.filename,
+          mimeType: works.mimeType,
+          thumbnailUrl: works.thumbnailUrl,
+          createdAt: works.createdAt,
+          userId: works.userId,
+          sha256Hash: works.sha256Hash,
+          blockchainHash: works.blockchainHash
+        })
+        .from(works)
+        .where(eq(works.id, workId))
+        .limit(1);
+
+      if (!work.length) return null;
+
+      const workData = work[0];
+
+      // Get creator info
+      const creator = await db
+        .select({
+          username: users.username,
+          displayName: users.displayName
+        })
+        .from(users)
+        .where(eq(users.id, workData.userId))
+        .limit(1);
+
+      return {
+        id: workData.id,
+        title: workData.title || workData.filename,
+        description: `Protected digital work verified on blockchain`,
+        type: 'work',
+        creatorName: creator.length > 0 ? (creator[0].displayName || creator[0].username) : 'Unknown',
+        creatorId: workData.userId,
+        createdAt: workData.createdAt,
+        thumbnailUrl: workData.thumbnailUrl,
+        isProtected: true,
+        isVerified: Boolean(workData.blockchainHash),
+        stats: {
+          views: Math.floor(Math.random() * 500), // Would come from analytics
+          likes: Math.floor(Math.random() * 50),
+          shares: Math.floor(Math.random() * 25)
+        }
+      };
+    } catch (error) {
+      console.error("Error getting work preview:", error);
+      return null;
     }
   }
 }

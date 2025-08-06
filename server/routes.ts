@@ -4405,6 +4405,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // URL Preview API endpoints
+  app.get("/api/preview/posts/:id", async (req: AuthenticatedRequest, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: "Invalid post ID" });
+      }
+
+      const preview = await storage.getPostPreview(postId);
+      if (!preview) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      res.json(preview);
+    } catch (error) {
+      console.error("Error fetching post preview:", error);
+      res.status(500).json({ error: "Failed to fetch preview" });
+    }
+  });
+
+  app.get("/api/preview/certificates/:id", async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+      if (isNaN(workId)) {
+        return res.status(400).json({ error: "Invalid certificate ID" });
+      }
+
+      const preview = await storage.getWorkPreview(workId);
+      if (!preview) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+
+      res.json(preview);
+    } catch (error) {
+      console.error("Error fetching certificate preview:", error);
+      res.status(500).json({ error: "Failed to fetch preview" });
+    }
+  });
+
+  app.get("/api/preview/works/:id", async (req: AuthenticatedRequest, res) => {
+    try {
+      const workId = parseInt(req.params.id);
+      if (isNaN(workId)) {
+        return res.status(400).json({ error: "Invalid work ID" });
+      }
+
+      const preview = await storage.getWorkPreview(workId);
+      if (!preview) {
+        return res.status(404).json({ error: "Work not found" });
+      }
+
+      res.json(preview);
+    } catch (error) {
+      console.error("Error fetching work preview:", error);
+      res.status(500).json({ error: "Failed to fetch preview" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

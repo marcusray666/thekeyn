@@ -1,6 +1,7 @@
 import { formatTimeAgo } from "@/lib/utils";
 import { Shield, Download, Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { ShareModal } from "./share-modal";
 
 interface PostCardProps {
   post: {
@@ -25,6 +26,7 @@ interface PostCardProps {
 export function PostCard({ post, onDetailsClick }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(post.likesCount || 0);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -124,7 +126,13 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
             <span className="text-sm">{post.commentsCount || 0}</span>
           </button>
           
-          <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+          <button 
+            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowShareModal(true);
+            }}
+          >
             <Share2 className="h-6 w-6" />
           </button>
         </div>
@@ -134,6 +142,25 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
           Certificate
         </button>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          content={{
+            id: post.id,
+            title: post.title,
+            type: 'post',
+            creatorName: post.creatorName,
+            creatorId: post.creatorId || 0,
+            thumbnailUrl: post.thumbnailUrl,
+            isProtected: post.isProtected,
+            filename: post.filename,
+            description: post.description
+          }}
+        />
+      )}
     </div>
   );
 }

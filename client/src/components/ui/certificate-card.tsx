@@ -1,6 +1,8 @@
 import { Download, Share2, QrCode, ExternalLink, Users } from "lucide-react";
 import { GlassCard } from "./glass-card";
 import { Button } from "./button";
+import { ShareModal } from "@/components/premium/share-modal";
+import { useState } from "react";
 import type { Work, Certificate } from "@shared/schema";
 
 interface CertificateCardProps {
@@ -10,6 +12,7 @@ interface CertificateCardProps {
 }
 
 export function CertificateCard({ work, certificate, onShareToCommunity }: CertificateCardProps) {
+  const [showShareModal, setShowShareModal] = useState(false);
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -110,17 +113,15 @@ export function CertificateCard({ work, certificate, onShareToCommunity }: Certi
                   QR Code
                 </Button>
               )}
-              {certificate?.shareableLink && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="btn-glass"
-                  onClick={() => copyToClipboard(certificate.shareableLink || '')}
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="btn-glass"
+                onClick={() => setShowShareModal(true)}
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -134,6 +135,25 @@ export function CertificateCard({ work, certificate, onShareToCommunity }: Certi
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          content={{
+            id: work.id,
+            title: work.title || work.filename,
+            type: 'work',
+            creatorName: work.creatorName,
+            creatorId: work.userId,
+            thumbnailUrl: work.thumbnailUrl,
+            isProtected: true,
+            filename: work.filename,
+            description: `Protected digital work with blockchain certificate ${work.certificateId}`
+          }}
+        />
+      )}
     </GlassCard>
   );
 }
