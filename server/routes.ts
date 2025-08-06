@@ -1871,16 +1871,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Community posts API
-  app.get("/api/community/posts", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      // Get all public community posts (not private certificates)
-      // For now, return empty array since we need to implement community post storage
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching community posts:", error);
-      res.status(500).json({ error: "Failed to fetch community posts" });
-    }
-  });
+  // OLD COMMUNITY POSTS ROUTE - REMOVED (replaced with better implementation at line 4570)
+  // This was returning empty array and requiring authentication
 
   // Share protected work to community
   app.post("/api/community/share", requireAuth, async (req: AuthenticatedRequest, res) => {
