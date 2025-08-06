@@ -44,6 +44,7 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeConversation, setActiveConversation] = useState<any>(null);
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const { isAuthenticated } = useAuth();
 
   // Check URL parameters for direct conversation access
@@ -63,7 +64,8 @@ export default function Messages() {
             id: parseInt(conversationId),
             participantName: user.username || `User ${userId}`,
             participantId: parseInt(userId),
-            isOnline: true
+            isOnline: true,
+            currentUserId: 31 // This should be dynamic in a real app
           });
         })
         .catch(() => {
@@ -72,7 +74,8 @@ export default function Messages() {
             id: parseInt(conversationId),
             participantName: `User ${userId}`,
             participantId: parseInt(userId),
-            isOnline: true
+            isOnline: true,
+            currentUserId: 31
           });
         });
     }
@@ -175,9 +178,10 @@ export default function Messages() {
       
       if (response.ok) {
         const message = await response.json();
-        console.log('Message sent:', message);
+        
+        // Add the message to local state immediately for instant feedback
+        setLocalMessages(prev => [...prev, message]);
         setNewMessage("");
-        // In a real app, you'd update the messages list here
       } else {
         console.error('Failed to send message');
       }
@@ -344,21 +348,22 @@ export default function Messages() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {messages?.map((message) => (
+                    {/* Show API messages if available, otherwise show local messages */}
+                    {(messages && messages.length > 0 ? messages : localMessages).map((message) => (
                       <div
                         key={message.id}
-                        className={`flex ${message.senderId === 31 ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.senderId === activeConversation?.currentUserId || message.senderId === 31 ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
                           className={`max-w-xs px-4 py-2 rounded-2xl ${
-                            message.senderId === 31
+                            message.senderId === activeConversation?.currentUserId || message.senderId === 31
                               ? 'bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white'
                               : 'bg-white/10 backdrop-blur-sm text-white border border-white/10'
                           }`}
                         >
                           <p className="text-sm">{message.content}</p>
                           <p className={`text-xs mt-1 ${
-                            message.senderId === 31 ? 'text-white/70' : 'text-white/50'
+                            message.senderId === activeConversation?.currentUserId || message.senderId === 31 ? 'text-white/70' : 'text-white/50'
                           }`}>
                             {new Date(message.timestamp).toLocaleTimeString([], {
                               hour: '2-digit',
@@ -368,6 +373,15 @@ export default function Messages() {
                         </div>
                       </div>
                     ))}
+                    
+                    {/* Show welcome message for new conversations */}
+                    {localMessages.length === 0 && (!messages || messages.length === 0) && (
+                      <div className="flex justify-center">
+                        <div className="bg-white/5 backdrop-blur-sm text-white/60 px-4 py-2 rounded-full text-sm">
+                          Start a conversation with {selectedConv?.participantName}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

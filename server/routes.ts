@@ -1760,17 +1760,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid message data" });
       }
 
-      // For now, return a mock message
-      // In a real implementation, you'd save to a messages table
+      // Create message object with proper user ID
       const message = {
         id: Date.now(),
         senderId: userId,
+        senderName: req.user!.username,
         conversationId,
         content: content.trim(),
         timestamp: new Date().toISOString(),
         isRead: false
       };
       
+      console.log('Message created:', message);
       res.json(message);
     } catch (error) {
       console.error("Error sending message:", error);
