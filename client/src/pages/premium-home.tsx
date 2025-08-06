@@ -15,11 +15,18 @@ export default function PremiumHome() {
   });
 
   // Fetch community posts (real data from API) - always call hooks at top level
-  const { data: communityPosts = [], isLoading } = useQuery({
+  const { data: communityPosts = [], isLoading, error } = useQuery({
     queryKey: ["/api/community/posts"],
     queryFn: () => apiRequest("/api/community/posts"),
     enabled: !!currentUser, // Only fetch when user is authenticated
+    retry: 1,
   });
+
+  // Debug logging
+  console.log("PremiumHome - currentUser:", currentUser);
+  console.log("PremiumHome - communityPosts:", communityPosts);
+  console.log("PremiumHome - isLoading:", isLoading);
+  console.log("PremiumHome - error:", error);
 
   // Show welcome page for unauthenticated users
   if (!authLoading && !currentUser) {

@@ -4569,10 +4569,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get community posts (feed)
   app.get("/api/community/posts", async (req, res) => {
     try {
+      console.log("📨 Fetching community posts...");
+      console.log("Session userId:", req.session?.userId);
+      
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = parseInt(req.query.offset as string) || 0;
       const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
       const currentUserId = req.session?.userId;
+      
+      console.log("Query params:", { limit, offset, userId, currentUserId });
       
       const posts = await storage.getPosts({ 
         userId, 
@@ -4580,6 +4585,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset, 
         currentUserId 
       });
+      
+      console.log(`Found ${posts.length} posts`);
       
       res.json(posts);
     } catch (error) {
