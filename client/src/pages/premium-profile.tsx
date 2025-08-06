@@ -5,9 +5,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { Settings, Share2, Edit3, Grid3X3, List, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/premium/post-card";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PremiumProfile() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const { user } = useAuth();
 
   // Fetch user profile
   const { data: profile, isLoading } = useQuery({
@@ -15,10 +17,11 @@ export default function PremiumProfile() {
     queryFn: () => apiRequest("/api/user/profile"),
   });
 
-  // Fetch user's community posts (not protected works)
+  // Fetch current user's community posts only (use user.id from auth)
   const { data: posts = [] } = useQuery({
-    queryKey: ["/api/community/posts", "current-user"],
-    queryFn: () => apiRequest("/api/community/posts"),
+    queryKey: ["/api/community/posts", "current-user", user?.id],
+    queryFn: () => apiRequest("/api/community/posts?userId=" + user?.id),
+    enabled: !!user?.id,
   });
 
   // Fetch user stats
