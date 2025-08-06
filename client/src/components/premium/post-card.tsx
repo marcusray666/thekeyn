@@ -73,12 +73,6 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
               <span className="text-white text-xs font-semibold">PROTECTED</span>
             </div>
           )}
-          {post.isVerified && (
-            <div className="verification-badge">
-              <Shield className="h-3 w-3" />
-              <span>Verified</span>
-            </div>
-          )}
           <div className="bg-gradient-to-r from-blue-500 to-green-500 px-3 py-1 rounded-full">
             <div className="flex items-center space-x-1">
               <CheckCircle className="h-3 w-3 text-white" />
