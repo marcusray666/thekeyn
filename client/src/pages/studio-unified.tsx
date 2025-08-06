@@ -34,6 +34,9 @@ import {
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
 import { Button } from "@/components/ui/button";
+import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
+import { useOnboardingTriggers } from "@/hooks/use-onboarding";
+import React from "react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,6 +91,7 @@ interface Certificate {
 type WorkflowStep = 'upload' | 'certificate' | 'nft' | 'complete';
 
 export default function StudioUnified() {
+  const { triggerStudioFlow } = useOnboardingTriggers();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
@@ -125,6 +129,13 @@ export default function StudioUnified() {
       setLocation("/login");
     }
   }, [isAuthenticated, authLoading, setLocation]);
+
+  // Trigger studio onboarding for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      triggerStudioFlow();
+    }
+  }, [isAuthenticated, authLoading, triggerStudioFlow]);
 
   // Fetch subscription data
   const { data: subscriptionData, refetch: refetchSubscription } = useQuery({
@@ -1204,6 +1215,13 @@ export default function StudioUnified() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Onboarding Manager */}
+      <OnboardingManager
+        steps={ONBOARDING_FLOWS.STUDIO}
+        tourId="STUDIO"
+        autoStart={false}
+      />
     </div>
   );
 }

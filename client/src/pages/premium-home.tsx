@@ -5,9 +5,14 @@ import { Plus, Users, Paintbrush, Sparkles, Zap, Crown, CheckCircle2 } from "luc
 import { LogoIcon } from "@/components/ui/logo-icon";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
+import { useOnboardingTriggers } from "@/hooks/use-onboarding";
+import React from "react";
 
 
 export default function PremiumHome() {
+  const { triggerDashboardFlow } = useOnboardingTriggers();
+  
   // Get current user data
   const { data: currentUser, isLoading: authLoading } = useQuery({
     queryKey: ["/api/auth/user"],
@@ -35,6 +40,13 @@ export default function PremiumHome() {
     enabled: !!currentUser, // Only fetch when user is authenticated
     retry: 1,
   });
+
+  // Trigger dashboard onboarding for authenticated users
+  React.useEffect(() => {
+    if (currentUser && !authLoading) {
+      triggerDashboardFlow();
+    }
+  }, [currentUser, authLoading, triggerDashboardFlow]);
 
   // Debug logging
   console.log("PremiumHome - currentUser:", currentUser);
@@ -122,8 +134,12 @@ export default function PremiumHome() {
         </div>
       </main>
 
-
-
+      {/* Onboarding Manager */}
+      <OnboardingManager
+        steps={ONBOARDING_FLOWS.DASHBOARD}
+        tourId="DASHBOARD"
+        autoStart={false}
+      />
     </div>
   );
 }

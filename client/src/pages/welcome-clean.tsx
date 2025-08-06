@@ -1,14 +1,24 @@
+import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Paintbrush, Info, MessageCircle, CheckCircle } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
+import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
+import { useOnboardingTriggers } from "@/hooks/use-onboarding";
 
 export default function WelcomeClean() {
+  const { triggerWelcomeFlow } = useOnboardingTriggers();
+
+  // Trigger welcome onboarding for new users
+  React.useEffect(() => {
+    triggerWelcomeFlow();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 text-center">
         {/* Logo */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-4 mb-8 logo-container">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto">
             <LogoIcon size="lg" className="text-primary-foreground" />
           </div>
@@ -20,7 +30,7 @@ export default function WelcomeClean() {
           </div>
           
           {/* Features Preview */}
-          <div className="grid grid-cols-3 gap-4 text-center text-sm text-muted-foreground">
+          <div className="grid grid-cols-3 gap-4 text-center text-sm text-muted-foreground features-section">
             <div>
               <LogoIcon size="md" className="mx-auto mb-1" />
               <p>Blockchain Protection</p>
@@ -38,7 +48,7 @@ export default function WelcomeClean() {
 
         {/* CTA Buttons */}
         <div className="space-y-4">
-          <Link href="/register" className="block">
+          <Link href="/register" className="block cta-button">
             <Button 
               size="lg" 
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
@@ -68,6 +78,13 @@ export default function WelcomeClean() {
           </Link>
         </div>
       </div>
+
+      {/* Onboarding Manager */}
+      <OnboardingManager
+        steps={ONBOARDING_FLOWS.WELCOME}
+        tourId="WELCOME"
+        autoStart={true}
+      />
     </div>
   );
 }
