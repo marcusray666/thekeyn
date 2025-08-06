@@ -110,13 +110,20 @@ Respond with JSON in this format:
 
         const aiResult = JSON.parse(response.text || '{}');
         
-        if (aiResult.issues && aiResult.issues.length > 0) {
+        // Only add flags for serious issues if AI says content is inappropriate
+        if (!aiResult.isAppropriate && aiResult.issues && aiResult.issues.length > 0) {
           flags.push(...aiResult.issues.map((issue: string) => `ai_detected_${issue.replace(/\s+/g, '_').toLowerCase()}`));
         }
         
-        // Combine AI confidence with basic analysis
+        // Use AI decision as primary factor
         const aiConfidence = aiResult.confidenceScore || 0;
-        confidence = Math.max(confidence, aiConfidence);
+        
+        // If AI says content is appropriate, override basic analysis confidence
+        if (aiResult.isAppropriate) {
+          confidence = Math.min(confidence, 0.2); // Low confidence for rejection
+        } else {
+          confidence = Math.max(confidence, aiConfidence);
+        }
         
         console.log('AI Content Moderation Result:', {
           isAppropriate: aiResult.isAppropriate,
@@ -144,8 +151,8 @@ Respond with JSON in this format:
     }
 
     confidence = Math.min(confidence, 1.0);
-    const requiresManualReview = confidence > 0.3;
-    const isApproved = confidence < 0.7;
+    const requiresManualReview = confidence > 0.5;
+    const isApproved = confidence < 0.8;
 
     return {
       isApproved,
@@ -236,12 +243,19 @@ Respond with JSON:
 
           const aiResult = JSON.parse(response.text || '{}');
           
-          if (aiResult.issues && aiResult.issues.length > 0) {
+          // Only add flags for serious issues if AI says image is inappropriate
+          if (!aiResult.isAppropriate && aiResult.issues && aiResult.issues.length > 0) {
             flags.push(...aiResult.issues.map((issue: string) => `ai_image_${issue.replace(/\s+/g, '_').toLowerCase()}`));
           }
           
           const aiConfidence = aiResult.confidenceScore || 0;
-          confidence = Math.max(confidence, aiConfidence);
+          
+          // If AI says image is appropriate, override basic analysis confidence
+          if (aiResult.isAppropriate) {
+            confidence = Math.min(confidence, 0.2); // Low confidence for rejection
+          } else {
+            confidence = Math.max(confidence, aiConfidence);
+          }
           
           console.log('AI Image Moderation Result:', {
             filename: path.basename(filePath),
@@ -271,8 +285,8 @@ Respond with JSON:
     }
 
     confidence = Math.min(confidence, 1.0);
-    const requiresManualReview = confidence > 0.3;
-    const isApproved = confidence < 0.6;
+    const requiresManualReview = confidence > 0.5;
+    const isApproved = confidence < 0.8;
 
     return {
       isApproved,
@@ -348,16 +362,19 @@ Respond with JSON:
     const imageModeration = await this.moderateImage(filePath);
     const plagiarismCheck = await this.checkPlagiarism(text, fileHash, existingHashes);
 
-    // Determine overall decision
+    // Determine overall decision - be more lenient, trust AI analysis
     const allResults = [textModeration, imageModeration, plagiarismCheck];
-    const hasRejection = allResults.some(result => !result.isApproved && result.confidence > 0.7);
-    const requiresReview = allResults.some(result => result.requiresManualReview);
+    
+    // Only reject if there's a high-confidence serious issue
+    const hasSerious = allResults.some(result => !result.isApproved && result.confidence > 0.8);
+    const hasHighRisk = allResults.some(result => result.confidence > 0.9);
+    const requiresReview = allResults.some(result => result.requiresManualReview && result.confidence > 0.6);
 
     let overallDecision: 'approved' | 'rejected' | 'pending_review';
     
-    if (hasRejection) {
+    if (hasHighRisk) {
       overallDecision = 'rejected';
-    } else if (requiresReview) {
+    } else if (hasSerious || requiresReview) {
       overallDecision = 'pending_review';
     } else {
       overallDecision = 'approved';
