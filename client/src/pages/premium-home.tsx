@@ -111,6 +111,7 @@ export default function PremiumHome() {
                   key={post.id}
                   post={post}
                   currentUserId={currentUser?.id}
+                  isAdmin={currentUser?.role === 'admin'}
                 />
               ))}
             </div>

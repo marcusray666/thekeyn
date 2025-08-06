@@ -4666,7 +4666,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session!.userId;
       const postId = req.params.id;
       
+      // Get user to check if they're admin
+      const user = await storage.getUser(userId);
+      const isAdmin = user?.role === 'admin';
+      
+      // Get the post to check ownership
+      const post = await storage.getPost(postId);
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      
+      // Allow deletion if user owns the post or is admin
+      if (post.userId !== userId && !isAdmin) {
+        return res.status(403).json({ error: "You can only delete your own posts" });
+      }
+      
       await storage.deletePost(postId, userId);
+      
+      // Log admin action if admin is deleting someone else's post
+      if (isAdmin && post.userId !== userId) {
+        try {
+          await storage.createAdminAuditLog({
+            adminId: userId,
+            action: 'post_deleted',
+            targetType: 'post',
+            targetId: postId,
+            details: JSON.stringify({ 
+              reason: 'Admin deletion',
+              originalUserId: post.userId,
+              postTitle: post.title 
+            }),
+            ipAddress: req.ip,
+            userAgent: req.get('User-Agent'),
+          });
+        } catch (logError) {
+          console.error("Failed to log admin action:", logError);
+          // Continue with deletion even if logging fails
+        }
+      }
+      
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting post:", error);

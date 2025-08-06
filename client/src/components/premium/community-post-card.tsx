@@ -1,10 +1,13 @@
 import { formatTimeAgo } from "@/lib/utils";
-import { Heart, MessageCircle, Share2, MapPin, Volume2, VolumeX, Play, Pause } from "lucide-react";
+import { Heart, MessageCircle, Share2, MapPin, Volume2, VolumeX, Play, Pause, Trash2, MoreHorizontal } from "lucide-react";
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface CommunityPost {
   id: string;
@@ -38,9 +41,10 @@ interface CommunityPost {
 interface CommunityPostCardProps {
   post: CommunityPost;
   currentUserId?: number;
+  isAdmin?: boolean;
 }
 
-export function CommunityPostCard({ post, currentUserId }: CommunityPostCardProps) {
+export function CommunityPostCard({ post, currentUserId, isAdmin = false }: CommunityPostCardProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [likes, setLikes] = useState(post.likes);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -61,6 +65,24 @@ export function CommunityPostCard({ post, currentUserId }: CommunityPostCardProp
       toast({
         title: "Error",
         description: "Failed to like post",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: () => apiRequest(`/api/community/posts/${post.id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      toast({
+        title: "Post deleted",
+        description: "The post has been successfully deleted",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete post",
         variant: "destructive",
       });
     },
@@ -290,11 +312,66 @@ export function CommunityPostCard({ post, currentUserId }: CommunityPostCardProp
             </div>
           </Link>
         </div>
-        {post.isProtected && (
-          <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
-            <span className="text-white text-xs font-semibold">PROTECTED</span>
-          </div>
-        )}
+        <div className="flex items-center space-x-2">
+          {post.isProtected && (
+            <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
+              <span className="text-white text-xs font-semibold">PROTECTED</span>
+            </div>
+          )}
+          
+          {/* Delete Menu - Show for post owner or admin */}
+          {(currentUserId === post.userId || isAdmin) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/10"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-black/90 border-white/20 text-white">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem 
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/20 cursor-pointer"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Post
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-black/95 border-white/20">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-white">Delete Post</AlertDialogTitle>
+                      <AlertDialogDescription className="text-white/60">
+                        Are you sure you want to delete this post? This action cannot be undone.
+                        {isAdmin && currentUserId !== post.userId && (
+                          <div className="mt-2 text-red-400 text-sm">
+                            You are deleting another user's post as an administrator.
+                          </div>
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => deletePostMutation.mutate()}
+                        disabled={deletePostMutation.isPending}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        {deletePostMutation.isPending ? "Deleting..." : "Delete"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       {/* Content */}
