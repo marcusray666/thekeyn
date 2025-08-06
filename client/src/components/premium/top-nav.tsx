@@ -84,10 +84,10 @@ export function TopNav() {
 
       {/* Actions */}
       <div className="flex items-center space-x-6">
-        <Link href="/upload">
+        <Link href="/create-post">
           <Button className="glass-button !px-4 !py-2">
             <Upload className="h-5 w-5 mr-2" />
-            Upload
+            Post
           </Button>
         </Link>
         

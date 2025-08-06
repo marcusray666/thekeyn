@@ -16,6 +16,7 @@ import Home from "@/pages/home";
 import PremiumHome from "@/pages/premium-home";
 import PremiumUpload from "@/pages/premium-upload";
 import PremiumProfile from "@/pages/premium-profile";
+import CreatePost from "@/pages/create-post";
 
 import PremiumCertificates from "@/pages/premium-certificates";
 import CertificateDetail from "@/pages/certificate-detail";
@@ -59,6 +60,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/upload" component={PremiumUpload} />
+      <Route path="/create-post" component={CreatePost} />
 
       
       {/* Home route - dynamic based on auth status */}

@@ -1,0 +1,236 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowLeft, Upload, Image, Music, Video, FileText, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Link, useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+
+export default function CreatePost() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const createPostMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      return apiRequest("/api/community/posts", {
+        method: "POST",
+        body: data,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Post Created!",
+        description: "Your post has been shared with the community.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      setLocation("/");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create post",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      
+      // Create preview URL
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a title for your post",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title.trim());
+    formData.append("description", description.trim());
+    formData.append("isProtected", "false"); // Community posts are not protected
+    
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
+    createPostMutation.mutate(formData);
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+  };
+
+  const getFileIcon = () => {
+    if (!selectedFile) return <Upload className="h-8 w-8" />;
+    
+    if (selectedFile.type.startsWith('image/')) return <Image className="h-8 w-8" />;
+    if (selectedFile.type.startsWith('audio/')) return <Music className="h-8 w-8" />;
+    if (selectedFile.type.startsWith('video/')) return <Video className="h-8 w-8" />;
+    return <FileText className="h-8 w-8" />;
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0F0F0F] pt-8 md:pt-20 pb-20 md:pb-8 relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
+      <div className="max-w-2xl mx-auto px-4 space-y-6 relative z-10">
+        {/* Header */}
+        <div className="flex items-center space-x-4 mb-8">
+          <Link href="/">
+            <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="text-sm md:text-base">Back to Feed</span>
+            </button>
+          </Link>
+          <div className="w-px h-6 bg-white/20"></div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Create Post</h1>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-6">
+            {/* Title */}
+            <div>
+              <label className="text-white font-medium mb-2 block">Title</label>
+              <Input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Give your post a catchy title..."
+                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                maxLength={100}
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="text-white font-medium mb-2 block">Description</label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell the community about your creation..."
+                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl min-h-[100px] resize-none"
+                maxLength={500}
+              />
+              <p className="text-white/50 text-sm mt-1">
+                {description.length}/500 characters
+              </p>
+            </div>
+
+            {/* File Upload */}
+            <div>
+              <label className="text-white font-medium mb-2 block">Media (Optional)</label>
+              
+              {!selectedFile ? (
+                <div className="relative">
+                  <input
+                    type="file"
+                    onChange={handleFileSelect}
+                    accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-white/40 transition-colors">
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white/70">
+                        {getFileIcon()}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Upload Media</p>
+                        <p className="text-white/50 text-sm">
+                          Images, audio, video, or documents
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-white/70">
+                      {getFileIcon()}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium truncate">
+                        {selectedFile.name}
+                      </p>
+                      <p className="text-white/50 text-sm">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="text-white/50 hover:text-white transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Preview */}
+            {previewUrl && selectedFile?.type.startsWith('image/') && (
+              <div>
+                <label className="text-white font-medium mb-2 block">Preview</label>
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full max-h-64 object-cover rounded-xl border border-white/10"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col md:flex-row gap-4 md:justify-end">
+            <Link href="/">
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full md:w-auto text-white/70 hover:text-white hover:bg-white/10"
+              >
+                Cancel
+              </Button>
+            </Link>
+            <Button
+              type="submit"
+              disabled={createPostMutation.isPending || !title.trim()}
+              className="w-full md:w-auto accent-button"
+            >
+              {createPostMutation.isPending ? "Posting..." : "Share Post"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
