@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useRoute } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Settings, Share2, Edit3, Grid3X3, List, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,24 +10,31 @@ import { useAuth } from "@/hooks/useAuth";
 export default function PremiumProfile() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { user } = useAuth();
+  const [, params] = useRoute("/profile/:username");
+  const username = params?.username;
 
-  // Fetch user profile
+  // Fetch user profile - either specific username or current user
   const { data: profile, isLoading } = useQuery({
-    queryKey: ["/api/user/profile"],
-    queryFn: () => apiRequest("/api/user/profile"),
+    queryKey: username ? ["/api/profile", username] : ["/api/user/profile"],
+    queryFn: () => username 
+      ? apiRequest(`/api/profile/${username}`) 
+      : apiRequest("/api/user/profile"),
   });
 
-  // Fetch current user's community posts only (use user.id from auth)
+  // Fetch posts for the profile user (either specific user or current user)
+  const targetUserId = username ? profile?.id : user?.id;
   const { data: posts = [] } = useQuery({
-    queryKey: ["/api/community/posts", "current-user", user?.id],
-    queryFn: () => apiRequest("/api/community/posts?userId=" + user?.id),
-    enabled: !!user?.id,
+    queryKey: ["/api/community/posts", "user", targetUserId],
+    queryFn: () => apiRequest("/api/community/posts?userId=" + targetUserId),
+    enabled: !!targetUserId,
   });
 
-  // Fetch user stats
+  // Fetch user stats for the profile user
   const { data: stats } = useQuery({
-    queryKey: ["/api/user/stats"],
-    queryFn: () => apiRequest("/api/user/stats"),
+    queryKey: username ? ["/api/user/stats", username] : ["/api/user/stats"],
+    queryFn: () => username 
+      ? apiRequest(`/api/user/stats?username=${username}`)
+      : apiRequest("/api/user/stats"),
   });
 
   if (isLoading) {
@@ -43,6 +50,20 @@ export default function PremiumProfile() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle profile not found
+  if (username && (!profile || profile.message === "User not found")) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-white/50 text-lg mb-4">Profile not found</div>
+          <Link href="/">
+            <Button className="glass-button">Return Home</Button>
+          </Link>
         </div>
       </div>
     );

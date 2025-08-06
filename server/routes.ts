@@ -1519,7 +1519,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user stats for dashboard
   app.get("/api/user/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.user!.id;
+      const { username } = req.query;
+      let userId = req.user!.id;
+      
+      // If username is provided, fetch that user's stats instead
+      if (username) {
+        const user = await storage.getUserByUsername(username as string);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        userId = user.id;
+      }
       
       // Get protected works count
       const userWorks = await storage.getUserWorks(userId);

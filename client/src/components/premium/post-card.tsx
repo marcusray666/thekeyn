@@ -59,11 +59,14 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
           className="flex items-center space-x-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors -m-2"
           onClick={(e) => {
             e.stopPropagation();
-            // Navigate to user profile using userId if available
-            if (post.creatorId) {
+            // Navigate to user profile using username (preferred) or userId as fallback
+            const username = post.username || post.creatorName;
+            if (username) {
+              window.location.href = `/profile/${username}`;
+            } else if (post.creatorId) {
               window.location.href = `/user/${post.creatorId}`;
             } else {
-              console.warn('No creatorId available for navigation');
+              console.warn('No username or creatorId available for navigation');
             }
           }}
         >
