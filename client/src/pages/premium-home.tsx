@@ -150,7 +150,7 @@ function WelcomePage() {
         {/* Hero Section */}
         <section className="px-6 py-20 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="mb-6 inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-full text-[#FFD200] text-sm font-medium backdrop-blur-sm">
+            <div className="mb-6 inline-flex items-center px-4 py-2 bg-white/10 rounded-full text-[#FFD200] text-sm font-medium backdrop-blur-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Digital Art Protection Platform
             </div>
@@ -172,7 +172,7 @@ function WelcomePage() {
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg">
+                <Button variant="outline" className="border-transparent text-white hover:bg-white/10 px-8 py-4 text-lg">
                   Sign In
                 </Button>
               </Link>
@@ -191,7 +191,7 @@ function WelcomePage() {
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm">
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-xl flex items-center justify-center mb-6">
                   <Shield className="h-6 w-6 text-white" />
                 </div>
@@ -211,7 +211,7 @@ function WelcomePage() {
                 </div>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm">
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FFD200] to-[#FFA500] rounded-xl flex items-center justify-center mb-6">
                   <Users className="h-6 w-6 text-white" />
                 </div>
@@ -231,7 +231,7 @@ function WelcomePage() {
                 </div>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm">
                 <div className="w-12 h-12 bg-gradient-to-r from-[#8B5CF6] to-[#A855F7] rounded-xl flex items-center justify-center mb-6">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
@@ -255,7 +255,7 @@ function WelcomePage() {
         </section>
 
         {/* Stats Section */}
-        <section className="px-6 py-20 bg-white/5 border-y border-white/10">
+        <section className="px-6 py-20 bg-white/5">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
@@ -297,7 +297,7 @@ function WelcomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="px-6 py-12 border-t border-white/10">
+        <footer className="px-6 py-12">
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
               <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
