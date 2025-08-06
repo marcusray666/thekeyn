@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import { 
   Upload, 
   FileText, 
-  Shield,
+  Paintbrush,
   Sparkles,
   CheckCircle,
   Clock,
@@ -661,7 +661,7 @@ export default function StudioUnified() {
                       <div className="absolute inset-0 bg-black/20"></div>
                       <div className="absolute top-4 right-4">
                         <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                          <Shield className="w-3 h-3 mr-1" />
+                          <Paintbrush className="w-3 h-3 mr-1" />
                           Certified
                         </Badge>
                       </div>
@@ -697,7 +697,7 @@ export default function StudioUnified() {
                           {certificate.work.mimeType.split('/')[0]}
                         </div>
                         <div className="flex items-center gap-1 text-green-500">
-                          <Shield className="w-3 h-3" />
+                          <Paintbrush className="w-3 h-3" />
                           Verified
                         </div>
                       </div>
@@ -981,7 +981,7 @@ export default function StudioUnified() {
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-pink-200/50 dark:border-pink-500/20">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-white" />
+                          <Paintbrush className="w-4 h-4 text-white" />
                         </div>
                         <h4 className="text-lg font-bold text-pink-800 dark:text-pink-200">Blockchain Verification Guide</h4>
                       </div>

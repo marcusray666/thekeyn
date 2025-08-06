@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { 
   Users, 
-  Shield, 
+  Paintbrush, 
   FileText, 
   DollarSign, 
   AlertTriangle, 
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Shield className="h-8 w-8 text-[#FE3F5E]" />
+                <Paintbrush className="h-8 w-8 text-[#FE3F5E]" />
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent">
                   Admin Dashboard
                 </h1>

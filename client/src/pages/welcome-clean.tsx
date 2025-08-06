@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Shield, Info, MessageCircle, CheckCircle } from "lucide-react";
+import { Paintbrush, Info, MessageCircle, CheckCircle } from "lucide-react";
 
 export default function WelcomeClean() {
   return (
@@ -9,7 +9,7 @@ export default function WelcomeClean() {
         {/* Logo */}
         <div className="space-y-4 mb-8">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto">
-            <Shield className="h-8 w-8 text-primary-foreground" />
+            <Paintbrush className="h-8 w-8 text-primary-foreground" />
           </div>
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-foreground">Loggin'</h1>
@@ -21,7 +21,7 @@ export default function WelcomeClean() {
           {/* Features Preview */}
           <div className="grid grid-cols-3 gap-4 text-center text-sm text-muted-foreground">
             <div>
-              <Shield className="h-6 w-6 mx-auto mb-1" />
+              <Paintbrush className="h-6 w-6 mx-auto mb-1" />
               <p>Blockchain Protection</p>
             </div>
             <div>
