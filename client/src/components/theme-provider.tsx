@@ -13,28 +13,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem("loggin-theme") as Theme;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    // Force dark theme always - user preference from replit.md
+    setTheme("dark");
   }, []);
 
   useEffect(() => {
-    // Apply theme to document
+    // Apply dark theme to document - force override
     const root = document.documentElement;
     const body = document.body;
     
-    // Remove existing theme classes
-    root.classList.remove("light", "dark");
-    body.classList.remove("light", "dark");
+    // Remove any light theme classes
+    root.classList.remove("light", "light-theme");
+    body.classList.remove("light", "light-theme");
     
-    // Add new theme classes
-    root.classList.add(theme);
-    body.classList.add(theme);
+    // Force add dark theme classes
+    root.classList.add("dark");
+    body.classList.add("dark");
+    
+    // Force dark styles with inline styles as backup
+    document.body.style.background = "#0F0F0F";
+    document.body.style.color = "#FFFFFF";
+    root.style.background = "#0F0F0F";
+    root.style.color = "#FFFFFF";
     
     // Save to localStorage
-    localStorage.setItem("loggin-theme", theme);
+    localStorage.setItem("loggin-theme", "dark");
   }, [theme]);
 
   return (
