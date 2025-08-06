@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, Plus, Bell } from "lucide-react";
+import { Search, Menu, Bell, MessageCircle, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -62,8 +62,14 @@ export function TopNav() {
       <div className="flex items-center space-x-6">
         <Link href="/upload">
           <Button className="glass-button !px-4 !py-2">
-            <Plus className="h-5 w-5 mr-2" />
+            <Upload className="h-5 w-5 mr-2" />
             Upload
+          </Button>
+        </Link>
+        
+        <Link href="/messages">
+          <Button className="glass-button p-3">
+            <MessageCircle className="h-5 w-5" />
           </Button>
         </Link>
         

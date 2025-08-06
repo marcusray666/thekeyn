@@ -113,16 +113,7 @@ export default function PremiumHome() {
               </div>
             </Link>
             
-            <Link href="/messages">
-              <div className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full p-0.5">
-                  <div className="w-full h-full bg-[#0F0F0F] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                    <MessageCircle className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-                <span className="text-xs text-white/70">Messages</span>
-              </div>
-            </Link>
+
           </div>
         </div>
 
