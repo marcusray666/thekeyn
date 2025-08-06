@@ -232,33 +232,38 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white pt-20 p-6">
+    <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">
+      {/* Background gradients - matching main app theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto pt-8 p-6 relative z-10"
       >
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Shield className="h-8 w-8 text-purple-400" />
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <Shield className="h-8 w-8 text-[#FE3F5E]" />
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent">
                   Admin Dashboard
                 </h1>
               </div>
-              <p className="text-gray-400">Complete platform management and monitoring</p>
+              <p className="text-white/60">Complete platform management and monitoring</p>
             </div>
-            <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 px-4 py-2 rounded-lg border border-purple-500/30">
-              <p className="text-purple-200 font-medium">Admin Access Enabled</p>
-              <p className="text-xs text-purple-300">Full platform control</p>
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-2xl">
+              <p className="text-[#FE3F5E] font-medium">Admin Access Enabled</p>
+              <p className="text-xs text-white/60">Full platform control</p>
             </div>
           </div>
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -267,7 +272,7 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4" />
               Users
             </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center gap-2 text-yellow-400">
+            <TabsTrigger value="privacy" className="flex items-center gap-2 text-[#FFD200]">
               <Shield className="h-4 w-4" />
               Privacy Override
             </TabsTrigger>
@@ -294,7 +299,7 @@ export default function AdminDashboard() {
             {metricsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <Card key={i} className="bg-gray-800/40 backdrop-blur-sm border-gray-700/50 animate-pulse">
+                  <Card key={i} className="bg-white/5 backdrop-blur-xl border border-white/10 animate-pulse rounded-2xl">
                     <CardContent className="p-6">
                       <div className="h-4 bg-gray-700 rounded mb-2"></div>
                       <div className="h-8 bg-gray-700 rounded"></div>
@@ -305,122 +310,122 @@ export default function AdminDashboard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Total Users</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalUsers?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FFD200]">Total Users</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.totalUsers?.toLocaleString() || 0}</p>
                       </div>
-                      <Users className="h-8 w-8 text-yellow-400" />
+                      <Users className="h-8 w-8 text-[#FFD200]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Active Users (30d)</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.activeUsers?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FE3F5E]">Active Users (30d)</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.activeUsers?.toLocaleString() || 0}</p>
                       </div>
-                      <Activity className="h-8 w-8 text-yellow-400" />
+                      <Activity className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">New Signups</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.newSignups?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FFD200]">New Signups</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.newSignups?.toLocaleString() || 0}</p>
                       </div>
-                      <Users className="h-8 w-8 text-yellow-400" />
+                      <Users className="h-8 w-8 text-[#FFD200]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('system')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Total Revenue</p>
-                        <p className="text-2xl font-bold text-yellow-200">{formatCurrency(metrics?.totalRevenue || 0)}</p>
-                        <p className="text-xs text-yellow-300/80">Subscription earnings</p>
+                        <p className="text-sm text-[#FE3F5E]">Total Revenue</p>
+                        <p className="text-2xl font-bold text-white">{formatCurrency(metrics?.totalRevenue || 0)}</p>
+                        <p className="text-xs text-white/60">Subscription earnings</p>
                       </div>
-                      <DollarSign className="h-8 w-8 text-yellow-400" />
+                      <DollarSign className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Protected Works</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalWorks?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FFD200]">Protected Works</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.totalWorks?.toLocaleString() || 0}</p>
                       </div>
-                      <Shield className="h-8 w-8 text-yellow-400" />
+                      <Shield className="h-8 w-8 text-[#FFD200]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Community Posts</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.totalPosts?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FE3F5E]">Community Posts</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.totalPosts?.toLocaleString() || 0}</p>
                       </div>
-                      <FileText className="h-8 w-8 text-yellow-400" />
+                      <FileText className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('system')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Storage Used</p>
-                        <p className="text-2xl font-bold text-yellow-200">{formatBytes(metrics?.storageUsed || 0)}</p>
+                        <p className="text-sm text-[#FFD200]">Storage Used</p>
+                        <p className="text-2xl font-bold text-white">{formatBytes(metrics?.storageUsed || 0)}</p>
                       </div>
-                      <Database className="h-8 w-8 text-yellow-400" />
+                      <Database className="h-8 w-8 text-[#FFD200]" />
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card 
-                  className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
                   onClick={() => setSelectedTab('moderation')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-400">Pending Reports</p>
-                        <p className="text-2xl font-bold text-yellow-200">{metrics?.reportsPending?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-[#FE3F5E]">Pending Reports</p>
+                        <p className="text-2xl font-bold text-white">{metrics?.reportsPending?.toLocaleString() || 0}</p>
                       </div>
-                      <AlertTriangle className="h-8 w-8 text-yellow-400" />
+                      <AlertTriangle className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
                   </CardContent>
                 </Card>
@@ -430,19 +435,19 @@ export default function AdminDashboard() {
 
           {/* Privacy Override Tab - Admin can see ALL user information */}
           <TabsContent value="privacy" className="space-y-6">
-            <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 backdrop-blur-sm border-yellow-700/50">
+            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-yellow-400">
+                    <CardTitle className="flex items-center gap-2 text-[#FE3F5E]">
                       <Shield className="h-5 w-5" />
                       Admin Privacy Override Panel
                     </CardTitle>
-                    <CardDescription className="text-yellow-200/80">
+                    <CardDescription className="text-white/60">
                       🔒 Access ALL user information regardless of privacy settings. Admin-only capability.
                     </CardDescription>
                   </div>
-                  <Badge variant="outline" className="bg-yellow-600/20 text-yellow-300 border-yellow-500">
+                  <Badge variant="outline" className="bg-[#FE3F5E]/20 text-[#FE3F5E] border-[#FE3F5E]/50">
                     ADMIN ACCESS
                   </Badge>
                 </div>
@@ -455,14 +460,14 @@ export default function AdminDashboard() {
                       placeholder="Search users by username, email, phone, or any private info..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-gray-800/50 border-yellow-600/50 text-white"
+                      className="bg-white/5 border-white/20 text-white backdrop-blur-xl rounded-2xl"
                     />
                   </div>
                   <Select value={userFilter} onValueChange={setUserFilter}>
-                    <SelectTrigger className="w-48 bg-gray-800/50 border-yellow-600/50">
+                    <SelectTrigger className="w-48 bg-white/5 border-white/20 backdrop-blur-xl rounded-2xl text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectContent className="bg-black/90 border-white/20 backdrop-blur-xl">
                       <SelectItem value="all">All Users</SelectItem>
                       <SelectItem value="premium">Premium Users</SelectItem>
                       <SelectItem value="verified">Verified Users</SelectItem>
@@ -482,7 +487,7 @@ export default function AdminDashboard() {
                 ) : users && users.length > 0 ? (
                   <div className="space-y-4">
                     {users.map((user) => (
-                      <Card key={user.id} className="bg-gray-900/90 border-yellow-700/60 backdrop-blur-sm">
+                      <Card key={user.id} className="bg-white/5 border-white/10 backdrop-blur-xl rounded-2xl">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div className="flex-1 space-y-3">
@@ -611,10 +616,10 @@ export default function AdminDashboard() {
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
             {/* User Management Controls */}
-            <Card className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/50 backdrop-blur-sm">
+            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-yellow-400">User Management</CardTitle>
-                <CardDescription className="text-yellow-200/80">Search, filter, and manage platform users</CardDescription>
+                <CardTitle className="text-[#FE3F5E]">User Management</CardTitle>
+                <CardDescription className="text-white/60">Search, filter, and manage platform users</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-4">
@@ -624,11 +629,11 @@ export default function AdminDashboard() {
                       placeholder="Search users by username or email..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 bg-gray-900/50 border-gray-600"
+                      className="pl-10 bg-white/5 border-white/20 text-white backdrop-blur-xl rounded-2xl"
                     />
                   </div>
                   <Select value={userFilter} onValueChange={setUserFilter}>
-                    <SelectTrigger className="w-48 bg-gray-900/50 border-gray-600">
+                    <SelectTrigger className="w-48 bg-white/5 border-white/20 backdrop-blur-xl rounded-2xl text-white">
                       <SelectValue placeholder="Filter users" />
                     </SelectTrigger>
                     <SelectContent>
@@ -644,7 +649,7 @@ export default function AdminDashboard() {
 
                 {usersLoading ? (
                   <div className="space-y-3">
-                    <div className="text-center py-4 text-yellow-300">Loading users...</div>
+                    <div className="text-center py-4 text-[#FFD200]">Loading users...</div>
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="h-16 bg-gray-700/50 rounded animate-pulse"></div>
                     ))}
@@ -652,9 +657,9 @@ export default function AdminDashboard() {
                 ) : users && users.length > 0 ? (
                   <div className="space-y-3">
                     {users.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 bg-gray-900/80 rounded-lg border border-purple-500/20">
+                      <div key={user.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                          <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">{user.username[0].toUpperCase()}</span>
                           </div>
                           <div className="flex-1">
@@ -667,19 +672,19 @@ export default function AdminDashboard() {
                               </Badge>
                               <Badge variant="outline">{user.subscriptionTier}</Badge>
                             </div>
-                            <p className="text-sm text-gray-400 mb-1">{user.email}</p>
-                            <div className="grid grid-cols-3 gap-4 text-xs text-gray-500 font-mono">
+                            <p className="text-sm text-white/60 mb-1">{user.email}</p>
+                            <div className="grid grid-cols-3 gap-4 text-xs text-white/40 font-mono">
                               <div className="flex flex-col items-center">
                                 <span className="text-lg font-bold text-white">{user.followerCount || 0}</span>
-                                <span className="text-gray-400">followers</span>
+                                <span className="text-white/60">followers</span>
                               </div>
                               <div className="flex flex-col items-center">
                                 <span className="text-lg font-bold text-white">{user.totalLikes || 0}</span>
-                                <span className="text-gray-400">likes</span>
+                                <span className="text-white/60">likes</span>
                               </div>
                               <div className="flex flex-col items-center">
                                 <span className="text-lg font-bold text-white">{user.totalWorks || 0}</span>
-                                <span className="text-gray-400">works</span>
+                                <span className="text-white/60">works</span>
                               </div>
                             </div>
                           </div>
@@ -688,7 +693,7 @@ export default function AdminDashboard() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-purple-500/50 text-purple-300 hover:from-purple-500/30 hover:to-blue-500/30 backdrop-blur-sm"
+                            className="bg-white/5 border-white/20 text-[#FE3F5E] hover:bg-white/10 backdrop-blur-xl rounded-xl"
                             onClick={() => window.open(`/profile/${user.username}`, '_blank')}
                           >
                             <Eye className="h-4 w-4" />
@@ -697,7 +702,7 @@ export default function AdminDashboard() {
                           {!user.isVerified && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="outline" className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm">
+                                <Button size="sm" variant="outline" className="bg-white/5 border-white/20 text-emerald-400 hover:bg-white/10 backdrop-blur-xl rounded-xl">
                                   <CheckCircle className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
@@ -721,7 +726,7 @@ export default function AdminDashboard() {
                           {!user.isBanned ? (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="outline" className="bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 backdrop-blur-sm">
+                                <Button size="sm" variant="outline" className="bg-white/5 border-white/20 text-red-400 hover:bg-white/10 backdrop-blur-xl rounded-xl">
                                   <Ban className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
