@@ -95,7 +95,7 @@ interface AuditLog {
   action: string;
   targetType: string;
   targetId: string;
-  details?: string;
+  details?: string | object;
   createdAt: string;
   adminUsername: string;
 }
@@ -974,7 +974,9 @@ export default function AdminDashboard() {
                               {log.targetType} ID: {log.targetId}
                             </p>
                             {log.details && (
-                              <p className="text-sm text-gray-300 mt-1">{log.details}</p>
+                              <p className="text-sm text-gray-300 mt-1">
+                                {typeof log.details === 'string' ? log.details : JSON.stringify(log.details)}
+                              </p>
                             )}
                           </div>
                           <span className="text-xs text-gray-500">
