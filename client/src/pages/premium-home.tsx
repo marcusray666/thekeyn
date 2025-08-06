@@ -118,24 +118,12 @@ function WelcomePage() {
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="px-6 py-4 flex items-center justify-between">
+        <header className="px-6 py-4 flex items-center justify-center">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" />
             </div>
             <span className="text-white font-bold text-xl">Loggin'</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Link href="/login">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                Log In
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white hover:opacity-90">
-                Sign Up
-              </Button>
-            </Link>
           </div>
         </header>
 
