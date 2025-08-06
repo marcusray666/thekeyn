@@ -9,10 +9,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, MessageCircle, Share, Shield, Image, Video, FileText, MoreHorizontal } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface Post {
   id: string;
   username: string;
+  userId?: number;
   content: string;
   image?: string;
   protected_work?: {
@@ -31,6 +33,7 @@ export default function FeedClean() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newPost, setNewPost] = useState("");
+  const [, setLocation] = useLocation();
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["/api/social/feed"],
@@ -189,7 +192,33 @@ export default function FeedClean() {
                         <AvatarFallback>{post.username?.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{post.username}</p>
+                        <p 
+                          className="font-medium cursor-pointer hover:text-primary transition-colors"
+                          onClick={async () => {
+                            try {
+                              // Find user by username to get their ID
+                              const users = await apiRequest(`/api/users/search?q=${post.username}`);
+                              const user = users.find((u: any) => u.username === post.username);
+                              if (user) {
+                                setLocation(`/user/${user.id}`);
+                              } else {
+                                toast({
+                                  title: "User not found",
+                                  description: "This user's profile is not available.",
+                                  variant: "destructive",
+                                });
+                              }
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to load user profile.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          {post.username}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {formatTimeAgo(post.created_at)}
                         </p>
