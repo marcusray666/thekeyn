@@ -15,10 +15,10 @@ export default function PremiumProfile() {
     queryFn: () => apiRequest("/api/user/profile"),
   });
 
-  // Fetch user's works
-  const { data: works = [] } = useQuery({
-    queryKey: ["/api/works"],
-    queryFn: () => apiRequest("/api/works"),
+  // Fetch user's community posts (not protected works)
+  const { data: posts = [] } = useQuery({
+    queryKey: ["/api/community/posts", "current-user"],
+    queryFn: () => apiRequest("/api/community/posts"),
   });
 
   // Fetch user stats
@@ -145,22 +145,30 @@ export default function PremiumProfile() {
 
           {/* Content */}
           <div className="p-6">
-            {works.length > 0 ? (
+            {posts.length > 0 ? (
               viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {works.map((work) => (
-                    <div key={work.id} className="aspect-square bg-white/5 rounded-2xl p-4 hover:bg-white/10 transition-colors cursor-pointer">
+                  {posts.map((post) => (
+                    <div key={post.id} className="aspect-square bg-white/5 rounded-2xl p-4 hover:bg-white/10 transition-colors cursor-pointer">
                       <div className="flex flex-col h-full">
                         <div className="flex-1 flex items-center justify-center">
-                          <div className="text-4xl mb-2">
-                            {work.mimeType?.startsWith('image/') ? '🎨' :
-                             work.mimeType?.startsWith('audio/') ? '🎵' :
-                             work.mimeType?.startsWith('video/') ? '🎬' : '📄'}
-                          </div>
+                          {post.imageUrl ? (
+                            <img 
+                              src={post.imageUrl} 
+                              alt={post.title}
+                              className="w-full h-full object-cover rounded-xl"
+                            />
+                          ) : (
+                            <div className="text-4xl mb-2">
+                              {post.mimeType?.startsWith('image/') ? '🎨' :
+                               post.mimeType?.startsWith('audio/') ? '🎵' :
+                               post.mimeType?.startsWith('video/') ? '🎬' : '📄'}
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <h3 className="text-white font-medium truncate">{work.title || work.filename}</h3>
-                          <p className="text-white/50 text-sm truncate">{work.creatorName}</p>
+                        <div className="mt-2">
+                          <h3 className="text-white font-medium truncate">{post.title || post.filename}</h3>
+                          <p className="text-white/50 text-sm truncate">{post.username}</p>
                         </div>
                       </div>
                     </div>
@@ -168,13 +176,13 @@ export default function PremiumProfile() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {works.map((work) => (
+                  {posts.map((post) => (
                     <PostCard
-                      key={work.id}
+                      key={post.id}
                       post={{
-                        ...work,
-                        likesCount: Math.floor(Math.random() * 100),
-                        commentsCount: Math.floor(Math.random() * 20)
+                        ...post,
+                        likesCount: post.likes || 0,
+                        commentsCount: post.comments || 0
                       }}
                     />
                   ))}
@@ -185,13 +193,13 @@ export default function PremiumProfile() {
                 <div className="w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
                   <Edit3 className="h-12 w-12 text-white/50" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">No Protected Works Yet</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">No Posts Yet</h3>
                 <p className="text-white/50 mb-6 max-w-sm mx-auto">
-                  Start protecting your digital creations to build your portfolio.
+                  Share your first community post to start building your profile.
                 </p>
-                <Link href="/upload">
+                <Link href="/create-post">
                   <Button className="accent-button">
-                    Protect Your First Work
+                    Create Your First Post
                   </Button>
                 </Link>
               </div>
