@@ -1846,10 +1846,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search users for messaging - MUST BE BEFORE /:userId route
+  app.get("/api/users/search", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const query = req.query.q as string;
+      const currentUserId = req.user!.id;
+      
+      if (!query || query.trim().length < 2) {
+        return res.json([]);
+      }
+      
+      const users = await storage.searchUsers(query.trim(), currentUserId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Failed to search users" });
+    }
+  });
+
+  // Discover users (for social page)
+  app.get("/api/users/discover", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const currentUserId = req.user!.id;
+      const users = await storage.discoverUsers(currentUserId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error discovering users:", error);
+      res.status(500).json({ error: "Failed to discover users" });
+    }
+  });
+
   // Get user info for conversations
   app.get("/api/users/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -1914,35 +1947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search users for messaging
-  app.get("/api/users/search", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      const query = req.query.q as string;
-      const currentUserId = req.user!.id;
-      
-      if (!query || query.trim().length < 2) {
-        return res.json([]);
-      }
-      
-      const users = await storage.searchUsers(query.trim(), currentUserId);
-      res.json(users);
-    } catch (error) {
-      console.error("Error searching users:", error);
-      res.status(500).json({ error: "Failed to search users" });
-    }
-  });
-
-  // Discover users (for social page)
-  app.get("/api/users/discover", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      const currentUserId = req.user!.id;
-      const users = await storage.discoverUsers(currentUserId);
-      res.json(users);
-    } catch (error) {
-      console.error("Error discovering users:", error);
-      res.status(500).json({ error: "Failed to discover users" });
-    }
-  });
+  // Routes moved above to prevent /:userId conflict
 
   // Get user profile by ID
   app.get("/api/users/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
