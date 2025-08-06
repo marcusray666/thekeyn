@@ -150,7 +150,14 @@ function WelcomePage() {
         {/* Hero Section */}
         <section className="px-6 py-20 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="mb-6 inline-flex items-center px-4 py-2 bg-white/10 rounded-full text-[#FFD200] text-sm font-medium backdrop-blur-sm" style={{border: 'none !important'}}>
+            <div className="mb-6 inline-flex items-center px-4 py-2 text-[#FFD200] text-sm font-medium" style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '9999px',
+              backdropFilter: 'blur(4px)',
+              border: 'none',
+              boxShadow: 'none',
+              outline: 'none'
+            }}>
               <Sparkles className="h-4 w-4 mr-2" />
               Digital Art Protection Platform
             </div>
@@ -172,9 +179,15 @@ function WelcomePage() {
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" className="border-transparent text-white hover:bg-white/10 px-8 py-4 text-lg" style={{border: 'none !important'}}>
+                <button className="text-white hover:bg-white/10 px-8 py-4 text-lg font-medium transition-colors" style={{
+                  background: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none',
+                  outline: 'none',
+                  borderRadius: '0.5rem'
+                }}>
                   Sign In
-                </Button>
+                </button>
               </Link>
             </div>
           </div>
@@ -191,7 +204,14 @@ function WelcomePage() {
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm" style={{border: 'none !important'}}>
+              <div className="p-8" style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '1rem',
+                backdropFilter: 'blur(4px)',
+                border: 'none',
+                boxShadow: 'none',
+                outline: 'none'
+              }}>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-xl flex items-center justify-center mb-6">
                   <Shield className="h-6 w-6 text-white" />
                 </div>
@@ -211,7 +231,14 @@ function WelcomePage() {
                 </div>
               </div>
 
-              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm" style={{border: 'none !important'}}>
+              <div className="p-8" style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '1rem',
+                backdropFilter: 'blur(4px)',
+                border: 'none',
+                boxShadow: 'none',
+                outline: 'none'
+              }}>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FFD200] to-[#FFA500] rounded-xl flex items-center justify-center mb-6">
                   <Users className="h-6 w-6 text-white" />
                 </div>
@@ -231,7 +258,14 @@ function WelcomePage() {
                 </div>
               </div>
 
-              <div className="bg-white/5 rounded-2xl p-8 backdrop-blur-sm" style={{border: 'none !important'}}>
+              <div className="p-8" style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '1rem',
+                backdropFilter: 'blur(4px)',
+                border: 'none',
+                boxShadow: 'none',
+                outline: 'none'
+              }}>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#8B5CF6] to-[#A855F7] rounded-xl flex items-center justify-center mb-6">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
@@ -255,7 +289,12 @@ function WelcomePage() {
         </section>
 
         {/* Stats Section */}
-        <section className="px-6 py-20 bg-white/5" style={{border: 'none !important'}}>
+        <section className="px-6 py-20" style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: 'none',
+          boxShadow: 'none',
+          outline: 'none'
+        }}>
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
