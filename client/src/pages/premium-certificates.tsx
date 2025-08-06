@@ -31,7 +31,7 @@ export default function PremiumCertificates() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32">
+      <div className="min-h-screen bg-[#0F0F0F] pt-8 md:pt-20 pb-20 md:pb-32">
         <div className="max-w-6xl mx-auto px-4">
           <div className="animate-pulse space-y-6">
             <div className="h-20 bg-white/10 rounded-3xl"></div>
@@ -47,32 +47,34 @@ export default function PremiumCertificates() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0F0F0F] pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden">
       {/* Background gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
       
-      <div className="max-w-6xl mx-auto px-4 space-y-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 space-y-6 md:space-y-8 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
             <Link href="/">
               <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
                 <ArrowLeft className="h-5 w-5" />
-                <span>Back to Feed</span>
+                <span className="text-sm md:text-base">Back to Feed</span>
               </button>
             </Link>
-            <div className="w-px h-6 bg-white/20"></div>
-            <h1 className="text-3xl font-bold text-white">My Certificates</h1>
-            <div className="px-3 py-1 bg-[#FE3F5E]/20 border border-[#FE3F5E]/50 rounded-full">
-              <span className="text-[#FE3F5E] text-sm font-medium">{certificates.length}</span>
+            <div className="hidden md:block w-px h-6 bg-white/20"></div>
+            <div className="flex items-center space-x-3">
+              <h1 className="text-2xl md:text-3xl font-bold text-white">My Certificates</h1>
+              <div className="px-3 py-1 bg-[#FE3F5E]/20 border border-[#FE3F5E]/50 rounded-full">
+                <span className="text-[#FE3F5E] text-sm font-medium">{certificates.length}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             {/* Search */}
             <div className="flex-1 max-w-md">
@@ -125,9 +127,9 @@ export default function PremiumCertificates() {
         {/* Certificates */}
         {filteredCertificates.length > 0 ? (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/8 transition-all duration-300">
+                <div key={cert.id} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/8 transition-all duration-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-white truncate">
@@ -243,12 +245,12 @@ export default function PremiumCertificates() {
             </div>
           )
         ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
-              <span className="text-4xl">🛡️</span>
+          <div className="text-center py-12 md:py-16 px-4">
+            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
+              <span className="text-3xl md:text-4xl">🛡️</span>
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">No Certificates Found</h3>
-            <p className="text-white/50 mb-6 max-w-sm mx-auto">
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">No Certificates Found</h3>
+            <p className="text-white/50 mb-6 max-w-sm mx-auto text-sm md:text-base">
               {searchQuery ? 'No certificates match your search criteria.' : 'Start protecting your digital works to see certificates here.'}
             </p>
             <Link href="/upload">
