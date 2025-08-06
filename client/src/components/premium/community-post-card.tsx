@@ -306,7 +306,14 @@ export function CommunityPostCard({ post, currentUserId }: CommunityPostCardProp
         
         {/* Location */}
         {post.location && (
-          <div className="flex items-center space-x-1 text-white/60 text-sm mb-2">
+          <div className="flex items-center space-x-1 text-white/60 text-sm mb-2 cursor-pointer hover:text-[#FFD200] transition-colors"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 // Open location search (could link to maps or location-based posts)
+                 if (post.location) {
+                   window.open(`https://www.openstreetmap.org/search?query=${encodeURIComponent(post.location)}`, '_blank');
+                 }
+               }}>
             <MapPin className="h-4 w-4" />
             <span>{post.location}</span>
           </div>

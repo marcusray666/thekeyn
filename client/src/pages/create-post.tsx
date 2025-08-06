@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { LocationPicker } from "@/components/premium/location-picker";
 
 export default function CreatePost() {
   const [, navigate] = useLocation();
@@ -150,13 +151,10 @@ export default function CreatePost() {
             {/* Location */}
             <div>
               <label className="text-white font-medium mb-2 block">Location (Optional)</label>
-              <Input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Where did you create this? (e.g., New York, Studio)"
-                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
-                maxLength={100}
+              <LocationPicker
+                selectedLocation={location}
+                onLocationSelect={setLocation}
+                placeholder="Where did you create this? (e.g., Soho, NYC)"
               />
             </div>
 
