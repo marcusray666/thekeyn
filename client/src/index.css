@@ -1407,15 +1407,15 @@ select:focus-visible {
     border: 2px solid rgba(255, 255, 255, 0.3);
   }
 }
-/* Onboarding highlight styles */
-.onboarding-highlight {
+/* Onboarding highlight styles - ONLY apply when .onboarding-active is present */
+.onboarding-active .onboarding-highlight {
   position: relative !important;
   z-index: 9997 !important;
   border-radius: 8px !important;
   animation: onboardingPulse 2s infinite;
 }
 
-.onboarding-highlight::before {
+.onboarding-active .onboarding-highlight::before {
   content: "";
   position: absolute;
   top: -4px;

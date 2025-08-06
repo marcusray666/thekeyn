@@ -126,7 +126,7 @@ export function OnboardingTooltip({ steps, isVisible, onComplete, onSkip }: Onbo
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay - only show when onboarding is actually active */}
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]" />
       
       {/* Tooltip */}

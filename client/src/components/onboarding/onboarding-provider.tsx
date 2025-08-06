@@ -31,7 +31,9 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   const { onboardingState, markGuideAsSeen, markOnboardingComplete, shouldShowOnboarding } = useOnboarding();
   const [location] = useLocation();
 
-  // Auto-start tours based on page context
+  // Auto-start tours based on page context - DISABLED for now
+  // Users complained about automatic tours, only show when manually triggered
+  /*
   useEffect(() => {
     if (!shouldShowOnboarding()) return;
 
@@ -53,6 +55,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
 
     return () => clearTimeout(timer);
   }, [location, onboardingState, shouldShowOnboarding]);
+  */
 
   const startTour = (tourType: keyof typeof onboardingTours) => {
     setCurrentTour(tourType);
@@ -125,7 +128,9 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
 
   return (
     <OnboardingContext.Provider value={contextValue}>
-      {children}
+      <div className={isTooltipVisible ? 'onboarding-active' : ''}>
+        {children}
+      </div>
       
       {/* Onboarding tooltip overlay */}
       {isTooltipVisible && currentTour && (
