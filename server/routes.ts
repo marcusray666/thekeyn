@@ -1657,81 +1657,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user profile by ID
-  app.get("/api/users/:userId", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      if (isNaN(userId)) {
-        return res.status(400).json({ error: "Invalid user ID" });
-      }
 
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
 
-      // Return safe user data (no password)
-      const { password, ...safeUser } = user;
-      
-      // Add additional profile data
-      const profile = {
-        ...safeUser,
-        displayName: user.displayName || user.username,
-        followerCount: 0,
-        followingCount: 0,  
-        workCount: 0,
-        postCount: 0,
-        isFollowing: false,
-        isOnline: false,
-        joinedDate: user.createdAt || new Date().toISOString(),
-        isVerified: false
-      };
 
-      res.json(profile);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      res.status(500).json({ error: "Failed to fetch user profile" });
-    }
-  });
-
-  // Get users for discovery (social page)
-  app.get("/api/users/discover", requireAuth, async (req: AuthenticatedRequest, res) => {
-    try {
-      const currentUserId = req.user!.id;
-      
-      // Get all real users from database
-      const allUsers = await storage.getAllUsers();
-      
-      // Filter out current user and transform to expected format
-      const discoveryUsers = await Promise.all(
-        allUsers
-          .filter(user => user.id !== currentUserId)
-          .map(async (user) => {
-            // Get user's work count
-            const userWorks = await storage.getUserWorks(user.id);
-            
-            return {
-              id: user.id,
-              username: user.username,
-              displayName: user.username, // Using username as display name
-              bio: user.bio || `Creator on Loggin' protecting digital works`,
-              avatar: user.profileImageUrl,
-              followerCount: 0, // Real follower system not implemented yet
-              followingCount: 0, // Real following system not implemented yet
-              workCount: userWorks.length, // Real work count from database
-              isFollowing: false, // Real follow status not implemented yet
-              isOnline: Math.random() > 0.5, // Random online status for now
-              lastSeen: user.lastLoginAt || user.createdAt || new Date().toISOString()
-            };
-          })
-      );
-      
-      res.json(discoveryUsers);
-    } catch (error) {
-      console.error("Error fetching users for discovery:", error);
-      res.status(500).json({ error: "Failed to fetch users" });
-    }
-  });
 
   // Simple in-memory conversation storage (in production, use database)
   const conversationStorage = new Map();
@@ -1894,16 +1822,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Search users for messaging - MUST BE BEFORE /:userId route
-  app.get("/api/users/search", requireAuth, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/users/search", async (req, res) => {
     try {
       const query = req.query.q as string;
-      const currentUserId = req.user!.id;
+      const authHeader = req.headers.authorization;
       
       if (!query || query.trim().length < 2) {
         return res.json([]);
       }
       
+      // For search, we'll use a default currentUserId of 1 if not authenticated
+      let currentUserId = 1;
+      if (authHeader && req.session?.userId) {
+        currentUserId = req.session.userId;
+      }
+      
       const users = await storage.searchUsers(query.trim(), currentUserId);
+      console.log(`User search for "${query}":`, users);
       res.json(users);
     } catch (error) {
       console.error("Error searching users:", error);
@@ -1923,8 +1858,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user info for conversations
-  app.get("/api/users/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+  // Get user info for conversations - KEEP THIS AFTER SEARCH
+  app.get("/api/users/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Return safe user data (no password)
+      const { password, ...safeUser } = user;
+      
+      // Add profile data
+      const profile = {
+        ...safeUser,
+        displayName: user.displayName || user.username,
+        followerCount: 0,
+        followingCount: 0,  
+        workCount: 0,
+        postCount: 0,
+        isFollowing: false,
+        isOnline: false,
+        joinedDate: user.createdAt || new Date().toISOString(),
+        isVerified: false
+      };
+
+      res.json(profile);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ error: "Failed to fetch user profile" });
+    }
+  });
+
+  // Legacy conversation endpoint
+  app.get("/api/users/:userId/conversation", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = parseInt(req.params.userId);
       if (isNaN(userId)) {
