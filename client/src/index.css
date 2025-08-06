@@ -4,16 +4,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NUCLEAR BORDER REMOVAL - ABSOLUTE HIGHEST PRIORITY */
-html, body, *, *::before, *::after, #root, div, section, article, button, a, span, p, h1, h2, h3, h4, h5, h6 {
-  border: 0px solid transparent !important;
-  border-width: 0px !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: 0px solid transparent !important;
-  outline-width: 0px !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
+/* BROWSER DEFAULT OVERRIDE - RESET ALL STYLING */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-sizing: border-box;
+}
+
+/* FORCE REMOVE ALL BORDERS THROUGH CSS VARIABLES */
+:root {
+  --tw-border-opacity: 0 !important;
+  --tw-ring-opacity: 0 !important;
+  --tw-shadow: none !important;
+  --tw-ring-shadow: none !important;
+  --tw-shadow-colored: none !important;
+}
+
+/* ANTI-BORDER INJECTION */
+[class*="border"], [style*="border"], div, section, button, a {
+  border: none !important;
+  outline: none !important;
   box-shadow: none !important;
 }
 

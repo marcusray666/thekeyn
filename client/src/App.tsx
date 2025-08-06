@@ -11,8 +11,7 @@ import { OnboardingProvider } from "@/components/onboarding/onboarding-provider"
 
 import Login from "@/pages/login-clean";
 import Register from "@/pages/register-clean";
-import UploadPage from "@/pages/upload";
-import Home from "@/pages/home";
+
 import PremiumHome from "@/pages/premium-home";
 import PremiumUpload from "@/pages/premium-upload";
 import PremiumProfile from "@/pages/premium-profile";
@@ -26,7 +25,6 @@ import BulkOperations from "@/pages/bulk-operations";
 import PremiumSettings from "@/pages/premium-settings";
 import Security from "@/pages/security";
 import Profile from "@/pages/profile";
-import UserProfile from "@/pages/user-profile";
 import Portfolio from "@/pages/portfolio";
 import CertificateGuide from "@/pages/certificate-guide";
 
@@ -40,14 +38,13 @@ import SubscriptionCancelled from "@/pages/subscription-cancelled";
 import BlockchainVerification from "@/pages/blockchain-verification";
 import Social from "@/pages/social";
 import Messages from "@/pages/messages";
-import UserProfilePage from "@/pages/profile";
 import Followers from "@/pages/followers";
 import ShareDemo from "@/pages/share-demo";
 
 import Studio from "@/pages/studio";
 import AdminDashboard from "@/pages/admin-dashboard";
 
-import EnhancedDashboard from "@/pages/enhanced-dashboard";
+
 import Welcome from "@/pages/welcome";
 
 import NotFound from "@/pages/not-found";
@@ -86,7 +83,7 @@ function Router() {
       <Route path="/blockchain-verification" component={BlockchainVerification} />
       <Route path="/social" component={Social} />
       <Route path="/messages" component={Messages} />
-      <Route path="/user/:userId" component={UserProfile} />
+      <Route path="/user/:userId" component={Profile} />
       <Route path="/followers" component={Followers} />
       <Route path="/share-demo" component={ShareDemo} />
       <Route path="/settings" component={PremiumSettings} />
