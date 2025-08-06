@@ -1,5 +1,5 @@
 import { formatTimeAgo } from "@/lib/utils";
-import { Shield, Download, Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
+import { Shield, Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { ShareModal } from "./share-modal";
 
@@ -130,11 +130,6 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
             <Share2 className="h-6 w-6" />
           </button>
         </div>
-
-        <button className="glass-button !px-4 !py-2 !text-sm">
-          <Download className="h-4 w-4 mr-2" />
-          Certificate
-        </button>
       </div>
 
       {/* Share Modal */}
