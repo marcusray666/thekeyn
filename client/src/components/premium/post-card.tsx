@@ -12,7 +12,7 @@ interface PostCardProps {
     creatorId?: number;
     createdAt: string;
     sha256Hash?: string;
-    mimeType: string;
+    mimeType: string | null;
     thumbnailUrl?: string;
     isVerified: boolean;
     isProtected?: boolean;
@@ -35,9 +35,9 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
   };
 
   const getFileIcon = () => {
-    if (post.mimeType.startsWith('image/')) return '🎨';
-    if (post.mimeType.startsWith('audio/')) return '🎵';
-    if (post.mimeType.startsWith('video/')) return '🎬';
+    if (post.mimeType?.startsWith('image/')) return '🎨';
+    if (post.mimeType?.startsWith('audio/')) return '🎵';
+    if (post.mimeType?.startsWith('video/')) return '🎬';
     return '📄';
   };
 
