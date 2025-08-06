@@ -1,5 +1,5 @@
 import { formatTimeAgo } from "@/lib/utils";
-import { Shield, Download, Share2, Heart, MessageCircle } from "lucide-react";
+import { Shield, Download, Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
 interface PostCardProps {
@@ -65,6 +65,12 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
               <span>Verified</span>
             </div>
           )}
+          <div className="bg-gradient-to-r from-blue-500 to-green-500 px-3 py-1 rounded-full">
+            <div className="flex items-center space-x-1">
+              <CheckCircle className="h-3 w-3 text-white" />
+              <span className="text-white text-xs font-semibold">Verified by AI</span>
+            </div>
+          </div>
         </div>
       </div>
 

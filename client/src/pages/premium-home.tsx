@@ -153,22 +153,7 @@ export default function PremiumHome() {
             </div>
           )}
           
-          {/* Show upload prompt after community posts */}
-          <div className="mt-8 text-center py-12 bg-white/5 rounded-3xl">
-            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center mb-6">
-              <Plus className="h-12 w-12 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Join the Community</h3>
-            <p className="text-white/50 mb-6 max-w-sm mx-auto">
-              Upload your digital work to protect it on the blockchain and share it with creators worldwide.
-            </p>
-            <Link href="/upload">
-              <button className="accent-button">
-                <Plus className="h-5 w-5 mr-2" />
-                Protect Your Work
-              </button>
-            </Link>
-          </div>
+
         </div>
       </main>
 

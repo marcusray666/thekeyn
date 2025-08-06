@@ -16,6 +16,7 @@ UI animations: Disabled - user prefers static interface without motion effects.
 - **AI Migration**: Successfully switched from OpenAI to Google Gemini AI for content moderation
 - **Content Separation Architecture**: Clear distinction between Community Posts (public social feed) and Certificates (private blockchain-protected works)
 - **Share to Community Feature**: Users can share protected works to community feed with "PROTECTED" badge marking
+- **AI Content Verification**: All posts display "Verified by AI" badge indicating content moderation for violence/adult content
 - **Messaging System**: Full real-time messaging with persistent conversations and back navigation
 - **Enhanced Navigation**: Profile dropdown includes certificates, analytics, blockchain verification, and settings
 - **Consistent Gradient Backgrounds**: Applied unified pink/yellow gradient atmospheric effects across all pages
