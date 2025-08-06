@@ -47,6 +47,43 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     );
   }
 
+  // If it's a video, display video player
+  if (mimeType && mimeType.startsWith('video/') && filename) {
+    return (
+      <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex items-center justify-center`}>
+        <video
+          src={`/uploads/${filename}`}
+          className="max-w-full max-h-full object-contain"
+          controls
+          preload="metadata"
+          style={{ backgroundColor: 'transparent' }}
+        >
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    );
+  }
+
+  // If it's audio, display audio player
+  if (mimeType && mimeType.startsWith('audio/') && filename) {
+    return (
+      <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex flex-col items-center justify-center p-6`}>
+        <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-4">
+          <Music className="h-8 w-8 text-white" />
+        </div>
+        <h3 className="text-white text-sm font-medium mb-4 text-center">{title}</h3>
+        <audio
+          src={`/uploads/${filename}`}
+          className="w-full"
+          controls
+          preload="metadata"
+        >
+          Your browser does not support the audio tag.
+        </audio>
+      </div>
+    );
+  }
+
   // Fallback to icon display
   return (
     <div className={`${className} flex flex-col items-center justify-center bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-600`}>
