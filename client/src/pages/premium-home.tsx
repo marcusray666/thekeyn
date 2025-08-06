@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CommunityPostCard } from "@/components/premium/community-post-card";
-import { Plus, MessageCircle, TrendingUp, Clock, Users, Shield, Sparkles, Zap, Crown, ArrowRight, CheckCircle2, Play, Eye } from "lucide-react";
+import { Plus, Users, Shield, Sparkles, Zap, Crown, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +12,13 @@ export default function PremiumHome() {
     queryKey: ["/api/auth/user"],
     queryFn: () => apiRequest("/api/auth/user"),
     retry: false,
+  });
+
+  // Fetch community posts (real data from API) - always call hooks at top level
+  const { data: communityPosts = [], isLoading } = useQuery({
+    queryKey: ["/api/community/posts"],
+    queryFn: () => apiRequest("/api/community/posts"),
+    enabled: !!currentUser, // Only fetch when user is authenticated
   });
 
   // Show welcome page for unauthenticated users
@@ -33,12 +39,6 @@ export default function PremiumHome() {
       </div>
     );
   }
-
-  // Fetch community posts (real data from API)
-  const { data: communityPosts = [], isLoading } = useQuery({
-    queryKey: ["/api/community/posts"],
-    queryFn: () => apiRequest("/api/community/posts"),
-  });
 
   // Use real API data only
 
