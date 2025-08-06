@@ -1,9 +1,8 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "./lib/queryClient";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -116,7 +115,13 @@ function Router() {
 }
 
 function AppContent() {
-  const { isAuthenticated } = useAuth();
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/user"],
+    queryFn: () => apiRequest("/api/auth/user"),
+    retry: false,
+  });
+  
+  const isAuthenticated = !!currentUser;
   
   return (
     <TooltipProvider>
@@ -125,11 +130,12 @@ function AppContent() {
         <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#FE3F5E] text-white px-4 py-2 rounded">
           Skip to main content
         </a>
-        <TopNav />
+        {/* Only show navigation for authenticated users */}
+        {isAuthenticated && <TopNav />}
         <main id="main-content">
           <Router />
         </main>
-        <BottomNav />
+        {isAuthenticated && <BottomNav />}
       </div>
       <Toaster />
     </TooltipProvider>
