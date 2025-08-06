@@ -232,8 +232,11 @@ export default function Social() {
             >
               <div className="flex flex-col items-center text-center">
                 {/* Avatar */}
-                <div className="relative mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10">
+                <div 
+                  className="relative mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setLocation(`/user/${user.id}`)}
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10 hover:border-[#FE3F5E]/30 transition-colors">
                     <User className="h-8 w-8 text-white/70" />
                   </div>
                   {user.isOnline && (
@@ -242,8 +245,18 @@ export default function Social() {
                 </div>
 
                 {/* User Info */}
-                <h3 className="text-lg font-semibold text-white mb-1">{user.displayName}</h3>
-                <p className="text-white/60 text-sm mb-2">@{user.username}</p>
+                <h3 
+                  className="text-lg font-semibold text-white mb-1 hover:text-[#FE3F5E] transition-colors cursor-pointer"
+                  onClick={() => setLocation(`/user/${user.id}`)}
+                >
+                  {user.displayName}
+                </h3>
+                <p 
+                  className="text-white/60 text-sm mb-2 hover:text-[#FE3F5E] transition-colors cursor-pointer"
+                  onClick={() => setLocation(`/user/${user.id}`)}
+                >
+                  @{user.username}
+                </p>
                 
                 {user.bio && (
                   <p className="text-white/50 text-xs mb-4 line-clamp-2">{user.bio}</p>

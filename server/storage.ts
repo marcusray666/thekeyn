@@ -151,6 +151,11 @@ export interface IStorage {
   // User search for messaging
   searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
   findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null>;
+  getUserProfile(userId: number, currentUserId: number): Promise<any | null>;
+  getUserWorks(userId: number): Promise<any[]>;
+  followUser(followerId: number, followingId: number): Promise<any>;
+  unfollowUser(followerId: number, followingId: number): Promise<void>;
+  discoverUsers(currentUserId: number): Promise<any[]>;
   
   // Admin functions
   getSystemMetrics(): Promise<any>;
@@ -2056,6 +2061,169 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error finding conversation between users:", error);
       return null;
+    }
+  }
+
+  async getUserProfile(userId: number, currentUserId: number): Promise<any | null> {
+    try {
+      const [user] = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          displayName: users.displayName,
+          bio: users.bio,
+          profileImageUrl: users.profileImageUrl,
+          location: users.location,
+          website: users.website,
+          isVerified: users.isVerified,
+          createdAt: users.createdAt,
+          followerCount: sql`(SELECT count(*) FROM ${userFollows} WHERE following_id = ${users.id})`.as('followerCount'),
+          followingCount: sql`(SELECT count(*) FROM ${userFollows} WHERE follower_id = ${users.id})`.as('followingCount'),
+          workCount: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('workCount'),
+          postCount: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('postCount'),
+          isFollowing: sql`EXISTS (
+            SELECT 1 FROM ${userFollows} 
+            WHERE follower_id = ${currentUserId} 
+            AND following_id = ${users.id}
+          )`.as('isFollowing'),
+          isOnline: sql`true`.as('isOnline') // Simplified - would be based on actual activity
+        })
+        .from(users)
+        .where(and(eq(users.id, userId), ne(users.isBanned, true)))
+        .limit(1);
+
+      if (!user) return null;
+
+      return {
+        ...user,
+        joinedDate: user.createdAt,
+        followerCount: Number(user.followerCount),
+        followingCount: Number(user.followingCount),
+        workCount: Number(user.workCount),
+        postCount: Number(user.postCount),
+        isFollowing: Boolean(user.isFollowing)
+      };
+    } catch (error) {
+      console.error("Error getting user profile:", error);
+      return null;
+    }
+  }
+
+  async getUserWorks(userId: number): Promise<any[]> {
+    try {
+      const userWorks = await db
+        .select({
+          id: works.id,
+          title: works.title,
+          filename: works.filename,
+          thumbnailUrl: works.thumbnailUrl,
+          mimeType: works.mimeType,
+          createdAt: works.createdAt,
+          likes: sql`0`.as('likes'), // Simplified - would come from likes table
+          views: sql`0`.as('views'), // Simplified - would come from views table
+        })
+        .from(works)
+        .where(eq(works.userId, userId))
+        .orderBy(desc(works.createdAt))
+        .limit(20);
+
+      return userWorks.map(work => ({
+        ...work,
+        likes: Number(work.likes),
+        views: Number(work.views)
+      }));
+    } catch (error) {
+      console.error("Error getting user works:", error);
+      return [];
+    }
+  }
+
+  async followUser(followerId: number, followingId: number): Promise<any> {
+    try {
+      // Check if already following
+      const existingFollow = await db
+        .select()
+        .from(userFollows)
+        .where(and(
+          eq(userFollows.followerId, followerId),
+          eq(userFollows.followingId, followingId)
+        ))
+        .limit(1);
+
+      if (existingFollow.length > 0) {
+        return existingFollow[0];
+      }
+
+      // Create new follow relationship
+      const [follow] = await db
+        .insert(userFollows)
+        .values({
+          followerId,
+          followingId,
+          createdAt: new Date().toISOString()
+        })
+        .returning();
+
+      return follow;
+    } catch (error) {
+      console.error("Error following user:", error);
+      throw error;
+    }
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    try {
+      await db
+        .delete(userFollows)
+        .where(and(
+          eq(userFollows.followerId, followerId),
+          eq(userFollows.followingId, followingId)
+        ));
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      throw error;
+    }
+  }
+
+  async discoverUsers(currentUserId: number): Promise<any[]> {
+    try {
+      const discoveredUsers = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          displayName: users.displayName,
+          bio: users.bio,
+          profileImageUrl: users.profileImageUrl,
+          isVerified: users.isVerified,
+          followerCount: sql`(SELECT count(*) FROM ${userFollows} WHERE following_id = ${users.id})`.as('followerCount'),
+          followingCount: sql`(SELECT count(*) FROM ${userFollows} WHERE follower_id = ${users.id})`.as('followingCount'),
+          workCount: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('workCount'),
+          isFollowing: sql`EXISTS (
+            SELECT 1 FROM ${userFollows} 
+            WHERE follower_id = ${currentUserId} 
+            AND following_id = ${users.id}
+          )`.as('isFollowing'),
+          isOnline: sql`true`.as('isOnline'), // Simplified - would be based on actual activity
+          lastSeen: sql`'recently'`.as('lastSeen')
+        })
+        .from(users)
+        .where(and(
+          ne(users.id, currentUserId), // Don't include current user
+          ne(users.isBanned, true)     // Don't include banned users
+        ))
+        .orderBy(desc(users.createdAt))
+        .limit(50);
+
+      return discoveredUsers.map(user => ({
+        ...user,
+        followerCount: Number(user.followerCount),
+        followingCount: Number(user.followingCount),
+        workCount: Number(user.workCount),
+        isFollowing: Boolean(user.isFollowing)
+      }));
+    } catch (error) {
+      console.error("Error discovering users:", error);
+      return [];
     }
   }
 }

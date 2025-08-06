@@ -320,19 +320,29 @@ export default function Messages() {
                       {searchUsers.map((user) => (
                         <div
                           key={user.id}
-                          onClick={() => startConversationWithUser(user)}
                           className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
                         >
-                          <div className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10">
-                            <User className="h-5 w-5 text-white/70" />
+                          <div 
+                            className="flex items-center space-x-3 flex-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLocation(`/user/${user.id}`);
+                            }}
+                          >
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10">
+                              <User className="h-5 w-5 text-white/70" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-white text-sm hover:text-[#FE3F5E] transition-colors">{user.username}</p>
+                              {user.displayName && (
+                                <p className="text-xs text-white/50">{user.displayName}</p>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <p className="font-medium text-white text-sm">{user.username}</p>
-                            {user.displayName && (
-                              <p className="text-xs text-white/50">{user.displayName}</p>
-                            )}
-                          </div>
-                          <div className="px-2 py-1 bg-[#FE3F5E]/20 rounded-full">
+                          <div 
+                            className="px-2 py-1 bg-[#FE3F5E]/20 rounded-full hover:bg-[#FE3F5E]/30 transition-colors"
+                            onClick={() => startConversationWithUser(user)}
+                          >
                             <span className="text-xs text-[#FE3F5E] font-medium">Message</span>
                           </div>
                         </div>
@@ -348,13 +358,19 @@ export default function Messages() {
             {filteredConversations.map((conversation) => (
               <div
                 key={conversation.id}
-                onClick={() => setSelectedConversation(conversation.id)}
                 className={`p-4 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors ${
                   selectedConversation === conversation.id ? 'bg-white/10' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="relative">
+                  <div 
+                    className="relative cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Navigate to user profile if we have participant ID
+                      setLocation(`/user/${conversation.participantName}`);
+                    }}
+                  >
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10">
                       <User className="h-6 w-6 text-white/70" />
                     </div>
@@ -363,9 +379,18 @@ export default function Messages() {
                     )}
                   </div>
                   
-                  <div className="flex-1 min-w-0">
+                  <div 
+                    className="flex-1 min-w-0"
+                    onClick={() => setSelectedConversation(conversation.id)}
+                  >
                     <div className="flex items-center justify-between">
-                      <p className="font-semibold text-white truncate">
+                      <p 
+                        className="font-semibold text-white truncate hover:text-[#FE3F5E] transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLocation(`/user/${conversation.participantName}`);
+                        }}
+                      >
                         {conversation.participantName}
                       </p>
                       <span className="text-xs text-white/50">

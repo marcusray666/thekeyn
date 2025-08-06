@@ -1940,6 +1940,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Discover users (for social page)
+  app.get("/api/users/discover", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const currentUserId = req.user!.id;
+      const users = await storage.discoverUsers(currentUserId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error discovering users:", error);
+      res.status(500).json({ error: "Failed to discover users" });
+    }
+  });
+
+  // Get user profile by ID
+  app.get("/api/users/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const currentUserId = req.user!.id;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      const userProfile = await storage.getUserProfile(userId, currentUserId);
+      if (!userProfile) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(userProfile);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ error: "Failed to fetch user profile" });
+    }
+  });
+
+  // Get user's works
+  app.get("/api/users/:userId/works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      const works = await storage.getUserWorks(userId);
+      res.json(works);
+    } catch (error) {
+      console.error("Error fetching user works:", error);
+      res.status(500).json({ error: "Failed to fetch user works" });
+    }
+  });
+
+  // Follow/unfollow user
+  app.post("/api/users/:userId/follow", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const followerId = req.user!.id;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      if (userId === followerId) {
+        return res.status(400).json({ error: "Cannot follow yourself" });
+      }
+      
+      const follow = await storage.followUser(followerId, userId);
+      res.json({ success: true, follow });
+    } catch (error) {
+      console.error("Error following user:", error);
+      res.status(500).json({ error: "Failed to follow user" });
+    }
+  });
+
+  app.post("/api/users/:userId/unfollow", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const followerId = req.user!.id;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      await storage.unfollowUser(followerId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      res.status(500).json({ error: "Failed to unfollow user" });
+    }
+  });
+
   // Start conversation with a user
   app.post("/api/messages/start-conversation", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

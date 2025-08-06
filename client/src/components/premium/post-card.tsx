@@ -8,6 +8,7 @@ interface PostCardProps {
     title: string;
     filename: string;
     creatorName: string;
+    creatorId?: number;
     createdAt: string;
     sha256Hash?: string;
     mimeType: string;
@@ -42,14 +43,25 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
     <div className="post-card" onClick={onDetailsClick}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
+        <div 
+          className="flex items-center space-x-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors -m-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Navigate to user profile using userId if available
+            if (post.creatorId) {
+              window.location.href = `/user/${post.creatorId}`;
+            } else {
+              console.warn('No creatorId available for navigation');
+            }
+          }}
+        >
           <div className="creator-avatar">
             <div className="avatar-inner">
               {post.creatorName.charAt(0).toUpperCase()}
             </div>
           </div>
           <div>
-            <h3 className="text-white font-semibold">{post.creatorName}</h3>
+            <h3 className="text-white font-semibold hover:text-[#FE3F5E] transition-colors">{post.creatorName}</h3>
             <p className="text-white/50 text-sm">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
