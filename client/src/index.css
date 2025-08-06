@@ -255,6 +255,42 @@
     color: #FFFFFF !important;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
+
+  /* Mobile bottom navigation improvements */
+  @media (max-width: 768px) {
+    /* Ensure mobile content has proper bottom padding for navigation */
+    body {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    
+    /* Bottom navigation styling */
+    .mobile-nav-item {
+      @apply flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 transition-all duration-200;
+      touch-action: manipulation;
+    }
+    
+    .mobile-nav-icon {
+      @apply h-5 w-5 mb-1 transition-colors flex-shrink-0;
+    }
+    
+    .mobile-nav-label {
+      @apply text-[10px] font-medium leading-tight text-center whitespace-nowrap;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Improve button alignment and spacing */
+    .mobile-action-button {
+      @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors;
+      min-height: 44px; /* iOS touch target minimum */
+    }
+    
+    /* Ensure proper safe areas on iOS */
+    .mobile-safe-area {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    }
+  }
   
   /* Loggin text specific */
   a span, nav span {

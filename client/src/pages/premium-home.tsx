@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CommunityPostCard } from "@/components/premium/community-post-card";
-import { Plus, Users, Paintbrush, Sparkles, Zap, Crown, CheckCircle2 } from "lucide-react";
+import { Plus, Users, Sparkles, Zap, Crown, CheckCircle2 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,7 @@ export default function PremiumHome() {
   // Use real API data only
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0F0F0F] pb-24 md:pb-0 relative overflow-hidden">
       {/* Background gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
@@ -119,7 +119,7 @@ export default function PremiumHome() {
             </div>
           ) : (
             <div className="space-y-6">
-              {communityPosts.map((post) => (
+              {communityPosts.map((post: any) => (
                 <CommunityPostCard
                   key={post.id}
                   post={post}
