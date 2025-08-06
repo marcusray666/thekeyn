@@ -45,6 +45,8 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeConversation, setActiveConversation] = useState<any>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
+  const [searchUsers, setSearchUsers] = useState<any[]>([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
@@ -159,6 +161,69 @@ export default function Messages() {
     conv.participantName.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
+  // Search for users when typing in search box
+  React.useEffect(() => {
+    if (searchQuery.length > 1) {
+      setIsSearchingUsers(true);
+      
+      // Debounce the search
+      const timeoutId = setTimeout(async () => {
+        try {
+          const response = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
+            credentials: 'include'
+          });
+          if (response.ok) {
+            const users = await response.json();
+            setSearchUsers(users);
+          }
+        } catch (error) {
+          console.error('User search error:', error);
+        } finally {
+          setIsSearchingUsers(false);
+        }
+      }, 300);
+      
+      return () => clearTimeout(timeoutId);
+    } else {
+      setSearchUsers([]);
+      setIsSearchingUsers(false);
+    }
+  }, [searchQuery]);
+
+  const startConversationWithUser = async (user: any) => {
+    try {
+      const response = await fetch('/api/messages/start-conversation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          participantId: user.id
+        })
+      });
+      
+      if (response.ok) {
+        const conversation = await response.json();
+        setSelectedConversation(conversation.id);
+        setActiveConversation({
+          id: conversation.id,
+          participantName: user.username,
+          participantId: user.id,
+          isOnline: true,
+          currentUserId: 31 // This should be dynamic
+        });
+        setSearchQuery("");
+        setSearchUsers([]);
+        
+        // Refresh conversations list
+        queryClient.invalidateQueries({ queryKey: ["/api/messages/conversations"] });
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    }
+  };
+
   const selectedConv = conversations?.find(c => c.id === selectedConversation) || activeConversation;
 
   const sendMessage = async () => {
@@ -240,6 +305,46 @@ export default function Messages() {
           
           {/* Conversations */}
           <div className="overflow-y-auto h-full pb-20">
+            {/* Show user search results when searching */}
+            {searchQuery.length > 1 && (
+              <div className="border-b border-white/10 bg-black/10">
+                <div className="p-3">
+                  <h3 className="text-sm font-semibold text-white/70 mb-2">Find People</h3>
+                  
+                  {isSearchingUsers ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="w-6 h-6 border-2 border-[#FE3F5E]/30 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+                    </div>
+                  ) : searchUsers.length > 0 ? (
+                    <div className="space-y-2">
+                      {searchUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          onClick={() => startConversationWithUser(user)}
+                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                        >
+                          <div className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E]/20 to-[#FFD200]/20 rounded-full flex items-center justify-center border border-white/10">
+                            <User className="h-5 w-5 text-white/70" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-white text-sm">{user.username}</p>
+                            {user.displayName && (
+                              <p className="text-xs text-white/50">{user.displayName}</p>
+                            )}
+                          </div>
+                          <div className="px-2 py-1 bg-[#FE3F5E]/20 rounded-full">
+                            <span className="text-xs text-[#FE3F5E] font-medium">Message</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/50">No users found</p>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {filteredConversations.map((conversation) => (
               <div
                 key={conversation.id}

@@ -1922,6 +1922,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search users for messaging
+  app.get("/api/users/search", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const query = req.query.q as string;
+      const currentUserId = req.user!.id;
+      
+      if (!query || query.trim().length < 2) {
+        return res.json([]);
+      }
+      
+      const users = await storage.searchUsers(query.trim(), currentUserId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Failed to search users" });
+    }
+  });
+
+  // Start conversation with a user
+  app.post("/api/messages/start-conversation", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { participantId } = req.body;
+      
+      if (!participantId) {
+        return res.status(400).json({ error: "Participant ID is required" });
+      }
+      
+      // Check if conversation already exists
+      const existingConversation = await storage.findConversationBetweenUsers(userId, participantId);
+      if (existingConversation) {
+        return res.json(existingConversation);
+      }
+      
+      // Create new conversation with both participants
+      const conversation = await storage.createConversation([userId, participantId]);
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      res.status(500).json({ error: "Failed to start conversation" });
+    }
+  });
+
   // Get user recent activity
   app.get("/api/user/activity", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

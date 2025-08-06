@@ -150,6 +150,7 @@ export interface IStorage {
 
   // User search for messaging
   searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
+  findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null>;
   
   // Admin functions
   getSystemMetrics(): Promise<any>;
@@ -1997,6 +1998,65 @@ export class DatabaseStorage implements IStorage {
       .where(eq(works.id, workId))
       .returning();
     return work;
+  }
+
+  async searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]> {
+    try {
+      const searchResults = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          displayName: users.displayName,
+          profileImageUrl: users.profileImageUrl,
+          isVerified: users.isVerified
+        })
+        .from(users)
+        .where(
+          and(
+            ne(users.id, currentUserId), // Exclude current user
+            ne(users.isBanned, true), // Exclude banned users
+            or(
+              ilike(users.username, `%${query}%`),
+              ilike(users.displayName, `%${query}%`)
+            )
+          )
+        )
+        .limit(10);
+
+      return searchResults;
+    } catch (error) {
+      console.error("Error searching users:", error);
+      return [];
+    }
+  }
+
+  async findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null> {
+    try {
+      // Find conversation where both users are participants
+      const [conversation] = await db
+        .select({
+          id: conversations.id,
+          createdAt: conversations.createdAt
+        })
+        .from(conversations)
+        .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+        .where(
+          and(
+            eq(conversationParticipants.userId, userId1),
+            sql`EXISTS (
+              SELECT 1 FROM ${conversationParticipants} cp2 
+              WHERE cp2.conversation_id = ${conversations.id} 
+              AND cp2.user_id = ${userId2}
+            )`
+          )
+        )
+        .limit(1);
+
+      return conversation || null;
+    } catch (error) {
+      console.error("Error finding conversation between users:", error);
+      return null;
+    }
   }
 }
 
