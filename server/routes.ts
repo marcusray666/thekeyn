@@ -1686,14 +1686,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple in-memory conversation storage (in production, use database)
+  const conversationStorage = new Map();
+  const messageStorage = new Map();
+
   // Get conversations for messaging
   app.get("/api/messages/conversations", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user!.id;
       
-      // For now, return empty array since we don't have a full messaging system
-      // In a real implementation, you'd query a conversations table
-      res.json([]);
+      // Get conversations where user is a participant
+      const userConversations = [];
+      for (const [convId, conversation] of conversationStorage.entries()) {
+        if (conversation.participants.includes(userId)) {
+          // Get the other participant's info
+          const otherParticipantId = conversation.participants.find(id => id !== userId);
+          const otherUser = await storage.getUser(otherParticipantId);
+          
+          // Get latest message for preview
+          const messages = messageStorage.get(convId) || [];
+          const latestMessage = messages[messages.length - 1];
+          
+          userConversations.push({
+            id: convId,
+            participantId: otherParticipantId,
+            participantName: otherUser?.username || `User ${otherParticipantId}`,
+            participantAvatar: otherUser?.profileImageUrl,
+            lastMessage: latestMessage?.content || "No messages yet",
+            lastMessageTime: latestMessage?.timestamp || conversation.createdAt,
+            unreadCount: 0, // Could implement real unread counting
+            isOnline: Math.random() > 0.5 // Mock online status
+          });
+        }
+      }
+      
+      // Sort by last message time
+      userConversations.sort((a, b) => new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime());
+      
+      res.json(userConversations);
     } catch (error) {
       console.error("Error fetching conversations:", error);
       res.status(500).json({ error: "Failed to fetch conversations" });
@@ -1706,9 +1736,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const conversationId = parseInt(req.params.conversationId);
       const userId = req.user!.id;
       
-      // For now, return empty array since we don't have a full messaging system
-      // In a real implementation, you'd query a messages table
-      res.json([]);
+      // Check if user has access to this conversation
+      const conversation = conversationStorage.get(conversationId);
+      if (!conversation || !conversation.participants.includes(userId)) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get messages for this conversation
+      const messages = messageStorage.get(conversationId) || [];
+      res.json(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
       res.status(500).json({ error: "Failed to fetch messages" });
@@ -1731,9 +1767,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // For now, return a mock conversation ID
-      // In a real implementation, you'd create or find an existing conversation
-      const conversationId = Date.now(); // Simple ID generation
+      // Check if conversation already exists between these users
+      let existingConversationId = null;
+      for (const [convId, conversation] of conversationStorage.entries()) {
+        if (conversation.participants.includes(userId) && conversation.participants.includes(recipientId)) {
+          existingConversationId = convId;
+          break;
+        }
+      }
+
+      let conversationId;
+      if (existingConversationId) {
+        conversationId = existingConversationId;
+      } else {
+        // Create new conversation
+        conversationId = Date.now();
+        conversationStorage.set(conversationId, {
+          id: conversationId,
+          participants: [userId, recipientId],
+          createdAt: new Date().toISOString()
+        });
+        // Initialize empty messages array for this conversation
+        messageStorage.set(conversationId, []);
+      }
       
       res.json({
         conversationId,
@@ -1760,7 +1816,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid message data" });
       }
 
-      // Create message object with proper user ID
+      // Check if user has access to this conversation
+      const conversation = conversationStorage.get(conversationId);
+      if (!conversation || !conversation.participants.includes(userId)) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Create message object
       const message = {
         id: Date.now(),
         senderId: userId,
@@ -1771,7 +1833,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isRead: false
       };
       
-      console.log('Message created:', message);
+      // Store message in memory
+      const messages = messageStorage.get(conversationId) || [];
+      messages.push(message);
+      messageStorage.set(conversationId, messages);
+      
+      console.log('Message stored:', message);
       res.json(message);
     } catch (error) {
       console.error("Error sending message:", error);

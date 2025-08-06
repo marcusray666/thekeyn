@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { 
   Search, 
   Send, 
@@ -46,6 +46,7 @@ export default function Messages() {
   const [activeConversation, setActiveConversation] = useState<any>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   // Check URL parameters for direct conversation access
   React.useEffect(() => {
@@ -93,7 +94,7 @@ export default function Messages() {
     enabled: isAuthenticated && !!selectedConversation,
   });
 
-  // Show no data state if user has no conversations and no active conversation
+  // Show no data state if user has no conversations and no active conversation from URL
   if (!loadingConversations && (!conversations || conversations.length === 0) && !activeConversation) {
     return (
       <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
@@ -182,6 +183,9 @@ export default function Messages() {
         // Add the message to local state immediately for instant feedback
         setLocalMessages(prev => [...prev, message]);
         setNewMessage("");
+        
+        // Refetch conversations to update the sidebar
+        queryClient.invalidateQueries({ queryKey: ["/api/messages/conversations"] });
       } else {
         console.error('Failed to send message');
       }
