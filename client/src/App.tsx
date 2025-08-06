@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
+import { OnboardingProvider } from "@/components/onboarding/onboarding-provider";
 
 
 import Login from "@/pages/login-clean";
@@ -146,7 +147,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AppContent />
+        <OnboardingProvider>
+          <AppContent />
+        </OnboardingProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -97,7 +97,7 @@ export default function UploadPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
-            <h2 className="text-2xl font-bold text-white mb-2">Upload Your Work</h2>
+            <h2 className="text-2xl font-bold text-white mb-2" data-tour="upload-button">Upload Your Work</h2>
             <p className="text-gray-400">Try Loggin' by uploading a file and seeing how protection works</p>
           </div>
 
@@ -114,9 +114,22 @@ export default function UploadPage() {
             </div>
           </GlassCard>
 
+          {/* Blockchain Protection Info */}
+          <GlassCard variant="cyan" className="p-4 mb-6" data-tour="blockchain-info">
+            <div className="flex items-center space-x-2 text-white">
+              <div className="w-5 h-5 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full" />
+              <div>
+                <p className="font-medium">Dual Blockchain Protection</p>
+                <p className="text-sm text-gray-300">
+                  Your work will be protected on both Ethereum and Bitcoin blockchains for maximum security.
+                </p>
+              </div>
+            </div>
+          </GlassCard>
+
           <form className="space-y-6">
             {/* File Upload */}
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="file-input">
               <Label className="text-white">Upload File</Label>
               {!selectedFile ? (
                 <FileUpload
@@ -151,7 +164,7 @@ export default function UploadPage() {
             </div>
 
             {/* Work Details */}
-            <div className="space-y-4">
+            <div className="space-y-4" data-tour="work-details">
               <div>
                 <Label htmlFor="title" className="text-white">
                   Work Title <span className="text-red-400">*</span>
