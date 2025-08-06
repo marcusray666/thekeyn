@@ -144,6 +144,27 @@
   *:not(input):not(textarea):not(select):not(button[type="submit"]):not([role="button"]) {
     border: none !important;
   }
+  
+  /* Specific Tailwind CSS overrides */
+  .bg-white\/5, .rounded-2xl, .backdrop-blur-sm, .border-transparent {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  
+  /* Button component overrides */
+  button, .btn, [role="button"], .inline-flex, 
+  .rounded-md, .rounded-lg, .rounded-full {
+    border: none !important;
+    outline: none !important;
+  }
+  
+  /* Shadcn Button variants */
+  .variant-outline, .border, .ring-offset-background {
+    border: none !important;
+    ring: none !important;
+    outline: none !important;
+  }
 
   /* Force dark theme globally - Instagram style */
   html,
