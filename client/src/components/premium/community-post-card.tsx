@@ -266,7 +266,7 @@ export function CommunityPostCard({ post, currentUserId }: CommunityPostCardProp
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <Link href={`/user/${post.username}`}>
+          <Link href={`/user/${post.userId}`}>
             <div className="flex items-center space-x-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors -m-2">
               <div className="w-10 h-10 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
                 {profileImage ? (
