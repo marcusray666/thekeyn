@@ -2495,6 +2495,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user profile
+  app.get('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Return full profile for current user (no privacy restrictions)
+      const { passwordHash, ...profileData } = user;
+      
+      res.json(profileData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ message: "Failed to fetch user profile" });
+    }
+  });
+
   // Profile routes
   app.get('/api/profile/:username', async (req, res) => {
     try {
@@ -2524,7 +2544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if profile is public
       if (!privacySettings.publicProfile) {
         // Only allow access to own profile or return limited info
-        const requesterId = (req as any).userId;
+        const requesterId = (req as any).session?.userId;
         if (!requesterId || requesterId !== user.id) {
           return res.json({
             id: user.id,
