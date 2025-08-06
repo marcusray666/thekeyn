@@ -104,16 +104,7 @@ export default function PremiumHome() {
         {/* Stories Section */}
         <div className="px-6 mb-4">
           <div className="flex space-x-6 overflow-x-auto pb-4">
-            <Link href="/upload">
-              <div className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <Plus className="h-8 w-8 text-white" />
-                </div>
-                <span className="text-xs text-white/70">Upload</span>
-              </div>
-            </Link>
-            
-
+            {/* Upload button removed - now available in top navigation */}
           </div>
         </div>
 
