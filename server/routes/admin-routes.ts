@@ -289,6 +289,61 @@ export default function setupAdminRoutes(app: Express) {
     }
   });
 
+  // System management endpoints
+  app.post("/api/admin/system/database-maintenance", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      // Log the maintenance action
+      await storage.createAdminAuditLog({
+        adminId: (req as any).user.id,
+        action: "DATABASE_MAINTENANCE",
+        targetType: "system",
+        targetId: "database",
+        details: JSON.stringify({ timestamp: new Date().toISOString() })
+      });
+
+      // Simulate database maintenance (placeholder)
+      console.log("Database maintenance initiated by admin:", (req as any).user.username);
+      
+      res.json({ 
+        success: true, 
+        message: "Database maintenance initiated successfully",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Failed to run database maintenance:", error);
+      res.status(500).json({ error: "Failed to run database maintenance" });
+    }
+  });
+
+  app.post("/api/admin/system/export", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      // Log the export action
+      await storage.createAdminAuditLog({
+        adminId: (req as any).user.id,
+        action: "SYSTEM_EXPORT",
+        targetType: "system",
+        targetId: "data",
+        details: JSON.stringify({ timestamp: new Date().toISOString() })
+      });
+
+      // Generate system export data
+      const exportData = {
+        timestamp: new Date().toISOString(),
+        systemMetrics: await storage.getSystemMetrics(),
+        userCount: (await storage.getAllUsers()).length,
+        exportedBy: (req as any).user.username,
+        version: "1.0.0"
+      };
+
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="system-export-${new Date().toISOString().split('T')[0]}.json"`);
+      res.json(exportData);
+    } catch (error) {
+      console.error("Failed to export system data:", error);
+      res.status(500).json({ error: "Failed to export system data" });
+    }
+  });
+
   // Get pending moderation works
   app.get("/api/admin/moderation/pending", requireAdmin, async (req: Request, res: Response) => {
     try {

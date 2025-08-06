@@ -200,6 +200,65 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSystemAction = async (action: string) => {
+    try {
+      switch (action) {
+        case 'database-maintenance':
+          // Show confirmation dialog for database maintenance
+          const confirmMaintenance = confirm('Are you sure you want to run database maintenance? This may temporarily affect system performance.');
+          if (!confirmMaintenance) return;
+          
+          const maintenanceResponse = await fetch('/api/admin/system/database-maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          
+          if (maintenanceResponse.ok) {
+            alert('Database maintenance started successfully');
+          } else {
+            alert('Failed to start database maintenance');
+          }
+          break;
+          
+        case 'export-data':
+          // Trigger system data export
+          const exportResponse = await fetch('/api/admin/system/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          
+          if (exportResponse.ok) {
+            const blob = await exportResponse.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `system-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          } else {
+            alert('Failed to export system data');
+          }
+          break;
+          
+        case 'privacy-policy':
+          // Open privacy policy editor (placeholder functionality)
+          alert('Privacy Policy Editor: This would open a form to update the platform privacy policy.');
+          break;
+          
+        case 'rate-limits':
+          // Open rate limits configuration (placeholder functionality)
+          alert('Rate Limits Configuration: This would open settings to configure API rate limits.');
+          break;
+          
+        default:
+          console.error('Unknown system action:', action);
+      }
+    } catch (error) {
+      console.error(`Failed to execute system action ${action}:`, error);
+      alert(`Failed to execute ${action}. Please try again.`);
+    }
+  };
+
   const handleModerationAction = async (workId: number, action: string, resolution?: string) => {
     try {
       const response = await fetch(`/api/admin/moderation/${workId}/${action}`, {
@@ -1031,7 +1090,11 @@ export default function AdminDashboard() {
                     <span className="text-yellow-300">Blockchain Verifications</span>
                     <span className="font-mono text-yellow-200">{metrics?.blockchainVerifications || 0}</span>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" 
+                    variant="outline"
+                    onClick={() => handleSystemAction('database-maintenance')}
+                  >
                     <Database className="h-4 w-4 mr-2" />
                     Run Database Maintenance
                   </Button>
@@ -1044,15 +1107,27 @@ export default function AdminDashboard() {
                   <CardDescription className="text-yellow-200/80">Configure platform-wide settings</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" 
+                    variant="outline"
+                    onClick={() => handleSystemAction('export-data')}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Export System Data
                   </Button>
-                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" 
+                    variant="outline"
+                    onClick={() => handleSystemAction('privacy-policy')}
+                  >
                     <Globe className="h-4 w-4 mr-2" />
                     Update Privacy Policy
                   </Button>
-                  <Button className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" variant="outline">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-yellow-700/20 to-orange-700/20 border-yellow-600/50 text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 backdrop-blur-sm" 
+                    variant="outline"
+                    onClick={() => handleSystemAction('rate-limits')}
+                  >
                     <Settings className="h-4 w-4 mr-2" />
                     Configure Rate Limits
                   </Button>
