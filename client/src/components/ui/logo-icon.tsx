@@ -8,15 +8,15 @@ interface LogoIconProps {
 
 export function LogoIcon({ className, size = "md" }: LogoIconProps) {
   const sizeClasses = {
-    sm: "w-5 h-5",
-    md: "w-8 h-8", 
-    lg: "w-10 h-10"
+    sm: "w-10 h-10",
+    md: "w-16 h-16", 
+    lg: "w-20 h-20"
   };
 
   const paintbrushSizes = {
-    sm: "w-3 h-3",
-    md: "w-5 h-5",
-    lg: "w-6 h-6"
+    sm: "w-6 h-6",
+    md: "w-10 h-10",
+    lg: "w-12 h-12"
   };
 
   return (
@@ -45,7 +45,7 @@ export function LogoIcon({ className, size = "md" }: LogoIconProps) {
       <Paintbrush 
         className={cn(
           paintbrushSizes[size], 
-          "absolute text-current"
+          "absolute text-white"
         )} 
         strokeWidth={1.5}
         style={{
