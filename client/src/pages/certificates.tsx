@@ -118,14 +118,15 @@ export default function Certificates() {
 
         {/* Certificates Grid */}
         {filteredWorks.length > 0 ? (
-          <div className="space-y-8">
+          <div className="space-y-6 px-4">
             {filteredWorks.map(({ work, certificate }) => (
-              <CertificateCard 
-                key={work.id} 
-                work={work} 
-                certificate={certificate}
-                onShareToCommunity={() => handleShareToCommunity(work.id)}
-              />
+              <div key={work.id} className="border border-white/20 rounded-2xl p-4 bg-white/5 backdrop-blur-sm">
+                <CertificateCard 
+                  work={work} 
+                  certificate={certificate}
+                  onShareToCommunity={() => handleShareToCommunity(work.id)}
+                />
+              </div>
             ))}
           </div>
         ) : worksWithCertificates.length === 0 ? (

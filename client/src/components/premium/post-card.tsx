@@ -43,13 +43,14 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
 
   return (
     <div 
-      className="post-card bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6" 
+      className="post-card bg-white/10 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 mb-4" 
       style={{
-        background: 'rgba(255, 255, 255, 0.05) !important', 
-        border: '1px solid rgba(255, 255, 255, 0.1) !important',
+        background: 'rgba(255, 255, 255, 0.08) !important', 
+        border: '2px solid rgba(255, 255, 255, 0.2) !important',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        color: '#FFFFFF'
+        color: '#FFFFFF',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       }} 
       onClick={onDetailsClick}
     >

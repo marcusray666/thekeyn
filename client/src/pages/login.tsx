@@ -116,7 +116,7 @@ export default function Login() {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="pl-10 glass-input"
+                  className="pl-10 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50"
                   placeholder="Enter your username"
                 />
               </div>
@@ -135,7 +135,7 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="pl-10 glass-input"
+                  className="pl-10 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50"
                   placeholder="Enter your password"
                 />
               </div>

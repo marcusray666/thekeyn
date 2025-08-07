@@ -273,7 +273,53 @@
       @apply h-5 w-5 mb-1 transition-colors flex-shrink-0;
     }
     
-    .mobile-nav-label {
+    /* MOBILE VISUAL SEPARATION OVERRIDES */
+    /* Override the no-borders rule for mobile to improve usability */
+    
+    /* Post cards need clear boundaries on mobile */
+    .post-card {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 2px solid rgba(255, 255, 255, 0.15) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+      border-radius: 1rem !important;
+      margin: 1rem 0.5rem !important;
+    }
+    
+    /* Profile sections need clear boundaries */
+    .bg-white\/5, .backdrop-blur-xl {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Form inputs need clear boundaries */
+    input, textarea, select {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 2px solid rgba(255, 255, 255, 0.2) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Buttons need clear boundaries */
+    button, .btn, [role="button"] {
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Certificate cards need extra clear boundaries */
+    .mobile-card, .border.border-white\/20 {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 2px solid rgba(255, 255, 255, 0.2) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+  }
+  
+  .mobile-nav-label {
       @apply text-[10px] font-medium leading-tight text-center whitespace-nowrap;
       max-width: 60px;
       overflow: hidden;
@@ -286,10 +332,9 @@
       min-height: 44px; /* iOS touch target minimum */
     }
     
-    /* Ensure proper safe areas on iOS */
-    .mobile-safe-area {
-      padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
-    }
+  /* Ensure proper safe areas on iOS */
+  .mobile-safe-area {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
   }
   
   /* Loggin text specific */
