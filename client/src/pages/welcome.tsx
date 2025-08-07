@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Shield, 
@@ -150,73 +150,61 @@ export default function Welcome() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
           >
             {/* Protect Now Card */}
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-gradient-to-br from-violet-600/10 to-violet-800/10 border-violet-500/20 backdrop-blur-xl hover:from-violet-600/20 hover:to-violet-800/20 transition-all duration-500 group cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <motion.div
-                    animate={floatAnimation}
-                    className="w-20 h-20 bg-gradient-to-br from-violet-600 to-violet-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-violet-500/25 transition-shadow"
-                  >
-                    <Shield className="h-10 w-10 text-white" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Instant Protection</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    Upload your work and get blockchain-verified certificates within seconds. Military-grade security meets creator convenience.
-                  </p>
-                  <Link href="/upload">
-                    <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white">
-                      Start Protecting
-                      <ChevronRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+            <motion.div variants={itemVariants} className="p-8 text-center group">
+              <motion.div
+                animate={floatAnimation}
+                className="w-20 h-20 bg-gradient-to-br from-violet-600 to-violet-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-violet-500/25 transition-shadow"
+              >
+                <Shield className="h-10 w-10 text-white" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-white mb-4">Instant Protection</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Upload your work and get blockchain-verified certificates within seconds. Military-grade security meets creator convenience.
+              </p>
+              <Link href="/upload">
+                <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+                  Start Protecting
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
             </motion.div>
 
             {/* See How It Works Card */}
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-gradient-to-br from-emerald-500/10 to-emerald-700/10 border-emerald-500/20 backdrop-blur-xl hover:from-emerald-500/20 hover:to-emerald-700/20 transition-all duration-500 group cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <motion.div
-                    animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 0.5}}}
-                    className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-emerald-500/25 transition-shadow"
-                  >
-                    <Zap className="h-10 w-10 text-white" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Dual Blockchain</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    Your work is anchored to both Ethereum and Bitcoin blockchains, creating an immutable record that lasts forever.
-                  </p>
-                  <Button variant="outline" className="w-full border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
-                    Learn More
-                    <Play className="h-4 w-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
+            <motion.div variants={itemVariants} className="p-8 text-center group">
+              <motion.div
+                animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 0.5}}}
+                className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-emerald-500/25 transition-shadow"
+              >
+                <Zap className="h-10 w-10 text-white" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-white mb-4">Dual Blockchain</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Your work is anchored to both Ethereum and Bitcoin blockchains, creating an immutable record that lasts forever.
+              </p>
+              <Button variant="outline" className="w-full border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
+                Learn More
+                <Play className="h-4 w-4 ml-2" />
+              </Button>
             </motion.div>
 
             {/* View Example Card */}
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-gradient-to-br from-amber-500/10 to-orange-600/10 border-amber-500/20 backdrop-blur-xl hover:from-amber-500/20 hover:to-orange-600/20 transition-all duration-500 group cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <motion.div
-                    animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 1}}}
-                    className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-amber-500/25 transition-shadow"
-                  >
-                    <Eye className="h-10 w-10 text-white" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Live Examples</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    See real certificates from creators worldwide. Explore the future of digital ownership protection.
-                  </p>
-                  <Link href="/certificates">
-                    <Button variant="outline" className="w-full border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
-                      View Gallery
-                      <Eye className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+            <motion.div variants={itemVariants} className="p-8 text-center group">
+              <motion.div
+                animate={{...floatAnimation, transition: {...floatAnimation.transition, delay: 1}}}
+                className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-amber-500/25 transition-shadow"
+              >
+                <Eye className="h-10 w-10 text-white" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-white mb-4">Live Examples</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                See real certificates from creators worldwide. Explore the future of digital ownership protection.
+              </p>
+              <Link href="/certificates">
+                <Button variant="outline" className="w-full border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
+                  View Gallery
+                  <Eye className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
             </motion.div>
           </motion.div>
 
