@@ -220,7 +220,7 @@ function WelcomePage() {
                 outline: 'none'
               }}>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-xl flex items-center justify-center mb-6">
-                  <LogoIcon size="lg" className="text-white" />
+                  <Zap className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-4">Blockchain Certificates</h3>
                 <p className="text-white/60 mb-6">
