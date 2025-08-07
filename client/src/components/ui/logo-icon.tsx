@@ -8,9 +8,9 @@ interface LogoIconProps {
 
 export function LogoIcon({ className, size = "md" }: LogoIconProps) {
   const sizeClasses = {
-    sm: "w-16 h-16",
-    md: "w-28 h-28", 
-    lg: "w-32 h-32"
+    sm: "w-24 h-24",
+    md: "w-40 h-40", 
+    lg: "w-48 h-48"
   };
 
   const paintbrushSizes = {
