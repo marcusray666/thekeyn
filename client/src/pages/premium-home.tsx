@@ -192,7 +192,7 @@ function WelcomePage() {
               </Link>
               <Link href="/login">
                 <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] text-white px-10 py-5 text-xl font-semibold hover:opacity-90 transition-opacity">
-                  <LogoIcon size="md" className="mr-3 text-white" />
+                  <LogoIcon size="lg" className="mr-3 text-white" />
                   Loggin'
                 </Button>
               </Link>

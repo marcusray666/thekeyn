@@ -1,4 +1,4 @@
-import { Shield, Paintbrush } from "lucide-react";
+import { Shield, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LogoIconProps {
@@ -23,13 +23,13 @@ export function LogoIcon({ className, size = "md" }: LogoIconProps) {
     <div className={cn("relative inline-flex items-center justify-center", className)}>
       {/* Shield background */}
       <Shield className={cn(sizeClasses[size], "text-current")} />
-      {/* Thin paintbrush overlay */}
-      <Paintbrush 
+      {/* Thin art pen overlay */}
+      <PenTool 
         className={cn(
           paintbrushSizes[size], 
           "absolute text-current opacity-90"
         )} 
-        strokeWidth={1.5}
+        strokeWidth={1}
       />
     </div>
   );
