@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { 
   Shield, 
@@ -14,6 +14,7 @@ import {
   Sparkles,
   Eye
 } from "lucide-react";
+import { LogoIcon } from "@/components/ui/logo-icon";
 
 export default function Welcome() {
   const containerVariants = {
@@ -272,7 +273,8 @@ export default function Welcome() {
                   size="lg"
                   className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm"
                 >
-                  Sign In
+                  <LogoIcon className="h-6 w-6 mr-3" />
+                  Loggin'
                 </Button>
               </Link>
             </div>

@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { LogoIcon } from "@/components/ui/logo-icon";
 
 const navigationItems = [
   { title: "Home", icon: Home, route: "/" },
@@ -69,10 +70,7 @@ export function SidebarNav() {
           <div className="mb-8">
             <Link href="/">
               <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#9146FF] to-[#7C3AED] rounded-lg flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-white" />
-                </div>
-                <span className="text-xl font-bold text-white">Loggin'</span>
+                <LogoIcon className="w-8 h-8" />
               </div>
             </Link>
           </div>

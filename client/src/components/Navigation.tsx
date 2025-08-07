@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { LogoIcon } from "@/components/ui/logo-icon";
 
 export function Navigation() {
   const [location, setLocation] = useLocation();
@@ -62,7 +63,7 @@ export function Navigation() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-white">Loggin'</h1>
+              <LogoIcon className="w-8 h-8" />
             </Link>
             
             <div className="hidden md:flex items-center space-x-6">

@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { LogoIcon } from "@/components/ui/logo-icon";
 
 export function TopNav() {
   const [location, setLocation] = useLocation();
@@ -68,10 +69,7 @@ export function TopNav() {
       {/* Logo */}
       <Link href="/">
         <div className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-lg">L</span>
-          </div>
-          <span className="text-2xl font-bold text-white">Loggin'</span>
+          <LogoIcon className="w-10 h-10" />
         </div>
       </Link>
 
