@@ -8,15 +8,15 @@ interface LogoIconProps {
 
 export function LogoIcon({ className, size = "md" }: LogoIconProps) {
   const sizeClasses = {
-    sm: "w-10 h-10",
-    md: "w-16 h-16", 
-    lg: "w-20 h-20"
+    sm: "w-12 h-12",
+    md: "w-20 h-20", 
+    lg: "w-24 h-24"
   };
 
   const paintbrushSizes = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6",
-    lg: "w-8 h-8"
+    sm: "w-5 h-5",
+    md: "w-8 h-8",
+    lg: "w-10 h-10"
   };
 
   return (
@@ -28,15 +28,9 @@ export function LogoIcon({ className, size = "md" }: LogoIconProps) {
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <linearGradient id="shield-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FE3F5E" />
-            <stop offset="100%" stopColor="#FFD200" />
-          </linearGradient>
-        </defs>
         <path 
           d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" 
-          stroke="url(#shield-gradient)" 
+          stroke="white" 
           strokeWidth="2" 
           fill="none"
         />
