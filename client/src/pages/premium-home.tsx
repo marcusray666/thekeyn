@@ -157,11 +157,8 @@ function WelcomePage() {
       <div className="relative z-10">
         {/* Header */}
         <header className="px-6 py-4 flex items-center justify-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
-              <LogoIcon size="sm" className="text-white" />
-            </div>
-            <span className="text-white font-bold text-xl">Loggin'</span>
+          <div className="flex items-center justify-center">
+            <LogoIcon className="w-8 h-8 text-white" />
           </div>
         </header>
 
@@ -198,7 +195,8 @@ function WelcomePage() {
               </Link>
               <Link href="/login">
                 <Button variant="outline" className="border-transparent text-white hover:bg-white/10 px-8 py-4 text-lg">
-                  Sign In
+                  <LogoIcon size="sm" className="mr-3 text-white" />
+                  Loggin'
                 </Button>
               </Link>
             </div>
@@ -351,10 +349,7 @@ function WelcomePage() {
         <footer className="px-6 py-12">
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-lg flex items-center justify-center">
-                <LogoIcon size="sm" className="text-white" />
-              </div>
-              <span className="text-white font-bold text-xl">Loggin'</span>
+              <LogoIcon className="w-8 h-8 text-white" />
             </div>
             <p className="text-white/60">
               © 2025 Loggin'. Protecting creators' rights through blockchain technology.
