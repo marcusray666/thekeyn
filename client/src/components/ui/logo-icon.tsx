@@ -14,9 +14,9 @@ export function LogoIcon({ className, size = "md" }: LogoIconProps) {
   };
 
   const paintbrushSizes = {
-    sm: "w-6 h-6",
-    md: "w-10 h-10",
-    lg: "w-12 h-12"
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8"
   };
 
   return (
