@@ -156,10 +156,7 @@ function WelcomePage() {
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="px-6 py-4 flex items-center justify-center">
-          <div className="flex items-center justify-center">
-            <LogoIcon className="w-8 h-8 text-white" />
-          </div>
+        <header className="px-6 py-4">
         </header>
 
         {/* Hero Section */}
@@ -194,8 +191,8 @@ function WelcomePage() {
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" className="border-transparent text-white hover:bg-white/10 px-8 py-4 text-lg">
-                  <LogoIcon size="sm" className="mr-3 text-white" />
+                <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] text-white px-10 py-5 text-xl font-semibold hover:opacity-90 transition-opacity">
+                  <LogoIcon size="md" className="mr-3 text-white" />
                   Loggin'
                 </Button>
               </Link>
