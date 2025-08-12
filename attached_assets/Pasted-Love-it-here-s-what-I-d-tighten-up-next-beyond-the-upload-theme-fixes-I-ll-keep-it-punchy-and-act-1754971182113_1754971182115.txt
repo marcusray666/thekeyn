@@ -1,0 +1,161 @@
+Love it—here’s what I’d tighten up next beyond the upload + theme fixes. I’ll keep it punchy and actionable, with a few drop-in snippets.
+
+# Architecture & Storage
+
+* **Move media to object storage** (S3/R2/etc.) with **direct (presigned) uploads** from the browser. Keeps your API stateless and your server disk clean.
+
+  ```ts
+  // server: create presigned PUT
+  import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+  import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+  const s3 = new S3Client({ region: process.env.AWS_REGION! });
+
+  app.post("/api/upload-url", auth, async (req, res) => {
+    const key = `community/${req.user.id}/${crypto.randomUUID()}.jpg`;
+    const url = await getSignedUrl(s3, new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET!,
+      Key: key,
+      ContentType: req.body.contentType,
+      ACL: "private",
+    }), { expiresIn: 60 });
+    res.json({ url, key });
+  });
+  ```
+
+  Then post the `key` (not the file) in your create-post API.
+
+* **Serve via CDN** and generate **responsive variants** (thumb/medium/original). Queue background resizing (e.g., `bullmq` + `sharp`).
+
+# Security & Reliability
+
+* **Helmet + strict CSP**, rate limiting, and input validation on *every* mutation.
+
+  ```ts
+  // Express hardening
+  import helmet from "helmet";
+  import rateLimit from "express-rate-limit";
+  app.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "img-src": ["'self'", "data:", "blob:", "https://cdn.yourapp.com"],
+        "media-src": ["'self'", "https://cdn.yourapp.com"],
+      }
+    }
+  }));
+  app.use(rateLimit({ windowMs: 15*60*1000, max: 300 }));
+  ```
+
+* **Zod request validation** so bad payloads never hit business logic.
+
+  ```ts
+  import { z } from "zod";
+  const PostSchema = z.object({
+    title: z.string().min(1).max(120),
+    description: z.string().max(2000).optional(),
+    mediaKey: z.string().min(1) // S3 key
+  });
+  app.post("/api/community/posts", auth, (req, res, next) => {
+    const parsed = PostSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json(parsed.error.flatten());
+    req.body = parsed.data; next();
+  });
+  ```
+
+* **Secrets & env safety:** centralize env parsing and crash fast if missing.
+
+  ```ts
+  const Env = z.object({
+    DATABASE_URL: z.string().url(),
+    S3_BUCKET: z.string(),
+    AWS_REGION: z.string(),
+  });
+  export const env = Env.parse(process.env);
+  ```
+
+* **Audit auth/session flows:** short-lived JWTs + refresh rotation, `SameSite=Lax`, `HttpOnly` cookies, CSRF protection on form posts.
+
+# Database & Performance
+
+* **Add DB constraints & indexes** matching queries (userId, createdAt). Prefer **keyset pagination** for feeds.
+
+  ```ts
+  // Drizzle example
+  export const posts = pgTable("posts", {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  }, (t) => ({
+    idx_user_created: index("idx_posts_user_created").on(t.userId, t.createdAt.desc()),
+  }));
+  // Keyset (createdAt, id)
+  // WHERE (created_at,id) < ($1,$2) ORDER BY created_at DESC, id DESC LIMIT 20
+  ```
+
+* **Caching:** send `ETag`/`Cache-Control` for static + CDN assets; consider in-memory cache (e.g., `lru-cache`) for hot read-only lists.
+
+* **Background jobs** for heavy work (thumbnails, AI moderation), not in request path.
+
+# Frontend Quality
+
+* **Kill hard-coded colors** everywhere; use design tokens (`bg-background text-foreground`, `--brand`) so themes “just work.”
+
+* **Lazy load** heavy routes and media; ship **skeletons** + **error boundaries**.
+
+  ```tsx
+  // Lazy route
+  const Community = React.lazy(() => import("./pages/Community"));
+  // Error boundary
+  function ErrorBoundary({ children }) {
+    return (
+      <React.Suspense fallback={<div className="animate-pulse">Loading…</div>}>
+        <Boundary>{children}</Boundary>
+      </React.Suspense>
+    );
+  }
+  ```
+
+* **A11y pass:** focus states, aria-labels on toggles, color contrast ≥ 4.5:1, trap focus in modals, skip-to-content link.
+
+* **Asset hygiene:** `loading="lazy"` on images, `srcset/sizes` for responsive images, clamp max dimensions in CSS to avoid CLS.
+
+# Observability & DX
+
+* **Structured logging** (pino/winston) with correlation IDs; log request summaries and errors (without PII).
+* **Error reporting** (Sentry) on both client and server.
+* **Testing:** add a small but meaningful suite:
+
+  * Unit: schema & utils (Zod, auth utils)
+  * API: happy path + validation failures (supertest)
+  * E2E critical flows: login, post create, upload (Playwright)
+* **CI:** lint/typecheck/test on PR, preview deploys, DB migrations gated.
+
+# Content & Community Safety
+
+* **Moderation pipeline** for community posts: file type allow-list, size cap, optional NSFW/abuse detection (queue), per-user **rate limits**.
+* **Report/block** features and shadow-ban tools as you grow.
+
+# Progressive Web App (nice-to-have)
+
+* Basic **PWA** (manifest + service worker) for snappy reloads and offline shell. Users love it for simple feed reading & drafts.
+
+# A couple of small code tighten-ups
+
+* **Central file-type guard** to reuse across routes:
+
+  ```ts
+  const ALLOWED = new Set(["image/jpeg","image/png","image/webp","image/gif"]);
+  export const isAllowed = (t?: string) => !!t && ALLOWED.has(t);
+  ```
+* **Unified error shape**:
+
+  ```ts
+  type ApiError = { error: string; code?: string; details?: unknown };
+  const fail = (res: Response, status: number, e: ApiError) => res.status(status).json(e);
+  ```
+
+If you want, I can help you:
+
+1. switch to presigned uploads + CDN,
+2. refactor remaining components to tokens, and
+3. add a basic Playwright test that covers login → create post with image → see it in feed.

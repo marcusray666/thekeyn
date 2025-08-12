@@ -195,14 +195,14 @@ export default function CreatePost() {
                 className="bg-input border-border text-foreground placeholder-muted-foreground rounded-xl min-h-[100px] resize-none"
                 maxLength={500}
               />
-              <p className="text-white/50 text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 {description.length}/500 characters • Use #hashtags and @username for mentions
               </p>
             </div>
 
             {/* Location */}
             <div>
-              <label className="text-white font-medium mb-2 block">Location (Optional)</label>
+              <label className="text-foreground font-medium mb-2 block">Location (Optional)</label>
               <LocationPicker
                 selectedLocation={location}
                 onLocationSelect={setLocation}
@@ -212,7 +212,7 @@ export default function CreatePost() {
 
             {/* File Upload */}
             <div>
-              <label className="text-white font-medium mb-2 block">Media (Optional)</label>
+              <label className="text-foreground font-medium mb-2 block">Media (Optional)</label>
               
               {!selectedFile ? (
                 <div className="relative">
@@ -222,14 +222,14 @@ export default function CreatePost() {
                     accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-white/40 transition-colors">
+                  <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-border/60 transition-colors">
                     <div className="flex flex-col items-center space-y-3">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white/70">
+                      <div className="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground">
                         {getFileIcon()}
                       </div>
                       <div>
-                        <p className="text-white font-medium">Upload Media</p>
-                        <p className="text-white/50 text-sm">
+                        <p className="text-foreground font-medium">Upload Media</p>
+                        <p className="text-muted-foreground text-sm">
                           Images, audio, video, or documents
                         </p>
                       </div>
@@ -237,16 +237,16 @@ export default function CreatePost() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between">
+                <div className="bg-muted/30 rounded-xl p-4 flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="text-white/70">
+                    <div className="text-muted-foreground">
                       {getFileIcon()}
                     </div>
                     <div>
-                      <p className="text-white font-medium truncate">
+                      <p className="text-foreground font-medium truncate">
                         {selectedFile.name}
                       </p>
-                      <p className="text-white/50 text-sm">
+                      <p className="text-muted-foreground text-sm">
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -254,7 +254,7 @@ export default function CreatePost() {
                   <button
                     type="button"
                     onClick={removeFile}
-                    className="text-white/50 hover:text-white transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -265,11 +265,11 @@ export default function CreatePost() {
             {/* Preview */}
             {previewUrl && selectedFile?.type.startsWith('image/') && (
               <div>
-                <label className="text-white font-medium mb-2 block">Preview</label>
+                <label className="text-foreground font-medium mb-2 block">Preview</label>
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="w-full max-h-64 object-cover rounded-xl border border-white/10"
+                  className="w-full max-h-64 object-cover rounded-xl border border-border"
                 />
               </div>
             )}
@@ -281,7 +281,7 @@ export default function CreatePost() {
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full md:w-auto text-white/70 hover:text-white hover:bg-white/10"
+                className="w-full md:w-auto text-muted-foreground hover:text-foreground hover:bg-muted/20"
               >
                 Cancel
               </Button>

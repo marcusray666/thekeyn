@@ -12,11 +12,14 @@ import Stripe from "stripe";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
+import { createPostSchema, uploadUrlSchema, workUploadSchema, createApiError, isAllowedMediaType } from "@shared/validation";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { blockchainVerification } from "./blockchain-verification";
 import { openTimestampsService } from "./opentimestamps-service";
 import { contentModerationService } from "./services/content-moderation";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -73,6 +76,26 @@ function generateCertificateId(): string {
   const random = crypto.randomBytes(8).toString("hex");
   return `CERT-${timestamp}-${random}`.toUpperCase();
 }
+
+// Helper to send API errors
+const sendError = (res: express.Response, status: number, error: string, code?: string, details?: unknown) => {
+  res.status(status).json(createApiError(error, code, details));
+};
+
+// Rate limiter for uploads
+import rateLimit from "express-rate-limit";
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 uploads per window
+  message: { error: "Too many uploads, please try again later" },
+});
+
+// Rate limiter for creating posts
+const postLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes  
+  max: 20, // 20 posts per window
+  message: { error: "Too many posts, please try again later" },
+});
 
 function generateFileHash(filePath: string): string {
   const fileBuffer = fs.readFileSync(filePath);
@@ -4709,6 +4732,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting post:", error);
       res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
+  // Object Storage Routes
+  const objectStorageService = new ObjectStorageService();
+
+  // Get presigned upload URL
+  app.post("/api/upload-url", requireAuth, uploadLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const parsed = uploadUrlSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return sendError(res, 400, "Invalid request", "VALIDATION_ERROR", parsed.error.flatten());
+      }
+
+      const { contentType, fileSize } = parsed.data;
+      
+      if (!isAllowedMediaType(contentType)) {
+        return sendError(res, 400, "File type not allowed", "INVALID_FILE_TYPE");
+      }
+
+      const uploadUrl = await objectStorageService.getObjectEntityUploadURL();
+      const objectKey = uploadUrl.split('/').pop()?.split('?')[0] || '';
+
+      res.json({ 
+        uploadUrl, 
+        objectKey,
+        contentType,
+        expiresIn: 900 // 15 minutes
+      });
+    } catch (error) {
+      console.error("Error generating upload URL:", error);
+      sendError(res, 500, "Failed to generate upload URL");
+    }
+  });
+
+  // Serve public objects
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Serve private objects with ACL check
+  app.get("/objects/:objectPath(*)", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: req.user?.id.toString(),
+        requestedPermission: ObjectPermission.READ,
+      });
+      
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
