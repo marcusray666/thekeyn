@@ -317,6 +317,22 @@
       -webkit-backdrop-filter: blur(12px) !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     }
+    
+    /* Enhanced visual boundaries for ALL cards and sections */
+    .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Profile avatar borders */
+    .creator-avatar {
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      backdrop-filter: blur(8px) !important;
+    }
   }
   
   .mobile-nav-label {
@@ -335,6 +351,17 @@
   /* Ensure proper safe areas on iOS */
   .mobile-safe-area {
     padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  }
+  
+  /* Desktop overrides for better visual separation */
+  @media (min-width: 769px) {
+    .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    }
   }
   
   /* Loggin text specific */
