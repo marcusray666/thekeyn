@@ -4549,16 +4549,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("🔍 POST /api/community/posts received:", {
         hasFile: !!req.file,
-        file: req.file ? { 
-          originalname: req.file.originalname, 
-          mimetype: req.file.mimetype, 
-          size: req.file.size,
-          filename: req.file.filename,
-          path: req.file.path
-        } : null,
         body: req.body,
-        userId: req.session?.userId,
-        sessionExists: !!req.session
+        userId: req.session?.userId
       });
 
       const userId = req.session!.userId;
@@ -4615,20 +4607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         else fileType = 'document';
       }
 
-      console.log("📝 Creating post with data:", {
-        userId,
-        title: title?.trim(),
-        description: description?.trim(),
-        imageUrl,
-        filename,
-        fileType,
-        mimeType,
-        fileSize,
-        hashtags,
-        location: location || null,
-        mentionedUsers: mentions,
-        isProtected: false
-      });
+      console.log("📝 Creating post with title:", title?.trim());
 
       const post = await storage.createPost({
         userId,

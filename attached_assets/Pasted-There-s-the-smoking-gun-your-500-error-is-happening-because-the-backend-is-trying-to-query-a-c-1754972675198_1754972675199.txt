@@ -1,0 +1,78 @@
+There’s the smoking gun — your **500 error** is happening because the backend is trying to query a column that doesn’t exist in the database:
+
+```
+error: column posts.title does not exist
+code: 42703
+routine: errorMissingColumn
+```
+
+### What this means
+
+* Your `posts` table in PostgreSQL **does not have a `title` column**.
+* The server code (probably in `DatabaseStorage.getPosts` and also when creating a post) is trying to `SELECT posts.title` or `INSERT INTO posts (title, …)`.
+* Because the column is missing, PostgreSQL throws `42703`, and the whole request fails with a 500.
+
+---
+
+### How to fix it
+
+#### 1. Update your DB schema
+
+If `title` is supposed to be part of the table:
+
+* **Drizzle ORM**: Add `title` to the `posts` table definition and run a migration.
+
+Example:
+
+```ts
+// drizzle/schema/posts.ts
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  title: text("title").notNull(), // 👈 add this
+  description: text("description"),
+  mediaUrl: text("media_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+```
+
+Then generate + push migrations:
+
+```sh
+npx drizzle-kit generate
+npx drizzle-kit push
+```
+
+---
+
+#### 2. Or, remove `title` from the code
+
+If your design no longer uses a `title` for posts, you’ll need to:
+
+* Remove `title` from all `SELECT` queries, inserts, and TypeScript interfaces.
+* Check `DatabaseStorage.getPosts` and any `INSERT INTO posts` code.
+
+Example:
+
+```ts
+// Before
+db.select({ id: posts.id, title: posts.title, ... })
+
+// After
+db.select({ id: posts.id, description: posts.description, ... })
+```
+
+---
+
+### Which path to choose?
+
+* If your **frontend has a “title” field** (and you want it stored), add the column to the DB (Option 1).
+* If you **only use description/media**, remove it from the code and migrations (Option 2).
+
+Given your screenshot, you **do have a title input** when creating posts (“test13”), so you probably want **Option 1** — add `title` to the table.
+
+---
+
+If you want, I can write you the exact **Drizzle migration** for adding `title` to `posts` so you can run it without losing existing data. That would unblock your post creation instantly.
+
+Do you want me to prep that migration for you?
