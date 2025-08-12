@@ -10,34 +10,45 @@ type ThemeProviderContext = {
 const ThemeProviderContext = createContext<ThemeProviderContext | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Check localStorage for saved theme preference
+    const saved = localStorage.getItem("loggin-theme");
+    return (saved as Theme) || "dark";
+  });
 
   useEffect(() => {
-    // Force dark theme always - user preference from replit.md
-    setTheme("dark");
+    // Allow theme switching - removed forced dark mode
+    // Theme will be controlled by user interaction
   }, []);
 
   useEffect(() => {
-    // Apply dark theme to document - force override
+    // Apply theme to document
     const root = document.documentElement;
     const body = document.body;
     
-    // Remove any light theme classes
-    root.classList.remove("light", "light-theme");
-    body.classList.remove("light", "light-theme");
+    // Remove existing theme classes
+    root.classList.remove("light", "dark");
+    body.classList.remove("light", "dark");
     
-    // Force add dark theme classes
-    root.classList.add("dark");
-    body.classList.add("dark");
+    // Add current theme class
+    root.classList.add(theme);
+    body.classList.add(theme);
     
-    // Force dark styles with inline styles as backup
-    document.body.style.background = "#0F0F0F";
-    document.body.style.color = "#FFFFFF";
-    root.style.background = "#0F0F0F";
-    root.style.color = "#FFFFFF";
+    // Apply theme-specific styles
+    if (theme === "dark") {
+      document.body.style.background = "#0F0F0F";
+      document.body.style.color = "#FFFFFF";
+      root.style.background = "#0F0F0F";
+      root.style.color = "#FFFFFF";
+    } else {
+      document.body.style.background = "#FFFFFF";
+      document.body.style.color = "#000000";
+      root.style.background = "#FFFFFF";
+      root.style.color = "#000000";
+    }
     
     // Save to localStorage
-    localStorage.setItem("loggin-theme", "dark");
+    localStorage.setItem("loggin-theme", theme);
   }, [theme]);
 
   return (

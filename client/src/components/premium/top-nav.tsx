@@ -1,15 +1,17 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, Bell, MessageCircle, Upload, User } from "lucide-react";
+import { Search, Menu, Bell, MessageCircle, Upload, User, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { LogoIcon } from "@/components/ui/logo-icon";
+import { useTheme } from "@/components/theme-provider";
 
 export function TopNav() {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -160,6 +162,18 @@ export function TopNav() {
           <Bell className="h-5 w-5" />
         </Button>
 
+        {/* Theme Toggle */}
+        <Button 
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          className="glass-button p-3"
+        >
+          {theme === "light" ? (
+            <Moon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
+          )}
+        </Button>
+
         {/* Profile Menu */}
         <div className="relative">
           <button
@@ -255,6 +269,23 @@ export function TopNav() {
                   <span style={{color: '#FFFFFF'}} className="font-medium">Settings</span>
                 </div>
               </Link>
+
+              <div 
+                className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                onClick={() => {
+                  setTheme(theme === "light" ? "dark" : "light");
+                  setIsMenuOpen(false);
+                }}
+              >
+                {theme === "light" ? (
+                  <Moon className="w-5 h-5" />
+                ) : (
+                  <Sun className="w-5 h-5" />
+                )}
+                <span style={{color: '#FFFFFF'}} className="font-medium">
+                  {theme === "light" ? "Dark Mode" : "Light Mode"}
+                </span>
+              </div>
               
               <div className="border-t border-white/10 mt-2">
                 <button
