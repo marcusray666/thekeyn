@@ -562,16 +562,13 @@ export class DatabaseStorage implements IStorage {
 
   // Posts functionality implementation
   async createPost(postData: InsertPost & { userId: number }): Promise<Post> {
-    const postId = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
     const [post] = await db
       .insert(posts)
       .values({
-        id: postId,
         userId: postData.userId,
         title: postData.title,
         description: postData.description,
-        content: postData.content,
+        content: postData.content || postData.title, // Use title as content if no content provided
         imageUrl: postData.imageUrl,
         filename: postData.filename,
         fileType: postData.fileType,
@@ -595,9 +592,9 @@ export class DatabaseStorage implements IStorage {
             userId: mentionedUser.id,
             type: 'mention',
             title: 'You were mentioned in a post',
-            content: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content.substring(0, 50)}..."`,
+            content: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content?.substring(0, 50)}..."`,
             data: {
-              postId: postId,
+              postId: post.id,
               mentionedBy: postData.userId,
               postTitle: postData.title
             }

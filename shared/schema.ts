@@ -204,27 +204,33 @@ export type NftMint = typeof nftMints.$inferSelect;
 export type InsertNftMint = z.infer<typeof insertNftMintSchema>;
 
 // Social posts table for Community feed
-export const posts = pgTable("posts", {
-  id: text("id").primaryKey().notNull(),
+export const posts = pgTable("community_posts", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  title: text("title").notNull(),
+  title: text("title"),
   description: text("description"),
-  content: text("content").notNull(),
+  content: text("content"),
   imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  audioUrl: text("audio_url"),
+  fileUrl: text("file_url"),
   filename: text("filename"),
   fileType: text("file_type"), // 'image', 'audio', 'video', etc.
   mimeType: text("mime_type"),
   fileSize: integer("file_size"),
   hashtags: text("hashtags").array().default([]), // Hashtag functionality
   location: text("location"), // Location where photo/content was created
-  mentionedUsers: text("mentioned_users").array().default([]), // User mentions
+  mentions: text("mentions").array().default([]), // User mentions (original column)
+  mentionedUsers: text("mentioned_users").array().default([]), // User mentions (new column)
   isProtected: boolean("is_protected").default(false), // For shared protected works
   protectedWorkId: integer("protected_work_id").references(() => works.id), // Reference to protected work if shared
   tags: text("tags").array().default([]),
-  likes: integer("likes").default(0),
-  comments: integer("comments").default(0),
-  shares: integer("shares").default(0),
-  views: integer("views").default(0),
+  likes: integer("like_count").default(0),
+  comments: integer("comment_count").default(0),
+  shares: integer("share_count").default(0),
+  views: integer("view_count").default(0),
+  moderationStatus: text("moderation_status"),
+  moderationFlags: text("moderation_flags").array().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

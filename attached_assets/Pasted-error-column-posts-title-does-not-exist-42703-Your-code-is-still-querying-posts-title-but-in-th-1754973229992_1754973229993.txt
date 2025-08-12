@@ -1,0 +1,58 @@
+error: column posts.title does not exist (42703)
+
+Your code is still querying posts.title, but in the DB you now have community_posts (created by the last drizzle-kit push). So you’ve got a schema–code mismatch.
+
+Here’s the clean fix path that won’t bite you later:
+
+Option A (recommended): Move code to community_posts and add title there
+Migration: add title to community_posts
+-- 20250812_add_title_to_community_posts.sql
+ALTER TABLE community_posts
+  ADD COLUMN IF NOT EXISTS title text;
+
+-- if you want to enforce having a title:
+-- UPDATE community_posts SET title = '' WHERE title IS NULL;
+-- ALTER TABLE community_posts ALTER COLUMN title SET NOT NULL;
+
+-- helpful index for feed
+CREATE INDEX IF NOT EXISTS idx_community_posts_created_at
+  ON community_posts (created_at DESC, id DESC);
+If you use Drizzle migrations, add the equivalent in a migration file and run:
+npx drizzle-kit generate
+npx drizzle-kit push
+Point the code at community_posts
+In your Drizzle schema, make sure you have:
+// drizzle/schema/communityPosts.ts
+export const communityPosts = pgTable('community_posts', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull(),
+  title: text('title'),                // ← added
+  description: text('description'),
+  mediaUrl: text('media_url'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+In queries (e.g., DatabaseStorage.getPosts and your insert route), replace posts with communityPosts and select/insert title from/to it:
+// read
+const rows = await db.select({
+  id: communityPosts.id,
+  userId: communityPosts.userId,
+  title: communityPosts.title,
+  description: communityPosts.description,
+  mediaUrl: communityPosts.mediaUrl,
+  createdAt: communityPosts.createdAt,
+})
+.from(communityPosts)
+.orderBy(desc(communityPosts.createdAt), desc(communityPosts.id))
+.limit(limit)
+.offset(offset);
+
+// write
+await db.insert(communityPosts).values({
+  userId,
+  title,                // ← make sure you pass it
+  description,
+  mediaUrl,
+});
+Frontend
+You already send a “title” from the community post form—keep doing that. No changes needed, other than making sure your API is expecting title.
+Redeploy and test “Share Post”.
