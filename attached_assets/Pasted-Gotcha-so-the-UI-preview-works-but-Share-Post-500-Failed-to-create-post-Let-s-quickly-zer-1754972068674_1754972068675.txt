@@ -1,0 +1,172 @@
+Gotcha—so the UI preview works, but “Share Post” → **500: Failed to create post**. Let’s quickly zero in and kill this.
+
+## Fast triage (do these 5 checks)
+
+1. **Server logs for that request** – tail your API logs while you click Share:
+
+   * look for the route it hits (`POST /api/community/posts` or similar) and any stack trace.
+2. **Field name mismatch** – your backend almost certainly uses `multer.single('media')` (or `'image'`). If the frontend sends the file under a different key (e.g. `'file'`), `req.file` is `undefined` and any code that reads `req.file.path` will 500.
+3. **uploads/ directory** – in containers this folder often doesn’t exist or isn’t writeable → Multer throws, you get 500.
+4. **Auth userId** – if your insert needs `userId` and `req.user` is missing/null, the DB insert can 500 (NOT 401) depending on your code.
+5. **DB schema** – ensure the `posts` table exists and has the `mediaUrl` (or similar) column you’re inserting into.
+
+---
+
+## Drop-in fixes (safe to add even before logs)
+
+### A) Backend: make upload robust + visible errors
+
+```ts
+// server/routes/community.ts (or wherever your route lives)
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
+import multer from "multer";
+import type { Request, Response, NextFunction } from "express";
+
+// 1) Ensure upload dir exists (works in Docker too)
+const uploadDir = path.join(process.cwd(), "uploads");
+fs.mkdirSync(uploadDir, { recursive: true });
+
+// 2) Multer config
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) =>
+    cb(null, `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`),
+});
+
+const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED.has(file.mimetype)) {
+      return cb(new Error(`Unsupported file type: ${file.mimetype}`));
+    }
+    cb(null, true);
+  },
+});
+
+// 3) Small validator (title required, others optional)
+function validate(req: Request, res: Response): { ok: boolean; msg?: string } {
+  const title = (req.body.title || "").trim();
+  if (!title) return { ok: false, msg: "Title is required" };
+  return { ok: true };
+}
+
+// 4) Route (note: field name 'media' – match frontend)
+app.post("/api/community/posts",
+  authMiddleware,
+  (req, res, next) => upload.single("media")(req, res, (err: any) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  }),
+  async (req: Request, res: Response) => {
+    try {
+      const { ok, msg } = validate(req, res);
+      if (!ok) return res.status(400).json({ error: msg });
+
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+      const mediaUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+      // 🚧 replace with your DB call (Drizzle/Prisma/SQL)
+      const post = await db.insert(posts).values({
+        userId,
+        title: req.body.title,
+        description: req.body.description ?? null,
+        location: req.body.location ?? null,
+        mediaUrl,
+      }).returning();
+
+      return res.status(201).json(post[0]);
+    } catch (e: any) {
+      // Clean up uploaded file if DB op failed
+      if (req.file) {
+        try { fs.unlinkSync(path.join(uploadDir, req.file.filename)); } catch {}
+      }
+      console.error("create-post error:", e);
+      return res.status(500).json({ error: "Failed to create post" });
+    }
+  }
+);
+
+// 5) Central error wrapper (keeps 400 vs 500 clean)
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  if (err?.message?.startsWith("Unsupported file type")) {
+    return res.status(400).json({ error: err.message });
+  }
+  return res.status(500).json({ error: "Server error" });
+});
+```
+
+### B) Frontend: ensure field name + form-data are correct
+
+```ts
+// Wherever you submit the community post
+async function submitPost({ title, description, location, file }: {
+  title: string; description?: string; location?: string; file?: File | null;
+}) {
+  const fd = new FormData();
+  fd.append("title", title);
+  if (description) fd.append("description", description);
+  if (location) fd.append("location", location);
+  if (file) fd.append("media", file); // 👈 must match upload.single("media")
+
+  const res = await fetch("/api/community/posts", {
+    method: "POST",
+    body: fd, // fetch sets multipart boundaries for FormData automatically
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error || "Failed to create post");
+  }
+  return res.json();
+}
+```
+
+### C) Ensure the uploads directory is reachable by the client
+
+If you’re serving from Express, add this once:
+
+```ts
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+```
+
+If you’re behind Nginx, make sure `/uploads` is allowed and not blocked by a `try_files` rule.
+
+---
+
+## Common reasons this exact UI → 500 happens
+
+* **Wrong field name** (`file` vs `media`) – #1 culprit.
+* **Missing uploads folder** inside the container – Multer throws ENOENT.
+* **Proxy body-size limits** (Nginx `client_max_body_size`) – often returns 413, but some setups surface it as 500. If your images are big, bump it:
+
+  ```
+  client_max_body_size 20M;
+  ```
+* **Null userId** during insert – DB not-null constraint 500s the request.
+* **DB column mismatch** – e.g., inserting `mediaUrl` but the column is named `media_path` (or the table wasn’t migrated).
+
+---
+
+## Quick next step
+
+If you can, paste the **server log lines** that appear right when you click “Share Post.” Even the first 10–15 lines around the error will pinpoint which of the above it is (field name vs ENOENT vs DB). If logs aren’t verbose, add this one-liner before your insert:
+
+```ts
+console.log("create-post payload", {
+  userId: req.user?.id,
+  hasFile: !!req.file,
+  file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : null,
+  body: { title: req.body.title, hasDesc: !!req.body.description, hasLoc: !!req.body.location },
+});
+```
+
+That will immediately tell us: did the server receive the file? is the user authenticated? are required fields there?
+
+Want me to tailor the patch to your exact route file names? If you drop the route file path and the current `multer.single(...)` field name, I’ll adjust the code to be copy-paste ready.

@@ -4547,6 +4547,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create community post
   app.post("/api/community/posts", requireAuth, postUpload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
+      console.log("🔍 POST /api/community/posts received:", {
+        hasFile: !!req.file,
+        file: req.file ? { 
+          originalname: req.file.originalname, 
+          mimetype: req.file.mimetype, 
+          size: req.file.size,
+          filename: req.file.filename,
+          path: req.file.path
+        } : null,
+        body: req.body,
+        userId: req.session?.userId,
+        sessionExists: !!req.session
+      });
+
       const userId = req.session!.userId;
       const { title, description, location } = req.body;
       
@@ -4601,6 +4615,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         else fileType = 'document';
       }
 
+      console.log("📝 Creating post with data:", {
+        userId,
+        title: title?.trim(),
+        description: description?.trim(),
+        imageUrl,
+        filename,
+        fileType,
+        mimeType,
+        fileSize,
+        hashtags,
+        location: location || null,
+        mentionedUsers: mentions,
+        isProtected: false
+      });
+
       const post = await storage.createPost({
         userId,
         title: title.trim(),
@@ -4618,10 +4647,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tags: hashtags, // Also store as tags for compatibility
       });
 
+      console.log("✅ Post created successfully:", post.id);
       res.json(post);
     } catch (error) {
-      console.error("Error creating post:", error);
-      res.status(500).json({ error: "Failed to create post" });
+      console.error("❌ Error creating post:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      res.status(500).json({ error: "Failed to create post", details: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
