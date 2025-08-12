@@ -20,7 +20,7 @@ export default function CreatePost() {
   // Redirect to login if not authenticated
   if (!isAuthLoading && !currentUser) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center relative overflow-hidden">
         {/* Background gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
@@ -30,8 +30,8 @@ export default function CreatePost() {
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
             <ArrowLeft className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-white font-bold text-2xl mb-4">Authentication Required</h2>
-          <p className="text-white/60 mb-6">You need to log in to create posts</p>
+          <h2 className="text-foreground font-bold text-2xl mb-4">Authentication Required</h2>
+          <p className="text-muted-foreground mb-6">You need to log in to create posts</p>
           <div className="flex gap-4 justify-center">
             <Link href="/login">
               <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white font-semibold hover:opacity-90 transition-opacity">
@@ -39,7 +39,7 @@ export default function CreatePost() {
               </Button>
             </Link>
             <Link href="/register">
-              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              <Button variant="outline" className="border-border text-foreground hover:bg-muted">
                 Sign Up
               </Button>
             </Link>
@@ -51,13 +51,13 @@ export default function CreatePost() {
   
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 relative">
             <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
           </div>
-          <p className="text-white/60">Loading...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-8 md:pt-20 pb-20 md:pb-8 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground pt-8 md:pt-20 pb-20 md:pb-8 relative overflow-hidden">
       {/* Background gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
@@ -160,39 +160,39 @@ export default function CreatePost() {
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/">
-            <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+            <button className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-5 w-5" />
               <span className="text-sm md:text-base">Back to Feed</span>
             </button>
           </Link>
-          <div className="w-px h-6 bg-white/20"></div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Create Post</h1>
+          <div className="w-px h-6 bg-border"></div>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Create Post</h1>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-6">
+          <div className="bg-card/50 backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-6">
             {/* Title */}
             <div>
-              <label className="text-white font-medium mb-2 block">Title</label>
+              <label className="text-foreground font-medium mb-2 block">Title</label>
               <Input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your post a catchy title..."
-                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                className="bg-input border-border text-foreground placeholder-muted-foreground rounded-xl"
                 maxLength={100}
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="text-white font-medium mb-2 block">Description</label>
+              <label className="text-foreground font-medium mb-2 block">Description</label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tell the community about your creation... Use #hashtags and @mentions"
-                className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl min-h-[100px] resize-none"
+                className="bg-input border-border text-foreground placeholder-muted-foreground rounded-xl min-h-[100px] resize-none"
                 maxLength={500}
               />
               <p className="text-white/50 text-sm mt-1">

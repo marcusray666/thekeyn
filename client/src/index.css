@@ -102,26 +102,20 @@
 }
 
 @layer components {
-  /* Premium card components - Force dark style */
+  /* Premium card components - Theme responsive */
   .post-card {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: none !important;
-    @apply rounded-3xl p-6 transition-all duration-300 hover:scale-[1.02]
-           hover:shadow-2xl cursor-pointer;
+    @apply bg-slate-100 dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-3xl p-6 
+           transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer;
   }
   
   .post-card:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: none !important;
+    @apply bg-slate-200 dark:bg-white/10;
   }
   
   .glass-button {
-    @apply bg-white/10 hover:bg-white/20 backdrop-blur-sm
-           rounded-full px-6 py-3 text-white font-medium transition-all duration-200 
-           hover:scale-105 active:scale-95;
-    border: 0px solid transparent !important;
+    @apply bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 backdrop-blur-sm 
+           text-slate-900 dark:text-white rounded-full px-6 py-3 font-medium transition-all duration-200 
+           hover:scale-105 active:scale-95 border-0;
   }
   
   .accent-button {
@@ -145,7 +139,7 @@
   
   .nav-item {
     @apply flex flex-col items-center space-y-1 p-3 rounded-2xl transition-all duration-200
-           hover:bg-white/10 active:scale-95;
+           hover:bg-slate-200 dark:hover:bg-white/10 active:scale-95;
   }
   
   .feed-container {
