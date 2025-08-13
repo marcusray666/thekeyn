@@ -63,71 +63,170 @@ export default function LoginClean() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`login-page ${isDark ? 'dark' : ''}`}>
-      <div className="login-container">
+    <div style={{ 
+      minHeight: '100vh', 
+      background: isDark ? '#0F0F0F' : '#ffffff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Back Button */}
-        <Link href="/" className={`login-back-button ${isDark ? 'dark' : ''}`}>
+        <Link href="/" style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 16px',
+          color: isDark ? '#9CA3AF' : '#6B7280',
+          textDecoration: 'none',
+          marginBottom: '24px',
+          fontSize: '14px'
+        }}>
           <ArrowLeft size={16} />
           Back
         </Link>
 
         {/* Login Card */}
-        <div className={`login-card ${isDark ? 'dark' : ''}`}>
-          <div className="login-header">
-            <h1 className={`login-title ${isDark ? 'dark' : ''}`}>Log In</h1>
-          </div>
+        <div style={{
+          background: isDark ? '#151518' : '#ffffff',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+        }}>
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: '700',
+            color: isDark ? '#ffffff' : '#111827',
+            textAlign: 'center',
+            marginBottom: '32px',
+            margin: '0 0 32px 0'
+          }}>Log In</h1>
           
-          <div className="login-content">
-            <form onSubmit={handleSubmit} className="login-form">
-              <div className="login-field">
-                <label htmlFor="username" className={`login-label ${isDark ? 'dark' : ''}`}>
-                  Username
-                </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                  className={`login-input ${isDark ? 'dark' : ''}`}
-                  placeholder="Enter your username"
-                />
-              </div>
-              
-              <div className="login-field">
-                <label htmlFor="password" className={`login-label ${isDark ? 'dark' : ''}`}>
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className={`login-input ${isDark ? 'dark' : ''}`}
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                className="login-button"
-                disabled={loginMutation.isPending}
-              >
-                {loginMutation.isPending ? "Logging in..." : "Log In"}
-              </button>
-            </form>
-
-            <div className={`login-footer ${isDark ? 'dark' : ''}`}>
-              <span className={`login-footer-text ${isDark ? 'dark' : ''}`}>
-                Don't have an account?{" "}
-                <Link href="/register" className="login-footer-link">
-                  Sign up
-                </Link>
-              </span>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label htmlFor="username" style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: isDark ? '#ffffff' : '#111827',
+                marginBottom: '8px'
+              }}>
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                placeholder="Enter your username"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  padding: '0 16px',
+                  fontSize: '16px',
+                  color: isDark ? '#ffffff' : '#111827',
+                  background: isDark ? '#1F1F23' : '#F9FAFB',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  borderRadius: '12px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FE3F5E';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
             </div>
+            
+            <div>
+              <label htmlFor="password" style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: isDark ? '#ffffff' : '#111827',
+                marginBottom: '8px'
+              }}>
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  padding: '0 16px',
+                  fontSize: '16px',
+                  color: isDark ? '#ffffff' : '#111827',
+                  background: isDark ? '#1F1F23' : '#F9FAFB',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  borderRadius: '12px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FE3F5E';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={loginMutation.isPending}
+              style={{
+                width: '100%',
+                height: '48px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#ffffff',
+                background: '#FE3F5E',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: loginMutation.isPending ? 'not-allowed' : 'pointer',
+                opacity: loginMutation.isPending ? 0.6 : 1,
+                marginTop: '8px'
+              }}
+            >
+              {loginMutation.isPending ? "Logging in..." : "Log In"}
+            </button>
+          </form>
+
+          <div style={{
+            textAlign: 'center',
+            paddingTop: '16px',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+            marginTop: '24px'
+          }}>
+            <span style={{
+              fontSize: '14px',
+              color: isDark ? '#9CA3AF' : '#6B7280'
+            }}>
+              Don't have an account?{" "}
+              <Link href="/register" style={{
+                color: '#FE3F5E',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}>
+                Sign up
+              </Link>
+            </span>
           </div>
         </div>
       </div>

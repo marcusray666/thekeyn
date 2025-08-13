@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import { useTheme } from "@/theme/ThemeProvider";
 
 export default function RegisterClean() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -62,91 +60,216 @@ export default function RegisterClean() {
     }));
   };
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0F0F0F] flex flex-col items-center justify-center px-4">
-      <div className="max-w-md w-full space-y-6">
+    <div style={{ 
+      minHeight: '100vh', 
+      background: isDark ? '#0F0F0F' : '#ffffff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Back Button */}
-        <Link href="/">
-          <Button variant="ghost" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+        <Link href="/" style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 16px',
+          color: isDark ? '#9CA3AF' : '#6B7280',
+          textDecoration: 'none',
+          marginBottom: '24px',
+          fontSize: '14px'
+        }}>
+          <ArrowLeft size={16} />
+          Back
         </Link>
 
         {/* Register Card */}
-        <Card className="bg-white dark:bg-[#151518] border border-gray-200 dark:border-white/10 shadow-xl">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">Sign Up</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-12 px-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23] border border-gray-200 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FE3F5E] focus:border-transparent"
-                  placeholder="Choose a username"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-12 px-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23] border border-gray-200 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FE3F5E] focus:border-transparent"
-                  placeholder="Enter your email"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-12 px-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23] border border-gray-200 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FE3F5E] focus:border-transparent"
-                  placeholder="Create a password"
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white font-semibold rounded-xl transition-all duration-200 mt-6"
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? "Creating account..." : "Sign Up"}
-              </Button>
-            </form>
-
-            <div className="text-center pt-4 border-t border-gray-200 dark:border-white/10">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Already have an account?{" "}
-                <Link href="/login" className="text-[#FE3F5E] hover:text-[#FE3F5E]/80 font-medium hover:underline">
-                  Log in
-                </Link>
-              </span>
+        <div style={{
+          background: isDark ? '#151518' : '#ffffff',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+        }}>
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: '700',
+            color: isDark ? '#ffffff' : '#111827',
+            textAlign: 'center',
+            marginBottom: '32px',
+            margin: '0 0 32px 0'
+          }}>Sign Up</h1>
+          
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label htmlFor="username" style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: isDark ? '#ffffff' : '#111827',
+                marginBottom: '8px'
+              }}>
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                placeholder="Choose a username"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  padding: '0 16px',
+                  fontSize: '16px',
+                  color: isDark ? '#ffffff' : '#111827',
+                  background: isDark ? '#1F1F23' : '#F9FAFB',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  borderRadius: '12px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FE3F5E';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label htmlFor="email" style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: isDark ? '#ffffff' : '#111827',
+                marginBottom: '8px'
+              }}>
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  padding: '0 16px',
+                  fontSize: '16px',
+                  color: isDark ? '#ffffff' : '#111827',
+                  background: isDark ? '#1F1F23' : '#F9FAFB',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  borderRadius: '12px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FE3F5E';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: isDark ? '#ffffff' : '#111827',
+                marginBottom: '8px'
+              }}>
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Create a password"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  padding: '0 16px',
+                  fontSize: '16px',
+                  color: isDark ? '#ffffff' : '#111827',
+                  background: isDark ? '#1F1F23' : '#F9FAFB',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  borderRadius: '12px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FE3F5E';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={registerMutation.isPending}
+              style={{
+                width: '100%',
+                height: '48px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#ffffff',
+                background: '#FE3F5E',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: registerMutation.isPending ? 'not-allowed' : 'pointer',
+                opacity: registerMutation.isPending ? 0.6 : 1,
+                marginTop: '8px'
+              }}
+            >
+              {registerMutation.isPending ? "Creating account..." : "Sign Up"}
+            </button>
+          </form>
+
+          <div style={{
+            textAlign: 'center',
+            paddingTop: '16px',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+            marginTop: '24px'
+          }}>
+            <span style={{
+              fontSize: '14px',
+              color: isDark ? '#9CA3AF' : '#6B7280'
+            }}>
+              Already have an account?{" "}
+              <Link href="/login" style={{
+                color: '#FE3F5E',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}>
+                Log in
+              </Link>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
