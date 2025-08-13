@@ -3,8 +3,8 @@ import { queryClient, apiRequest } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { NavBar } from "@/components/enhanced/NavBar";
-import { MobileNav } from "@/components/enhanced/MobileNav";
+import { TopNav } from "@/components/premium/top-nav";
+import { BottomNav } from "@/components/premium/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
 import { OnboardingProvider } from "@/components/onboarding/onboarding-provider";
 
@@ -123,17 +123,17 @@ function AppContent() {
   
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background text-foreground font-inter transition-colors duration-300">
+      <div className="min-h-screen bg-background text-foreground font-inter">
         {/* Skip Links for Screen Readers */}
         <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#FE3F5E] text-white px-4 py-2 rounded">
           Skip to main content
         </a>
         {/* Only show navigation for authenticated users */}
-        {isAuthenticated && <NavBar />}
-        <main id="main-content" className="pb-20 md:pb-0">
+        {isAuthenticated && <TopNav />}
+        <main id="main-content">
           <Router />
         </main>
-        {isAuthenticated && <MobileNav />}
+        {isAuthenticated && <BottomNav />}
       </div>
       <Toaster />
     </TooltipProvider>

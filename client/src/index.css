@@ -35,61 +35,69 @@
 /* Instagram-inspired premium theme */
 @layer base {
   :root {
-    /* Light mode defaults - Modern social platform */
-    --background: 210 20% 97%;          /* #F7F7F9 */
-    --foreground: 222 84% 8%;           /* #111827 */
-    --card: 0 0% 100%;                  /* #FFFFFF */
-    --card-foreground: 222 84% 8%;      /* #111827 */
+    /* Light mode defaults */
+    --background: 0 0% 100%;            /* #FFFFFF */
+    --foreground: 0 0% 0%;              /* #000000 */
+    --card: 0 0% 98%;                   /* #FAFAFA */
+    --card-foreground: 0 0% 0%;         /* #000000 */
     --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 8%;
+    --popover-foreground: 0 0% 0%;
     --primary: 346 98% 62%;             /* #FE3F5E */
     --primary-foreground: 0 0% 100%;
     --secondary: 50 100% 50%;           /* #FFD200 */
     --secondary-foreground: 0 0% 0%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 50 100% 50%;              /* #FFD200 */
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 95%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 0 0% 100%;
+    --border: 0 0% 85%;
+    --input: 0 0% 98%;
     --ring: 346 98% 62%;
-    --radius: 1rem;
+    --radius: 1.5rem;
   }
 
   .dark {
     /* Dark mode overrides */
-    --background: 220 18% 4%;           /* #0B0B0D */
-    --foreground: 210 40% 96%;          /* #F5F6F7 */
-    --card: 220 13% 9%;                 /* #151518 */
-    --card-foreground: 210 40% 96%;     /* #F5F6F7 */
-    --popover: 220 13% 9%;
-    --popover-foreground: 210 40% 96%;
+    --background: 15 15 15;             /* #0F0F0F */
+    --foreground: 0 0% 100%;            /* #FFFFFF */
+    --card: 15 15 15;                   /* #0F0F0F */
+    --card-foreground: 0 0% 100%;       /* #FFFFFF */
+    --popover: 15 15 15;
+    --popover-foreground: 0 0% 100%;
     --primary: 346 98% 62%;             /* #FE3F5E */
     --primary-foreground: 0 0% 100%;
     --secondary: 50 100% 50%;           /* #FFD200 */
-    --secondary-foreground: 220 13% 9%;
-    --muted: 215 28% 17%;
-    --muted-foreground: 218 11% 65%;
-    --accent: 50 100% 50%;              /* #FFD200 */
-    --accent-foreground: 220 13% 9%;
+    --secondary-foreground: 15 15 15;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 346 98% 62%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
     --ring: 346 98% 62%;
   }
   
   body {
-    @apply bg-background text-foreground antialiased transition-colors duration-300;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Inter', 'Urbanist', system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
+  }
+  
+  .dark body {
+    background: #0F0F0F !important;
+    color: #FFFFFF !important;
   }
   
   #root {
-    @apply min-h-screen bg-background text-foreground transition-colors duration-300;
+    @apply min-h-screen bg-background text-foreground;
+  }
+  
+  .dark #root {
+    background: #0F0F0F !important;
+    color: #FFFFFF !important;
   }
 }
 
