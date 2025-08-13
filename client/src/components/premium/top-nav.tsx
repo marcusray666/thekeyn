@@ -62,9 +62,13 @@ export function TopNav() {
 
   return (
     <nav 
-      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-transform duration-300 nav-gradient ${
+      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}>
+      }`}
+      style={{
+        backgroundColor: '#fecdd3',
+        background: '#fecdd3'
+      }}>
       {/* Logo */}
       <Link href="/">
         <div className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform">
