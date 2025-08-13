@@ -66,7 +66,7 @@ export function TopNav() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{
-        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.12) 0%, rgba(255, 210, 0, 0.12) 50%, rgba(254, 63, 94, 0.08) 100%)',
+        backgroundColor: 'rgba(254, 63, 94, 0.08)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         borderBottom: '1px solid rgba(255,255,255,0.2)'
