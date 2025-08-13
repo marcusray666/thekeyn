@@ -66,7 +66,9 @@ export function TopNav() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{
-        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.03) 0%, rgba(255, 210, 0, 0.03) 50%, rgba(254, 63, 94, 0.02) 100%)'
+        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.08) 0%, rgba(255, 210, 0, 0.08) 50%, rgba(254, 63, 94, 0.05) 100%)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)'
       }}>
       {/* Logo */}
       <Link href="/">
