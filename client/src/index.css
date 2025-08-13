@@ -6,95 +6,60 @@
 
 
 
-/* Instagram-inspired premium theme */
+/* White liquid glass theme */
 @layer base {
   :root {
-    /* Light mode defaults */
+    /* White theme with liquid glass effects */
     --background: 0 0% 100%;            /* #FFFFFF */
-    --foreground: 0 0% 0%;              /* #000000 */
+    --foreground: 0 0% 15%;             /* #262626 */
     --card: 0 0% 98%;                   /* #FAFAFA */
-    --card-foreground: 0 0% 0%;         /* #000000 */
+    --card-foreground: 0 0% 15%;        /* #262626 */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 15%;
     --primary: 346 98% 62%;             /* #FE3F5E */
     --primary-foreground: 0 0% 100%;
     --secondary: 50 100% 50%;           /* #FFD200 */
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 0 0% 95%;
-    --accent-foreground: 0 0% 0%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 15%;
     --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 85%;
+    --border: 0 0% 90%;
     --input: 0 0% 98%;
     --ring: 346 98% 62%;
     --radius: 1.5rem;
   }
-
-  .dark {
-    /* Dark mode overrides */
-    --background: 240 10% 3.9%;         /* #0F0F0F */
-    --foreground: 0 0% 98%;             /* #FAFAFA */
-    --card: 240 10% 3.9%;               /* #0F0F0F */
-    --card-foreground: 0 0% 98%;        /* #FAFAFA */
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 346 98% 62%;             /* #FE3F5E */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 50 100% 50%;           /* #FFD200 */
-    --secondary-foreground: 240 10% 3.9%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 346 98% 62%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84% 58%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 346 98% 62%;
-  }
   
   body {
     font-family: 'Inter', 'Urbanist', system-ui, sans-serif;
-    background: #ffffff;
-    color: #000000;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+    color: #262626;
     margin: 0;
     padding: 0;
-  }
-  
-  .dark body {
-    background: #0F0F0F;
-    color: #ffffff;
+    min-height: 100vh;
   }
   
   #root {
     min-height: 100vh;
-    background: #ffffff;
-    color: #000000;
-  }
-  
-  .dark #root {
-    background: #0F0F0F;
-    color: #ffffff;
+    background: transparent;
+    color: #262626;
   }
 }
 
 @layer components {
-  /* Premium card components - Theme responsive */
+  /* White liquid glass components */
   .post-card {
-    @apply bg-slate-100 dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-3xl p-6 
-           transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer;
-  }
-  
-  .post-card:hover {
-    @apply bg-slate-200 dark:bg-white/10;
+    @apply bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 
+           transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
+           shadow-lg hover:bg-white/80;
   }
   
   .glass-button {
-    @apply bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 backdrop-blur-sm 
-           text-slate-900 dark:text-white rounded-full px-6 py-3 font-medium transition-all duration-200 
-           hover:scale-105 active:scale-95 border-0;
+    @apply bg-white/60 hover:bg-white/80 backdrop-blur-xl 
+           text-gray-800 rounded-full px-6 py-3 font-medium transition-all duration-200 
+           hover:scale-105 active:scale-95 border border-gray-200/30 shadow-lg;
   }
   
   .accent-button {
@@ -104,21 +69,20 @@
   }
   
   .secondary-button {
-    @apply bg-[#FFD200] hover:bg-[#FFD200]/90 text-black font-semibold 
+    @apply bg-[#FFD200] hover:bg-[#FFD200]/90 text-gray-800 font-semibold 
            rounded-full px-8 py-4 transition-all duration-200 hover:scale-105 
            active:scale-95 shadow-lg hover:shadow-xl;
   }
   
   .upload-zone {
-    @apply rounded-3xl p-12 
-           transition-all duration-300 hover:bg-[#FE3F5E]/5
-           text-center cursor-pointer;
-    border: none !important;
+    @apply rounded-3xl p-12 bg-gray-50/50 backdrop-blur-xl border border-gray-200/50
+           transition-all duration-300 hover:bg-[#FE3F5E]/5 hover:border-[#FE3F5E]/20
+           text-center cursor-pointer shadow-lg;
   }
   
   .nav-item {
     @apply flex flex-col items-center space-y-1 p-3 rounded-2xl transition-all duration-200
-           hover:bg-slate-200 dark:hover:bg-white/10 active:scale-95;
+           hover:bg-white/60 hover:backdrop-blur-xl active:scale-95;
   }
   
   .feed-container {
@@ -608,14 +572,17 @@
 }
 
 .light-theme .glass-button {
-  background: rgba(255, 255, 255, 0.8);
-  color: #1a1a1a !important;
-  border: none;
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: #374151 !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .light-theme .glass-button:hover {
-  background: rgba(255, 255, 255, 0.9);
-  color: #1a1a1a !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Light theme navigation */

@@ -1,16 +1,14 @@
 import { Link } from "wouter";
-import { Search, Bell, MessageCircle, Upload, User, Sun, Moon } from "lucide-react";
+import { Search, Bell, MessageCircle, Upload, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { LogoIcon } from "@/components/ui/logo-icon";
-import { useTheme } from "../../theme/ThemeProvider";
 
 export function TopNav() {
   const { user } = useAuth();
-  const { theme, setTheme } = useTheme();
   
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -63,7 +61,7 @@ export function TopNav() {
   }, [lastScrollY]);
 
   return (
-    <nav className={`hidden md:flex items-center justify-between px-8 py-6 bg-surface border-b border-soft sticky top-0 z-40 transition-transform duration-300 backdrop-blur supports-[backdrop-filter]:bg-surface/90 ${
+    <nav className={`hidden md:flex items-center justify-between px-8 py-6 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-40 transition-transform duration-300 shadow-lg ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       {/* Logo */}
@@ -76,12 +74,12 @@ export function TopNav() {
       {/* Search */}
       <div className="flex-1 max-w-md mx-8">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search creators, works..."
             value={searchQuery}
-            className="w-full bg-white/10 border border-white/20 rounded-full py-3 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-[#FE3F5E] transition-colors"
+            className="w-full bg-white/60 backdrop-blur-xl border border-gray-200 rounded-full py-3 pl-12 pr-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#FE3F5E] transition-colors shadow-sm"
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setShowSearchResults(e.target.value.length >= 2);
@@ -99,14 +97,14 @@ export function TopNav() {
           
           {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto shadow-xl">
               <div className="p-3">
-                <div className="text-sm text-white/50 mb-3 px-2">Users</div>
+                <div className="text-sm text-gray-500 mb-3 px-2">Users</div>
                 {searchResults.map((user: any) => (
                   <Link
                     key={user.id}
                     href={`/user/${user.id}`}
-                    className="flex items-center space-x-3 p-3 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                    className="flex items-center space-x-3 p-3 hover:bg-gray-100/60 rounded-xl transition-colors cursor-pointer"
                     onClick={() => {
                       setShowSearchResults(false);
                       setSearchQuery("");
@@ -120,8 +118,8 @@ export function TopNav() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="text-white font-medium">{user.displayName || user.username}</div>
-                      <div className="text-white/50 text-sm">@{user.username}</div>
+                      <div className="text-gray-800 font-medium">{user.displayName || user.username}</div>
+                      <div className="text-gray-500 text-sm">@{user.username}</div>
                     </div>
                   </Link>
                 ))}
@@ -131,10 +129,10 @@ export function TopNav() {
           
           {/* No Results */}
           {showSearchResults && searchQuery.length >= 2 && searchResults.length === 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 shadow-xl">
               <div className="p-6 text-center">
-                <User className="h-8 w-8 text-white/30 mx-auto mb-2" />
-                <div className="text-white/50 text-sm">No users found for "{searchQuery}"</div>
+                <User className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                <div className="text-gray-500 text-sm">No users found for "{searchQuery}"</div>
               </div>
             </div>
           )}
@@ -160,17 +158,7 @@ export function TopNav() {
           <Bell className="h-5 w-5" />
         </Button>
 
-        {/* Theme Toggle */}
-        <Button 
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="glass-button p-3"
-        >
-          {theme === "light" ? (
-            <Moon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" />
-          )}
-        </Button>
+
 
         {/* Profile Menu */}
         <div className="relative">
@@ -187,57 +175,56 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-surface text-[color:var(--text)] border border-soft rounded-xl shadow-xl"
-                 style={{ background: 'var(--surface)', color: 'var(--text)' }}>
+            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-xl">
               <Link href="/profile">
                 <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">👤</span>
-                  <span className="font-medium text-[color:var(--text)]">Profile</span>
+                  <span className="font-medium text-gray-800">Profile</span>
                 </div>
               </Link>
               
-              <div className="border-t border-white/10 my-2"></div>
+              <div className="border-t border-gray-200/50 my-2"></div>
               
               <Link href="/certificates">
                 <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">🛡️</span>
-                  <span className="font-medium text-[color:var(--text)]">My Certificates</span>
+                  <span className="font-medium text-gray-800">My Certificates</span>
                 </div>
               </Link>
               
               <Link href="/analytics">
                 <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">📊</span>
-                  <span className="font-medium text-[color:var(--text)]">Analytics</span>
+                  <span className="font-medium text-gray-800">Analytics</span>
                 </div>
               </Link>
               
               <Link href="/blockchain-verification">
                 <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⛓️</span>
-                  <span className="font-medium text-[color:var(--text)]">Blockchain Verification</span>
+                  <span className="font-medium text-gray-800">Blockchain Verification</span>
                 </div>
               </Link>
 
               {/* Admin Dashboard - Only for admin users */}
               {(user as any)?.role === 'admin' && (
                 <>
-                  <div className="border-t border-white/10 my-2"></div>
+                  <div className="border-t border-gray-200/50 my-2"></div>
                   <Link href="/admin-dashboard">
                     <div 
-                      className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                      className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <span className="text-lg">🔧</span>
@@ -247,42 +234,25 @@ export function TopNav() {
                 </>
               )}
               
-              <div className="border-t border-white/10 my-2"></div>
+              <div className="border-t border-gray-200/50 my-2"></div>
               
               <Link href="/settings">
                 <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
+                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⚙️</span>
-                  <span className="font-medium text-[color:var(--text)]">Settings</span>
+                  <span className="font-medium text-gray-800">Settings</span>
                 </div>
               </Link>
 
-              <div 
-                className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
-                onClick={() => {
-                  setTheme(theme === "light" ? "dark" : "light");
-                  setIsMenuOpen(false);
-                }}
-              >
-                {theme === "light" ? (
-                  <Moon className="w-5 h-5" />
-                ) : (
-                  <Sun className="w-5 h-5" />
-                )}
-                <span className="font-medium text-[color:var(--text)]">
-                  {theme === "light" ? "Dark Mode" : "Light Mode"}
-                </span>
-              </div>
-              
-              <div className="border-t border-white/10 mt-2">
+              <div className="border-t border-gray-200/50 mt-2">
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
                     logoutMutation.mutate();
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors flex items-center space-x-3"
+                  className="w-full text-left px-4 py-3 hover:bg-gray-100/60 transition-colors flex items-center space-x-3"
                 >
                   <span className="text-lg">🚪</span>
                   <span style={{color: '#FF6B6B'}} className="font-medium">Sign Out</span>

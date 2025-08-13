@@ -150,10 +150,10 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
     if (!post.mentionedUsers || post.mentionedUsers.length === 0) return null;
     return (
       <div className="flex flex-wrap gap-1 mt-1">
-        <span className="text-white/50 text-sm">Mentioned:</span>
+        <span className="text-gray-500 text-sm">Mentioned:</span>
         {post.mentionedUsers.map((username, index) => (
           <Link key={index} href={`/user/${username}`}>
-            <span className="text-[#FFD200] hover:text-[#FFF200] text-sm cursor-pointer">
+            <span className="text-[#FE3F5E] hover:text-[#FF6B8A] text-sm cursor-pointer">
               @{username}
             </span>
           </Link>
@@ -168,7 +168,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
     switch (post.fileType) {
       case 'image':
         return (
-          <div className="relative rounded-xl overflow-hidden border border-white/10 bg-white/5">
+          <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
             <img
               src={post.imageUrl}
               alt={post.title}
@@ -188,7 +188,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
       
       case 'video':
         return (
-          <div className="relative rounded-xl overflow-hidden border border-white/10 bg-white/5">
+          <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
             <video
               ref={videoRef}
               src={post.imageUrl}
@@ -203,7 +203,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
       
       case 'audio':
         return (
-          <div className="rounded-xl border border-white/10 bg-gradient-to-r from-white/5 to-white/10 p-4">
+          <div className="rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-4">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handlePlayPause}
@@ -216,12 +216,12 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                 )}
               </button>
               <div className="flex-1">
-                <p className="text-white font-medium">{post.title}</p>
-                <p className="text-white/50 text-sm">Audio Track</p>
+                <p className="text-gray-800 font-medium">{post.title}</p>
+                <p className="text-gray-500 text-sm">Audio Track</p>
               </div>
               <button
                 onClick={handleMuteToggle}
-                className="flex items-center justify-center w-8 h-8 text-white/70 hover:text-white transition-colors"
+                className="flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-700 transition-colors"
               >
                 {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
@@ -293,14 +293,14 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
       
       case 'text':
         return (
-          <div className="rounded-xl border border-white/10 bg-gradient-to-r from-white/5 to-white/10 p-4">
+          <div className="rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg">
                 <span className="text-white font-bold text-lg">📝</span>
               </div>
               <div className="flex-1">
-                <p className="text-white font-medium">{post.title}</p>
-                <p className="text-white/50 text-sm">Text Document</p>
+                <p className="text-gray-800 font-medium">{post.title}</p>
+                <p className="text-gray-500 text-sm">Text Document</p>
               </div>
               <a
                 href={post.imageUrl}
@@ -323,12 +323,12 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
   const profileImage = post.profileImageUrl;
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-6 mb-4 hover:bg-white/8 transition-all duration-300">
+    <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-4 md:p-6 mb-4 hover:bg-white/80 transition-all duration-300 shadow-lg">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <Link href={`/user/${post.userId}`}>
-            <div className="flex items-center space-x-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors -m-2">
+            <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100/60 p-2 rounded-lg transition-colors -m-2">
               <div className="w-10 h-10 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
                 {profileImage ? (
                   <img
@@ -343,10 +343,10 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                 )}
               </div>
               <div>
-                <h3 className="text-white font-semibold hover:text-[#FE3F5E] transition-colors">
+                <h3 className="text-gray-800 font-semibold hover:text-[#FE3F5E] transition-colors">
                   {displayName}
                 </h3>
-                <p className="text-white/50 text-sm">@{post.username} • {formatTimeAgo(post.createdAt)}</p>
+                <p className="text-gray-500 text-sm">@{post.username} • {formatTimeAgo(post.createdAt)}</p>
               </div>
             </div>
           </Link>
@@ -365,36 +365,36 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/10"
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black/90 border-white/20 text-white">
+              <DropdownMenuContent className="bg-white/90 backdrop-blur-xl border-gray-200/50 text-gray-800 shadow-xl">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem 
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/20 cursor-pointer"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete Post
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-black/95 border-white/20">
+                  <AlertDialogContent className="bg-white/95 backdrop-blur-xl border-gray-200/50 shadow-2xl">
                     <AlertDialogHeader>
-                      <AlertDialogTitle className="text-white">Delete Post</AlertDialogTitle>
-                      <AlertDialogDescription className="text-white/60">
+                      <AlertDialogTitle className="text-gray-800">Delete Post</AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-600">
                         Are you sure you want to delete this post? This action cannot be undone.
                         {isAdmin && currentUserId !== post.userId && (
-                          <div className="mt-2 text-red-400 text-sm">
+                          <div className="mt-2 text-red-600 text-sm">
                             You are deleting another user's post as an administrator.
                           </div>
                         )}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                      <AlertDialogCancel className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300">
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
@@ -415,14 +415,14 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
 
       {/* Content */}
       <div className="mb-4">
-        <h2 className="text-white font-bold text-lg mb-2">{post.title}</h2>
+        <h2 className="text-gray-800 font-bold text-lg mb-2">{post.title}</h2>
         {post.description && (
-          <p className="text-white/80 mb-3 leading-relaxed">{post.description}</p>
+          <p className="text-gray-600 mb-3 leading-relaxed">{post.description}</p>
         )}
         
         {/* Location */}
         {post.location && (
-          <div className="flex items-center space-x-1 text-white/60 text-sm mb-2 cursor-pointer hover:text-[#FFD200] transition-colors"
+          <div className="flex items-center space-x-1 text-gray-500 text-sm mb-2 cursor-pointer hover:text-[#FE3F5E] transition-colors"
                onClick={(e) => {
                  e.stopPropagation();
                  // Open location search (could link to maps or location-based posts)
@@ -447,8 +447,8 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
 
       {/* AI Verification Badge */}
       <div className="flex items-center space-x-2 mb-4">
-        <div className="bg-green-500/20 border border-green-500/30 px-2 py-1 rounded-full">
-          <span className="text-green-400 text-xs font-medium">✓ Verified by AI</span>
+        <div className="bg-green-100 border border-green-200 px-2 py-1 rounded-full">
+          <span className="text-green-700 text-xs font-medium">✓ Verified by AI</span>
         </div>
       </div>
 
@@ -461,25 +461,25 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
             className={`flex items-center space-x-2 transition-colors ${
               isLiked 
                 ? 'text-red-500 hover:text-red-400' 
-                : 'text-white/60 hover:text-red-500'
+                : 'text-gray-500 hover:text-red-500'
             }`}
           >
             <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
             <span className="text-sm font-medium">{likes}</span>
           </button>
           
-          <button className="flex items-center space-x-2 text-white/60 hover:text-[#FFD200] transition-colors">
+          <button className="flex items-center space-x-2 text-gray-500 hover:text-[#FE3F5E] transition-colors">
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm font-medium">{post.comments}</span>
           </button>
           
-          <button className="flex items-center space-x-2 text-white/60 hover:text-[#FE3F5E] transition-colors">
+          <button className="flex items-center space-x-2 text-gray-500 hover:text-[#FE3F5E] transition-colors">
             <Share2 className="h-5 w-5" />
             <span className="text-sm font-medium">{post.shares}</span>
           </button>
         </div>
         
-        <div className="text-white/40 text-sm">
+        <div className="text-gray-400 text-sm">
           {post.views} views
         </div>
       </div>
