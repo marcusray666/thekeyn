@@ -160,17 +160,17 @@ export function Navigation() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-56 !bg-gray-900 !text-white !border-gray-600 shadow-2xl"
+                    className="w-56 bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-2xl text-gray-800"
                     style={{
-                      backgroundColor: 'rgb(17, 24, 39)',
-                      color: 'white',
-                      borderColor: 'rgb(75, 85, 99)',
-                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      borderColor: 'rgba(229, 231, 235, 0.5)',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)'
                     }}
                   >
                     {/* Account Section */}
-                    <div className="px-3 py-2 border-b border-gray-600" style={{ borderColor: 'rgb(75, 85, 99)' }}>
-                      <div className="text-xs uppercase tracking-wide mb-2" style={{ color: 'rgb(209, 213, 219)' }}>Account</div>
+                    <div className="px-3 py-2 border-b border-gray-200/50" style={{ borderColor: 'rgba(229, 231, 235, 0.5)' }}>
+                      <div className="text-xs uppercase tracking-wide mb-2 text-gray-500" style={{ color: 'rgb(107, 114, 128)' }}>Account</div>
                       <div className="flex items-center space-x-3">
                         <Link 
                           href={`/profile/${user?.username}`}
@@ -187,27 +187,27 @@ export function Navigation() {
                           )}
                         </Link>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate" style={{ color: 'white' }}>{user?.displayName || user?.username}</div>
-                          <div className="text-xs truncate" style={{ color: 'rgb(229, 231, 235)' }}>{user?.email || `${user?.username}@loggin.app`}</div>
+                          <div className="font-medium text-sm truncate text-gray-800" style={{ color: 'rgb(31, 41, 55)' }}>{user?.displayName || user?.username}</div>
+                          <div className="text-xs truncate text-gray-600" style={{ color: 'rgb(107, 114, 128)' }}>{user?.email || `${user?.username}@loggin.app`}</div>
                         </div>
                       </div>
                     </div>
 
-                    <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
+                    <DropdownMenuSeparator style={{ backgroundColor: 'rgba(229, 231, 235, 0.5)' }} />
                     
                     {/* Navigation Items - Only Portfolio */}
                     <DropdownMenuItem asChild>
                       <Link 
                         href={`/portfolio/${user?.username}`} 
-                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
-                        style={{ color: 'rgb(229, 231, 235)' }}
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors text-gray-700"
+                        style={{ color: 'rgb(75, 85, 99)' }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                          e.currentTarget.style.color = 'white';
+                          e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.1)';
+                          e.currentTarget.style.color = 'rgb(31, 41, 55)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                          e.currentTarget.style.color = 'rgb(75, 85, 99)';
                         }}
                       >
                         <Eye className="mr-3 h-4 w-4" />
@@ -218,7 +218,7 @@ export function Navigation() {
                     {/* Admin Option - Only visible to admins */}
                     {user?.role === 'admin' && (
                       <>
-                        <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
+                        <DropdownMenuSeparator style={{ backgroundColor: 'rgba(229, 231, 235, 0.5)' }} />
                         
                         <DropdownMenuItem asChild>
                           <Link 
@@ -226,8 +226,8 @@ export function Navigation() {
                             className="flex items-center w-full py-2 px-2 rounded-sm transition-colors"
                             style={{ color: 'rgb(251, 191, 36)' }} // Gold color for admin
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(251, 191, 36, 0.2)';
-                              e.currentTarget.style.color = 'rgb(254, 240, 138)';
+                              e.currentTarget.style.backgroundColor = 'rgba(251, 191, 36, 0.1)';
+                              e.currentTarget.style.color = 'rgb(217, 119, 6)';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.backgroundColor = 'transparent';
@@ -241,20 +241,20 @@ export function Navigation() {
                       </>
                     )}
 
-                    <DropdownMenuSeparator style={{ backgroundColor: 'rgb(75, 85, 99)' }} />
+                    <DropdownMenuSeparator style={{ backgroundColor: 'rgba(229, 231, 235, 0.5)' }} />
                     
                     <DropdownMenuItem
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
-                      className="flex items-center w-full py-2 px-2 rounded-sm transition-colors cursor-pointer"
-                      style={{ color: 'rgb(229, 231, 235)' }}
+                      className="flex items-center w-full py-2 px-2 rounded-sm transition-colors cursor-pointer text-gray-700"
+                      style={{ color: 'rgb(75, 85, 99)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                        e.currentTarget.style.color = 'white';
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                        e.currentTarget.style.color = 'rgb(220, 38, 38)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'rgb(229, 231, 235)';
+                        e.currentTarget.style.color = 'rgb(75, 85, 99)';
                       }}
                     >
                       <LogOut className="mr-3 h-4 w-4" />
