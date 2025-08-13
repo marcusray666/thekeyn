@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, FileText, Calendar, Image, Search, Download, ExternalLink, Shield, Award, Eye, Hash, Share2, Upload } from "lucide-react";
+import { Plus, FileText, Calendar, Image, Search, Download, ExternalLink, Shield, Award, Eye, Hash, Share2, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
@@ -133,9 +133,18 @@ export default function MyCertificates() {
       
       <div className="max-w-6xl mx-auto px-6 py-8 relative z-10 pt-24">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">My Certificates</h1>
-          <p className="text-white/60 text-lg">Manage and view all your registered creative works</p>
+        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">My Certificates</h1>
+            <p className="text-white/60 text-lg">Manage and view all your registered creative works</p>
+          </div>
+          <Button
+            onClick={() => setLocation('/studio')}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 font-semibold"
+          >
+            <Upload className="mr-2 h-5 w-5" />
+            Upload Work
+          </Button>
         </div>
 
         {/* Search and Controls */}
@@ -337,6 +346,176 @@ export default function MyCertificates() {
             </GlassCard>
           </div>
         )}
+
+        {/* Certificate Guide Section */}
+        <div className="mt-16 border-t border-white/10 pt-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">Certificate Guide</h2>
+            <p className="text-white/60 text-lg">Learn how to use your certificates for maximum protection</p>
+          </div>
+
+          {/* How to Use Your Certificate ID */}
+          <div className="mb-12 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+            <div className="mb-6">
+              <h3 className="text-white text-xl font-semibold mb-2">How to Use Your Certificate ID</h3>
+              <p className="text-white/60">
+                Your Certificate ID is proof of authenticity and ownership. Here's how to use it effectively:
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="space-y-4">
+                <div className="p-4 bg-[#FE3F5E]/10 rounded-xl border border-[#FE3F5E]/20">
+                  <Shield className="h-8 w-8 text-[#FE3F5E] mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Copyright Protection</h4>
+                  <ul className="text-white/70 text-sm space-y-1">
+                    <li>• DMCA takedown notices</li>
+                    <li>• Legal contract references</li>
+                    <li>• Court evidence documentation</li>
+                    <li>• Cease and desist letters</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-[#FFD200]/10 rounded-xl border border-[#FFD200]/20">
+                  <ExternalLink className="h-8 w-8 text-[#FFD200] mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Social Media & Online</h4>
+                  <ul className="text-white/70 text-sm space-y-1">
+                    <li>• Instagram/TikTok bio verification</li>
+                    <li>• YouTube video descriptions</li>
+                    <li>• Portfolio website credentials</li>
+                    <li>• NFT marketplace authenticity</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                  <FileText className="h-8 w-8 text-purple-400 mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Business & Commercial</h4>
+                  <ul className="text-white/70 text-sm space-y-1">
+                    <li>• Client delivery documents</li>
+                    <li>• Licensing agreement references</li>
+                    <li>• Brand partnership verification</li>
+                    <li>• Stock photo authenticity</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                  <Award className="h-8 w-8 text-emerald-400 mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Academic & Professional</h4>
+                  <ul className="text-white/70 text-sm space-y-1">
+                    <li>• Research paper citations</li>
+                    <li>• Conference presentation credits</li>
+                    <li>• Professional portfolio verification</li>
+                    <li>• Grant application proof</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Verification */}
+          <div className="mb-12 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+            <div className="mb-6">
+              <h3 className="text-white text-xl font-semibold mb-2">Quick Verification</h3>
+              <p className="text-white/60">
+                Anyone can verify your Certificate ID instantly
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 p-4 bg-black/40 rounded-xl border border-white/5">
+                <span className="text-white/70">Visit:</span>
+                <code className="text-[#FFD200] font-mono flex-1">
+                  https://loggin.com/certificate/[YOUR-CERTIFICATE-ID]
+                </code>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-white/70 mb-4">Or verify manually:</p>
+                <div className="space-y-2 text-sm text-white/50">
+                  <p>1. Go to Loggin.com</p>
+                  <p>2. Click "Verify Certificate"</p>
+                  <p>3. Enter your Certificate ID</p>
+                  <p>4. View blockchain verification details</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Best Practices */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+              <div className="mb-4">
+                <h4 className="text-emerald-400 font-semibold text-lg flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  DO
+                </h4>
+              </div>
+              <ul className="space-y-2 text-white/70">
+                <li>✅ Keep Certificate ID secure until needed</li>
+                <li>✅ Include in all commercial licensing</li>
+                <li>✅ Save Certificate ID records for each work</li>
+                <li>✅ Use when reporting theft or unauthorized use</li>
+                <li>✅ Reference in legal documentation</li>
+              </ul>
+            </div>
+
+            <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-xl">
+              <div className="mb-4">
+                <h4 className="text-red-400 font-semibold text-lg flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5" />
+                  DON'T
+                </h4>
+              </div>
+              <ul className="space-y-2 text-white/70">
+                <li>❌ Share Certificate ID publicly unless necessary</li>
+                <li>❌ Use expired certificates for legal claims</li>
+                <li>❌ Rely solely on Certificate ID without originals</li>
+                <li>❌ Forget to document infringement evidence</li>
+                <li>❌ Ignore blockchain verification status</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Emergency Contact */}
+          <div className="p-6 bg-orange-500/10 border border-orange-500/20 rounded-xl mb-8">
+            <div className="mb-4">
+              <h4 className="text-orange-400 font-semibold text-lg flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                Emergency: Someone is Using Your Work Without Permission
+              </h4>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="text-white font-medium mb-2">Immediate Steps:</h5>
+                <ol className="space-y-1 text-white/70 text-sm">
+                  <li>1. Document the infringement (screenshots, URLs)</li>
+                  <li>2. Reference your Certificate ID as proof</li>
+                  <li>3. File DMCA takedown including Certificate ID</li>
+                  <li>4. Contact Loggin support for legal assistance</li>
+                </ol>
+              </div>
+              <div>
+                <h5 className="text-white font-medium mb-2">Contact Information:</h5>
+                <div className="space-y-2 text-sm">
+                  <div className="text-white/70">
+                    <strong>Email:</strong> support@loggin.com
+                  </div>
+                  <div className="text-white/70">
+                    <strong>Subject:</strong> "Copyright Infringement - [Certificate ID]"
+                  </div>
+                  <div className="text-white/70">
+                    <strong>Response:</strong> Within 24 hours
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

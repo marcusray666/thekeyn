@@ -68,7 +68,6 @@ export function Navigation() {
     { href: "/social", label: "Community", icon: Users },
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/studio", label: "Studio", icon: Upload },
-    { href: "/certificate-guide", label: "Certificate Guide", icon: BookOpen },
     { href: "/subscription", label: "Subscription", icon: Crown },
     ...(user?.role === 'admin' ? [{ href: "/admin-dashboard", label: "Admin Panel", icon: Shield }] : []),
   ];
