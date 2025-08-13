@@ -204,7 +204,7 @@
   }
   
   /* Navigation styling for white theme */
-  nav {
+  nav:not(.custom-bg) {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(20px) !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -579,7 +579,7 @@
 }
 
 /* Light theme navigation */
-.light-theme nav {
+.light-theme nav:not(.custom-bg) {
   background: rgba(255, 255, 255, 0.98) !important;
   border-bottom: none !important;
   backdrop-filter: blur(20px);
@@ -1047,7 +1047,7 @@
 }
 
 /* Navigation glass effect */
-nav, .nav-glass {
+nav:not(.custom-bg), .nav-glass {
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;

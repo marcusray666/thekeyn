@@ -62,12 +62,14 @@ export function TopNav() {
 
   return (
     <nav 
-      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-transform duration-300 ${
+      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-transform duration-300 custom-bg ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{
-        backgroundColor: '#FF69B4',
-        background: '#FF69B4'
+        backgroundColor: 'rgba(254, 63, 94, 0.12)',
+        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.12) 0%, rgba(255, 210, 0, 0.08) 50%, rgba(254, 63, 94, 0.10) 100%)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)'
       }}>
       {/* Logo */}
       <Link href="/">
