@@ -50,6 +50,12 @@
 
 @layer components {
   /* White liquid glass components */
+  .nav-gradient {
+    background: linear-gradient(135deg, rgba(254, 63, 94, 0.15) 0%, rgba(255, 210, 0, 0.12) 50%, rgba(254, 63, 94, 0.10) 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+  
   .post-card {
     @apply bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 
            transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
