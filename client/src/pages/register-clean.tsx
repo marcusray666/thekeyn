@@ -65,11 +65,12 @@ export default function RegisterClean() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: isDark ? '#0F0F0F' : '#ffffff',
+      background: '#0F0F0F',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px'
+      padding: '20px',
+      backgroundImage: 'linear-gradient(135deg, rgba(254, 63, 94, 0.05) 0%, rgba(255, 210, 0, 0.05) 100%)'
     }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Back Button */}
@@ -78,10 +79,12 @@ export default function RegisterClean() {
           alignItems: 'center',
           gap: '8px',
           padding: '8px 16px',
-          color: isDark ? '#9CA3AF' : '#6B7280',
+          color: '#ffffff',
           textDecoration: 'none',
           marginBottom: '24px',
-          fontSize: '14px'
+          fontSize: '14px',
+          opacity: 0.8,
+          transition: 'opacity 0.2s ease'
         }}>
           <ArrowLeft size={16} />
           Back
@@ -89,11 +92,13 @@ export default function RegisterClean() {
 
         {/* Register Card */}
         <div style={{
-          background: isDark ? '#151518' : '#ffffff',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '16px',
           padding: '32px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)'
         }}>
           <h1 style={{
             fontSize: '32px',

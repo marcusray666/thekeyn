@@ -65,11 +65,12 @@ export default function LoginClean() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: isDark ? '#0F0F0F' : '#ffffff',
+      background: '#0F0F0F',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px'
+      padding: '20px',
+      backgroundImage: 'linear-gradient(135deg, rgba(254, 63, 94, 0.05) 0%, rgba(255, 210, 0, 0.05) 100%)'
     }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Back Button */}
@@ -78,10 +79,12 @@ export default function LoginClean() {
           alignItems: 'center',
           gap: '8px',
           padding: '8px 16px',
-          color: isDark ? '#9CA3AF' : '#6B7280',
+          color: '#ffffff',
           textDecoration: 'none',
           marginBottom: '24px',
-          fontSize: '14px'
+          fontSize: '14px',
+          opacity: 0.8,
+          transition: 'opacity 0.2s ease'
         }}>
           <ArrowLeft size={16} />
           Back
@@ -89,16 +92,18 @@ export default function LoginClean() {
 
         {/* Login Card */}
         <div style={{
-          background: isDark ? '#151518' : '#ffffff',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '16px',
           padding: '32px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)'
         }}>
           <h1 style={{
             fontSize: '32px',
             fontWeight: '700',
-            color: isDark ? '#ffffff' : '#111827',
+            color: '#ffffff',
             textAlign: 'center',
             marginBottom: '32px',
             margin: '0 0 32px 0'
@@ -110,7 +115,7 @@ export default function LoginClean() {
                 display: 'block',
                 fontSize: '14px',
                 fontWeight: '500',
-                color: isDark ? '#ffffff' : '#111827',
+                color: '#ffffff',
                 marginBottom: '8px'
               }}>
                 Username
@@ -128,9 +133,9 @@ export default function LoginClean() {
                   height: '48px',
                   padding: '0 16px',
                   fontSize: '16px',
-                  color: isDark ? '#ffffff' : '#111827',
-                  background: isDark ? '#1F1F23' : '#F9FAFB',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  color: '#ffffff',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: '12px',
                   outline: 'none',
                   boxSizing: 'border-box'
@@ -140,7 +145,7 @@ export default function LoginClean() {
                   e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.borderColor = 'rgba(255,255,255,0.2)';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -151,7 +156,7 @@ export default function LoginClean() {
                 display: 'block',
                 fontSize: '14px',
                 fontWeight: '500',
-                color: isDark ? '#ffffff' : '#111827',
+                color: '#ffffff',
                 marginBottom: '8px'
               }}>
                 Password
@@ -169,9 +174,9 @@ export default function LoginClean() {
                   height: '48px',
                   padding: '0 16px',
                   fontSize: '16px',
-                  color: isDark ? '#ffffff' : '#111827',
-                  background: isDark ? '#1F1F23' : '#F9FAFB',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
+                  color: '#ffffff',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: '12px',
                   outline: 'none',
                   boxSizing: 'border-box'
@@ -181,7 +186,7 @@ export default function LoginClean() {
                   e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
+                  e.target.style.borderColor = 'rgba(255,255,255,0.2)';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -211,12 +216,12 @@ export default function LoginClean() {
           <div style={{
             textAlign: 'center',
             paddingTop: '16px',
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+            borderTop: '1px solid rgba(255,255,255,0.1)',
             marginTop: '24px'
           }}>
             <span style={{
               fontSize: '14px',
-              color: isDark ? '#9CA3AF' : '#6B7280'
+              color: 'rgba(255, 255, 255, 0.7)'
             }}>
               Don't have an account?{" "}
               <Link href="/register" style={{
