@@ -185,11 +185,11 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/80 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl"
+            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/85 backdrop-blur-md border border-gray-200/50 rounded-xl shadow-2xl"
                  style={{
-                   backdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
-                   WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
-                   backgroundColor: 'rgba(255, 255, 255, 0.7)'
+                   backdropFilter: 'blur(10px) saturate(150%)',
+                   WebkitBackdropFilter: 'blur(10px) saturate(150%)',
+                   backgroundColor: 'rgba(255, 255, 255, 0.85)'
                  }}>
               <Link href="/profile">
                 <div 
