@@ -174,6 +174,14 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
               alt={post.title}
               className="w-full h-auto max-h-96 object-contain"
               loading="lazy"
+              onError={(e) => {
+                console.error('Image failed to load:', post.imageUrl);
+                // Try to reload with cache-busting
+                const target = e.target as HTMLImageElement;
+                if (!target.src.includes('?reload=')) {
+                  target.src = `${post.imageUrl}?reload=${Date.now()}`;
+                }
+              }}
             />
           </div>
         );
@@ -231,23 +239,54 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
       
       case 'pdf':
         return (
-          <div className="rounded-xl border border-white/10 bg-gradient-to-r from-white/5 to-white/10 p-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-red-500 rounded-lg">
-                <span className="text-white font-bold text-lg">📄</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-white font-medium">{post.title}</p>
-                <p className="text-white/50 text-sm">PDF Document</p>
+          <div className="rounded-xl border border-white/10 bg-gradient-to-r from-white/5 to-white/10 overflow-hidden">
+            {/* PDF Preview Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-red-500 rounded-lg">
+                  <span className="text-white font-bold text-sm">📄</span>
+                </div>
+                <div>
+                  <p className="text-white font-medium">{post.filename || post.title}</p>
+                  <p className="text-white/50 text-sm">PDF Document</p>
+                </div>
               </div>
               <a
                 href={post.imageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-[#FE3F5E] hover:bg-[#FF6B8A] text-white rounded-lg transition-colors"
+                className="px-3 py-1.5 bg-[#FE3F5E] hover:bg-[#FF6B8A] text-white text-sm rounded-lg transition-colors"
               >
                 View PDF
               </a>
+            </div>
+            
+            {/* PDF Inline Preview */}
+            <div className="relative">
+              <iframe
+                src={`${post.imageUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                className="w-full h-96 border-0"
+                title={`PDF Preview: ${post.title}`}
+                loading="lazy"
+                style={{
+                  background: 'white',
+                  filter: 'none'
+                }}
+                onError={(e) => {
+                  // Fallback if iframe fails
+                  console.log('PDF iframe failed to load:', e);
+                }}
+              />
+              
+              {/* PDF Overlay for click handling */}
+              <div className="absolute inset-0 bg-transparent hover:bg-black/10 transition-colors cursor-pointer"
+                   onClick={() => window.open(post.imageUrl, '_blank')}>
+                <div className="absolute bottom-4 right-4 opacity-0 hover:opacity-100 transition-opacity">
+                  <span className="bg-black/70 text-white px-2 py-1 rounded text-xs">
+                    Click to open full PDF
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         );

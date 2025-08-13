@@ -572,12 +572,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filePath = path.join("uploads", filename);
       
       if (!fs.existsSync(filePath)) {
+        console.log(`File not found: ${filePath}`);
         return res.status(404).json({ error: "File not found" });
       }
 
       // Set appropriate headers
       const stat = fs.statSync(filePath);
       res.setHeader('Content-Length', stat.size);
+      
+      // Set CORS headers for cross-origin requests
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       
       // Set content type based on file extension
       const ext = path.extname(filename).toLowerCase();
@@ -627,8 +633,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.setHeader('Content-Type', contentTypeMap[ext]);
       }
       
+      // For PDFs, add specific headers to enable inline viewing
+      if (ext === '.pdf') {
+        res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+      
       // Stream the file
       const readStream = fs.createReadStream(filePath);
+      readStream.on('error', (error) => {
+        console.error('Error streaming file:', error);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Failed to stream file" });
+        }
+      });
       readStream.pipe(res);
     } catch (error) {
       console.error("Error serving file:", error);
