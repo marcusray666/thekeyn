@@ -92,7 +92,8 @@ export default function LoginClean() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your username"
-                className="w-full h-12 px-4 text-gray-800 bg-white/80 border border-gray-200 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20 backdrop-blur-md"
+                className="w-full h-12 px-4 text-gray-900 bg-white border border-gray-300 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20"
+                style={{ color: '#111827', backgroundColor: '#ffffff' }}
               />
             </div>
             
@@ -111,7 +112,8 @@ export default function LoginClean() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your password"
-                className="w-full h-12 px-4 text-gray-800 bg-white/80 border border-gray-200 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20 backdrop-blur-md"
+                className="w-full h-12 px-4 text-gray-900 bg-white border border-gray-300 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20"
+                style={{ color: '#111827', backgroundColor: '#ffffff' }}
               />
             </div>
 
