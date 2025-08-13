@@ -62,25 +62,27 @@ export default function LoginClean() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-white dark:bg-[#0F0F0F] flex flex-col items-center justify-center px-4">
       <div className="max-w-md w-full space-y-6">
         {/* Back Button */}
         <Link href="/">
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
         </Link>
 
         {/* Login Card */}
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Log In</CardTitle>
+        <Card className="bg-white dark:bg-[#151518] border border-gray-200 dark:border-white/10 shadow-xl">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">Log In</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Username
+                </Label>
                 <Input
                   id="username"
                   name="username"
@@ -88,12 +90,15 @@ export default function LoginClean() {
                   value={formData.username}
                   onChange={handleChange}
                   required
-                  className="w-full"
+                  className="w-full h-12 px-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23] border border-gray-200 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FE3F5E] focus:border-transparent"
+                  placeholder="Enter your username"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   name="password"
@@ -101,23 +106,24 @@ export default function LoginClean() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full"
+                  className="w-full h-12 px-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23] border border-gray-200 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FE3F5E] focus:border-transparent"
+                  placeholder="Enter your password"
                 />
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full h-12 bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white font-semibold rounded-xl transition-all duration-200 mt-6"
                 disabled={loginMutation.isPending}
               >
                 {loginMutation.isPending ? "Logging in..." : "Log In"}
               </Button>
             </form>
 
-            <div className="text-center mt-4">
-              <span className="text-sm text-muted-foreground">
+            <div className="text-center pt-4 border-t border-gray-200 dark:border-white/10">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 Don't have an account?{" "}
-                <Link href="/register" className="text-primary hover:underline">
+                <Link href="/register" className="text-[#FE3F5E] hover:text-[#FE3F5E]/80 font-medium hover:underline">
                   Sign up
                 </Link>
               </span>
