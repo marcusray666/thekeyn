@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Upload, LogOut, User, Users, Settings, ChevronDown, Crown, Shield, MessageCircle, BarChart3, AlertTriangle, Eye, BookOpen } from "lucide-react";
+import { Menu, X, Home, Upload, LogOut, User, Users, Settings, ChevronDown, Crown, Shield, MessageCircle, BarChart3, AlertTriangle, Eye } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

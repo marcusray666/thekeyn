@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, Bell, MessageCircle, Upload, User, Sun, Moon } from "lucide-react";
+import { Search, Bell, MessageCircle, Upload, User, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { LogoIcon } from "@/components/ui/logo-icon";
 import { useTheme } from "@/components/theme-provider";
 
 export function TopNav() {
-  const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   
@@ -189,7 +188,7 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a]/95 backdrop-blur-xl border border-white/30 rounded-2xl py-2 shadow-2xl z-50" style={{background: 'rgba(26, 26, 26, 0.95)', border: '1px solid rgba(255, 255, 255, 0.3)'}}>
+            <div className="absolute right-0 top-full mt-2 w-56 bg-[#0F0F0F]/98 backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50" style={{background: 'rgba(15, 15, 15, 0.98)', border: '1px solid rgba(255, 255, 255, 0.2)'}}>
               <Link href="/profile">
                 <div 
                   className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
@@ -229,16 +228,6 @@ export function TopNav() {
                 >
                   <span className="text-lg">⛓️</span>
                   <span style={{color: '#FFFFFF'}} className="font-medium">Blockchain Verification</span>
-                </div>
-              </Link>
-              
-              <Link href="/certificate-guide">
-                <div 
-                  className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span className="text-lg">📖</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">Certificate Guide</span>
                 </div>
               </Link>
 
