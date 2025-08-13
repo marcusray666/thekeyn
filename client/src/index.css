@@ -4,32 +4,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clean border reset */
-* {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+/* ---- Color tokens for both themes ---- */
+:root {
+  /* base surfaces */
+  --bg:        #F7F7F9;    /* page */
+  --surface:   #FFFFFF;    /* cards/nav/dropdowns */
+  --text:      #111827;    /* primary text */
+  --muted:     #6B7280;    /* meta text */
+  --border:    rgba(0,0,0,0.06);
+
+  /* brand */
+  --primary:   #FE3F5E;    /* actions */
+  --accent:    #FFD200;
 }
 
-/* Global border reset - highest priority but preserve input functionality */
-*:not(input):not(textarea):not(select):not(fieldset):not(legend) {
-  border: 0 !important;
-  outline: 0 !important;
+:root.dark {
+  --bg:        #0B0B0D;
+  --surface:   #151518;
+  --text:      #F3F4F6;
+  --muted:     #9CA3AF;
+  --border:    rgba(255,255,255,0.10);
+  --primary:   #FE3F5E;
+  --accent:    #FFD200;
 }
 
-/* Specifically target CSS variable borders */
-[style*="border"], [class*="border"], [class*="outline"] {
-  border: 0 !important;
-  outline: 0 !important;
+html, body, #root {
+  height: 100%;
 }
 
-/* Override any Tailwind border utilities */
-.border, .border-t, .border-r, .border-b, .border-l,
-.border-2, .border-4, .border-8,
-.border-solid, .border-dashed, .border-dotted,
-.border-transparent, .border-white, .border-black,
-[class*="border-"] {
-  border: none !important;
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply transition-colors duration-300;
+}
+
+/* helpers */
+.bg-surface { background-color: var(--surface); }
+.text-muted { color: var(--muted); }
+.border-soft { border-color: var(--border) !important; }
+
+/* make dropdowns & cards readable in both themes */
+.card {
+  background: var(--surface);
+  @apply rounded-2xl border border-soft shadow-sm;
+}
+
+/* remove any full-screen overlays someone might have left lying around */
+.app-backdrop-kill {
+  pointer-events: none !important;
+  @apply -z-10 !important;
 }
 
 /* Instagram-inspired premium theme */

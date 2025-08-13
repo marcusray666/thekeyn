@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Search, Bell, MessageCircle, Upload, User, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { LogoIcon } from "@/components/ui/logo-icon";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "../../theme/ThemeProvider";
 
 export function TopNav() {
   const { user } = useAuth();
@@ -17,8 +17,7 @@ export function TopNav() {
       await apiRequest("/api/auth/logout", { method: "POST" });
     },
     onSuccess: () => {
-      setLocation("/");
-      window.location.reload();
+      window.location.href = "/";
     },
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,7 +63,7 @@ export function TopNav() {
   }, [lastScrollY]);
 
   return (
-    <nav className={`hidden md:flex items-center justify-between px-8 py-6 bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40 transition-transform duration-300 ${
+    <nav className={`hidden md:flex items-center justify-between px-8 py-6 bg-surface border-b border-soft sticky top-0 z-40 transition-transform duration-300 backdrop-blur supports-[backdrop-filter]:bg-surface/90 ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       {/* Logo */}
@@ -188,14 +187,15 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-[#0F0F0F]/98 backdrop-blur-xl border border-white/20 rounded-2xl py-2 shadow-2xl z-50" style={{background: 'rgba(15, 15, 15, 0.98)', border: '1px solid rgba(255, 255, 255, 0.2)'}}>
+            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-surface text-[color:var(--text)] border border-soft rounded-xl shadow-xl"
+                 style={{ background: 'var(--surface)', color: 'var(--text)' }}>
               <Link href="/profile">
                 <div 
                   className="px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">👤</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">Profile</span>
+                  <span className="font-medium text-[color:var(--text)]">Profile</span>
                 </div>
               </Link>
               
@@ -207,7 +207,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">🛡️</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">My Certificates</span>
+                  <span className="font-medium text-[color:var(--text)]">My Certificates</span>
                 </div>
               </Link>
               
@@ -217,7 +217,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">📊</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">Analytics</span>
+                  <span className="font-medium text-[color:var(--text)]">Analytics</span>
                 </div>
               </Link>
               
@@ -227,7 +227,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⛓️</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">Blockchain Verification</span>
+                  <span className="font-medium text-[color:var(--text)]">Blockchain Verification</span>
                 </div>
               </Link>
 
@@ -255,7 +255,7 @@ export function TopNav() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="text-lg">⚙️</span>
-                  <span style={{color: '#FFFFFF'}} className="font-medium">Settings</span>
+                  <span className="font-medium text-[color:var(--text)]">Settings</span>
                 </div>
               </Link>
 
@@ -271,7 +271,7 @@ export function TopNav() {
                 ) : (
                   <Sun className="w-5 h-5" />
                 )}
-                <span style={{color: '#FFFFFF'}} className="font-medium">
+                <span className="font-medium text-[color:var(--text)]">
                   {theme === "light" ? "Dark Mode" : "Light Mode"}
                 </span>
               </div>

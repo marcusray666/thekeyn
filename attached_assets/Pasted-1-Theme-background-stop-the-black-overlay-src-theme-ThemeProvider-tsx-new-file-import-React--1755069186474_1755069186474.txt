@@ -1,0 +1,233 @@
+1) Theme + background (stop the black overlay)
+src/theme/ThemeProvider.tsx (new file)
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+type Theme = "light" | "dark" | "system";
+type Ctx = { theme: Theme; setTheme: (t: Theme) => void };
+
+const ThemeCtx = createContext<Ctx>({ theme: "light", setTheme: () => {} });
+export const useTheme = () => useContext(ThemeCtx);
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const getInitial = (): Theme => (localStorage.getItem("theme") as Theme) || "light";
+  const [theme, setTheme] = useState<Theme>(getInitial);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const resolved =
+      theme === "system"
+        ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+        : theme;
+    root.classList.toggle("dark", resolved === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  return <ThemeCtx.Provider value={{ theme, setTheme }}>{children}</ThemeCtx.Provider>;
+};
+src/components/layout/BackgroundGlow.tsx (new file)
+export default function BackgroundGlow() {
+  // IMPORTANT: -z-10 + pointer-events-none keeps this behind everything.
+  return (
+    <div
+      className="
+      pointer-events-none fixed inset-0 -z-10
+      [background:
+        radial-gradient(600px_240px_at_30%_20%,rgba(254,63,94,.24),transparent_60%),
+        radial-gradient(700px_320px_at_80%_80%,rgba(255,210,0,.16),transparent_60%)
+      ]
+      dark:[background:
+        radial-gradient(600px_240px_at_30%_20%,rgba(254,63,94,.08),transparent_60%),
+        radial-gradient(700px_320px_at_80%_80%,rgba(255,210,0,.06),transparent_60%)
+      ]"
+    />
+  );
+}
+Wrap your app
+In your root (usually src/main.tsx or src/index.tsx), wrap with ThemeProvider and render BackgroundGlow once.
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./styles/globals.css";
+import { ThemeProvider } from "./theme/ThemeProvider";
+import BackgroundGlow from "./components/layout/BackgroundGlow";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <ThemeProvider>
+      <BackgroundGlow />
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
+);
+2) Global colors that actually work in Light and Dark
+src/styles/globals.css (replace the top with this; keep your Tailwind directives)
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Color tokens for both themes ---- */
+:root {
+  /* base surfaces */
+  --bg:        #F7F7F9;    /* page */
+  --surface:   #FFFFFF;    /* cards/nav/dropdowns */
+  --text:      #111827;    /* primary text */
+  --muted:     #6B7280;    /* meta text */
+  --border:    rgba(0,0,0,0.06);
+
+  /* brand */
+  --primary:   #FE3F5E;    /* actions */
+  --accent:    #FFD200;
+}
+
+:root.dark {
+  --bg:        #0B0B0D;
+  --surface:   #151518;
+  --text:      #F3F4F6;
+  --muted:     #9CA3AF;
+  --border:    rgba(255,255,255,0.10);
+  --primary:   #FE3F5E;
+  --accent:    #FFD200;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply transition-colors duration-300;
+}
+
+/* helpers */
+.bg-surface { background-color: var(--surface); }
+.text-muted { color: var(--muted); }
+.border-soft { border-color: var(--border) !important; }
+
+/* make dropdowns & cards readable in both themes */
+.card {
+  background: var(--surface);
+  @apply rounded-2xl border border-soft shadow-sm;
+}
+
+/* remove any full-screen overlays someone might have left lying around */
+.app-backdrop-kill {
+  pointer-events: none !important;
+  @apply -z-10 !important;
+}
+3) Tailwind brand colors
+tailwind.config.js (or tailwind.config.ts) – add under theme.extend
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: "class",
+  content: ["./index.html","./src/**/*.{ts,tsx,js,jsx}"],
+  theme: {
+    extend: {
+      colors: {
+        primary: "#FE3F5E",
+        accent: "#FFD200",
+      },
+      borderRadius: {
+        "2xl": "1rem",
+      },
+    },
+  },
+  plugins: [],
+};
+4) Fix the dropdown / menus (legible text + proper z-index)
+Wherever you use a menu/popover (shadcn DropdownMenuContent or your own), force surface/text:
+// example
+<DropdownMenuContent
+  className="z-50 bg-surface text-[color:var(--text)] border border-soft rounded-xl shadow-xl"
+  align="end"
+>
+  {/* items */}
+</DropdownMenuContent>
+If you have your own component, add the same classes.
+5) Kill any foreground overlays that were sitting ON TOP of the app
+Search your code for any full-screen gradient/overlay like:
+<div className="absolute inset-0 ... opacity-40 ..." />
+Change those to:
+<div className="pointer-events-none fixed inset-0 -z-10 ..." />
+Or simply add className="app-backdrop-kill" to them so the CSS above pushes them behind.
+This is the main reason your home page looks dimmed and your profile menu is unreadable.
+
+6) Media URL helper + image fallback (no more broken “?”)
+src/utils/media.ts (new file)
+export const buildMediaUrl = (src?: string | null) => {
+  if (!src) return "";
+  if (/^https?:\/\//i.test(src)) return src;
+  const base = (import.meta as any).env?.VITE_API_BASE || "";
+  const cleanBase = base?.replace(/\/$/, "");
+  const cleanSrc = src.replace(/^\//, "");
+  return cleanBase ? `${cleanBase}/${cleanSrc}` : `/${cleanSrc}`;
+};
+Patch your Post card to use it
+In src/components/post/PostCard.tsx (or wherever you render post media), replace the media block with:
+import { Image as ImageIcon } from "lucide-react";
+import { buildMediaUrl } from "../../utils/media";
+import { useState } from "react";
+
+// ...
+const mediaSrc = buildMediaUrl(post.image_url || post.video_url || post.media_url);
+const [imgErr, setImgErr] = useState(false);
+
+{mediaSrc && !imgErr ? (
+  <img
+    src={mediaSrc}
+    alt={post.title || "Post media"}
+    loading="lazy"
+    onError={() => setImgErr(true)}
+    className="w-full aspect-[16/9] object-cover rounded-2xl bg-neutral-100 dark:bg-neutral-800"
+  />
+) : (
+  <div className="w-full aspect-[16/9] rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+    <ImageIcon className="w-8 h-8 text-neutral-400" />
+  </div>
+)}
+Do the same for profile grid thumbnails and certificates preview images.
+7) Top nav clarity (consistent surface + layering)
+In your NavBar component (e.g., src/components/layout/NavBar.tsx), ensure the wrapper has surface and sits above content:
+<nav className="sticky top-0 z-40 bg-surface border-b border-soft backdrop-blur supports-[backdrop-filter]:bg-surface/90">
+  {/* inner: logo, search, actions */}
+</nav>
+Make the Post button stand out:
+<button className="px-4 h-10 rounded-full bg-primary text-white font-medium hover:opacity-90 transition">
+  + Post
+</button>
+8) Theme toggle button (so users can pick before/after login)
+src/components/ThemeToggle.tsx (new file)
+import { useTheme } from "../theme/ThemeProvider";
+import { Sun, Moon } from "lucide-react";
+
+export default function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const dark = document.documentElement.classList.contains("dark");
+  return (
+    <button
+      aria-label="Toggle theme"
+      onClick={() => setTheme(dark ? "light" : "dark")}
+      className="w-9 h-9 rounded-full border border-soft hover:bg-neutral-50 dark:hover:bg-neutral-900 flex items-center justify-center"
+    >
+      {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </button>
+  );
+}
+Add it to the right side of your nav and the profile menu.
+9) Quick feed readability pass
+On empty feed states (that “Create Your First Post” card), make sure the text is readable:
+<div className="max-w-xl mx-auto text-center card p-8">
+  <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-primary/90 text-white grid place-items-center text-xl">+</div>
+  <h2 className="text-xl font-semibold mb-1">Welcome to the Community</h2>
+  <p className="text-muted mb-6">Be the first to share your creative work!</p>
+  <button className="px-5 h-10 rounded-full bg-primary text-white font-medium">Create Your First Post</button>
+</div>
+10) If you see any component still dimmed…
+Add app-backdrop-kill to its wrapper and check there isn’t an absolutely positioned <div class="inset-0 bg-black/60"> higher in the tree. Convert it to the BackgroundGlow approach (fixed, -z-10, pointer-events-none) or delete it.
+Why this fixes your screenshot
+The dimmed page + unreadable dropdown is a stray full-screen overlay sitting on top. We push all background effects behind with -z-10 and kill their pointer events.
+Light mode now has real light tokens; no more white text on white or dark-on-dark.
+Menus/cards use bg-surface and border-soft so they’re legible in both themes.
+Broken media now goes through buildMediaUrl and shows a graceful placeholder if the file fails.
