@@ -1,90 +1,86 @@
-import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Paintbrush, Info, MessageCircle, CheckCircle } from "lucide-react";
-import { LogoIcon } from "@/components/ui/logo-icon";
-import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
-import { useOnboardingTriggers } from "@/hooks/use-onboarding";
+import { Badge } from "@/components/ui/badge";
+import { Shield, Sparkles, Crown } from "lucide-react";
+// LogoIcon component will be replaced with simple text
 
 export default function WelcomeClean() {
-  const { triggerWelcomeFlow } = useOnboardingTriggers();
-
-  // Trigger welcome onboarding for new users
-  React.useEffect(() => {
-    triggerWelcomeFlow();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-      <div className="max-w-md w-full space-y-8 text-center">
-        {/* Logo */}
-        <div className="space-y-4 mb-8 logo-container">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto">
-            <LogoIcon size="lg" className="text-primary-foreground" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-foreground">Loggin'</h1>
-            <p className="text-lg text-muted-foreground">
-              Protect your creativity. Build your community.
-            </p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center p-5 light-theme">
+      {/* Content */}
+      <div className="w-full max-w-4xl mx-auto text-center">
+        {/* Hero Section */}
+        <div className="mb-12">
+          <Badge className="mb-6 bg-white/60 backdrop-blur-md border-gray-200/50 text-gray-700 px-4 py-2">
+            <Sparkles className="h-4 w-4 mr-2" />
+            Digital Art Protection Platform
+          </Badge>
           
-          {/* Features Preview */}
-          <div className="grid grid-cols-3 gap-4 text-center text-sm text-muted-foreground features-section">
-            <div>
-              <LogoIcon size="md" className="mx-auto mb-1" />
-              <p>Blockchain Protection</p>
-            </div>
-            <div>
-              <MessageCircle className="h-6 w-6 mx-auto mb-1" />
-              <p>Creator Community</p>
-            </div>
-            <div>
-              <CheckCircle className="h-6 w-6 mx-auto mb-1" />
-              <p>Instant Verification</p>
-            </div>
-          </div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-gray-800">
+            Protect Your Creative Work
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Instantly secure, prove, and defend your digital creations with blockchain-powered certificates. Join thousands of creators protecting their intellectual property.
+          </p>
         </div>
 
         {/* CTA Buttons */}
-        <div className="space-y-4">
-          <Link href="/register" className="block cta-button">
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+          <Link href="/register">
             <Button 
               size="lg" 
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
+              className="bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-xl transition-all duration-300"
             >
-              Sign Up
+              <Crown className="h-6 w-6 mr-3" />
+              Get Started
             </Button>
           </Link>
           
-          <Link href="/login" className="block">
+          <Link href="/login">
             <Button 
               variant="outline" 
               size="lg"
-              className="w-full border-border text-foreground hover:bg-muted rounded-lg"
+              className="border-gray-300 text-gray-800 hover:bg-gray-50 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm"
             >
-              Log In
+              Loggin'
             </Button>
           </Link>
         </div>
 
-        {/* How it Works Link */}
-        <div className="pt-4">
-          <Link href="/how-it-works">
-            <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              <Info className="h-4 w-4 mr-2" />
-              How it Works
-            </Button>
-          </Link>
+        {/* Feature Preview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-8 text-center shadow-lg">
+            <div className="w-16 h-16 bg-[#FE3F5E]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Shield className="h-8 w-8 text-[#FE3F5E]" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-3">Instant Protection</h3>
+            <p className="text-gray-600">
+              Upload your work and get blockchain-verified certificates within seconds.
+            </p>
+          </div>
+
+          <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-8 text-center shadow-lg">
+            <div className="w-16 h-16 bg-[#FFD200]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="h-8 w-8 text-[#FFD200]" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-3">AI Powered</h3>
+            <p className="text-gray-600">
+              Advanced AI ensures your content meets platform guidelines automatically.
+            </p>
+          </div>
+
+          <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-8 text-center shadow-lg">
+            <div className="w-16 h-16 bg-[#FE3F5E]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Crown className="h-8 w-8 text-[#FE3F5E]" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-3">Global Recognition</h3>
+            <p className="text-gray-600">
+              Certificates recognized worldwide with immutable blockchain proof.
+            </p>
+          </div>
         </div>
       </div>
-
-      {/* Onboarding Manager */}
-      <OnboardingManager
-        steps={ONBOARDING_FLOWS.WELCOME}
-        tourId="WELCOME"
-        autoStart={true}
-      />
     </div>
   );
 }

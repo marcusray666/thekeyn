@@ -59,10 +59,9 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen light-theme">
+    <div className="min-h-screen flex items-center justify-center p-5 light-theme">
       {/* Content */}
-      <div className="pt-20 pb-16 px-4">
-        <div className="max-w-7xl mx-auto">
+      <div className="w-full pt-20 pb-16 px-4">
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -231,27 +230,27 @@ export default function Welcome() {
             animate="visible"
             className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
               Ready to Join the Creator Revolution?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Start protecting your creative works today with the world's most trusted blockchain platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register">
                 <Button 
                   size="lg" 
-                  className="bg-gradient-to-r from-violet-600 to-emerald-500 hover:from-violet-700 hover:to-emerald-600 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-violet-500/25 transition-all duration-300"
+                  className="bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-xl transition-all duration-300"
                 >
                   <Crown className="h-6 w-6 mr-3" />
-                  Start Your Empire
+                  Get Started
                 </Button>
               </Link>
               <Link href="/login">
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm"
+                  className="border-gray-300 text-gray-800 hover:bg-gray-50 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm"
                 >
                   <LogoIcon className="h-6 w-6 mr-3" />
                   Loggin'

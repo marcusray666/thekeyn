@@ -45,7 +45,7 @@ import Studio from "@/pages/studio";
 import AdminDashboard from "@/pages/admin-dashboard";
 
 
-import Welcome from "@/pages/welcome";
+import WelcomeClean from "@/pages/welcome-clean";
 
 import NotFound from "@/pages/not-found";
 
@@ -53,7 +53,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes - accessible to everyone */}
-      <Route path="/welcome" component={Welcome} />
+      <Route path="/welcome" component={WelcomeClean} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       
