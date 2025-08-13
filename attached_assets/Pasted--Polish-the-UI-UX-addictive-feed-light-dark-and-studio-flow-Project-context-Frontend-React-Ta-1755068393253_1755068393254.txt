@@ -1,0 +1,210 @@
+“Polish the UI/UX, addictive feed, light/dark, and studio flow”
+Project context
+Frontend: React + Tailwind + shadcn/ui (and lucide-react icons), React Router (or Next pages if applicable), React Query.
+Backend/API already exists (Express/Drizzle). Do not change DB schema here; only call the API the way it’s already exposed.
+Goal: fix light mode, unify navigation, make the feed addictive (infinite scroll + optimistic likes), clean Post card, better profile & certificates, studio upload wizard, onboarding with theme choice, notifications shell, and general polish.
+If file paths differ, search the codebase and adapt names. Keep changes isolated & reusable (components). Write clean, typed code and keep Tailwind classes consistent.
+0) Install deps & set env (Shell)
+Ensure these packages are installed (skip those already present):
+npm i lucide-react framer-motion @radix-ui/react-tooltip @tanstack/react-query
+Ensure env:
+VITE_API_BASE is set (used to build media URLs). If not present, add to .env and use in fetchers.
+Do not hardcode http://localhost. Always use import.meta.env.VITE_API_BASE.
+1) Theme system (default Light, user choice at first-run)
+Files: src/theme/ThemeProvider.tsx (or create), src/index.(tsx|jsx), src/styles/globals.css, tailwind.config.(ts|js)
+Tasks
+
+Provide a ThemeProvider that:
+Reads theme from localStorage ('light' | 'dark' | 'system'), default 'light'.
+Applies/removes .dark class on <html>.
+Exposes useTheme() hook with { theme, setTheme }.
+Remove any global CSS that forces dark mode or disables light (e.g. rules that set everything to bg-black or text-white unconditionally). Make light and dark colors use Tailwind with dark: variants and CSS variables.
+In globals.css, keep a minimal set of CSS variables for surface and card colors and ensure sufficient contrast in both themes:
+Light: background #F7F7F9, card #FFFFFF, text #111827.
+Dark: background #0B0B0D, card #151518, text #F5F6F7.
+Add smooth theme transition (body/background) with transition-colors duration-300.
+Acceptance
+On first load (no saved theme), app shows Light.
+Toggling theme changes <html class="dark"> instantly and persists choice.
+No unreadable text in either theme.
+2) Navigation overhaul (desktop + mobile parity)
+Files: src/components/NavBar.tsx, src/components/MobileNav.tsx, src/components/ThemeToggle.tsx, src/components/NotificationsBell.tsx
+Tasks
+
+Replace any emoji icons with lucide-react equivalents for consistency.
+Desktop top-nav:
+Left: logo (click -> Home).
+Center: search input (debounced handler).
+Right: actions: Post (CTA), Messages, Notifications (with red dot badge if unseen), Theme toggle, Profile avatar (menu).
+Profile dropdown items (consistent across modes): Profile, My Certificates, Analytics, Blockchain Verification, Studio (Upload), Settings, Theme toggle (redundant), Sign Out.
+Mobile bottom-nav (if present): Home, Explore, Post (center big), Inbox, Profile. Apply the same active state color (primary pink) and badge on bell.
+Acceptance
+The nav items match between desktop & mobile (terminology and routes).
+Notification bell shows a red dot when the query useNotifications({ unseen: true }) returns count > 0 (stub the hook if backend not ready).
+Post CTA is visually prominent (primary color).
+3) Color & typography polish
+Files: tailwind.config.(ts|js), src/styles/globals.css
+Tasks
+
+In tailwind.config, define brand colors:
+extend: {
+  colors: {
+    primary: { DEFAULT: '#FE3F5E' }, // hot pink (actions)
+    accent:  { DEFAULT: '#FFD200' }, // yellow (highlights)
+    surface: { light: '#FFFFFF', dark: '#151518' },
+    base:    { light: '#F7F7F9', dark: '#0B0B0D' },
+  }
+}
+Use consistent rounded corners (rounded-2xl) for cards & buttons.
+Typography: Inter/Urbanist (whatever the project uses) – ensure 16px+ base, 14px min for meta text.
+Acceptance
+Primary buttons and active icons use text-primary or bg-primary.
+Cards clearly lift from background in both themes (shadow or subtle border).
+4) PostCard cleanup + media reliability
+Files: src/components/post/PostCard.tsx, src/utils/media.ts, src/components/Skeletons.tsx
+Tasks
+
+Add a utility buildMediaUrl(path: string) that prefixes VITE_API_BASE when path is relative.
+<img> should:
+Use loading="lazy".
+Be wrapped in an aspect-ratio container (e.g., 16:9) with object-cover.
+On error, fallback to a neutral placeholder (e.g., blurred gradient with an image icon).
+Header area: avatar, displayName, username, timestamp (readable), menu ....
+Action bar: Like (optimistic), Comment (opens thread), Share (copy link + toast).
+Micro-interaction: on like, animate the heart (scale/bounce) and optimistic increment. Revert if API fails.
+Acceptance
+No more broken-image “question mark” glyph; placeholder shows if URL fails.
+Like action feels instant and numbers update optimistically.
+5) Addictive, endless Feed
+Files: src/pages/Feed.tsx (or route), src/hooks/useInfiniteScroll.ts, src/api/posts.ts
+Tasks
+
+Implement React Query infinite feed using cursor pagination: /posts?cursor=<id> (adapt to your API; if it’s page/limit, map accordingly).
+Create useInfiniteScroll(ref, { onIntersect }) using IntersectionObserver to load next page.
+When a user has few/no follows, fallback to trending endpoint /posts/trending automatically.
+Add skeleton loaders while fetching.
+Acceptance
+Scrolling near the end loads more posts (no “hard stop”).
+New users still see an interesting feed (trending fallback).
+Performance stays smooth (images lazy-load).
+6) Create Post modal (clarity, validation, attach protected work)
+Files: src/components/post/CreatePostModal.tsx, src/pages/CreatePost.tsx
+Tasks
+
+Form fields: Title, Description (helper: “Use #hashtags and @mentions”), optional Location, Media Upload (drag-drop), optional “Attach Protected Work” (picker listing user’s works).
+Disable “Share Post” until required fields valid; show inline errors.
+On submit: show button loading state, post, toast success, insert new item at top of feed or navigate to the post.
+Keep styling consistent with shadcn/ui Dialog/Sheet.
+Acceptance
+A novice user can successfully create a text or media post with clear feedback.
+If they attach a protected work, the post displays the work badge.
+7) Studio (Upload & Certificate) → 3-step wizard
+Files: src/pages/Studio.tsx (new), src/components/studio/UploadStep.tsx, CertStep.tsx, ShareStep.tsx
+Tasks
+
+Stepper UI: ① Upload file → ② Generate certificate → ③ Share to community.
+Show a progress bar across steps. Each finished step gets a ✅.
+After success, show CTA: “View Certificate” and “Share to Feed” (opens Create Post with media preselected).
+Acceptance
+A full happy path from upload to certificate to share works and feels guided (no dead ends).
+If backend temporarily fails, show retry with human-readable message.
+8) Profile page (portfolio-first)
+Files: src/pages/Profile.tsx, src/components/profile/StatsBar.tsx, src/components/profile/WorkGrid.tsx, src/components/FollowButton.tsx
+Tasks
+
+Top card: avatar, display name, @username, stats row:
+Format as: 2 Protected Works • 0 Certificates • 1 Follower • 0 Likes.
+Pluralization correct.
+If viewing own profile: show “Edit Profile” button.
+If viewing other user: show Follow/Unfollow button with immediate state toggle & count update.
+Tabs: My Works, Liked, Saved. Use grid (cards with consistent aspect ratio). Badges on thumbnails that are “Protected”.
+Optional: allow a banner/cover image (editable in profile settings) for personal branding.
+Acceptance
+Stats are legible and correct; follow toggles instantly (optimistic).
+Works grid looks tidy; protected items visibly marked.
+9) Certificates list polish
+Files: src/pages/Certificates.tsx, src/components/cert/CertificateCard.tsx
+Tasks
+
+Consistent card style: title, owner, created date, type, hash (truncate in middle), status chip: Pending (amber), Confirmed (green).
+Actions: View, Download, Share (with clear tooltips). Align buttons baseline.
+Title “My Certificates (N)” vs “Pending (M)” filters (dropdown).
+Acceptance
+Cards feel uniform; status is obvious; no “floating” misaligned buttons.
+10) Notifications & toasts (loop)
+Files: src/components/NotificationsBell.tsx, src/pages/Notifications.tsx, src/api/notifications.ts
+Tasks
+
+Implement a bell dropdown or a /notifications page that lists:
+New likes, comments, followers, certificate approvals.
+Show a red dot on the bell when there are unseen notifications.
+Mark as seen when opened.
+Use toasts for quick feedback (like “Link copied”).
+Acceptance
+Users clearly see when something new happened.
+Clicking the bell reveals items; counts/badges update.
+11) Onboarding: friendly, fast, and themed
+Files: src/components/onboarding/OnboardingModal.tsx
+Tasks
+
+First login: show an onboarding modal with 3–4 steps:
+Welcome + Theme choice (Light/Dark with live preview).
+Pick interests (categories) or auto-follow a few recommended creators (you can stub with a list).
+“Upload your first work” CTA or “Create your first post”.
+Persist “completed” so it doesn’t show again.
+Acceptance
+New users do not face an empty feed or confusing UI; they exit onboarding with content to see and a clear next action.
+12) Explore page (optional but powerful)
+Files: src/pages/Explore.tsx
+Tasks
+
+Grid of trending works and creators; filters by category/hashtag.
+Clicking a creator opens their profile; clicking a work opens detail/post.
+Acceptance
+New users can browse interesting content even without following anyone.
+13) Accessibility, states, and polish pass
+Everywhere
+Button hover/focus states; focus rings visible.
+aria-labels on icon buttons.
+Text contrast: AA or better.
+Empty states with a friendly illustration and action (e.g., “No messages yet → Find People to Connect”).
+Acceptance
+Keyboard navigation works in nav and modals.
+No obvious unreadable text or invisible focus.
+14) Image reliability checklist
+Files: src/utils/media.ts, any place images are used
+Tasks
+
+Always build full URLs via buildMediaUrl().
+For private/protected content that requires a signed URL, call the proper API first, then set src to the signed link.
+Add .onError fallback to a neutral placeholder SVG (do not show broken glyph).
+Acceptance
+Images load, or a consistent placeholder appears—no browser “missing image” icon.
+15) QA scenarios (the model must self-test in preview)
+Toggle theme several times; reload; preference persists.
+Create text-only post; create media post; attach protected work; both visible in feed.
+Scroll feed to bottom → next page loads; skeletons show while loading.
+Like/unlike a post repeatedly; counts optimistic and stable after server response.
+Visit someone else’s profile; follow/unfollow; counts update.
+Upload in Studio; see progress across steps; at the end, click “Share to Feed” and confirm post appears.
+Certificates list: statuses and action buttons aligned.
+Notifications bell: dot appears when “unseen > 0”; clearing updates state.
+Mobile: bottom nav active states; Post button centered and larger.
+16) Code style & structure
+Prefer small, focused components (PostCard, StatsBar, FollowButton, InfiniteFeed, OnboardingModal, StudioWizard).
+Keep UI state inside components/hooks; fetchers inside /api/*.
+Use useMutation with optimistic updates for likes/follows; invalidate relevant queries on settle.
+Keep tailwind classes consistent (spacing scale, rounded-2xl, shadows). No !important.
+17) Deliverables
+Updated components & pages as listed.
+ThemeProvider wired at the app root.
+New utilities: buildMediaUrl.
+Hooks: useInfiniteScroll.
+A short README-UX-NOTES.md at project root summarizing what changed and how to extend.
+Important: If any endpoint is missing (e.g., trending posts, notifications), scaffold the front-end hooks and components and gate them behind feature flags (e.g., FEATURE_TRENDING = true). Show realistic mock data so UI still functions; keep API calls in one place for later wiring.
+Primary design cues to follow
+
+Primary color: #FE3F5E (actions), Secondary highlight: #FFD200.
+Light mode default; cards clearly separated from background; readable meta text.
+Micro-interactions on like/share; toasts for key actions.
+Portfolio-first for creatives; studio wizard to protect + share.

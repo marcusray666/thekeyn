@@ -13,7 +13,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     // Check localStorage for saved theme preference
     const saved = localStorage.getItem("loggin-theme");
-    return (saved as Theme) || "dark";
+    return (saved as Theme) || "light";
   });
 
   useEffect(() => {

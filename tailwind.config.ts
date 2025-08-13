@@ -22,20 +22,28 @@ export default {
           foreground: "var(--popover-foreground)",
         },
         primary: {
-          DEFAULT: "var(--primary)",
+          DEFAULT: "#FE3F5E", // Hot pink for actions
           foreground: "var(--primary-foreground)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
           foreground: "var(--secondary-foreground)",
         },
+        accent: {
+          DEFAULT: "#FFD200", // Yellow for highlights
+          foreground: "var(--accent-foreground)",
+        },
+        surface: {
+          light: "#FFFFFF",
+          dark: "#151518",
+        },
+        base: {
+          light: "#F7F7F9", 
+          dark: "#0B0B0D",
+        },
         muted: {
           DEFAULT: "var(--muted)",
           foreground: "var(--muted-foreground)",
-        },
-        accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
         },
         destructive: {
           DEFAULT: "var(--destructive)",
