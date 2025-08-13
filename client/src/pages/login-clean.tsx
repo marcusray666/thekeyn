@@ -25,8 +25,7 @@ export default function LoginClean() {
     },
     onSuccess: () => {
       toast({
-        title: "Login successful",
-        description: "Welcome back!",
+        title: "✓ Logged in successfully",
       });
       
       // Check if user was trying to upload before login
