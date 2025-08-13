@@ -61,7 +61,7 @@ export function TopNav() {
   }, [lastScrollY]);
 
   return (
-    <nav className={`hidden md:flex items-center justify-between px-8 py-6 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-40 transition-transform duration-300 shadow-lg ${
+    <nav className={`hidden md:flex items-center justify-between px-8 py-4 bg-white/60 backdrop-blur-md sticky top-0 z-40 transition-transform duration-300 ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       {/* Logo */}
