@@ -59,13 +59,13 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
+    <div className="min-h-screen relative overflow-hidden light-theme">
+      {/* Subtle Background with Pink/Yellow Gradient */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-violet-900/20 to-slate-900"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/30 via-yellow-50/20 to-pink-50/30"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FE3F5E]/5 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FFD200]/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#FE3F5E]/3 rounded-full blur-3xl animate-pulse"></div>
       </div>
 
       {/* Content */}
@@ -79,67 +79,55 @@ export default function Welcome() {
           >
             {/* Hero Section */}
             <motion.div variants={itemVariants} className="mb-8">
-              <Badge className="mb-4 bg-gradient-to-r from-violet-600/20 to-emerald-500/20 border-violet-500/30 text-violet-300 px-4 py-2">
+              <Badge className="mb-4 bg-white/60 backdrop-blur-md border-gray-200/50 text-gray-700 px-4 py-2">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Billion-Dollar Creator Protection Platform
+                Digital Art Protection Platform
               </Badge>
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-urbanist font-bold mb-6">
-                <span className="bg-gradient-to-r from-violet-400 via-white to-emerald-400 bg-clip-text text-transparent">
-                  Protect Your
+                <span className="text-gray-800">
+                  Protect Your Creative
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-emerald-400 via-violet-400 to-white bg-clip-text text-transparent">
-                  Digital Empire
+                <span className="text-gray-800">
+                  Work
                 </span>
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-                The world's most advanced blockchain-powered platform for digital creators.
-                <br />
-                <span className="text-violet-300">Secure, verify, and monetize your creative works with military-grade protection.</span>
+              <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+                Instantly secure, prove, and defend your digital creations with blockchain-powered certificates. Join thousands of creators protecting their intellectual property.
               </p>
             </motion.div>
 
             {/* CTA Buttons */}
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Link href="/upload">
+              <Link href="/register">
                 <Button 
                   size="lg" 
-                  className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-violet-500/25 transition-all duration-300 group"
+                  className="bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-xl transition-all duration-300 group"
                 >
-                  <Shield className="h-6 w-6 mr-3 group-hover:animate-glow" />
-                  Protect Now
-                  <ArrowRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                  Sign up to start protecting your work
                 </Button>
               </Link>
               
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm group"
-              >
-                <Play className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform" />
-                See How It Works
-              </Button>
+              <Link href="/login">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="bg-[#FFD200] hover:bg-[#FFD200]/90 border-[#FFD200] text-gray-800 hover:text-gray-900 text-lg px-8 py-4 rounded-2xl group shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <LogoIcon className="h-6 w-6 mr-3" />
+                  Loggin'
+                </Button>
+              </Link>
             </motion.div>
 
-            {/* Trust Indicators */}
-            <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 mb-16">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                <span>Ethereum Verified</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                <span>Bitcoin Anchored</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                <span>Military-Grade Security</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                <span>Legal Protection</span>
-              </div>
+            {/* Bottom Section */}
+            <motion.div variants={itemVariants} className="mt-20">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                Everything You Need to Protect Your Art
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Professional-grade protection tools trusted by creators worldwide
+              </p>
             </motion.div>
           </motion.div>
 
