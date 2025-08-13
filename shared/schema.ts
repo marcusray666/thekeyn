@@ -264,7 +264,7 @@ export type InsertPost = z.infer<typeof insertPostSchema>;
 // Post comments table
 export const postComments = pgTable("post_comments", {
   id: serial("id").primaryKey(),
-  postId: text("post_id").references(() => posts.id).notNull(),
+  postId: integer("post_id").references(() => posts.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   parentId: integer("parent_id"), // For reply threads
   content: text("content").notNull(),
@@ -277,7 +277,7 @@ export const postComments = pgTable("post_comments", {
 // Post reactions table (for different reaction types)
 export const postReactions = pgTable("post_reactions", {
   id: serial("id").primaryKey(),
-  postId: text("post_id").references(() => posts.id).notNull(),
+  postId: integer("post_id").references(() => posts.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   type: text("type").notNull(), // 'like', 'love', 'fire', 'star', etc.
   createdAt: timestamp("created_at").defaultNow(),
@@ -297,7 +297,7 @@ export const userNotifications = pgTable("user_notifications", {
   userId: integer("user_id").references(() => users.id).notNull(),
   type: text("type").notNull(), // 'like', 'comment', 'follow', 'mention', 'post_share', 'work_featured', 'admin_action'
   fromUserId: integer("from_user_id").references(() => users.id),
-  postId: text("post_id").references(() => posts.id),
+  postId: integer("post_id").references(() => posts.id),
   workId: integer("work_id").references(() => works.id),
   commentId: integer("comment_id").references(() => postComments.id),
   title: text("title").notNull(),

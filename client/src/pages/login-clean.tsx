@@ -60,8 +60,6 @@ export default function LoginClean() {
     }));
   };
 
-  const isDark = theme === 'dark';
-
   return (
     <div style={{ 
       minHeight: '100vh', 
