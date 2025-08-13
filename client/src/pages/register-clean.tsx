@@ -4,12 +4,10 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
-import { useTheme } from "@/theme/ThemeProvider";
 
 export default function RegisterClean() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -60,64 +58,30 @@ export default function RegisterClean() {
     }));
   };
 
-  const isDark = theme === 'dark';
-
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: '#0F0F0F',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      backgroundImage: 'linear-gradient(135deg, rgba(254, 63, 94, 0.05) 0%, rgba(255, 210, 0, 0.05) 100%)'
-    }}>
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+    <div className="min-h-screen flex items-center justify-center p-5 light-theme">
+      <div className="w-full max-w-md">
         {/* Back Button */}
-        <Link href="/" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 16px',
-          color: '#ffffff',
-          textDecoration: 'none',
-          marginBottom: '24px',
-          fontSize: '14px',
-          opacity: 0.8,
-          transition: 'opacity 0.2s ease'
-        }}>
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 mb-6 text-sm transition-colors"
+        >
           <ArrowLeft size={16} />
           Back
         </Link>
 
         {/* Register Card */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '16px',
-          padding: '32px',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)'
-        }}>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            color: isDark ? '#ffffff' : '#111827',
-            textAlign: 'center',
-            marginBottom: '32px',
-            margin: '0 0 32px 0'
-          }}>Sign Up</h1>
+        <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-8 shadow-2xl">
+          <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">
+            Sign Up
+          </h1>
           
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="username" style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: isDark ? '#ffffff' : '#111827',
-                marginBottom: '8px'
-              }}>
+              <label 
+                htmlFor="username" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Username
               </label>
               <input
@@ -128,37 +92,15 @@ export default function RegisterClean() {
                 onChange={handleChange}
                 required
                 placeholder="Choose a username"
-                style={{
-                  width: '100%',
-                  height: '48px',
-                  padding: '0 16px',
-                  fontSize: '16px',
-                  color: isDark ? '#ffffff' : '#111827',
-                  background: isDark ? '#1F1F23' : '#F9FAFB',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
-                  borderRadius: '12px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FE3F5E';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className="w-full h-12 px-4 text-gray-800 bg-white/80 border border-gray-200 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20 backdrop-blur-md"
               />
             </div>
 
             <div>
-              <label htmlFor="email" style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: isDark ? '#ffffff' : '#111827',
-                marginBottom: '8px'
-              }}>
+              <label 
+                htmlFor="email" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email
               </label>
               <input
@@ -169,37 +111,15 @@ export default function RegisterClean() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
-                style={{
-                  width: '100%',
-                  height: '48px',
-                  padding: '0 16px',
-                  fontSize: '16px',
-                  color: isDark ? '#ffffff' : '#111827',
-                  background: isDark ? '#1F1F23' : '#F9FAFB',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
-                  borderRadius: '12px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FE3F5E';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className="w-full h-12 px-4 text-gray-800 bg-white/80 border border-gray-200 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20 backdrop-blur-md"
               />
             </div>
             
             <div>
-              <label htmlFor="password" style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: isDark ? '#ffffff' : '#111827',
-                marginBottom: '8px'
-              }}>
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
               <input
@@ -210,66 +130,26 @@ export default function RegisterClean() {
                 onChange={handleChange}
                 required
                 placeholder="Create a password"
-                style={{
-                  width: '100%',
-                  height: '48px',
-                  padding: '0 16px',
-                  fontSize: '16px',
-                  color: isDark ? '#ffffff' : '#111827',
-                  background: isDark ? '#1F1F23' : '#F9FAFB',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'}`,
-                  borderRadius: '12px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FE3F5E';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(254, 63, 94, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#D1D5DB';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className="w-full h-12 px-4 text-gray-800 bg-white/80 border border-gray-200 rounded-xl outline-none transition-all duration-200 focus:border-[#FE3F5E] focus:ring-2 focus:ring-[#FE3F5E]/20 backdrop-blur-md"
               />
             </div>
 
             <button 
               type="submit" 
               disabled={registerMutation.isPending}
-              style={{
-                width: '100%',
-                height: '48px',
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#ffffff',
-                background: '#FE3F5E',
-                border: 'none',
-                borderRadius: '12px',
-                cursor: registerMutation.isPending ? 'not-allowed' : 'pointer',
-                opacity: registerMutation.isPending ? 0.6 : 1,
-                marginTop: '8px'
-              }}
+              className="w-full h-12 text-white font-semibold bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl mt-6"
             >
               {registerMutation.isPending ? "Creating account..." : "Sign Up"}
             </button>
           </form>
 
-          <div style={{
-            textAlign: 'center',
-            paddingTop: '16px',
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
-            marginTop: '24px'
-          }}>
-            <span style={{
-              fontSize: '14px',
-              color: isDark ? '#9CA3AF' : '#6B7280'
-            }}>
+          <div className="text-center pt-6 mt-6 border-t border-gray-200/50">
+            <span className="text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login" style={{
-                color: '#FE3F5E',
-                textDecoration: 'none',
-                fontWeight: '500'
-              }}>
+              <Link 
+                href="/login" 
+                className="text-[#FE3F5E] hover:text-[#FE3F5E]/80 font-medium transition-colors"
+              >
                 Log in
               </Link>
             </span>
