@@ -51,9 +51,7 @@
 @layer components {
   /* White liquid glass components */
   .nav-gradient {
-    background-color: rgba(254, 63, 94, 0.12) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    background-color: #fecdd3 !important;
   }
   
   .post-card {
