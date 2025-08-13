@@ -1,7 +1,7 @@
-import { create } from 'ipfs-http-client';
+// import { create } from 'ipfs-http-client'; // Temporarily disabled
 import FormData from 'form-data';
 import fetch from 'node-fetch';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import type { IPFSUploadResponse } from '@shared/blockchain-schema';
 
 // IPFS service class for handling decentralized storage
@@ -73,7 +73,7 @@ export class IPFSService {
         ipfsHash: result.IpfsHash,
         ipfsUrl: `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`,
         fileSize: result.PinSize,
-        uploadId: uuidv4(),
+        uploadId: randomUUID(),
       };
     } catch (error) {
       console.error('IPFS upload error:', error);
@@ -122,7 +122,7 @@ export class IPFSService {
         ipfsHash: result.IpfsHash,
         ipfsUrl: `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`,
         fileSize: result.PinSize,
-        uploadId: uuidv4(),
+        uploadId: randomUUID(),
       };
     } catch (error) {
       console.error('IPFS metadata upload error:', error);

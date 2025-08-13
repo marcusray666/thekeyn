@@ -849,7 +849,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user's works endpoint
   app.get("/api/works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.session!.userId;
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       console.log("Fetching works for user ID:", userId);
       const works = await storage.getUserWorks(userId);
       console.log("Found works:", works.length, works.map(w => ({ id: w.id, title: w.title, userId: w.userId })));
@@ -880,9 +883,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check subscription limits
-      const userId = req.session!.userId;
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       console.log('Checking upload limits for user:', userId);
-      const uploadCheck = await storage.checkUploadLimit(userId!);
+      const uploadCheck = await storage.checkUploadLimit(userId);
       console.log('Upload limit check result:', uploadCheck);
       
       if (!uploadCheck.canUpload) {
@@ -1003,7 +1009,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileHash,
         certificateId,
         blockchainHash,
-        userId: userId!, // Add userId to properly associate work with user
+        userId: userId, // Add userId to properly associate work with user
         moderationStatus,
         moderationFlags,
         moderationScore,
@@ -1013,7 +1019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get user's subscription limits for certificate features
       console.log('Getting subscription limits...');
-      const limits = await storage.getUserSubscriptionLimits(userId!);
+      const limits = await storage.getUserSubscriptionLimits(userId);
       console.log('Subscription limits:', limits);
       
       // Read file buffer for verification proof

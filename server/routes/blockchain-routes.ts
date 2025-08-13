@@ -17,7 +17,7 @@ import { IPFSService } from '../services/ipfs-service';
 import { BlockchainService } from '../services/blockchain-service';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import type { Request } from 'express';
 
 // Auth interface
@@ -180,7 +180,7 @@ router.post('/generate-metadata/:workId', async (req: AuthenticatedRequest, res)
     const [metadataRecord] = await db
       .insert(nftMetadata)
       .values({
-        id: uuidv4(),
+        id: randomUUID(),
         workId: work.id,
         metadataUri: metadataResult.ipfsUrl,
         name: metadata.name,
@@ -290,7 +290,7 @@ router.post('/mint-nft', async (req: AuthenticatedRequest, res) => {
       await db
         .insert(nftTokens)
         .values({
-          id: uuidv4(),
+          id: randomUUID(),
           workId: requestData.workId,
           transactionId: transaction.id,
           tokenId: mintResult.tokenId,
