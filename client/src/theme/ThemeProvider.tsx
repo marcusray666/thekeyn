@@ -31,9 +31,12 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
+    const body = window.document.body;
     // Always use light theme, remove dark class
-    root.classList.remove("light", "dark");
-    root.classList.add("light");
+    root.classList.remove("light", "dark", "dark-theme");
+    root.classList.add("light", "light-theme");
+    body.classList.remove("dark", "dark-theme");
+    body.classList.add("light-theme");
   }, []);
 
   const value = {

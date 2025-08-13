@@ -164,63 +164,50 @@
     outline: none !important;
   }
 
-  /* Force dark theme globally - Instagram style */
+  /* WHITE LIQUID GLASS THEME - Override dark styles */
   html,
   body,
   #root {
-    background: #0F0F0F !important;
-    color: #FFFFFF !important;
+    background: linear-gradient(135deg, 
+      rgba(254, 63, 94, 0.05) 0%,
+      rgba(255, 210, 0, 0.05) 25%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(254, 63, 94, 0.05) 75%,
+      rgba(255, 210, 0, 0.05) 100%
+    ) !important;
+    color: #1f2937 !important;
     min-height: 100vh !important;
   }
   
-  /* Ensure all text is visible with proper contrast */
+  /* Force all text to be dark for white background */
   h1, h2, h3, h4, h5, h6, p, span, div, a, button {
-    color: #FFFFFF !important;
+    color: #1f2937 !important;
   }
   
-  /* Remove card backgrounds completely for clean design */
+  /* Override white text classes specifically */
+  .text-white, .text-white\/90, .text-white\/80, .text-white\/70, 
+  .text-white\/60, .text-white\/50, .text-white\/40, .text-white\/30 {
+    color: #1f2937 !important;
+  }
+  
+  /* White theme card backgrounds with liquid glass effect */
   .post-card, .glass-card, .bg-white\/5, 
   .bg-white\/10, .backdrop-blur-xl {
-    background: transparent !important;
-    border: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
   }
   
-  /* Remove card backgrounds for clean look */
-  .rounded-3xl, .rounded-2xl, .border,
-  [class*="bg-white"], [class*="bg-gray"] {
-    background: transparent !important;
-    border: none !important;
+  /* Navigation styling for white theme */
+  nav {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
   
-  /* Override any light backgrounds - remove for clean design */
-  .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-gray-300 {
-    background: transparent !important;
-  }
-  
-  /* Remove post card backgrounds for clean look */
-  .feed-container .space-y-6 > div,
-  .max-w-2xl > div,
-  .mx-auto > div,
-  .post-card,
-  div[class*="rounded-3xl"],
-  div[class*="bg-white"] {
-    background: transparent !important;
-    border: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  
-  /* Make sure all text on cards is white */
-  .post-card * {
-    color: #FFFFFF !important;
-  }
-  
-  /* Navigation logo text visibility */
-  nav span[class*="text-2xl"], .text-2xl {
-    color: #FFFFFF !important;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  nav span, nav div, nav a, nav button {
+    color: #1f2937 !important;
   }
 
   /* Mobile bottom navigation improvements */
@@ -243,61 +230,63 @@
     /* MOBILE VISUAL SEPARATION OVERRIDES */
     /* Override the no-borders rule for mobile to improve usability */
     
-    /* Post cards need clear boundaries on mobile */
+    /* Post cards need clear boundaries on mobile - WHITE THEME */
     .post-card {
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 2px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.8) !important;
+      border: 2px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
       border-radius: 1rem !important;
       margin: 1rem 0.5rem !important;
     }
     
-    /* Profile sections need clear boundaries */
+    /* Profile sections need clear boundaries - WHITE THEME */
     .bg-white\/5, .backdrop-blur-xl {
-      background: rgba(255, 255, 255, 0.05) !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.7) !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(8px) !important;
       -webkit-backdrop-filter: blur(8px) !important;
     }
     
-    /* Form inputs need clear boundaries */
+    /* Form inputs need clear boundaries - WHITE THEME */
     input, textarea, select {
-      background: rgba(255, 255, 255, 0.1) !important;
-      border: 2px solid rgba(255, 255, 255, 0.2) !important;
+      background: rgba(255, 255, 255, 0.8) !important;
+      border: 2px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(8px) !important;
+      color: #1f2937 !important;
     }
     
-    /* Buttons need clear boundaries */
+    /* Buttons need clear boundaries - WHITE THEME */
     button, .btn, [role="button"] {
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      background: rgba(255, 255, 255, 0.7) !important;
       backdrop-filter: blur(8px) !important;
+      color: #1f2937 !important;
     }
     
-    /* Certificate cards need extra clear boundaries */
+    /* Certificate cards need extra clear boundaries - WHITE THEME */
     .mobile-card, .border.border-white\/20 {
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 2px solid rgba(255, 255, 255, 0.2) !important;
+      background: rgba(255, 255, 255, 0.8) !important;
+      border: 2px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     }
     
-    /* Enhanced visual boundaries for ALL cards and sections */
+    /* Enhanced visual boundaries for ALL cards and sections - WHITE THEME */
     .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      background: rgba(255, 255, 255, 0.7) !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
     }
     
-    /* Profile avatar borders */
+    /* Profile avatar borders - WHITE THEME */
     .creator-avatar {
-      border: 2px solid rgba(255, 255, 255, 0.3) !important;
-      background: rgba(255, 255, 255, 0.1) !important;
+      border: 2px solid rgba(0, 0, 0, 0.2) !important;
+      background: rgba(255, 255, 255, 0.8) !important;
       backdrop-filter: blur(8px) !important;
     }
   }
@@ -320,14 +309,14 @@
     padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
   }
   
-  /* Desktop overrides for better visual separation */
+  /* Desktop overrides for better visual separation - WHITE THEME */
   @media (min-width: 769px) {
     .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
-      background: rgba(255, 255, 255, 0.06) !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.7) !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
       backdrop-filter: blur(16px) !important;
       -webkit-backdrop-filter: blur(16px) !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
     }
   }
   
@@ -997,17 +986,19 @@
 }
 
 .glass-button {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   transition: all 0.3s ease;
+  color: #374151 !important;
 }
 
 .glass-button:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
   transform: translateY(-2px);
+  color: #1f2937 !important;
 }
 
 /* Liquid glass background effects */
@@ -1053,11 +1044,15 @@
 
 /* Navigation glass effect */
 nav, .nav-glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
   z-index: 1000;
+}
+
+nav *, .nav-glass * {
+  color: #1f2937 !important;
 }
 
 /* Skip link for accessibility - should be hidden but available for screen readers */
