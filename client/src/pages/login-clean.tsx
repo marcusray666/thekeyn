@@ -4,13 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
-import { useTheme } from "@/theme/ThemeProvider";
 import "@/styles/login.css";
 
 export default function LoginClean() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     username: "",
     password: "",

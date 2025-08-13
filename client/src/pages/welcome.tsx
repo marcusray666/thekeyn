@@ -59,10 +59,9 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden light-theme">{/* No custom background - inherits from body */}
-
+    <div className="min-h-screen light-theme">
       {/* Content */}
-      <div className="relative z-10 pt-20 pb-16 px-4">
+      <div className="pt-20 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div
             variants={containerVariants}
