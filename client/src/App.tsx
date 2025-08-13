@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TopNav } from "@/components/premium/top-nav";
 import { BottomNav } from "@/components/premium/bottom-nav";
-import { ThemeProvider } from "@/components/theme-provider";
+// Removed old theme provider - using new one from main.tsx
 import { OnboardingProvider } from "@/components/onboarding/onboarding-provider";
 
 
@@ -143,11 +143,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <OnboardingProvider>
-          <AppContent />
-        </OnboardingProvider>
-      </ThemeProvider>
+      <OnboardingProvider>
+        <AppContent />
+      </OnboardingProvider>
     </QueryClientProvider>
   );
 }

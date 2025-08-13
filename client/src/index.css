@@ -4,58 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Color tokens for both themes ---- */
-:root {
-  /* base surfaces */
-  --bg:        #F7F7F9;    /* page */
-  --surface:   #FFFFFF;    /* cards/nav/dropdowns */
-  --text:      #111827;    /* primary text */
-  --muted:     #6B7280;    /* meta text */
-  --border:    rgba(0,0,0,0.06);
 
-  /* brand */
-  --primary:   #FE3F5E;    /* actions */
-  --accent:    #FFD200;
-}
-
-:root.dark {
-  --bg:        #0B0B0D;
-  --surface:   #151518;
-  --text:      #F3F4F6;
-  --muted:     #9CA3AF;
-  --border:    rgba(255,255,255,0.10);
-  --primary:   #FE3F5E;
-  --accent:    #FFD200;
-}
-
-html, body, #root {
-  height: 100%;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  @apply transition-colors duration-300;
-}
-
-/* helpers */
-.bg-surface { background-color: var(--surface); }
-.text-muted { color: var(--muted); }
-.border-soft { border-color: var(--border) !important; }
-
-/* make dropdowns & cards readable in both themes */
-.card {
-  background: var(--surface);
-  @apply rounded-2xl border border-soft shadow-sm;
-}
-
-/* remove any full-screen overlays someone might have left lying around */
-.app-backdrop-kill {
-  pointer-events: none !important;
-  @apply -z-10 !important;
-}
 
 /* Instagram-inspired premium theme */
 @layer base {
@@ -112,8 +61,8 @@ body {
   }
   
   .dark body {
-    background: #0F0F0F !important;
-    color: #FFFFFF !important;
+    background: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
   }
   
   #root {
@@ -121,8 +70,8 @@ body {
   }
   
   .dark #root {
-    background: #0F0F0F !important;
-    color: #FFFFFF !important;
+    background: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
   }
 }
 
@@ -419,90 +368,7 @@ body {
   }
   
   /* Force everything dark - highest priority */
-  html.dark, html, body, #root {
-    background: #0F0F0F !important;
-    color: #FFFFFF !important;
-  }
-  
-  /* Remove any light theme variables */
-  html:not(.dark) {
-    --background: 15 15 15 !important;
-    --foreground: 0 0% 100% !important;
-    --card: 15 15 15 !important;
-    --card-foreground: 0 0% 100% !important;
-  }
-  
-  /* Disable all light theme styles completely */
-  .light,
-  .light-theme,
-  html.light,
-  body.light {
-    background: #0F0F0F !important;
-    color: #FFFFFF !important;
-  }
-  
-  /* Override light theme card styles */
-  .light .post-card,
-  .light-theme .post-card,
-  .light .bg-white\/5,
-  .light-theme .bg-white\/5 {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: none !important;
-    color: #FFFFFF !important;
-  }
-  
-  /* Force all text to be white */
-  .light *,
-  .light-theme * {
-    color: #FFFFFF !important;
-  }
-  
-  /* Dropdown menu styling */
-  .absolute.right-0.top-full span,
-  .absolute.right-0.top-full div {
-    color: #FFFFFF !important;
-  }
-  
-  /* Light theme override for testing */
-  .light body,
-  .light #root {
-    background: #FAFAFA !important;
-    color: #111827 !important;
-  }
-  
-  .light h1, .light h2, .light h3, .light h4, .light h5, .light h6, 
-  .light p, .light span, .light div {
-    color: #111827 !important;
-  }
-  
-  .light .cosmic-bg {
-    background: linear-gradient(135deg, #f8fafc, #ffffff, #f1f5f9) !important;
-  }
-  
-  .light .glass-card,
-  .light .bg-white\/5 {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: none !important;
-  }
-  
-  .light .text-white {
-    color: #1a1a1a !important;
-  }
-  
-  .light .text-gray-300,
-  .light .text-gray-400 {
-    color: #666666 !important;
-  }
 
-  /* Dark theme styling */
-  .dark,
-  .dark body,
-  .dark #root,
-  html,
-  #root {
-    background: linear-gradient(135deg, #1f2937, #111827, #1f2937) !important;
-    color: white !important;
-  }
   
   /* Disable iOS tap highlight for better mobile experience */
   * {
@@ -1176,38 +1042,9 @@ body {
 }
 
 /* Liquid glass background effects */
-body {
-  background: linear-gradient(135deg, 
-    hsl(224, 71%, 4%) 0%, 
-    hsl(215, 28%, 9%) 25%, 
-    hsl(224, 71%, 4%) 50%, 
-    hsl(220, 30%, 8%) 75%, 
-    hsl(224, 71%, 4%) 100%);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
+/* Removed conflicting body background styles */
 
-body::before {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at 25% 25%, 
-    rgba(147, 51, 234, 0.1) 0%, 
-    transparent 50%),
-  radial-gradient(circle at 75% 75%, 
-    rgba(59, 130, 246, 0.08) 0%, 
-    transparent 50%),
-  radial-gradient(circle at 50% 50%, 
-    rgba(236, 72, 153, 0.06) 0%, 
-    transparent 50%);
-  animation: liquidFloat 20s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
+/* Removed conflicting body::before overlay */
 
 @keyframes liquidFloat {
   0%, 100% {
