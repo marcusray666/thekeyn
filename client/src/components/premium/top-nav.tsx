@@ -66,8 +66,8 @@ export function TopNav() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{
-        backgroundColor: '#fecdd3',
-        background: '#fecdd3'
+        backgroundColor: '#FF69B4',
+        background: '#FF69B4'
       }}>
       {/* Logo */}
       <Link href="/">
