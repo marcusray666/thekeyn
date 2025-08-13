@@ -59,14 +59,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden light-theme">
-      {/* Subtle Background with Pink/Yellow Gradient */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/30 via-yellow-50/20 to-pink-50/30"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FE3F5E]/5 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FFD200]/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#FE3F5E]/3 rounded-full blur-3xl animate-pulse"></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden light-theme">{/* No custom background - inherits from body */}
 
       {/* Content */}
       <div className="relative z-10 pt-20 pb-16 px-4">
