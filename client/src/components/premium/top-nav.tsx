@@ -141,8 +141,8 @@ export function TopNav() {
                    backgroundColor: 'rgba(255, 255, 255, 0.7)'
                  }}>
               <div className="p-6 text-center">
-                <User className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <div className="text-gray-500 text-sm">No users found for "{searchQuery}"</div>
+                <User className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <div className="text-gray-700 text-sm font-medium">No users found for "{searchQuery}"</div>
               </div>
             </div>
           )}
