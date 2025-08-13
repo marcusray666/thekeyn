@@ -380,11 +380,7 @@ export default function StudioUnified() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 pb-24 md:pb-8 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-purple-600/10"></div>
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-purple-700/20 via-blue-600/10 to-transparent blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-700/20 via-purple-600/10 to-transparent blur-3xl"></div>
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 relative overflow-hidden light-theme">
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
@@ -393,8 +389,8 @@ export default function StudioUnified() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl font-bold text-white mb-4">Creative Studio</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Creative Studio</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Upload your work and manage your certified creations - all in one place
           </p>
         </motion.div>

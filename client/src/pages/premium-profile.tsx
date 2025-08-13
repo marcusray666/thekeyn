@@ -198,15 +198,11 @@ export default function PremiumProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen pt-20 pb-32 relative overflow-hidden light-theme">
       
       <div className="max-w-4xl mx-auto px-4 space-y-8 relative z-10">
         {/* Profile Header */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+        <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-8 shadow-lg">
           <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
             {/* Avatar */}
             <div className="creator-avatar !w-24 !h-24">
@@ -219,10 +215,10 @@ export default function PremiumProfile() {
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-white mb-1">
+                  <h1 className="text-2xl font-bold text-gray-800 mb-1">
                     {profile?.displayName || profile?.username || "User"}
                   </h1>
-                  <p className="text-white/70">@{profile?.username}</p>
+                  <p className="text-gray-600">@{profile?.username}</p>
                 </div>
                 <div className="flex space-x-3 mt-4 sm:mt-0">
                   <Button className="glass-button">

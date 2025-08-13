@@ -159,7 +159,7 @@ export default function SubscriptionManagement() {
   const currentTierData = SUBSCRIPTION_TIERS.find(tier => tier.id === currentTier);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 p-6">
+    <div className="min-h-screen pt-20 p-6 light-theme">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -167,11 +167,11 @@ export default function SubscriptionManagement() {
             <div className="p-3 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 mr-4">
               <Crown className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-4xl font-bold text-gray-800">
               Subscription Management
             </h1>
           </div>
-          <p className="text-gray-400 text-lg">
+          <p className="text-gray-600 text-lg">
             Choose the perfect plan for your creative protection needs
           </p>
         </div>

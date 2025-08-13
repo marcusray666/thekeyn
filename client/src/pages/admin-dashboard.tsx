@@ -325,11 +325,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pb-20 md:pb-0 relative overflow-hidden">
-      {/* Background gradients - matching main app theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen pb-20 md:pb-0 relative overflow-hidden light-theme">{/* Using light theme to match login/home pages */}
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -346,17 +342,17 @@ export default function AdminDashboard() {
                   Admin Dashboard
                 </h1>
               </div>
-              <p className="text-white/60">Complete platform management and monitoring</p>
+              <p className="text-gray-600">Complete platform management and monitoring</p>
             </div>
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-2xl">
+            <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 px-4 py-2 rounded-2xl shadow-lg">
               <p className="text-[#FE3F5E] font-medium">Admin Access Enabled</p>
-              <p className="text-xs text-white/60">Full platform control</p>
+              <p className="text-xs text-gray-600">Full platform control</p>
             </div>
           </div>
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-7 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
+          <TabsList className="grid w-full grid-cols-7 bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -403,14 +399,14 @@ export default function AdminDashboard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/80 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FFD200]">Total Users</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.totalUsers?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.totalUsers?.toLocaleString() || 0}</p>
                       </div>
                       <Users className="h-8 w-8 text-[#FFD200]" />
                     </div>

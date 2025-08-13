@@ -127,24 +127,20 @@ export default function PremiumUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 px-4 relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen pt-20 pb-32 px-4 relative overflow-hidden light-theme">
       
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => setLocation('/')}
-            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Feed</span>
           </button>
           
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-gray-800">
             {step === 'upload' && 'Protect Your Work'}
             {step === 'processing' && 'Securing on Blockchain...'}
             {step === 'success' && 'Protected Successfully!'}

@@ -239,14 +239,14 @@ export default function Subscription() {
   const currentTierInfo = tierInfo[currentTier as keyof typeof tierInfo];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 pt-24 p-6">
+    <div className="min-h-screen pt-24 p-6 light-theme">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-white">
+          <h1 className="text-4xl font-bold text-gray-800">
             {isAuthenticated ? "Subscription Management" : "Choose Your Plan"}
           </h1>
-          <p className="text-xl text-white/70">
+          <p className="text-xl text-gray-600">
             {isAuthenticated 
               ? "Manage your subscription and view usage statistics" 
               : "Choose the perfect plan for your creative protection needs"
