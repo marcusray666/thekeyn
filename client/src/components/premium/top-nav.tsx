@@ -97,10 +97,11 @@ export function TopNav() {
           
           {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto shadow-2xl"
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto shadow-2xl"
                  style={{
-                   backdropFilter: 'blur(16px) saturate(180%)',
-                   WebkitBackdropFilter: 'blur(16px) saturate(180%)'
+                   backdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   backgroundColor: 'rgba(255, 255, 255, 0.7)'
                  }}>
               <div className="p-3">
                 <div className="text-sm text-gray-500 mb-3 px-2">Users</div>
@@ -133,10 +134,11 @@ export function TopNav() {
           
           {/* No Results */}
           {showSearchResults && searchQuery.length >= 2 && searchResults.length === 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 shadow-2xl"
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden z-50 shadow-2xl"
                  style={{
-                   backdropFilter: 'blur(16px) saturate(180%)',
-                   WebkitBackdropFilter: 'blur(16px) saturate(180%)'
+                   backdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   backgroundColor: 'rgba(255, 255, 255, 0.7)'
                  }}>
               <div className="p-6 text-center">
                 <User className="h-8 w-8 text-gray-300 mx-auto mb-2" />
@@ -183,10 +185,11 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl"
+            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/80 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl"
                  style={{
-                   backdropFilter: 'blur(16px) saturate(180%)',
-                   WebkitBackdropFilter: 'blur(16px) saturate(180%)'
+                   backdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%) brightness(1.1)',
+                   backgroundColor: 'rgba(255, 255, 255, 0.7)'
                  }}>
               <Link href="/profile">
                 <div 
