@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { 
   Users, 
-  Paintbrush, 
   FileText, 
   DollarSign, 
   AlertTriangle, 
@@ -20,7 +19,6 @@ import {
   CheckCircle,
   XCircle,
   Search,
-  Filter,
   Download,
   BarChart3,
   Settings,
@@ -32,7 +30,7 @@ import {
   Music,
   Trash2,
   Video as VideoIcon,
-  UserX,
+  Shield,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
 
@@ -46,6 +44,11 @@ interface SystemMetrics {
   storageUsed: number;
   blockchainVerifications: number;
   reportsPending: number;
+  subscriptionBreakdown?: {
+    free: number;
+    starter: number;
+    pro: number;
+  };
 }
 
 interface AdminUser {
