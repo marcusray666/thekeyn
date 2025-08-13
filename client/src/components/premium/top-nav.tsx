@@ -97,7 +97,11 @@ export function TopNav() {
           
           {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto shadow-xl">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-[20px] border border-gray-200/50 rounded-2xl overflow-hidden z-50 max-h-80 overflow-y-auto shadow-2xl"
+                 style={{
+                   backdropFilter: 'blur(20px) saturate(180%)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                 }}>
               <div className="p-3">
                 <div className="text-sm text-gray-500 mb-3 px-2">Users</div>
                 {searchResults.map((user: any) => (
@@ -129,7 +133,11 @@ export function TopNav() {
           
           {/* No Results */}
           {showSearchResults && searchQuery.length >= 2 && searchResults.length === 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden z-50 shadow-xl">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-[20px] border border-gray-200/50 rounded-2xl overflow-hidden z-50 shadow-2xl"
+                 style={{
+                   backdropFilter: 'blur(20px) saturate(180%)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                 }}>
               <div className="p-6 text-center">
                 <User className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                 <div className="text-gray-500 text-sm">No users found for "{searchQuery}"</div>
@@ -175,7 +183,11 @@ export function TopNav() {
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-xl">
+            <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white/90 backdrop-blur-[20px] border border-gray-200/50 rounded-xl shadow-2xl"
+                 style={{
+                   backdropFilter: 'blur(20px) saturate(180%)',
+                   WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                 }}>
               <Link href="/profile">
                 <div 
                   className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
