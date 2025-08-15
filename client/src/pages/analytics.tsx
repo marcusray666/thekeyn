@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 
 interface AnalyticsData {
   totalViews: number;
@@ -35,6 +36,14 @@ export default function Analytics() {
   const { data: analyticsData, isLoading, refetch, error } = useQuery<AnalyticsData>({
     queryKey: ["/api/analytics", timeRange],
     enabled: isAuthenticated,
+  });
+
+  // Log the current state for debugging
+  console.log("Analytics page state:", { 
+    isAuthenticated, 
+    isLoading, 
+    hasData: !!analyticsData, 
+    error: error?.message 
   });
 
   // Handle error state
@@ -63,68 +72,76 @@ export default function Analytics() {
     );
   }
 
+  // Create fallback data when API returns null (authentication issues) or no data
+  const fallbackAnalytics: AnalyticsData = {
+    totalViews: 0,
+    totalShares: 0,
+    totalDownloads: 0,
+    growthRate: 0,
+    monthlyViews: [],
+    topWorks: [],
+    deviceTypes: [],
+    geographicData: []
+  };
+
+  const analytics = analyticsData || fallbackAnalytics;
+
   // Show no data state if user has no analytics data
-  if (!isLoading && analyticsData && analyticsData.totalViews === 0 && analyticsData.topWorks.length === 0) {
+  if (!isLoading && analytics && analytics.totalViews === 0 && analytics.topWorks.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
-        {/* Background gradients */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
-        
-        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
-              <TrendingUp className="h-8 w-8 text-blue-400" />
+      <SimpleBackgroundEngine>
+        <div className="min-h-screen pt-24 pb-32 relative overflow-hidden">
+          <div className="flex items-center justify-center min-h-[60vh] relative z-10">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <TrendingUp className="h-8 w-8 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Analytics Data Yet</h3>
+              <p className="text-gray-600 text-sm mb-4">Upload and share your work to start seeing analytics.</p>
+              <Button onClick={() => setLocation('/upload')} className="accent-button">
+                Upload Your First Work
+              </Button>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Analytics Data Yet</h3>
-            <p className="text-white/60 text-sm mb-4">Upload and share your work to start seeing analytics.</p>
-            <Button onClick={() => setLocation('/upload')} className="accent-button">
-              Upload Your First Work
-            </Button>
           </div>
         </div>
-      </div>
+      </SimpleBackgroundEngine>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 relative overflow-hidden">
-        {/* Background gradients */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
-        
-        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 relative">
-              <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+      <SimpleBackgroundEngine>
+        <div className="min-h-screen pt-24 pb-32 relative overflow-hidden">
+          <div className="flex items-center justify-center min-h-[60vh] relative z-10">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 relative">
+                <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
+              </div>
+              <p className="text-gray-600 text-sm">Loading analytics...</p>
             </div>
-            <p className="text-white/60 text-sm">Loading analytics...</p>
           </div>
         </div>
-      </div>
+      </SimpleBackgroundEngine>
     );
   }
 
   const exportAnalytics = () => {
-    if (!analyticsData) return;
+    if (!analytics || analytics.totalViews === 0) return;
     
     const exportData = {
       timeRange,
       generatedAt: new Date().toISOString(),
       summary: {
-        totalViews: analyticsData.totalViews,
-        totalShares: analyticsData.totalShares,
-        totalDownloads: analyticsData.totalDownloads,
-        growthRate: analyticsData.growthRate
+        totalViews: analytics.totalViews,
+        totalShares: analytics.totalShares,
+        totalDownloads: analytics.totalDownloads,
+        growthRate: analytics.growthRate
       },
-      monthlyData: analyticsData.monthlyViews,
-      topPerformingWorks: analyticsData.topWorks,
-      deviceBreakdown: analyticsData.deviceTypes,
-      geographicBreakdown: analyticsData.geographicData
+      monthlyData: analytics.monthlyViews,
+      topPerformingWorks: analytics.topWorks,
+      deviceBreakdown: analytics.deviceTypes,
+      geographicBreakdown: analytics.geographicData
     };
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
@@ -137,13 +154,9 @@ export default function Analytics() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
-      
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 pt-24 pb-8">
+    <SimpleBackgroundEngine>
+      <div className="min-h-screen relative overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 pt-24 pb-8">
         {/* Header */}
         <div className="space-y-4 mb-8">
           {/* Back Button */}
@@ -152,7 +165,7 @@ export default function Analytics() {
               onClick={() => setLocation('/dashboard')}
               variant="ghost"
               size="sm"
-              className="text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10"
+              className="text-gray-600 hover:text-gray-800 hover:bg-white/10 backdrop-blur-sm border border-gray-300"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
@@ -161,17 +174,17 @@ export default function Analytics() {
           
           {/* Title Section */}
           <div className="text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-white/60 text-lg">Track your creative work performance and engagement</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Analytics Dashboard</h1>
+            <p className="text-gray-600 text-lg">Track your creative work performance and engagement</p>
           </div>
           
           {/* Controls */}
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:justify-end">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-full sm:w-32 bg-black/20 backdrop-blur-sm border-white/10 text-white">
+              <SelectTrigger className="w-full sm:w-32 bg-white/20 backdrop-blur-sm border-gray-300 text-gray-800">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#0F0F0F] border-white/10 backdrop-blur-xl">
+              <SelectContent className="bg-white/90 border-gray-300 backdrop-blur-xl">
                 <SelectItem value="1m">1 Month</SelectItem>
                 <SelectItem value="3m">3 Months</SelectItem>
                 <SelectItem value="6m">6 Months</SelectItem>
@@ -184,7 +197,7 @@ export default function Analytics() {
                 onClick={() => refetch()}
                 variant="ghost"
                 size="sm"
-                className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 flex-1 sm:flex-none"
+                className="bg-white/20 backdrop-blur-sm border border-gray-300 text-gray-600 hover:text-gray-800 hover:bg-white/30 flex-1 sm:flex-none"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
@@ -207,33 +220,33 @@ export default function Analytics() {
           <GlassCard className="text-center py-4 sm:py-6">
             <Eye className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-cyan-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-1">
-              {analyticsData?.totalViews.toLocaleString()}
+              {analytics.totalViews.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-xs sm:text-sm">Total Views</div>
+            <div className="text-gray-600 text-xs sm:text-sm">Total Views</div>
           </GlassCard>
           
           <GlassCard className="text-center py-4 sm:py-6">
             <Share2 className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-purple-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-1">
-              {analyticsData?.totalShares.toLocaleString()}
+              {analytics.totalShares.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-xs sm:text-sm">Total Shares</div>
+            <div className="text-gray-600 text-xs sm:text-sm">Total Shares</div>
           </GlassCard>
           
           <GlassCard className="text-center py-4 sm:py-6">
             <Download className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-emerald-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-emerald-400 mb-1">
-              {analyticsData?.totalDownloads.toLocaleString()}
+              {analytics.totalDownloads.toLocaleString()}
             </div>
-            <div className="text-gray-400 text-xs sm:text-sm">Downloads</div>
+            <div className="text-gray-600 text-xs sm:text-sm">Downloads</div>
           </GlassCard>
           
           <GlassCard className="text-center py-4 sm:py-6">
             <TrendingUp className="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-orange-400 mb-2 sm:mb-3" />
             <div className="text-2xl sm:text-3xl font-bold text-orange-400 mb-1">
-              +{analyticsData?.growthRate}%
+              +{analytics.growthRate}%
             </div>
-            <div className="text-gray-400 text-xs sm:text-sm">Growth Rate</div>
+            <div className="text-gray-600 text-xs sm:text-sm">Growth Rate</div>
           </GlassCard>
         </div>
 
@@ -241,10 +254,10 @@ export default function Analytics() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
           <GlassCard>
             <div className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Views & Shares Over Time</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Views & Shares Over Time</h3>
               <AnalyticsChart
                 type="line"
-                data={analyticsData?.monthlyViews || []}
+                data={analytics.monthlyViews || []}
                 dataKey="views"
                 xAxisKey="month"
                 colors={['#06B6D4']}
@@ -255,10 +268,10 @@ export default function Analytics() {
 
           <GlassCard>
             <div className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Device Types</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Device Types</h3>
               <AnalyticsChart
                 type="pie"
-                data={analyticsData?.deviceTypes || []}
+                data={analytics.deviceTypes || []}
                 dataKey="value"
                 colors={['#8B5CF6', '#06B6D4', '#10B981']}
                 className="h-80"
@@ -271,17 +284,17 @@ export default function Analytics() {
           {/* Top Performing Works */}
           <GlassCard>
             <div className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Top Performing Works</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Top Performing Works</h3>
               <div className="space-y-4">
-                {analyticsData?.topWorks.map((work, index) => (
+                {analytics.topWorks.map((work, index) => (
                   <div key={work.certificateId} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-semibold text-white">{work.title}</p>
-                        <p className="text-sm text-gray-400">{work.certificateId.slice(-8)}</p>
+                        <p className="font-semibold text-gray-800">{work.title}</p>
+                        <p className="text-sm text-gray-600">{work.certificateId.slice(-8)}</p>
                       </div>
                     </div>
                     <div className="text-cyan-400 font-semibold">
@@ -296,13 +309,13 @@ export default function Analytics() {
           {/* Geographic Data */}
           <GlassCard>
             <div className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Geographic Distribution</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Geographic Distribution</h3>
               <div className="space-y-4">
-                {analyticsData?.geographicData.map((country) => (
+                {analytics.geographicData.map((country) => (
                   <div key={country.country} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
-                      <span className="text-white">{country.country}</span>
+                      <span className="text-gray-800">{country.country}</span>
                     </div>
                     <div className="text-emerald-400 font-semibold">
                       {country.views.toLocaleString()}
@@ -313,7 +326,8 @@ export default function Analytics() {
             </div>
           </GlassCard>
         </div>
+        </div>
       </div>
-    </div>
+    </SimpleBackgroundEngine>
   );
 }
