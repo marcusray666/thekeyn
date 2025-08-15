@@ -36,29 +36,40 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
 
   // Fetch user preferences
   const { data: preferences = [], isLoading } = useQuery({
-    queryKey: ['/api/background-preferences'],
+    queryKey: [`/api/background/preferences/${user?.id}`],
     enabled: !!user,
   });
 
   // Fetch analytics
   const { data: analytics = [] } = useQuery({
-    queryKey: ['/api/background-analytics'],
+    queryKey: [`/api/background/recommendations/${user?.id}`],
     enabled: !!user,
   });
 
   // Create preference mutation
   const createPreferenceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/background-preferences', {
+      return await apiRequest('/api/background/preferences', {
         method: 'POST',
         body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/background-preferences'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
       toast({
         title: 'Preference saved',
         description: 'Your background preference has been saved successfully',
+      });
+    },
+    onError: (error) => {
+      console.error('Error saving preference:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save background preference',
+        variant: 'destructive',
       });
     },
   });
@@ -99,18 +110,48 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Generate new gradient mutation
   const generateGradientMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/background-generate', {
+      // Generate a random gradient based on user preferences
+      const gradientTypes = ['linear', 'radial', 'conic'];
+      const schemes = colorSchemeOptions;
+      
+      const randomType = gradientTypes[Math.floor(Math.random() * gradientTypes.length)];
+      const randomScheme = schemes[Math.floor(Math.random() * schemes.length)];
+      
+      const newGradient = {
+        gradientType: randomType,
+        colorScheme: randomScheme.value,
+        primaryColors: randomScheme.colors,
+        intensity: 0.7 + Math.random() * 0.3, // 0.7 to 1.0
+        animationSpeed: ['slow', 'medium', 'fast'][Math.floor(Math.random() * 3)],
+        direction: Math.floor(Math.random() * 360) + 'deg',
+        moodTag: 'generated',
+      };
+
+      return await apiRequest('/api/background/preferences', {
         method: 'POST',
+        body: JSON.stringify(newGradient),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     },
     onSuccess: (newGradient) => {
-      // Apply the new gradient immediately
+      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
       toast({
         title: 'New gradient generated',
-        description: 'A personalized gradient has been created based on your preferences',
+        description: 'A personalized gradient has been created and saved to your preferences',
       });
-      // Force a page refresh to show new gradient
-      window.location.reload();
+      
+      // Trigger background refresh instead of page reload
+      window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: newGradient }));
+    },
+    onError: (error) => {
+      console.error('Error generating gradient:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate new gradient',
+        variant: 'destructive',
+      });
     },
   });
 

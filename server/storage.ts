@@ -4,6 +4,7 @@ import {
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
   blockchainVerifications, verificationAuditLog, adminAuditLogs, contentReports, systemMetrics,
   conversations, conversationParticipants, messages, messageReadStatus,
+  userBackgroundPreferences, backgroundInteractions,
   type User, type InsertUser, type Work, type InsertWork, type Certificate, type InsertCertificate, 
   type NftMint, type InsertNftMint, 
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
@@ -13,7 +14,8 @@ import {
   type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
   type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
   type VerificationAuditLog, type InsertVerificationAuditLog,
-  type Conversation, type InsertConversation, type Message, type InsertMessage
+  type Conversation, type InsertConversation, type Message, type InsertMessage,
+  type UserBackgroundPreference, type InsertUserBackgroundPreference, type BackgroundInteraction, type InsertBackgroundInteraction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql, ne, isNull, ilike, or } from "drizzle-orm";
