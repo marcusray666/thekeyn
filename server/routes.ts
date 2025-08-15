@@ -225,30 +225,32 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       username: user.username,
       email: user.email,
       role: user.role,
-      subscriptionTier: user.subscriptionTier,
-      subscriptionStatus: user.subscriptionStatus,
-      monthlyUploads: user.monthlyUploads,
-      monthlyUploadLimit: user.monthlyUploadLimit,
+      subscriptionTier: user.subscriptionTier || 'free',
+      subscriptionStatus: user.subscriptionStatus || 'inactive',
+      monthlyUploads: user.monthlyUploads || 0,
+      monthlyUploadLimit: user.monthlyUploadLimit || 10,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
+      lastUploadReset: user.lastUploadReset || new Date(),
+      walletAddress: user.walletAddress,
       displayName: user.displayName,
       bio: user.bio,
       profileImageUrl: user.profileImageUrl,
       website: user.website,
       location: user.location,
-      isVerified: user.isVerified,
-      followerCount: user.followerCount,
-      followingCount: user.followingCount,
-      totalLikes: user.totalLikes,
-      themePreference: user.themePreference,
-      settings: user.settings,
+      isVerified: user.isVerified || false,
+      followerCount: user.followerCount || 0,
+      followingCount: user.followingCount || 0,
+      totalLikes: user.totalLikes || 0,
+      themePreference: user.themePreference || 'light',
+      settings: user.settings || {},
       lastLoginAt: user.lastLoginAt,
-      isBanned: user.isBanned,
+      isBanned: user.isBanned || false,
       banReason: user.banReason,
       createdAt: user.createdAt
     };
     
-    // CRITICAL FIX: Set userId for profile updates
-    req.userId = user.id;
+    // Add userId to session for compatibility
+    (req as any).userId = user.id;
 
     next();
   } catch (error) {
@@ -537,7 +539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all certificates for authenticated user
   app.get("/api/certificates", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.session!.userId;
+      const userId = req.user!.id;
       // Only get the user's own works and their associated certificates
       const userWorks = await storage.getUserWorks(userId);
       
@@ -762,7 +764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get dashboard stats - user specific only
   app.get("/api/dashboard/stats", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.session!.userId;
+      const userId = req.user!.id;
       // Only get the user's own works and certificates
       const userWorks = await storage.getUserWorks(userId);
       
@@ -797,7 +799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get recent works - user specific only
   app.get("/api/dashboard/recent-works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.session!.userId;
+      const userId = req.user!.id;
       // Only return the user's own works
       const userWorks = await storage.getUserWorks(userId);
       // Sort by creation date and limit to 10 most recent
@@ -1451,7 +1453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nftMint = await storage.createNftMint({
         ...req.body,
-        userId: req.userId!,
+        userId: req.user!.id,
         transactionHash: mockTransactionHash,
         tokenId: mockTokenId.toString(),
         status: 'minting',
@@ -1482,7 +1484,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/nft-mints', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const nftMints = await storage.getNftMints(req.userId!);
+      const nftMints = await storage.getNftMints(req.user!.id);
       res.json(nftMints);
     } catch (error) {
       console.error('Error fetching NFT mints:', error);
@@ -1919,8 +1921,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Return safe user data (no password)
-      const { password, ...safeUser } = user;
+      // Return safe user data (excluding password if it exists)
+      const { password, ...safeUser } = user as any;
       
       // Add profile data
       const profile = {
