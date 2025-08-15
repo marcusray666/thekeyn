@@ -8,6 +8,8 @@ import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import CommentsSection from "@/components/CommentsSection";
 
 interface CommunityPost {
   id: string;
@@ -468,10 +470,26 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
             <span className="text-sm font-medium">{likes}</span>
           </button>
           
-          <button className="flex items-center space-x-2 text-gray-500 hover:text-[#FE3F5E] transition-colors">
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">{post.comments}</span>
-          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="flex items-center space-x-2 text-gray-500 hover:text-[#FE3F5E] transition-colors">
+                <MessageCircle className="h-5 w-5" />
+                <span className="text-sm font-medium">{post.comments}</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-gray-800">Comments on "{post.title}"</DialogTitle>
+              </DialogHeader>
+              <div className="mt-4">
+                <CommentsSection 
+                  postId={post.id} 
+                  currentUserId={currentUserId} 
+                  postType="community"
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
           
           <button className="flex items-center space-x-2 text-gray-500 hover:text-[#FE3F5E] transition-colors">
             <Share2 className="h-5 w-5" />

@@ -33,9 +33,10 @@ interface Comment {
 interface CommentsSectionProps {
   postId: string;
   currentUserId?: number;
+  postType?: 'social' | 'community'; // Add post type to determine which API endpoints to use
 }
 
-export default function CommentsSection({ postId, currentUserId }: CommentsSectionProps) {
+export default function CommentsSection({ postId, currentUserId, postType = 'social' }: CommentsSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
@@ -43,20 +44,25 @@ export default function CommentsSection({ postId, currentUserId }: CommentsSecti
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
 
+  // Determine API endpoints based on post type
+  const baseApiPath = postType === 'community' ? '/api/community' : '/api/social';
+  const commentsApiPath = `${baseApiPath}/posts/${postId}/comments`;
+  const commentApiPath = `${baseApiPath}/comments`;
+
   const { data: comments, isLoading } = useQuery({
-    queryKey: [`/api/social/posts/${postId}/comments`],
+    queryKey: [commentsApiPath],
     enabled: !!postId,
   });
 
   const createCommentMutation = useMutation({
     mutationFn: async (commentData: { content: string; parentId?: number }) => {
-      return await apiRequest(`/api/social/posts/${postId}/comments`, {
+      return await apiRequest(commentsApiPath, {
         method: "POST",
         body: JSON.stringify(commentData),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/social/posts/${postId}/comments`] });
+      queryClient.invalidateQueries({ queryKey: [commentsApiPath] });
       setNewComment("");
       setReplyingTo(null);
       toast({
@@ -75,13 +81,13 @@ export default function CommentsSection({ postId, currentUserId }: CommentsSecti
 
   const updateCommentMutation = useMutation({
     mutationFn: async ({ id, content }: { id: number; content: string }) => {
-      return await apiRequest(`/api/social/comments/${id}`, {
+      return await apiRequest(`${commentApiPath}/${id}`, {
         method: "PUT",
         body: JSON.stringify({ content }),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/social/posts/${postId}/comments`] });
+      queryClient.invalidateQueries({ queryKey: [commentsApiPath] });
       setEditingComment(null);
       setEditContent("");
       toast({
@@ -100,12 +106,12 @@ export default function CommentsSection({ postId, currentUserId }: CommentsSecti
 
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      return await apiRequest(`/api/social/comments/${commentId}`, {
+      return await apiRequest(`${commentApiPath}/${commentId}`, {
         method: "DELETE",
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/social/posts/${postId}/comments`] });
+      queryClient.invalidateQueries({ queryKey: [commentsApiPath] });
       toast({
         title: "Success",
         description: "Comment deleted successfully",
@@ -122,12 +128,12 @@ export default function CommentsSection({ postId, currentUserId }: CommentsSecti
 
   const likeCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      return await apiRequest(`/api/social/comments/${commentId}/like`, {
+      return await apiRequest(`${commentApiPath}/${commentId}/like`, {
         method: "POST",
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/social/posts/${postId}/comments`] });
+      queryClient.invalidateQueries({ queryKey: [commentsApiPath] });
     },
     onError: (error) => {
       toast({

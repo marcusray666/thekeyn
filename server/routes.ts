@@ -4770,6 +4770,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community Posts Comment Routes
+  app.post("/api/community/posts/:id/comments", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId;
+      const { content, parentId, mentionedUsers } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const comment = await storage.createComment({
+        postId: parseInt(postId),
+        userId,
+        content: content.trim(),
+        parentId: parentId || null,
+        mentionedUsers: mentionedUsers || [],
+      });
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating community post comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  app.get("/api/community/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const { limit = 50, offset = 0 } = req.query;
+      
+      const comments = await storage.getPostComments(postId.toString(), {
+        limit: Number(limit),
+        offset: Number(offset),
+      });
+      
+      res.json(comments);
+    } catch (error) {
+      console.error("Error getting community post comments:", error);
+      res.status(500).json({ error: "Failed to get comments" });
+    }
+  });
+
+  app.put("/api/community/comments/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session!.userId;
+      const { content } = req.body;
+      
+      if (isNaN(commentId) || !isFinite(commentId) || commentId <= 0) {
+        return res.status(400).json({ error: "Invalid comment ID" });
+      }
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const updatedComment = await storage.updateComment(commentId, {
+        content: content.trim(),
+      });
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating community post comment:", error);
+      res.status(500).json({ error: "Failed to update comment" });
+    }
+  });
+
+  app.delete("/api/community/comments/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session!.userId;
+      
+      await storage.deleteComment(commentId, userId);
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting community post comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  app.post("/api/community/comments/:id/like", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const userId = req.session!.userId;
+      
+      await storage.likeComment(userId, commentId);
+      
+      res.json({ message: "Comment liked successfully" });
+    } catch (error) {
+      console.error("Error liking community post comment:", error);
+      res.status(500).json({ error: "Failed to like comment" });
+    }
+  });
+
   // Object Storage Routes
   const objectStorageService = new ObjectStorageService();
 
