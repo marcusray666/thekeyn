@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useRoute } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { Settings, Share2, Edit3, Grid3X3, List, MoreHorizontal, Heart, MessageCircle, X, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { Share2, Edit3, Grid3X3, List, Heart, MessageCircle, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/premium/post-card";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,15 +50,30 @@ export default function PremiumProfile() {
   // Like post mutation
   const likeMutation = useMutation({
     mutationFn: async (postId: string) => {
+      // Check if post is already liked to toggle properly
+      const isLiked = selectedPost?.isLiked;
+      const method = isLiked ? 'DELETE' : 'POST';
       return await apiRequest(`/api/community/posts/${postId}/like`, {
-        method: 'POST',
+        method: method,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update selected post state immediately
+      if (selectedPost) {
+        setSelectedPost({
+          ...selectedPost,
+          isLiked: !selectedPost.isLiked,
+          likes: selectedPost.isLiked ? (selectedPost.likes || 1) - 1 : (selectedPost.likes || 0) + 1
+        });
+      }
+      
+      // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts", "user", targetUserId] });
+      
       toast({
-        title: "Post liked!",
-        description: "Your like has been added to this post.",
+        title: selectedPost?.isLiked ? "Unliked" : "Liked!",
+        description: selectedPost?.isLiked ? "Removed from your likes" : "Added to your likes",
       });
     },
   });
@@ -68,11 +83,31 @@ export default function PremiumProfile() {
     mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
       return await apiRequest(`/api/community/posts/${postId}/comments`, {
         method: 'POST',
-        body: { content },
+        body: JSON.stringify({ content }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setNewComment("");
+      
+      // Update selected post with new comment count
+      if (selectedPost) {
+        setSelectedPost({
+          ...selectedPost,
+          comments: (selectedPost.comments || 0) + 1
+        });
+      }
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts", "user", targetUserId] });
+      
+      toast({
+        title: "Comment added!",
+        description: "Your comment has been posted.",
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
       toast({
         title: "Comment added!",
@@ -408,11 +443,15 @@ export default function PremiumProfile() {
                       onClick={handleLike}
                       variant="ghost"
                       size="sm"
-                      className="text-white/70 hover:text-[#FE3F5E] hover:bg-[#FE3F5E]/10"
+                      className={`hover:bg-[#FE3F5E]/10 ${
+                        selectedPost?.isLiked 
+                          ? 'text-[#FE3F5E]' 
+                          : 'text-white/70 hover:text-[#FE3F5E]'
+                      }`}
                       disabled={likeMutation.isPending}
                     >
-                      <Heart className="h-4 w-4 mr-1" />
-                      {selectedPost.likes || 0}
+                      <Heart className={`h-4 w-4 mr-1 ${selectedPost?.isLiked ? 'fill-current' : ''}`} />
+                      {selectedPost?.likes || 0}
                     </Button>
                     <Button
                       variant="ghost"

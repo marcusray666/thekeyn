@@ -27,7 +27,7 @@
     --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 90%;
-    --input: 0 0% 98%;
+    --input: 0 0% 100%;
     --ring: 346 98% 62%;
     --radius: 1.5rem;
   }
@@ -101,6 +101,20 @@
   
   .story-modal {
     @apply fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center;
+  }
+  
+  /* Fix input text visibility */
+  input[type="text"], input[type="email"], input[type="password"], textarea {
+    color: #262626 !important;
+    background-color: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  input[type="text"]::placeholder, 
+  input[type="email"]::placeholder, 
+  input[type="password"]::placeholder, 
+  textarea::placeholder {
+    color: #6b7280 !important;
   }
   
   .verification-badge {
