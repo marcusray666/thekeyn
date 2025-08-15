@@ -31,13 +31,18 @@ export default function PremiumCertificates() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-8 md:pt-20 pb-20 md:pb-32">
-        <div className="max-w-6xl mx-auto px-4">
+      <div className="min-h-screen bg-white/95 pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+        
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="animate-pulse space-y-6">
-            <div className="h-20 bg-white/10 rounded-3xl"></div>
+            <div className="h-20 bg-gray-200/50 rounded-3xl"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="h-64 bg-white/10 rounded-3xl"></div>
+                <div key={i} className="h-64 bg-gray-200/50 rounded-3xl"></div>
               ))}
             </div>
           </div>
@@ -58,14 +63,14 @@ export default function PremiumCertificates() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
             <Link href="/">
-              <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+              <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
                 <ArrowLeft className="h-5 w-5" />
                 <span className="text-sm md:text-base">Back to Feed</span>
               </button>
             </Link>
-            <div className="hidden md:block w-px h-6 bg-white/20"></div>
+            <div className="hidden md:block w-px h-6 bg-gray-300"></div>
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl md:text-3xl font-bold text-white">My Certificates</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">My Certificates</h1>
               <div className="px-3 py-1 bg-[#FE3F5E]/20 border border-[#FE3F5E]/50 rounded-full">
                 <span className="text-[#FE3F5E] text-sm font-medium">{certificates.length}</span>
               </div>
