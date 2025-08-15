@@ -73,32 +73,28 @@ const TIME_BASED_SUGGESTIONS = {
 
 export function BackgroundEngine({ pageContext, children, className = '' }: BackgroundEngineProps) {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [currentGradient, setCurrentGradient] = useState<GradientConfig | null>(null);
   const [sessionStartTime] = useState(Date.now());
   const [pageViewTime, setPageViewTime] = useState(Date.now());
 
   // Fetch user preferences
-  const { data: preferences } = useQuery({
-    queryKey: ['/api/background-preferences'],
-    enabled: !!user,
+  const { data: preferences = [] } = useQuery({
+    queryKey: ['/api/background/preferences', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const response = await fetch(`/api/background/preferences/${user.id}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!user?.id,
   });
 
   // Record interaction mutation
   const recordInteractionMutation = useMutation({
     mutationFn: async (interaction: any) => {
-      return await apiRequest('/api/background-interactions', {
+      return await apiRequest('/api/background/interactions', {
         method: 'POST',
         body: JSON.stringify(interaction),
-      });
-    },
-  });
-
-  // Update preference usage
-  const updateUsageMutation = useMutation({
-    mutationFn: async (preferenceId: number) => {
-      return await apiRequest(`/api/background-preferences/${preferenceId}/usage`, {
-        method: 'POST',
       });
     },
   });
@@ -118,16 +114,14 @@ export function BackgroundEngine({ pageContext, children, className = '' }: Back
     const timeSuggestion = TIME_BASED_SUGGESTIONS[timeOfDay];
     
     // If user has preferences, use learning algorithm
-    if (preferences && preferences.length > 0) {
+    if (preferences && Array.isArray(preferences) && preferences.length > 0) {
       const recentPrefs = preferences.slice(0, 5); // Get most recent preferences
-      const preferredSchemes = recentPrefs.map(p => p.colorScheme);
-      const preferredTypes = recentPrefs.map(p => p.gradientType);
       
       // Weight preferences based on usage and rating
-      const schemeWeights = {};
-      const typeWeights = {};
+      const schemeWeights: Record<string, number> = {};
+      const typeWeights: Record<string, number> = {};
       
-      recentPrefs.forEach(pref => {
+      recentPrefs.forEach((pref: any) => {
         const weight = (pref.usageCount || 1) * (pref.userRating || 3) / 3;
         schemeWeights[pref.colorScheme] = (schemeWeights[pref.colorScheme] || 0) + weight;
         typeWeights[pref.gradientType] = (typeWeights[pref.gradientType] || 0) + weight;
@@ -139,11 +133,11 @@ export function BackgroundEngine({ pageContext, children, className = '' }: Back
       );
       const preferredType = Object.keys(typeWeights).reduce((a, b) => 
         typeWeights[a] > typeWeights[b] ? a : b
-      );
+      ) as keyof typeof GRADIENT_PATTERNS;
       
       // Find matching pattern
       const patterns = GRADIENT_PATTERNS[preferredType] || GRADIENT_PATTERNS.linear;
-      const matchingPatterns = patterns.filter(p => 
+      const matchingPatterns = patterns.filter((p: any) => 
         p.scheme === preferredScheme || timeSuggestion.schemes.includes(p.scheme)
       );
       
@@ -151,7 +145,7 @@ export function BackgroundEngine({ pageContext, children, className = '' }: Back
         const pattern = matchingPatterns[Math.floor(Math.random() * matchingPatterns.length)];
         return {
           id: `${preferredType}-${Date.now()}`,
-          type: preferredType as any,
+          type: preferredType,
           colors: pattern.colors,
           direction: pattern.direction,
           intensity: timeSuggestion.intensity,
@@ -166,18 +160,18 @@ export function BackgroundEngine({ pageContext, children, className = '' }: Back
     const availableSchemes = timeSuggestion.schemes;
     const selectedScheme = availableSchemes[Math.floor(Math.random() * availableSchemes.length)];
     
-    const types = Object.keys(GRADIENT_PATTERNS);
+    const types = Object.keys(GRADIENT_PATTERNS) as Array<keyof typeof GRADIENT_PATTERNS>;
     const selectedType = types[Math.floor(Math.random() * types.length)];
     
     const patterns = GRADIENT_PATTERNS[selectedType];
-    const matchingPatterns = patterns.filter(p => p.scheme === selectedScheme);
+    const matchingPatterns = patterns.filter((p: any) => p.scheme === selectedScheme);
     const pattern = matchingPatterns.length > 0 
       ? matchingPatterns[Math.floor(Math.random() * matchingPatterns.length)]
       : patterns[Math.floor(Math.random() * patterns.length)];
     
     return {
       id: `${selectedType}-${Date.now()}`,
-      type: selectedType as any,
+      type: selectedType,
       colors: pattern.colors,
       direction: pattern.direction,
       intensity: timeSuggestion.intensity,
@@ -284,7 +278,7 @@ export function useBackgroundLearning() {
 
   const likeBackground = useMutation({
     mutationFn: async (gradientId: string) => {
-      return await apiRequest('/api/background-interactions', {
+      return await apiRequest('/api/background/interactions', {
         method: 'POST',
         body: JSON.stringify({
           gradientId,
@@ -298,13 +292,13 @@ export function useBackgroundLearning() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/background-preferences'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/background/preferences', user?.id] });
     },
   });
 
   const dislikeBackground = useMutation({
     mutationFn: async (gradientId: string) => {
-      return await apiRequest('/api/background-interactions', {
+      return await apiRequest('/api/background/interactions', {
         method: 'POST',
         body: JSON.stringify({
           gradientId,
@@ -318,7 +312,7 @@ export function useBackgroundLearning() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/background-preferences'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/background/preferences', user?.id] });
     },
   });
 

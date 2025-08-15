@@ -7,7 +7,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
 import { useOnboardingTriggers } from "@/hooks/use-onboarding";
-import { BackgroundEngine } from "@/components/BackgroundEngine";
+import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 import { BackgroundPreferencesPanel } from "@/components/BackgroundPreferencesPanel";
 import React from "react";
 
@@ -78,7 +78,7 @@ export default function PremiumHome() {
   // Use real API data only
 
   return (
-    <BackgroundEngine pageContext="/premium-home" className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
+    <SimpleBackgroundEngine className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
       {/* Background Settings Button */}
       <div className="fixed top-20 right-6 z-50">
         <BackgroundPreferencesPanel 
@@ -152,7 +152,7 @@ export default function PremiumHome() {
         tourId="DASHBOARD"
         autoStart={false}
       />
-    </BackgroundEngine>
+    </SimpleBackgroundEngine>
   );
 }
 
