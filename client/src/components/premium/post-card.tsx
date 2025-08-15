@@ -1,7 +1,10 @@
 import { formatTimeAgo } from "@/lib/utils";
-import { Shield, Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
+import { Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { ShareModal } from "./share-modal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface PostCardProps {
   post: {
@@ -18,22 +21,57 @@ interface PostCardProps {
     isVerified: boolean;
     isProtected?: boolean;
     likesCount?: number;
+    likes?: number; // For compatibility with the database field
     commentsCount?: number;
+    comments?: number; // For compatibility with the database field
     description?: string;
     username?: string;
+    isLiked?: boolean; // Current user's like status
   };
   onDetailsClick?: () => void;
 }
 
 export function PostCard({ post, onDetailsClick }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likes, setLikes] = useState(post.likesCount || 0);
+  const [isLiked, setIsLiked] = useState(post.isLiked || false);
+  const [likes, setLikes] = useState(post.likesCount || post.likes || 0);
   const [showShareModal, setShowShareModal] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Like mutation for community posts
+  const likeMutation = useMutation({
+    mutationFn: async (postId: number) => {
+      return await apiRequest(`/api/community/posts/${postId}/like`, {
+        method: 'POST'
+      });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch community posts
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      toast({
+        title: "Success",
+        description: isLiked ? "Post unliked" : "Post liked",
+      });
+    },
+    onError: (error: any) => {
+      // Revert the optimistic update
+      setIsLiked(!isLiked);
+      setLikes(prev => isLiked ? prev + 1 : prev - 1);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update like status",
+        variant: "destructive",
+      });
+    }
+  });
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // Optimistic update
     setIsLiked(!isLiked);
     setLikes(prev => isLiked ? prev - 1 : prev + 1);
+    // Make API call
+    likeMutation.mutate(post.id);
   };
 
   const getFileIcon = () => {
