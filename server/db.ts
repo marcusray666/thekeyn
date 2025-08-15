@@ -45,22 +45,22 @@ if (urlHost && !urlHost.includes(':5432')) {
 // Standard PostgreSQL pool configuration for Railway
 const connectionConfig = {
   connectionString: process.env.DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 60000,
-  connectionTimeoutMillis: 30000,
-  acquireTimeoutMillis: 30000,
-  statement_timeout: 30000,
-  query_timeout: 30000,
-  allowExitOnIdle: true,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  statement_timeout: 15000,
+  query_timeout: 15000,
+  allowExitOnIdle: false,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 };
 
 export const pool = new Pool(connectionConfig);
 export const db = drizzle(pool, { schema: { ...schema, ...blockchainSchema } });
 
-// Test database connection and verify schema on startup
-pool.connect()
-  .then(async client => {
+// Test database connection and verify schema on startup with better error handling
+async function testConnection() {
+  try {
+    const client = await pool.connect();
     console.log("✅ Database connected successfully");
     
     // Check if users table exists
@@ -68,17 +68,16 @@ pool.connect()
       const result = await client.query("SELECT COUNT(*) FROM users LIMIT 1");
       console.log("✅ Database schema verified - users table exists");
     } catch (err) {
-      console.error("❌ Database schema missing - users table not found");
-      console.error("🔧 Run 'npm run db:push' to create database schema");
-      if (process.env.NODE_ENV === 'production') {
-        console.error("🚨 CRITICAL: Production database needs schema setup");
-        console.error("🔧 Railway fix: Add DATABASE_URL variable and run drizzle-kit push");
-      }
+      console.warn("⚠️ Database schema missing - users table not found");
+      console.log("🔧 Schema will be created automatically when needed");
     }
     
     client.release();
-  })
-  .catch(err => {
-    console.error("❌ Database connection failed:", err.message);
-    console.error("🔧 Check your DATABASE_URL configuration");
-  });
+  } catch (err) {
+    console.error("❌ Database connection failed:", err instanceof Error ? err.message : String(err));
+    console.log("🔧 Application will continue, database will be retried automatically");
+  }
+}
+
+// Test connection without blocking startup
+testConnection();

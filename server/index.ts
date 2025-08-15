@@ -13,7 +13,7 @@ console.log('Available DB variables:', Object.keys(process.env).filter(key =>
 ));
 
 import { pool } from "./db.js";
-import { registerRoutes } from "./routes.js";
+import { registerRoutes } from "./routes-minimal.js";
 
 const app = express();
 
@@ -111,7 +111,6 @@ app.use(session({
 (async () => {
   const server = await registerRoutes(app);
 
-  // Ensure admin user exists in production database
   async function ensureAdminUser() {
     try {
       const bcrypt = await import('bcryptjs');
@@ -130,43 +129,13 @@ app.use(session({
            VALUES ($1, $2, $3, $4, $5)`,
           [adminUsername, hash, 'admin@example.com', 'admin', true]
         );
-        console.log('✅ Admin user created for production');
+        console.log('✅ Admin user created');
       } else {
         console.log('✅ Admin user already exists');
       }
     } catch (error) {
       console.error('❌ Failed to ensure admin user:', error instanceof Error ? error.message : String(error));
     }
-  }
-
-  // Runtime database schema verification
-  async function ensureSchema() {
-    try {
-      // Test if critical tables exist by attempting a simple query
-      await pool.query('SELECT 1 FROM users LIMIT 1');
-      await pool.query('SELECT 1 FROM posts LIMIT 1');
-      await pool.query('SELECT 1 FROM works LIMIT 1');
-      console.log('✅ Database schema verified - all tables exist');
-    } catch (error) {
-      console.warn('⚠️ Database schema missing, attempting to create tables...');
-      try {
-        const { execSync } = await import('child_process');
-        execSync('npm run db:push', { stdio: 'inherit' });
-        console.log('✅ Database schema created successfully');
-      } catch (migrationError) {
-        console.error('❌ Failed to create database schema:', migrationError);
-      }
-    }
-  }
-
-  // Initialize admin user after database connection
-  if (process.env.NODE_ENV === 'production') {
-    setTimeout(async () => {
-      await ensureSchema();
-      await ensureAdminUser();
-    }, 2000); // Wait for DB connection
-  } else {
-    setTimeout(ensureSchema, 1000); // Also check in development
   }
 
   // Set up Vite middleware for development
@@ -264,41 +233,42 @@ app.use(session({
     console.log('🚂 Railway deployment detected - forcing production mode');
   }
   
-  // Attempt to create database schema if missing (Railway fix)
-  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
-    await setupDatabaseSchema();
-  }
-  
-  async function setupDatabaseSchema() {
+  // Setup database schema in a more reliable way
+  async function initializeDatabase() {
     try {
-      console.log('🔧 Checking database schema...');
+      console.log('🔧 Initializing database...');
       
-      // Quick check if users table exists
-      const testClient = await pool.connect();
+      // First attempt database migration if needed
       try {
-        await testClient.query("SELECT COUNT(*) FROM users LIMIT 1");
+        await pool.query("SELECT 1 FROM users LIMIT 1");
         console.log('✅ Database schema verified');
-        testClient.release();
-        return;
       } catch (err) {
-        console.log('❌ Database schema missing - attempting to create...');
-        testClient.release();
-        
-        // Create schema using direct SQL commands
-        await createDatabaseSchema();
+        console.log('⚠️ Database schema missing, running migration...');
+        try {
+          const { execSync } = await import('child_process');
+          execSync('npm run db:push', { 
+            stdio: 'inherit',
+            timeout: 30000 
+          });
+          console.log('✅ Database migration completed');
+        } catch (migrationErr) {
+          console.warn('⚠️ Migration failed, will create minimal schema');
+          await createMinimalSchema();
+        }
       }
+      
+      // Ensure admin user exists
+      await ensureAdminUser();
+      
     } catch (err) {
-      console.error('⚠️ Schema check failed:', err instanceof Error ? err.message : 'Unknown error');
+      console.error('❌ Database initialization failed:', err instanceof Error ? err.message : String(err));
     }
   }
   
-  async function createDatabaseSchema() {
+  async function createMinimalSchema() {
     try {
-      console.log('📊 Creating database schema with SQL...');
-      const schemaClient = await pool.connect();
-      
-      // Create users table (core table needed for auth)
-      await schemaClient.query(`
+      const client = await pool.connect();
+      await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
           username VARCHAR(255) UNIQUE NOT NULL,
@@ -322,41 +292,22 @@ app.use(session({
           following_count INTEGER DEFAULT 0,
           total_likes INTEGER DEFAULT 0,
           theme_preference VARCHAR(50) DEFAULT 'liquid-glass',
-          settings JSONB DEFAULT '{}',
+          settings TEXT DEFAULT '{}',
           last_login_at TIMESTAMP,
           is_banned BOOLEAN DEFAULT false,
           ban_reason TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      
-      console.log('✅ Database schema created successfully');
-      
-      // Seed admin user if not exists
-      console.log('🔧 Checking admin user...');
-      const adminUser = 'vladislavdonighevici111307';
-      const adminPass = 'admin';
-      const adminEmail = 'admin@example.com';
-      
-      const adminCheck = await schemaClient.query(`SELECT 1 FROM users WHERE username=$1`, [adminUser]);
-      if (adminCheck.rowCount === 0) {
-        const bcrypt = await import('bcryptjs');
-        const hash = await bcrypt.hash(adminPass, 12);
-        await schemaClient.query(
-          `INSERT INTO users (username, email, password_hash, role, is_verified) 
-           VALUES ($1, $2, $3, 'admin', true)`, 
-          [adminUser, adminEmail, hash]
-        );
-        console.log('✅ Admin user seeded successfully');
-      } else {
-        console.log('✅ Admin user already exists');
-      }
-      
-      schemaClient.release();
-    } catch (schemaErr) {
-      console.error('❌ Failed to create schema:', schemaErr instanceof Error ? schemaErr.message : 'Unknown error');
+      client.release();
+      console.log('✅ Minimal schema created');
+    } catch (err) {
+      console.error('❌ Failed to create minimal schema:', err instanceof Error ? err.message : String(err));
     }
   }
+  
+  // Initialize database with timeout
+  setTimeout(initializeDatabase, 2000);
   
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Backend server running on port ${PORT}`);
