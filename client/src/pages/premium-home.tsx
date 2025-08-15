@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CommunityPostCard } from "@/components/premium/community-post-card";
-import { Plus, Users, Sparkles, Zap, Crown, CheckCircle2 } from "lucide-react";
+import { Plus, Users, Sparkles, Zap, Crown, CheckCircle2, Palette } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
 import { useOnboardingTriggers } from "@/hooks/use-onboarding";
+import { BackgroundEngine } from "@/components/BackgroundEngine";
+import { BackgroundPreferencesPanel } from "@/components/BackgroundPreferencesPanel";
 import React from "react";
 
 
@@ -76,7 +78,21 @@ export default function PremiumHome() {
   // Use real API data only
 
   return (
-    <div className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">{/* Removed dark background, using light theme instead */}
+    <BackgroundEngine pageContext="/premium-home" className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
+      {/* Background Settings Button */}
+      <div className="fixed top-20 right-6 z-50">
+        <BackgroundPreferencesPanel 
+          trigger={
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-white/90 backdrop-blur-xl border-gray-200/50 hover:bg-white shadow-lg"
+            >
+              <Palette className="h-4 w-4" />
+            </Button>
+          }
+        />
+      </div>
       
       <main className="pt-8 relative z-10">
         {/* Stories Section */}
@@ -136,7 +152,7 @@ export default function PremiumHome() {
         tourId="DASHBOARD"
         autoStart={false}
       />
-    </div>
+    </BackgroundEngine>
   );
 }
 

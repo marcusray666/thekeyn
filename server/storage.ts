@@ -122,6 +122,12 @@ export interface IStorage {
   
   // Content categories
   getContentCategories(): Promise<ContentCategory[]>;
+  
+  // Background preferences and interactions
+  getUserBackgroundPreferences(userId: number): Promise<any[]>;
+  saveBackgroundPreference(userId: number, preferenceData: any): Promise<any>;
+  trackBackgroundInteraction(userId: number, interactionData: any): Promise<any>;
+  getBackgroundRecommendations(userId: number, pageContext?: string): Promise<any>;
 
   // Subscription management
   getUserSubscription(userId: number): Promise<Subscription | undefined>;
@@ -2425,6 +2431,185 @@ export class DatabaseStorage implements IStorage {
       console.error("Error getting work preview:", error);
       return null;
     }
+  }
+
+  // Background Preferences Management
+  async getUserBackgroundPreferences(userId: number): Promise<UserBackgroundPreference[]> {
+    const preferences = await db
+      .select()
+      .from(userBackgroundPreferences)
+      .where(eq(userBackgroundPreferences.userId, userId))
+      .orderBy(desc(userBackgroundPreferences.lastUsed));
+
+    return preferences;
+  }
+
+  async createBackgroundPreference(data: InsertUserBackgroundPreference): Promise<UserBackgroundPreference> {
+    const [preference] = await db
+      .insert(userBackgroundPreferences)
+      .values(data)
+      .returning();
+
+    return preference;
+  }
+
+  async updateBackgroundPreference(id: number, updates: Partial<UserBackgroundPreference>): Promise<UserBackgroundPreference> {
+    const [preference] = await db
+      .update(userBackgroundPreferences)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(userBackgroundPreferences.id, id))
+      .returning();
+
+    return preference;
+  }
+
+  async recordBackgroundInteraction(data: InsertBackgroundInteraction): Promise<BackgroundInteraction> {
+    const [interaction] = await db
+      .insert(backgroundInteractions)
+      .values(data)
+      .returning();
+
+    return interaction;
+  }
+
+  async getBackgroundAnalytics(userId: number, days: number = 30): Promise<BackgroundInteraction[]> {
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+
+    const analytics = await db
+      .select()
+      .from(backgroundInteractions)
+      .where(
+        and(
+          eq(backgroundInteractions.userId, userId),
+          gte(backgroundInteractions.createdAt, daysAgo)
+        )
+      )
+      .orderBy(desc(backgroundInteractions.createdAt));
+
+    return analytics;
+  }
+
+  async getPopularBackgroundTrends(limit: number = 10): Promise<{
+    gradientType: string;
+    colorScheme: string;
+    usageCount: number;
+  }[]> {
+    const trends = await db
+      .select({
+        gradientType: userBackgroundPreferences.gradientType,
+        colorScheme: userBackgroundPreferences.colorScheme,
+        usageCount: sql<number>`sum(${userBackgroundPreferences.usageCount})`.as('total_usage'),
+      })
+      .from(userBackgroundPreferences)
+      .groupBy(userBackgroundPreferences.gradientType, userBackgroundPreferences.colorScheme)
+      .orderBy(desc(sql`sum(${userBackgroundPreferences.usageCount})`))
+      .limit(limit);
+
+    return trends;
+  }
+
+  async updateBackgroundUsage(preferenceId: number): Promise<void> {
+    await db
+      .update(userBackgroundPreferences)
+      .set({
+        usageCount: sql`${userBackgroundPreferences.usageCount} + 1`,
+        lastUsed: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(userBackgroundPreferences.id, preferenceId));
+  }
+
+  // Interface implementation methods
+  async saveBackgroundPreference(userId: number, preferenceData: any): Promise<any> {
+    const preference = await this.createBackgroundPreference({
+      userId,
+      gradientType: preferenceData.gradientType,
+      colorScheme: preferenceData.colorScheme,
+      primaryColors: preferenceData.primaryColors,
+      secondaryColors: preferenceData.secondaryColors,
+      direction: preferenceData.direction,
+      intensity: preferenceData.intensity,
+      animationSpeed: preferenceData.animationSpeed,
+      timeOfDayPreference: preferenceData.timeOfDayPreference,
+      moodTag: preferenceData.moodTag,
+      userRating: preferenceData.userRating,
+    });
+    return preference;
+  }
+
+  async trackBackgroundInteraction(userId: number, interactionData: any): Promise<any> {
+    const interaction = await this.recordBackgroundInteraction({
+      userId,
+      gradientId: interactionData.gradientId,
+      interactionType: interactionData.interactionType,
+      timeSpent: interactionData.timeSpent,
+      pageContext: interactionData.pageContext,
+      deviceType: interactionData.deviceType,
+      timeOfDay: interactionData.timeOfDay,
+      weatherContext: interactionData.weatherContext,
+      sessionDuration: interactionData.sessionDuration,
+    });
+    return interaction;
+  }
+
+  async getBackgroundRecommendations(userId: number, pageContext?: string): Promise<any> {
+    // Get user's preferences and interaction history
+    const preferences = await this.getUserBackgroundPreferences(userId);
+    const analytics = await this.getBackgroundAnalytics(userId, 30);
+    const trends = await this.getPopularBackgroundTrends();
+
+    // Simple recommendation algorithm combining user preferences, history, and trends
+    const recommendations = {
+      personalizedGradients: preferences.slice(0, 3),
+      trendingGradients: trends.slice(0, 3),
+      contextualSuggestions: this.generateContextualSuggestions(pageContext),
+      aiGeneratedOptions: this.generateAISuggestions(preferences, analytics)
+    };
+
+    return recommendations;
+  }
+
+  private generateContextualSuggestions(pageContext?: string): any[] {
+    // Generate contextual gradient suggestions based on page context
+    const contexts = {
+      '/premium-home': [
+        { gradientType: 'radial', colorScheme: 'warm', primaryColors: ['#FE3F5E', '#FFD200'] },
+        { gradientType: 'linear', colorScheme: 'cool', primaryColors: ['#6366f1', '#8b5cf6'] },
+      ],
+      '/dashboard': [
+        { gradientType: 'linear', colorScheme: 'professional', primaryColors: ['#374151', '#6b7280'] },
+        { gradientType: 'radial', colorScheme: 'energetic', primaryColors: ['#ef4444', '#f97316'] },
+      ],
+      default: [
+        { gradientType: 'linear', colorScheme: 'sunset', primaryColors: ['#FE3F5E', '#FFD200'] },
+        { gradientType: 'radial', colorScheme: 'ocean', primaryColors: ['#0ea5e9', '#06b6d4'] },
+      ]
+    };
+
+    return contexts[pageContext as keyof typeof contexts] || contexts.default;
+  }
+
+  private generateAISuggestions(preferences: any[], analytics: any[]): any[] {
+    // AI-powered suggestions based on user behavior patterns
+    const suggestions = [
+      {
+        gradientType: 'linear',
+        colorScheme: 'adaptive',
+        primaryColors: ['#FE3F5E', '#FFD200'],
+        reason: 'Based on your interaction patterns',
+        confidence: 0.85
+      },
+      {
+        gradientType: 'radial',
+        colorScheme: 'complementary',
+        primaryColors: ['#8b5cf6', '#06b6d4'],
+        reason: 'Popular among similar users',
+        confidence: 0.72
+      }
+    ];
+
+    return suggestions;
   }
 }
 

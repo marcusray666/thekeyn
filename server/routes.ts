@@ -4937,6 +4937,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Background API Routes
+  app.get("/api/background/preferences/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      if (req.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const preferences = await storage.getUserBackgroundPreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching background preferences:", error);
+      res.status(500).json({ error: "Failed to fetch background preferences" });
+    }
+  });
+
+  app.post("/api/background/preferences", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const preferenceData = req.body;
+      
+      const preference = await storage.saveBackgroundPreference(userId, preferenceData);
+      res.json(preference);
+    } catch (error) {
+      console.error("Error saving background preference:", error);
+      res.status(500).json({ error: "Failed to save background preference" });
+    }
+  });
+
+  app.post("/api/background/interactions", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const interactionData = req.body;
+      
+      const interaction = await storage.trackBackgroundInteraction(userId, interactionData);
+      res.json(interaction);
+    } catch (error) {
+      console.error("Error tracking background interaction:", error);
+      res.status(500).json({ error: "Failed to track background interaction" });
+    }
+  });
+
+  app.get("/api/background/recommendations/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const pageContext = req.query.page as string;
+      
+      if (req.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const recommendations = await storage.getBackgroundRecommendations(userId, pageContext);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching background recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch background recommendations" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
