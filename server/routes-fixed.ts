@@ -267,6 +267,10 @@ export async function registerRoutes(app: Express) {
     });
   });
 
+  app.get('/api/auth/user', requireAuth, (req: AuthenticatedRequest, res) => {
+    res.json(req.user);
+  });
+
   // Profile endpoints
   app.get('/api/profile', requireAuth, (req: AuthenticatedRequest, res) => {
     res.json(req.user);
