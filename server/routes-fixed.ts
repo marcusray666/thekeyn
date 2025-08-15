@@ -393,6 +393,164 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  // Posts endpoints for community feed
+  app.get('/api/posts', async (req, res) => {
+    try {
+      const { limit = 20, offset = 0 } = req.query;
+      
+      const result = await pool.query(`
+        SELECT p.*, u.username, u.display_name, u.profile_image_url
+        FROM community_posts p
+        JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT $1 OFFSET $2
+      `, [limit, offset]);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Get posts error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get('/api/posts/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const result = await pool.query(`
+        SELECT p.*, u.username, u.display_name, u.profile_image_url
+        FROM community_posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = $1
+      `, [id]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error('Get post error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Profile/user works endpoint
+  app.get('/api/users/:userId/works', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const currentUserId = (req.session as any)?.userId;
+      
+      // Check if requesting own works or public works
+      let query = `
+        SELECT w.*, c.pdf_path, c.qr_code, c.shareable_link
+        FROM works w
+        LEFT JOIN certificates c ON w.id = c.work_id
+        WHERE w.user_id = $1
+      `;
+      
+      // If not the owner, only show public works
+      if (parseInt(userId) !== currentUserId) {
+        query += ` AND w.is_public = true AND w.moderation_status = 'approved'`;
+      }
+      
+      query += ` ORDER BY w.created_at DESC`;
+      
+      const result = await pool.query(query, [userId]);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Get user works error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get current user's works (for profile page)
+  app.get('/api/my-works', requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT w.*, c.pdf_path, c.qr_code, c.shareable_link
+        FROM works w
+        LEFT JOIN certificates c ON w.id = c.work_id
+        WHERE w.user_id = $1
+        ORDER BY w.created_at DESC
+      `, [req.user!.id]);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Get my works error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Community/feed endpoint
+  app.get('/api/feed', async (req, res) => {
+    try {
+      const { limit = 20, offset = 0 } = req.query;
+      
+      // Get both posts and public works for the feed
+      const postsResult = await pool.query(`
+        SELECT 
+          'post' as type,
+          p.id,
+          p.title,
+          p.description,
+          p.content,
+          p.image_url as imageUrl,
+          p.video_url as videoUrl,
+          p.audio_url as audioUrl,
+          p.hashtags,
+          p.location,
+          p.like_count as likes,
+          p.comment_count as comments,
+          p.share_count as shares,
+          p.view_count as views,
+          p.created_at,
+          u.username,
+          u.display_name,
+          u.profile_image_url
+        FROM community_posts p
+        JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT $1 OFFSET $2
+      `, [limit, offset]);
+
+      const worksResult = await pool.query(`
+        SELECT 
+          'work' as type,
+          w.id,
+          w.title,
+          w.description,
+          w.filename,
+          w.mime_type,
+          w.like_count as likes,
+          w.comment_count as comments,
+          w.share_count as shares,
+          w.view_count as views,
+          w.created_at,
+          u.username,
+          u.display_name,
+          u.profile_image_url,
+          c.shareable_link
+        FROM works w
+        JOIN users u ON w.user_id = u.id
+        LEFT JOIN certificates c ON w.id = c.work_id
+        WHERE w.is_public = true AND w.moderation_status = 'approved'
+        ORDER BY w.created_at DESC
+        LIMIT $1 OFFSET $2
+      `, [limit, offset]);
+
+      // Combine and sort by created_at
+      const combined = [...postsResult.rows, ...worksResult.rows]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, parseInt(limit as string));
+
+      res.json(combined);
+    } catch (error) {
+      console.error('Get feed error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Catch-all for undefined API routes
   app.use('/api/*', (req, res) => {
     res.status(404).json({ error: `API endpoint not found: ${req.path}` });
