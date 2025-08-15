@@ -127,7 +127,9 @@ export interface IStorage {
   
   // Background preferences and interactions
   getUserBackgroundPreferences(userId: number): Promise<any[]>;
+  getBackgroundPreference(preferenceId: number): Promise<any>;
   saveBackgroundPreference(userId: number, preferenceData: any): Promise<any>;
+  deleteBackgroundPreference(preferenceId: number): Promise<void>;
   trackBackgroundInteraction(userId: number, interactionData: any): Promise<any>;
   getBackgroundRecommendations(userId: number, pageContext?: string): Promise<any>;
 
@@ -2519,6 +2521,21 @@ export class DatabaseStorage implements IStorage {
         lastUsed: new Date(),
         updatedAt: new Date(),
       })
+      .where(eq(userBackgroundPreferences.id, preferenceId));
+  }
+
+  async getBackgroundPreference(preferenceId: number): Promise<UserBackgroundPreference | undefined> {
+    const [preference] = await db
+      .select()
+      .from(userBackgroundPreferences)
+      .where(eq(userBackgroundPreferences.id, preferenceId));
+    
+    return preference;
+  }
+
+  async deleteBackgroundPreference(preferenceId: number): Promise<void> {
+    await db
+      .delete(userBackgroundPreferences)
       .where(eq(userBackgroundPreferences.id, preferenceId));
   }
 

@@ -4967,6 +4967,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/background/preferences/:preferenceId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const preferenceId = parseInt(req.params.preferenceId);
+      const userId = req.userId!;
+      
+      console.log(`DELETE /api/background/preferences/${preferenceId} - User: ${userId}`);
+      
+      // First check if the preference exists and belongs to the user
+      const preference = await storage.getBackgroundPreference(preferenceId);
+      if (!preference) {
+        console.log(`Preference ${preferenceId} not found`);
+        return res.status(404).json({ error: "Preference not found" });
+      }
+      
+      if (preference.userId !== userId) {
+        console.log(`Access denied: preference ${preferenceId} belongs to user ${preference.userId}, not ${userId}`);
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Delete the preference
+      await storage.deleteBackgroundPreference(preferenceId);
+      console.log(`Successfully deleted preference ${preferenceId}`);
+      
+      res.json({ success: true, message: "Preference deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting background preference:", error);
+      res.status(500).json({ error: "Failed to delete background preference" });
+    }
+  });
+
   app.post("/api/background/interactions", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.userId!;

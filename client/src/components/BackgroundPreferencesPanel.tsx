@@ -94,15 +94,34 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Delete preference mutation
   const deletePreferenceMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/background/preferences/${id}`, {
+      console.log('Deleting preference with ID:', id);
+      const response = await apiRequest(`/api/background/preferences/${id}`, {
         method: 'DELETE',
       });
+      console.log('Delete response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data, id) => {
+      console.log('Delete successful, invalidating queries for user:', user?.id);
+      // Invalidate multiple possible query keys to ensure update
       queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/background/preferences'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/background/recommendations/${user?.id}`] });
+      
+      // Force refetch
+      queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
+      
       toast({
         title: 'Preference deleted',
         description: 'Background preference has been removed',
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting preference:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete background preference',
+        variant: 'destructive',
       });
     },
   });
