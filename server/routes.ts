@@ -1118,6 +1118,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storageUsed: (currentUsage?.storageUsed || 0) + req.file.size
       });
 
+      // Track analytics for work creation
+      await storage.recordUserActivity(userId, {
+        workViews: 1,
+        totalEngagement: 1
+      });
+
       // Return appropriate response based on moderation status
       const response = {
         workId: work.id,
@@ -4764,6 +4770,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tags: hashtags, // Also store as tags for compatibility
       });
 
+      // Track analytics for post creation
+      await storage.recordUserActivity(userId, {
+        postViews: 1,
+        totalEngagement: 1
+      });
+
       console.log("✅ Post created successfully:", post.id);
       res.json(post);
     } catch (error) {
@@ -4857,6 +4869,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const postId = req.params.id;
       
       await storage.likePost(userId, postId);
+      
+      // Track analytics for engagement
+      await storage.recordUserActivity(userId, {
+        totalEngagement: 1
+      });
+      
       res.json({ success: true });
     } catch (error) {
       console.error("Error liking post:", error);
@@ -4933,6 +4951,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: content.trim(),
         parentId: parentId || null,
         mentionedUsers: mentionedUsers || [],
+      });
+      
+      // Track analytics for engagement
+      await storage.recordUserActivity(userId, {
+        totalEngagement: 1
       });
       
       res.json(comment);

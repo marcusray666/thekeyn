@@ -1216,20 +1216,47 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    await db
-      .insert(userAnalytics)
-      .values({ userId, date: today, ...activity })
-      .onConflictDoUpdate({
-        target: [userAnalytics.userId, userAnalytics.date],
-        set: {
+    // First check if record exists for today
+    const existing = await db
+      .select()
+      .from(userAnalytics)
+      .where(and(
+        eq(userAnalytics.userId, userId),
+        eq(userAnalytics.date, today)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing record
+      await db
+        .update(userAnalytics)
+        .set({
           profileViews: sql`${userAnalytics.profileViews} + ${activity.profileViews || 0}`,
           postViews: sql`${userAnalytics.postViews} + ${activity.postViews || 0}`,
           workViews: sql`${userAnalytics.workViews} + ${activity.workViews || 0}`,
           newFollowers: sql`${userAnalytics.newFollowers} + ${activity.newFollowers || 0}`,
           totalEngagement: sql`${userAnalytics.totalEngagement} + ${activity.totalEngagement || 0}`,
           revenue: sql`${userAnalytics.revenue} + ${activity.revenue || 0}`,
-        }
-      });
+        })
+        .where(and(
+          eq(userAnalytics.userId, userId),
+          eq(userAnalytics.date, today)
+        ));
+    } else {
+      // Create new record
+      await db
+        .insert(userAnalytics)
+        .values({
+          userId,
+          date: today,
+          profileViews: activity.profileViews || 0,
+          postViews: activity.postViews || 0,
+          workViews: activity.workViews || 0,
+          newFollowers: activity.newFollowers || 0,
+          totalEngagement: activity.totalEngagement || 0,
+          revenue: activity.revenue || 0,
+        });
+    }
   }
 
   // Marketplace
