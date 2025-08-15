@@ -1977,10 +1977,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // This was returning empty array and requiring authentication
 
   // Share protected work to community
-  app.post("/api/community/share", requireAuth, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/community/share-work", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user!.id;
-      const { workId, description } = req.body;
+      const { workId, description, hashtags = [] } = req.body;
       
       if (!workId) {
         return res.status(400).json({ error: "Work ID is required" });
@@ -1992,27 +1992,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Work not found or access denied" });
       }
 
-      // Create community post entry (simplified for now)
-      const communityPost = {
-        id: Date.now(),
-        workId: work.id,
-        userId,
-        username: req.user!.username,
-        title: work.originalName,
-        description: description || work.description || "Shared from protected works",
-        isProtected: true, // Mark as protected work
-        createdAt: new Date().toISOString(),
-        likesCount: 0,
-        commentsCount: 0
+      // Get the certificate for this work
+      const certificate = await storage.getCertificateByWorkId(work.id);
+      
+      // Create community post for the protected work
+      const postData = {
+        title: `🔒 ${work.title || work.originalName}`,
+        description: description || `Protected work shared from my certificates. Original creation: ${new Date(work.createdAt).toLocaleDateString()}`,
+        content: `This is a protected work verified on the blockchain. Certificate ID: ${work.certificateId}`,
+        isProtected: true,
+        protectedWorkId: work.id,
+        hashtags: [...hashtags, 'protected', 'verified', 'blockchain'],
+        tags: ['protected-work', 'certificate'],
+        // Use work's file info for display
+        imageUrl: work.mimeType?.startsWith('image/') ? `/api/files/${work.filename}` : null,
+        videoUrl: work.mimeType?.startsWith('video/') ? `/api/files/${work.filename}` : null,
+        audioUrl: work.mimeType?.startsWith('audio/') ? `/api/files/${work.filename}` : null,
+        fileUrl: `/api/files/${work.filename}`,
+        filename: work.filename,
+        fileType: work.mimeType?.split('/')[0] || 'file',
+        mimeType: work.mimeType,
+        fileSize: work.fileSize,
+        moderationStatus: 'approved' // Protected works are pre-approved
+      };
+
+      const communityPost = await storage.createPost({
+        ...postData,
+        userId
+      });
+      
+      // Add certificate link and verification info
+      const postWithCertificate = {
+        ...communityPost,
+        certificate: certificate ? {
+          id: certificate.certificateId,
+          shareableLink: certificate.shareableLink,
+          qrCode: certificate.qrCode,
+          verificationLevel: certificate.verificationLevel
+        } : null,
+        work: {
+          id: work.id,
+          originalName: work.originalName,
+          createdAt: work.createdAt,
+          blockchainHash: work.blockchainHash,
+          fileHash: work.fileHash
+        }
       };
       
-      // In a real implementation, you'd store this in a community_posts table
-      console.log('Community post created:', communityPost);
+      console.log('Protected work shared to community:', {
+        postId: communityPost.id,
+        workId: work.id,
+        certificateId: work.certificateId
+      });
       
-      res.json(communityPost);
+      res.json(postWithCertificate);
     } catch (error) {
-      console.error("Error sharing to community:", error);
-      res.status(500).json({ error: "Failed to share to community" });
+      console.error("Error sharing protected work to community:", error);
+      res.status(500).json({ error: "Failed to share protected work to community" });
+    }
+  });
+
+  // Get user's protected works (for sharing selection)
+  app.get("/api/my-protected-works", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Get all user's works with certificates
+      const userWorks = await storage.getUserWorks(userId);
+      
+      // Get certificates for each work and combine data
+      const protectedWorksWithCertificates = await Promise.all(
+        userWorks.map(async (work) => {
+          const certificate = await storage.getCertificateByWorkId(work.id);
+          return {
+            ...work,
+            certificate: certificate ? {
+              id: certificate.certificateId,
+              shareableLink: certificate.shareableLink,
+              qrCode: certificate.qrCode,
+              verificationLevel: certificate.verificationLevel,
+              createdAt: certificate.createdAt
+            } : null,
+            isShareable: !!certificate && work.isPublic, // Only shareable if has certificate and is public
+            filePreview: work.mimeType?.startsWith('image/') ? `/api/files/${work.filename}` : null
+          };
+        })
+      );
+      
+      res.json(protectedWorksWithCertificates);
+    } catch (error) {
+      console.error("Error fetching protected works:", error);
+      res.status(500).json({ error: "Failed to fetch protected works" });
     }
   });
 
@@ -4682,10 +4752,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentUserId 
       });
       
-      console.log(`Found ${posts.length} posts for community feed`);
-      console.log("Posts:", posts.map(p => ({ id: p.id, title: p.title, username: p.username })));
+      // Enhance posts with certificate info for protected works
+      const enhancedPosts = await Promise.all(
+        posts.map(async (post) => {
+          if (post.isProtected && post.protectedWorkId) {
+            try {
+              // Get the work and certificate info
+              const work = await storage.getWork(post.protectedWorkId);
+              const certificate = work ? await storage.getCertificateByWorkId(work.id) : null;
+              
+              return {
+                ...post,
+                protectedWork: work ? {
+                  id: work.id,
+                  originalName: work.originalName,
+                  createdAt: work.createdAt,
+                  fileHash: work.fileHash,
+                  blockchainHash: work.blockchainHash
+                } : null,
+                certificate: certificate ? {
+                  id: certificate.certificateId,
+                  shareableLink: certificate.shareableLink,
+                  verificationLevel: certificate.verificationLevel
+                } : null
+              };
+            } catch (error) {
+              console.error("Error enhancing protected post:", error);
+              return post;
+            }
+          }
+          return post;
+        })
+      );
       
-      res.json(posts);
+      console.log(`Found ${posts.length} posts for community feed`);
+      console.log("Posts:", posts.map(p => ({ id: p.id, title: p.title, username: p.username, isProtected: p.isProtected })));
+      
+      res.json(enhancedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
       res.status(500).json({ error: "Failed to fetch posts" });
