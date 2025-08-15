@@ -112,10 +112,14 @@ export const subscriptionUsage = pgTable("subscription_usage", {
 
 
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  email: true,
-  passwordHash: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateUserSchema = createInsertSchema(users).partial().omit({
+  id: true,
+  createdAt: true,
 });
 
 export const loginSchema = z.object({
@@ -147,14 +151,9 @@ export const insertWorkSchema = createInsertSchema(works).pick({
   moderationScore: true,
 });
 
-export const insertCertificateSchema = createInsertSchema(certificates).pick({
-  workId: true,
-  certificateId: true,
-  pdfPath: true,
-  qrCode: true,
-  shareableLink: true,
-  verificationProof: true,
-  isDownloadable: true,
+export const insertCertificateSchema = createInsertSchema(certificates).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const nftMints = pgTable("nft_mints", {

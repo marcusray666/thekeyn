@@ -13,7 +13,7 @@ console.log('Available DB variables:', Object.keys(process.env).filter(key =>
 ));
 
 import { pool } from "./db.js";
-import { registerRoutes } from "./routes-minimal.js";
+import { registerRoutes } from "./routes-fixed.js";
 
 const app = express();
 
