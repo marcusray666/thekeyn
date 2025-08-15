@@ -52,7 +52,7 @@ export default function PremiumCertificates() {
   }
 
   return (
-    <div className="min-h-screen pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme">
+    <div className="min-h-screen bg-white/95 pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme">
       {/* Background gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
@@ -79,18 +79,18 @@ export default function PremiumCertificates() {
         </div>
 
         {/* Controls */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6">
+        <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             {/* Search */}
             <div className="flex-1 max-w-md">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   type="text"
                   placeholder="Search certificates..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 bg-white/10 border-white/20 text-white placeholder-white/50 rounded-xl"
+                  className="pl-12 bg-white/70 border-gray-200/50 text-gray-800 placeholder-gray-400 rounded-xl"
                 />
               </div>
             </div>
@@ -100,18 +100,18 @@ export default function PremiumCertificates() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="bg-white/10 border border-white/20 text-white rounded-xl px-4 py-2 focus:outline-none focus:border-[#FE3F5E]"
+                className="bg-white/70 border border-gray-200/50 text-gray-800 rounded-xl px-4 py-2 focus:outline-none focus:border-[#FE3F5E]"
               >
-                <option value="all" className="bg-[#1A1A1A] text-white">All Certificates</option>
-                <option value="verified" className="bg-[#1A1A1A] text-white">Verified</option>
-                <option value="pending" className="bg-[#1A1A1A] text-white">Pending</option>
+                <option value="all" className="bg-white text-gray-800">All Certificates</option>
+                <option value="verified" className="bg-white text-gray-800">Verified</option>
+                <option value="pending" className="bg-white text-gray-800">Pending</option>
               </select>
 
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'
+                    viewMode === 'grid' ? 'bg-gray-200/70 text-gray-800' : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4" />
@@ -119,7 +119,7 @@ export default function PremiumCertificates() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'
+                    viewMode === 'list' ? 'bg-gray-200/70 text-gray-800' : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   <List className="h-4 w-4" />
@@ -134,13 +134,13 @@ export default function PremiumCertificates() {
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/8 transition-all duration-300">
+                <div key={cert.id} className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/90 transition-all duration-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white truncate">
+                      <h3 className="text-lg font-semibold text-gray-800 truncate">
                         {cert.title || cert.filename}
                       </h3>
-                      <p className="text-white/70 text-sm">{cert.creatorName}</p>
+                      <p className="text-gray-600 text-sm">{cert.creatorName}</p>
                     </div>
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       cert.isVerified 
@@ -153,22 +153,22 @@ export default function PremiumCertificates() {
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">Created:</span>
-                      <span className="text-white">
+                      <span className="text-gray-500">Created:</span>
+                      <span className="text-gray-700">
                         {new Date(cert.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">Type:</span>
-                      <span className="text-white">
+                      <span className="text-gray-500">Type:</span>
+                      <span className="text-gray-700">
                         {cert.mimeType?.startsWith('image/') ? 'Image' :
                          cert.mimeType?.startsWith('audio/') ? 'Audio' :
                          cert.mimeType?.startsWith('video/') ? 'Video' : 'Document'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">Hash:</span>
-                      <span className="text-white font-mono text-xs">
+                      <span className="text-gray-500">Hash:</span>
+                      <span className="text-gray-700 font-mono text-xs">
                         {cert.sha256Hash?.substring(0, 12)}...
                       </span>
                     </div>
@@ -192,10 +192,10 @@ export default function PremiumCertificates() {
               ))}
             </div>
           ) : (
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
-              <div className="divide-y divide-white/10">
+            <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden">
+              <div className="divide-y divide-gray-200/30">
                 {filteredCertificates.map((cert) => (
-                  <div key={cert.id} className="p-6 hover:bg-white/5 transition-colors">
+                  <div key={cert.id} className="p-6 hover:bg-white/90 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-4">
@@ -207,10 +207,10 @@ export default function PremiumCertificates() {
                             </span>
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-white">
+                            <h3 className="text-lg font-semibold text-gray-800">
                               {cert.title || cert.filename}
                             </h3>
-                            <p className="text-white/70">{cert.creatorName}</p>
+                            <p className="text-gray-600">{cert.creatorName}</p>
                           </div>
                         </div>
                       </div>
@@ -224,7 +224,7 @@ export default function PremiumCertificates() {
                           {cert.isVerified ? 'Verified' : 'Pending'}
                         </div>
                         
-                        <span className="text-white/50 text-sm">
+                        <span className="text-gray-500 text-sm">
                           {new Date(cert.createdAt).toLocaleDateString()}
                         </span>
                         
@@ -251,11 +251,11 @@ export default function PremiumCertificates() {
           )
         ) : (
           <div className="text-center py-12 md:py-16 px-4">
-            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gray-100/80 rounded-full flex items-center justify-center mb-6">
               <span className="text-3xl md:text-4xl">🛡️</span>
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">No Certificates Found</h3>
-            <p className="text-white/50 mb-6 max-w-sm mx-auto text-sm md:text-base">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">No Certificates Found</h3>
+            <p className="text-gray-600 mb-6 max-w-sm mx-auto text-sm md:text-base">
               {searchQuery ? 'No certificates match your search criteria.' : 'Start protecting your digital works to see certificates here.'}
             </p>
             <Link href="/upload">

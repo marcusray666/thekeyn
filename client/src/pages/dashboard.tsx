@@ -68,22 +68,26 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden light-theme">
+    <div className="min-h-screen bg-white/95 relative overflow-hidden light-theme">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
       
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10 pt-24">
-        <GlassCard className="p-8 md:p-12">
-          <h2 className="text-3xl font-bold mb-8 gradient-text text-center">
+        <GlassCard className="p-8 md:p-12 bg-white/80 backdrop-blur-xl border-gray-200/50">
+          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
             Your Creative Dashboard
           </h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Recent Works */}
             <div className="lg:col-span-2">
-              <GlassCard>
+              <GlassCard className="bg-white/60 backdrop-blur-xl border-gray-200/30">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-white">Recent Works</h3>
+                  <h3 className="text-xl font-semibold text-gray-800">Recent Works</h3>
                   <Link href="/">
-                    <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10">
+                    <Button variant="ghost" size="sm" className="bg-gray-100/70 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-800 hover:bg-gray-200/70">
                       <Plus className="h-5 w-5" />
                     </Button>
                   </Link>
@@ -101,15 +105,15 @@ export default function Dashboard() {
                           {getFileTypeIcon(work.mimeType)}
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-white">{work.title}</h4>
-                          <p className="text-sm text-gray-400">{formatDate(work.createdAt)}</p>
-                          <p className="text-xs text-purple-400">ID: #{work.certificateId}</p>
+                          <h4 className="font-semibold text-gray-800">{work.title}</h4>
+                          <p className="text-sm text-gray-600">{formatDate(work.createdAt)}</p>
+                          <p className="text-xs text-purple-600">ID: #{work.certificateId}</p>
                         </div>
                         <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-cyan-400 hover:text-white hover:bg-white/10">
+                          <Button variant="ghost" size="sm" className="bg-gray-100/70 backdrop-blur-sm border border-gray-200/50 text-cyan-600 hover:text-gray-800 hover:bg-gray-200/70">
                             <Share2 className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="bg-black/20 backdrop-blur-sm border border-white/10 text-emerald-400 hover:text-white hover:bg-white/10">
+                          <Button variant="ghost" size="sm" className="bg-gray-100/70 backdrop-blur-sm border border-gray-200/50 text-emerald-600 hover:text-gray-800 hover:bg-gray-200/70">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -117,11 +121,11 @@ export default function Dashboard() {
                     ))
                   ) : (
                     <div className="text-center py-12">
-                      <Upload className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-white/70 mb-2">No works yet</h4>
-                      <p className="text-white/60 mb-4">Upload your first creative work to get started</p>
+                      <Upload className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h4 className="text-lg font-medium text-gray-700 mb-2">No works yet</h4>
+                      <p className="text-gray-600 mb-4">Upload your first creative work to get started</p>
                       <Link href="/">
-                        <Button className="btn-glass">
+                        <Button className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500">
                           <Plus className="mr-2 h-4 w-4" />
                           Add Your First Work
                         </Button>
@@ -135,24 +139,24 @@ export default function Dashboard() {
             {/* Stats & Actions */}
             <div className="space-y-6">
               {/* Stats */}
-              <GlassCard>
-                <h3 className="text-lg font-semibold text-white mb-4">Your Stats</h3>
+              <GlassCard className="bg-white/60 backdrop-blur-xl border-gray-200/30">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Stats</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Works Protected</span>
-                    <span className="text-2xl font-bold gradient-text">
+                    <span className="text-gray-600">Works Protected</span>
+                    <span className="text-2xl font-bold text-gray-800">
                       {stats?.protected || 0}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Certificates Generated</span>
-                    <span className="text-2xl font-bold text-blue-400">
+                    <span className="text-gray-600">Certificates Generated</span>
+                    <span className="text-2xl font-bold text-blue-600">
                       {stats?.certificates || 0}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Reports Sent</span>
-                    <span className="text-2xl font-bold text-emerald-400">
+                    <span className="text-gray-600">Reports Sent</span>
+                    <span className="text-2xl font-bold text-emerald-600">
                       {stats?.reports || 0}
                     </span>
                   </div>
@@ -160,22 +164,22 @@ export default function Dashboard() {
               </GlassCard>
               
               {/* Quick Actions */}
-              <GlassCard>
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+              <GlassCard className="bg-white/60 backdrop-blur-xl border-gray-200/30">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
                   <Link href="/upload-work">
-                    <Button className="w-full glass-purple rounded-xl py-3 px-4 text-white font-medium hover:bg-opacity-80 transition-all">
+                    <Button className="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 rounded-xl py-3 px-4 font-medium transition-all">
                       <Plus className="mr-2 h-4 w-4" />
                       Add New Work
                     </Button>
                   </Link>
                   <Link href="/certificates">
-                    <Button className="w-full glass-blue rounded-xl py-3 px-4 text-white font-medium hover:bg-opacity-80 transition-all">
+                    <Button className="w-full bg-white/70 border border-gray-200/50 text-gray-700 hover:bg-gray-50 rounded-xl py-3 px-4 font-medium transition-all">
                       <Tag className="mr-2 h-4 w-4" />
                       View Certificates
                     </Button>
                   </Link>
-                  <Button className="w-full glass-cyan rounded-xl py-3 px-4 text-white font-medium hover:bg-opacity-80 transition-all">
+                  <Button className="w-full bg-white/70 border border-gray-200/50 text-gray-700 hover:bg-gray-50 rounded-xl py-3 px-4 font-medium transition-all">
                     <Flag className="mr-2 h-4 w-4" />
                     File Report
                   </Button>
@@ -183,15 +187,15 @@ export default function Dashboard() {
               </GlassCard>
               
               {/* Blockchain Status */}
-              <GlassCard variant="emerald">
+              <GlassCard className="bg-emerald-50/80 backdrop-blur-xl border-emerald-200/50">
                 <div className="flex items-center space-x-3 mb-3">
-                  <div className="status-indicator"></div>
-                  <h3 className="text-lg font-semibold text-white">Blockchain Status</h3>
+                  <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <h3 className="text-lg font-semibold text-gray-800">Blockchain Status</h3>
                 </div>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-gray-700">
                   All works are securely anchored to the blockchain
                 </p>
-                <p className="text-xs text-gray-400 mt-2">Last sync: 2 minutes ago</p>
+                <p className="text-xs text-gray-600 mt-2">Last sync: 2 minutes ago</p>
               </GlassCard>
             </div>
           </div>
