@@ -49,268 +49,270 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Colors
-  const primaryColor = '#6366f1'; // Indigo
-  const darkGray = '#374151';
-  const lightGray = '#9ca3af';
+  // Colors matching website theme - Pink: #FE3F5E, Yellow: #FFD200
   
-  // Header Background
-  pdf.setFillColor(99, 102, 241); // Indigo
-  pdf.rect(0, 0, pageWidth, 40, 'F');
+  // Gradient Header Background
+  pdf.setFillColor(254, 63, 94); // Primary pink
+  pdf.rect(0, 0, pageWidth, 50, 'F');
+  
+  // Add a subtle secondary stripe
+  pdf.setFillColor(255, 210, 0); // Yellow
+  pdf.rect(0, 45, pageWidth, 5, 'F');
   
   // Header Text
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(24);
+  pdf.setFontSize(28);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('CERTIFICATE OF AUTHENTICITY', pageWidth / 2, 20, { align: 'center' });
-  
-  pdf.setFontSize(12);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('Blockchain-Verified Digital Asset Protection', pageWidth / 2, 30, { align: 'center' });
-  
-  // Reset text color
-  pdf.setTextColor(55, 65, 81); // Dark gray
-  
-  // Certificate ID Section
-  pdf.setFontSize(16);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('Certificate ID:', 20, 60);
+  pdf.text('LOGGIN\' CERTIFICATE', pageWidth / 2, 22, { align: 'center' });
   
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'normal');
-  pdf.setTextColor(99, 102, 241); // Indigo
-  pdf.text(data.certificateId, 20, 70);
+  pdf.text('Digital Asset Protection & Blockchain Verification', pageWidth / 2, 35, { align: 'center' });
   
-  // Work Information Section
-  pdf.setTextColor(55, 65, 81);
-  pdf.setFontSize(16);
+  // Reset text color to match website theme
+  pdf.setTextColor(31, 41, 55); // Dark gray from website
+  
+  // Certificate ID Section with better spacing
+  let currentY = 70;
+  pdf.setFontSize(18);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Work Information', 20, 90);
+  pdf.text('Certificate ID', pageWidth / 2, currentY, { align: 'center' });
   
-  // Draw line under heading
-  pdf.setDrawColor(156, 163, 175);
-  pdf.line(20, 95, pageWidth - 20, 95);
+  // Certificate ID in box with pink accent
+  currentY += 15;
+  pdf.setFillColor(254, 63, 94, 0.1); // Light pink background
+  pdf.setDrawColor(254, 63, 94); // Pink border
+  pdf.rect(20, currentY - 5, pageWidth - 40, 12, 'FD');
   
-  const leftColumn = 20;
-  const rightColumn = 110;
-  let yPos = 110;
-  
-  // Work details
-  pdf.setFontSize(12);
+  pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Title:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(data.title, leftColumn + 25, yPos);
+  pdf.setTextColor(254, 63, 94); // Pink text
+  pdf.text(data.certificateId, pageWidth / 2, currentY + 4, { align: 'center' });
   
-  yPos += 10;
+  // Work Information Section with improved layout
+  currentY += 30;
+  pdf.setTextColor(31, 41, 55);
+  pdf.setFontSize(18);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Creator:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(data.creatorName, leftColumn + 25, yPos);
+  pdf.text('Protected Work Details', pageWidth / 2, currentY, { align: 'center' });
   
-  yPos += 10;
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('File Name:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(data.originalName, leftColumn + 25, yPos);
+  // Draw elegant line under heading
+  currentY += 5;
+  pdf.setDrawColor(254, 63, 94);
+  pdf.setLineWidth(0.5);
+  pdf.line(pageWidth / 2 - 40, currentY, pageWidth / 2 + 40, currentY);
   
-  yPos += 10;
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('File Type:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(data.mimeType, leftColumn + 25, yPos);
+  // Work details in organized card-like format
+  currentY += 15;
   
-  yPos += 10;
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('File Size:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(formatFileSize(data.fileSize), leftColumn + 25, yPos);
+  // Create info boxes for better organization
+  const createInfoBox = (label: string, value: string, y: number) => {
+    pdf.setFillColor(248, 250, 252); // Light gray background
+    pdf.setDrawColor(229, 231, 235); // Gray border
+    pdf.rect(30, y - 3, pageWidth - 60, 10, 'FD');
+    
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(107, 114, 128); // Gray label
+    pdf.text(label, 35, y + 2);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(31, 41, 55); // Dark text
+    pdf.text(value, 35, y + 6);
+    
+    return y + 15;
+  };
   
-  yPos += 10;
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('Created:', leftColumn, yPos);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(formatDate(data.createdAt), leftColumn + 25, yPos);
+  currentY = createInfoBox('Title', data.title, currentY);
+  currentY = createInfoBox('Creator', data.creatorName, currentY);
+  currentY = createInfoBox('File Name', data.originalName, currentY);
+  currentY = createInfoBox('File Type', data.mimeType, currentY);
+  currentY = createInfoBox('File Size', formatFileSize(data.fileSize), currentY);
+  currentY = createInfoBox('Protection Date', formatDate(data.createdAt), currentY);
   
   // Description (if provided)
   if (data.description) {
-    yPos += 20;
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Description:', leftColumn, yPos);
-    yPos += 7;
-    pdf.setFont('helvetica', 'normal');
-    
-    // Split long descriptions
-    const splitDescription = pdf.splitTextToSize(data.description, pageWidth - 40);
-    pdf.text(splitDescription, leftColumn, yPos);
-    yPos += splitDescription.length * 5;
+    currentY += 5;
+    currentY = createInfoBox('Description', data.description, currentY);
   }
   
-  // Dual Blockchain Verification Section
-  yPos += 20;
-  pdf.setFontSize(16);
+  // Blockchain Verification Section
+  currentY += 20;
+  pdf.setFontSize(18);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Dual Blockchain Verification', leftColumn, yPos);
+  pdf.setTextColor(31, 41, 55);
+  pdf.text('Blockchain Verification', pageWidth / 2, currentY, { align: 'center' });
   
-  pdf.setDrawColor(156, 163, 175);
-  pdf.line(20, yPos + 5, pageWidth - 20, yPos + 5);
+  // Draw elegant line under heading
+  currentY += 5;
+  pdf.setDrawColor(254, 63, 94);
+  pdf.setLineWidth(0.5);
+  pdf.line(pageWidth / 2 - 40, currentY, pageWidth / 2 + 40, currentY);
   
-  yPos += 20;
+  // File Hash in prominent box
+  currentY += 15;
+  pdf.setFillColor(248, 250, 252); // Light background
+  pdf.setDrawColor(107, 114, 128); // Gray border
+  pdf.rect(20, currentY - 5, pageWidth - 40, 20, 'FD');
+  
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('File Hash (SHA-256):', leftColumn, yPos);
-  yPos += 7;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text(data.fileHash, leftColumn, yPos);
+  pdf.setTextColor(107, 114, 128);
+  pdf.text('File Hash (SHA-256):', 25, currentY + 2);
   
-  // Bitcoin OpenTimestamps Section
-  yPos += 20;
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(31, 41, 55);
+  const hashLines = pdf.splitTextToSize(data.fileHash, pageWidth - 50);
+  pdf.text(hashLines, 25, currentY + 8);
+  
+  currentY += 25;
+  
+  // Bitcoin Blockchain Section
   if (data.verificationProof?.bitcoin && data.verificationProof.hasBitcoinTimestamp) {
+    // Bitcoin section box
+    pdf.setFillColor(255, 248, 235); // Light orange background
+    pdf.setDrawColor(255, 140, 0); // Orange border
+    pdf.rect(20, currentY - 5, pageWidth - 40, 25, 'FD');
+    
     pdf.setFontSize(14);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(255, 140, 0); // Bitcoin orange
-    pdf.text('⛏ Bitcoin Blockchain (OpenTimestamps)', leftColumn, yPos);
-    
-    yPos += 10;
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(55, 65, 81);
+    pdf.text('₿ Bitcoin Blockchain (OpenTimestamps)', 25, currentY + 2);
     
     const btcStatus = data.verificationProof.bitcoin.verificationStatus === 'pending' ? 'Pending (1-6 hours)' : 'Confirmed';
-    pdf.text(`Status: ${btcStatus}`, leftColumn, yPos);
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(120, 53, 15); // Dark orange
+    pdf.text(`Status: ${btcStatus}`, 25, currentY + 8);
     
     if (data.verificationProof.bitcoin.blockHeight) {
-      yPos += 6;
-      pdf.text(`Block Height: ${data.verificationProof.bitcoin.blockHeight}`, leftColumn, yPos);
+      pdf.text(`Block Height: ${data.verificationProof.bitcoin.blockHeight}`, 25, currentY + 12);
     }
     
     if (data.verificationProof.bitcoin.otsFilename) {
-      yPos += 6;
-      pdf.text(`OTS File: ${data.verificationProof.bitcoin.otsFilename}`, leftColumn, yPos);
+      pdf.text(`OTS File: ${data.verificationProof.bitcoin.otsFilename}`, 25, currentY + 16);
     }
     
-    yPos += 6;
-    pdf.setTextColor(255, 140, 0);
-    pdf.text('Verify: https://opentimestamps.org', leftColumn, yPos);
-  } else {
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(156, 163, 175);
-    pdf.text('Bitcoin timestamp: Not available', leftColumn, yPos);
+    pdf.text('Verify: https://opentimestamps.org', 25, currentY + 20);
+    currentY += 30;
   }
   
   // Ethereum Blockchain Section
-  yPos += 20;
   if (data.verificationProof?.ethereum && data.verificationProof.ethereum.success) {
+    // Ethereum section box
+    pdf.setFillColor(236, 240, 255); // Light blue background
+    pdf.setDrawColor(99, 102, 241); // Blue border
+    pdf.rect(20, currentY - 5, pageWidth - 40, 25, 'FD');
+    
     pdf.setFontSize(14);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(99, 102, 241); // Ethereum blue
-    pdf.text('⟠ Ethereum Blockchain', leftColumn, yPos);
+    pdf.text('⟠ Ethereum Blockchain', 25, currentY + 2);
     
-    yPos += 10;
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(55, 65, 81);
     
     if (data.verificationProof.ethereum.transactionHash) {
-      pdf.text('Type: Transaction Anchor', leftColumn, yPos);
-      yPos += 6;
-      pdf.text(`Tx Hash: ${data.verificationProof.ethereum.transactionHash.substring(0, 20)}...`, leftColumn, yPos);
+      pdf.text('Type: Transaction Anchor', 25, currentY + 8);
+      pdf.text(`Tx Hash: ${data.verificationProof.ethereum.transactionHash.substring(0, 20)}...`, 25, currentY + 12);
     } else {
-      pdf.text('Type: Block Reference Anchor', leftColumn, yPos);
+      pdf.text('Type: Block Reference Anchor', 25, currentY + 8);
     }
     
     if (data.verificationProof.ethereum.blockNumber) {
-      yPos += 6;
-      pdf.text(`Block: ${data.verificationProof.ethereum.blockNumber}`, leftColumn, yPos);
+      pdf.text(`Block: ${data.verificationProof.ethereum.blockNumber}`, 25, currentY + 16);
     }
     
-    yPos += 6;
-    pdf.text('Status: Confirmed', leftColumn, yPos);
-    
-    yPos += 6;
-    pdf.setTextColor(99, 102, 241);
-    if (data.verificationProof.ethereum.verificationUrl) {
-      const shortUrl = data.verificationProof.ethereum.verificationUrl.replace('https://', '');
-      pdf.text(`Verify: ${shortUrl}`, leftColumn, yPos);
-    } else {
-      pdf.text('Verify: etherscan.io', leftColumn, yPos);
-    }
-  } else {
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(156, 163, 175);
-    pdf.text('Ethereum anchor: Not available', leftColumn, yPos);
+    pdf.text('Status: Confirmed', 25, currentY + 20);
+    currentY += 30;
   }
   
   // Verification Summary
-  yPos += 20;
+  currentY += 15;
+  pdf.setFillColor(240, 253, 244); // Light green background
+  pdf.setDrawColor(34, 197, 94); // Green border
+  pdf.rect(20, currentY - 5, pageWidth - 40, 15, 'FD');
+  
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.setTextColor(55, 65, 81);
   
   if (data.verificationProof?.isRealBlockchain) {
     if (data.verificationProof.dualAnchorComplete) {
-      pdf.setTextColor(0, 128, 0); // Green
-      pdf.text('✓ DUAL BLOCKCHAIN VERIFICATION COMPLETE', leftColumn, yPos);
+      pdf.setTextColor(22, 163, 74); // Green
+      pdf.text('✓ DUAL BLOCKCHAIN VERIFICATION COMPLETE', 25, currentY + 4);
     } else if (data.verificationProof.hasImmediateVerification) {
-      pdf.setTextColor(0, 128, 0); // Green  
-      pdf.text('✓ ETHEREUM VERIFIED - Bitcoin pending', leftColumn, yPos);
+      pdf.setTextColor(22, 163, 74); // Green  
+      pdf.text('✓ ETHEREUM VERIFIED - Bitcoin pending', 25, currentY + 4);
     } else {
-      pdf.setTextColor(255, 140, 0); // Orange
-      pdf.text('⏳ Blockchain verification in progress', leftColumn, yPos);
+      pdf.setTextColor(217, 119, 6); // Orange
+      pdf.text('⏳ Blockchain verification in progress', 25, currentY + 4);
     }
   } else {
-    pdf.setTextColor(156, 163, 175); // Gray
-    pdf.text('⚠ Limited blockchain verification', leftColumn, yPos);
+    pdf.setTextColor(107, 114, 128); // Gray
+    pdf.text('⚠ Limited blockchain verification', 25, currentY + 4);
   }
   
-  // QR Code Section
+  currentY += 20;
+  
+  // QR Code Section positioned properly
   try {
     const qrCodeDataUrl = await QRCode.toDataURL(data.shareableLink, {
       width: 200,
       margin: 2,
       color: {
-        dark: '#000000',
+        dark: '#FE3F5E', // Pink QR code to match theme
         light: '#FFFFFF'
       }
     });
     
-    // Position QR code on the right side
-    const qrSize = 40;
-    const qrX = pageWidth - qrSize - 20;
-    const qrY = 110;
+    // Position QR code on the right side with current Y position
+    const qrSize = 35;
+    const qrX = pageWidth - qrSize - 25;
     
-    pdf.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+    pdf.addImage(qrCodeDataUrl, 'PNG', qrX, currentY, qrSize, qrSize);
     
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('Scan to verify online', qrX + qrSize/2, qrY + qrSize + 8, { align: 'center' });
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(31, 41, 55);
+    pdf.text('Scan to verify online', qrX + qrSize/2, currentY + qrSize + 8, { align: 'center' });
+    
+    currentY += qrSize + 15;
   } catch (error) {
     console.error('Failed to generate QR code:', error);
+    currentY += 20;
   }
   
-  // Footer
-  const footerY = pageHeight - 30;
-  pdf.setDrawColor(156, 163, 175);
-  pdf.line(20, footerY, pageWidth - 20, footerY);
+  // Professional Footer with theme colors
+  const footerY = pageHeight - 40;
+  
+  // Footer background stripe
+  pdf.setFillColor(254, 63, 94); // Pink background
+  pdf.rect(0, footerY - 5, pageWidth, 45, 'F');
+  
+  // Footer content
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(255, 255, 255);
+  pdf.text('LOGGIN\' - Digital Asset Protection Platform', pageWidth / 2, footerY + 5, { align: 'center' });
   
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  pdf.setTextColor(156, 163, 175);
-  pdf.text('This certificate was generated by Loggin - Digital Asset Protection Platform', pageWidth / 2, footerY + 10, { align: 'center' });
   pdf.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  })}`, pageWidth / 2, footerY + 18, { align: 'center' });
+  })}`, pageWidth / 2, footerY + 15, { align: 'center' });
   
-  // Verification URL
-  pdf.setTextColor(99, 102, 241);
-  pdf.text(`Verify online: ${data.shareableLink}`, pageWidth / 2, footerY + 26, { align: 'center' });
+  // Verification URL in contrasting color
+  pdf.setTextColor(255, 210, 0); // Yellow accent
+  pdf.setFont('helvetica', 'bold');
+  const shortUrl = data.shareableLink.replace('https://', '').substring(0, 60) + '...';
+  pdf.text(`Verify online: ${shortUrl}`, pageWidth / 2, footerY + 25, { align: 'center' });
   
   // Download the PDF
   pdf.save(`certificate-${data.certificateId}.pdf`);
