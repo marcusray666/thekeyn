@@ -22,22 +22,33 @@ const GRADIENTS = [
 
 export function SimpleBackgroundEngine({ children, className = '' }: SimpleBackgroundEngineProps) {
   const { user } = useAuth();
-  const [currentGradient, setCurrentGradient] = useState(GRADIENTS[0]);
+  const [currentGradient, setCurrentGradient] = useState(() => {
+    // Initialize with persisted preference from localStorage
+    try {
+      const savedPreference = localStorage.getItem('selectedBackgroundPreference');
+      if (savedPreference) {
+        const preference = JSON.parse(savedPreference);
+        if (preference.primaryColors && preference.primaryColors.length >= 2) {
+          const [color1, color2] = preference.primaryColors;
+          return `linear-gradient(135deg, ${color1}20 0%, ${color2}20 100%)`;
+        }
+      }
+    } catch (error) {
+      console.log('Failed to load persisted background preference:', error);
+    }
+    return GRADIENTS[0]; // Default fallback
+  });
 
-  // Rotate gradients every 30 seconds for demo
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * GRADIENTS.length);
-      setCurrentGradient(GRADIENTS[randomIndex]);
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Initialize with user preference or random gradient
+  // Initialize with user preference from database if not in localStorage
   useEffect(() => {
     if (user) {
-      // Fetch user preference and set gradient
+      // Check if we already have a persisted preference
+      const savedPreference = localStorage.getItem('selectedBackgroundPreference');
+      if (savedPreference) {
+        return; // Use the persisted preference, don't override
+      }
+
+      // Fetch user preference from database
       fetch(`/api/background/preferences/${user.id}`)
         .then(res => res.ok ? res.json() : [])
         .then(preferences => {
@@ -47,13 +58,13 @@ export function SimpleBackgroundEngine({ children, className = '' }: SimpleBackg
               const [color1, color2] = latest.primaryColors;
               const gradient = `linear-gradient(135deg, ${color1}20 0%, ${color2}20 100%)`;
               setCurrentGradient(gradient);
+              // Also save to localStorage for persistence
+              localStorage.setItem('selectedBackgroundPreference', JSON.stringify(latest));
             }
           }
         })
         .catch(() => {
-          // Fallback to random gradient
-          const randomIndex = Math.floor(Math.random() * GRADIENTS.length);
-          setCurrentGradient(GRADIENTS[randomIndex]);
+          console.log('Failed to fetch background preferences from database');
         });
     }
   }, [user]);

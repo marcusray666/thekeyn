@@ -2560,7 +2560,7 @@ export class DatabaseStorage implements IStorage {
   async trackBackgroundInteraction(userId: number, interactionData: any): Promise<any> {
     const interaction = await this.recordBackgroundInteraction({
       userId,
-      gradientId: interactionData.gradientId,
+      gradientId: `preference-${interactionData.preferenceId || 'generated'}`, // Use preference ID as gradient identifier
       interactionType: interactionData.interactionType,
       timeSpent: interactionData.timeSpent,
       pageContext: interactionData.pageContext,

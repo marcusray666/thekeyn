@@ -3,8 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Palette, Sparkles, Settings, Heart, X, RefreshCw } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
@@ -46,50 +45,9 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
     enabled: !!user,
   });
 
-  // Create preference mutation
-  const createPreferenceMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest('/api/background/preferences', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
-      toast({
-        title: 'Preference saved',
-        description: 'Your background preference has been saved successfully',
-      });
-    },
-    onError: (error) => {
-      console.error('Error saving preference:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save background preference',
-        variant: 'destructive',
-      });
-    },
-  });
 
-  // Update preference mutation
-  const updatePreferenceMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return await apiRequest(`/api/background-preferences/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/background-preferences'] });
-      toast({
-        title: 'Preference updated',
-        description: 'Your background preference has been updated',
-      });
-    },
-  });
+
+
 
   // Delete preference mutation
   const deletePreferenceMutation = useMutation({
@@ -202,6 +160,9 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Select preference function
   const selectPreference = async (preference: BackgroundPreference) => {
     console.log('BackgroundPreferencesPanel: Selecting preference', preference);
+    
+    // Save to localStorage for persistence across sessions
+    localStorage.setItem('selectedBackgroundPreference', JSON.stringify(preference));
     
     // Apply the background immediately
     window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: preference }));
@@ -393,97 +354,28 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
             )}
           </div>
 
-          {/* Manual Preference Creator */}
+          {/* AI Recommendations */}
           <Card className="bg-white/80 backdrop-blur-xl border-gray-200/50">
             <CardHeader>
-              <CardTitle className="text-gray-800">Create Custom Preference</CardTitle>
+              <CardTitle className="text-gray-800">AI Recommendations</CardTitle>
               <CardDescription>
-                Manually create a background preference
+                Personalized suggestions based on your preferences and usage patterns
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Gradient Type
-                  </label>
-                  <Select defaultValue="linear">
-                    <SelectTrigger className="bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {gradientTypeOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.icon} {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Click "Generate New Gradient" above to let AI create personalized backgrounds that match your style and mood.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-3 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg border border-gray-200">
+                  <div className="text-sm font-medium text-gray-800">Smart Learning</div>
+                  <div className="text-xs text-gray-600 mt-1">AI learns from your interactions to suggest better backgrounds</div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Color Scheme
-                  </label>
-                  <Select defaultValue="warm">
-                    <SelectTrigger className="bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {colorSchemeOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          <div className="flex items-center">
-                            <div 
-                              className="w-4 h-4 rounded mr-2"
-                              style={{
-                                background: `linear-gradient(45deg, ${option.colors.join(', ')})`
-                              }}
-                            />
-                            {option.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-gray-200">
+                  <div className="text-sm font-medium text-gray-800">Context Aware</div>
+                  <div className="text-xs text-gray-600 mt-1">Backgrounds adapt based on time of day and page context</div>
                 </div>
               </div>
-              
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Intensity: 50%
-                </label>
-                <Slider
-                  defaultValue={[50]}
-                  max={200}
-                  min={10}
-                  step={10}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Mood
-                </label>
-                <Select defaultValue="professional">
-                  <SelectTrigger className="bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {moodOptions.map(option => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.icon} {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button 
-                className="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500"
-                disabled={createPreferenceMutation.isPending}
-              >
-                Save Custom Preference
-              </Button>
             </CardContent>
           </Card>
         </div>
