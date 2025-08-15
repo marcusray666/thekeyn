@@ -2052,6 +2052,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hide/unhide protected post from community wall
+  app.patch("/api/community/posts/:postId/visibility", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const postId = parseInt(req.params.postId);
+      const { isHidden } = req.body;
+      
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: "Invalid post ID" });
+      }
+
+      // Get the post to verify ownership and that it's a protected work
+      const post = await storage.getPostById(postId);
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      // Only allow the post owner to hide/unhide their own protected posts
+      if (post.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      if (!post.isProtected) {
+        return res.status(400).json({ error: "Only protected works can be hidden from community" });
+      }
+
+      // Update the post visibility
+      const updatedPost = await storage.updatePostVisibility(postId, isHidden);
+      
+      res.json({ 
+        success: true, 
+        postId,
+        isHidden: updatedPost.isHidden,
+        message: isHidden ? "Post hidden from community wall" : "Post restored to community wall"
+      });
+    } catch (error) {
+      console.error("Error updating post visibility:", error);
+      res.status(500).json({ error: "Failed to update post visibility" });
+    }
+  });
+
   // Get user's protected works (for sharing selection)
   app.get("/api/my-protected-works", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {

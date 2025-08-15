@@ -18,7 +18,7 @@ import {
   type UserBackgroundPreference, type InsertUserBackgroundPreference, type BackgroundInteraction, type InsertBackgroundInteraction
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, sql, ne, isNull, ilike, or } from "drizzle-orm";
+import { eq, desc, and, gte, sql, ne, isNull, ilike, or, lt, gt } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export interface IStorage {
@@ -589,6 +589,7 @@ export class DatabaseStorage implements IStorage {
         mentionedUsers: postData.mentionedUsers || [],
         isProtected: postData.isProtected || false,
         protectedWorkId: postData.protectedWorkId,
+        isHidden: postData.isHidden || false,
         tags: postData.tags || [],
       })
       .returning();
@@ -617,6 +618,45 @@ export class DatabaseStorage implements IStorage {
     const user = await this.getUser(postData.userId);
     return {
       ...post,
+      username: user?.username || 'unknown',
+      displayName: user?.displayName,
+      profileImageUrl: user?.profileImageUrl,
+    };
+  }
+
+  async getPostById(postId: number): Promise<Post | null> {
+    const [post] = await db
+      .select()
+      .from(posts)
+      .where(eq(posts.id, postId))
+      .limit(1);
+    
+    if (!post) return null;
+
+    // Get user info to complete Post type
+    const user = await this.getUser(post.userId);
+    return {
+      ...post,
+      username: user?.username || 'unknown',
+      displayName: user?.displayName,
+      profileImageUrl: user?.profileImageUrl,
+    };
+  }
+
+  async updatePostVisibility(postId: number, isHidden: boolean): Promise<Post> {
+    const [updatedPost] = await db
+      .update(posts)
+      .set({ 
+        isHidden,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId))
+      .returning();
+
+    // Get user info to complete Post type
+    const user = await this.getUser(updatedPost.userId);
+    return {
+      ...updatedPost,
       username: user?.username || 'unknown',
       displayName: user?.displayName,
       profileImageUrl: user?.profileImageUrl,
@@ -668,6 +708,9 @@ export class DatabaseStorage implements IStorage {
 
     if (userId) {
       query = query.where(eq(posts.userId, userId));
+    } else {
+      // For community feed, exclude hidden posts
+      query = query.where(or(eq(posts.isHidden, false), isNull(posts.isHidden)));
     }
 
     return await query;

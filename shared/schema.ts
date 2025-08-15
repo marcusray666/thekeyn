@@ -223,6 +223,7 @@ export const posts = pgTable("community_posts", {
   mentionedUsers: text("mentioned_users").array().default([]), // User mentions (new column)
   isProtected: boolean("is_protected").default(false), // For shared protected works
   protectedWorkId: integer("protected_work_id").references(() => works.id), // Reference to protected work if shared
+  isHidden: boolean("is_hidden").default(false), // For hiding posts from community wall
   tags: text("tags").array().default([]),
   likes: integer("like_count").default(0),
   comments: integer("comment_count").default(0),
@@ -248,6 +249,7 @@ export const insertPostSchema = createInsertSchema(posts).pick({
   mentionedUsers: true,
   isProtected: true,
   protectedWorkId: true,
+  isHidden: true,
   tags: true,
 });
 
