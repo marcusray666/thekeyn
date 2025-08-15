@@ -203,25 +203,25 @@ export default function PremiumCertificates() {
                 {filteredCertificates.map((cert) => (
                   <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0 pr-4">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-xl flex items-center justify-center">
+                          <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-xl flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-lg">
                               {cert.mimeType?.startsWith('image/') ? '🎨' :
                                cert.mimeType?.startsWith('audio/') ? '🎵' :
                                cert.mimeType?.startsWith('video/') ? '🎬' : '📄'}
                             </span>
                           </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-800">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-lg font-semibold text-gray-800 truncate">
                               {cert.title || cert.filename}
                             </h3>
-                            <p className="text-gray-600">{cert.creatorName}</p>
+                            <p className="text-gray-600 truncate">{cert.creatorName}</p>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-4 flex-shrink-0">
                         <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                           cert.isVerified 
                             ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
