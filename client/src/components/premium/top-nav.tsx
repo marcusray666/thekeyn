@@ -184,11 +184,11 @@ export function TopNav() {
               e.stopPropagation();
               setIsMenuOpen(!isMenuOpen);
             }}
-            className="creator-avatar"
+            className="w-10 h-10 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg border-2 border-white/50"
           >
-            <div className="avatar-inner">
+            <span className="text-white font-bold text-sm">
               {(user as any)?.username?.charAt(0).toUpperCase() || "U"}
-            </div>
+            </span>
           </button>
 
           {isMenuOpen && (
