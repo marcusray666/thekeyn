@@ -325,12 +325,16 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 relative overflow-hidden light-theme">{/* Using light theme to match login/home pages */}
+    <div className="min-h-screen bg-white pb-20 md:pb-0 relative overflow-hidden">{/* Using light theme to match login/home pages */}
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/15 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/15 rounded-full blur-[100px]"></div>
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto pt-8 p-6 relative z-10"
+        className="max-w-7xl mx-auto pt-24 p-6 relative z-10"
       >
         {/* Header */}
         <div className="mb-8">
@@ -388,10 +392,10 @@ export default function AdminDashboard() {
             {metricsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <Card key={i} className="bg-white/5 backdrop-blur-xl border border-white/10 animate-pulse rounded-2xl">
+                  <Card key={i} className="bg-white/90 backdrop-blur-xl border border-gray-200/50 animate-pulse rounded-2xl shadow-lg">
                     <CardContent className="p-6">
-                      <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                      <div className="h-8 bg-gray-700 rounded"></div>
+                      <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                      <div className="h-8 bg-gray-300 rounded"></div>
                     </CardContent>
                   </Card>
                 ))}
@@ -414,14 +418,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FE3F5E]">Active Users (30d)</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.activeUsers?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.activeUsers?.toLocaleString() || 0}</p>
                       </div>
                       <Activity className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
@@ -429,14 +433,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('users')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FFD200]">New Signups</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.newSignups?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.newSignups?.toLocaleString() || 0}</p>
                       </div>
                       <Users className="h-8 w-8 text-[#FFD200]" />
                     </div>
@@ -444,15 +448,15 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('system')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FE3F5E]">Total Revenue</p>
-                        <p className="text-2xl font-bold text-white">{formatCurrency(metrics?.totalRevenue || 0)}</p>
-                        <p className="text-xs text-white/60">Subscription earnings</p>
+                        <p className="text-2xl font-bold text-gray-800">{formatCurrency(metrics?.totalRevenue || 0)}</p>
+                        <p className="text-xs text-gray-600">Subscription earnings</p>
                       </div>
                       <DollarSign className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
@@ -460,14 +464,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FFD200]">Protected Works</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.totalWorks?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.totalWorks?.toLocaleString() || 0}</p>
                       </div>
                       <Shield className="h-8 w-8 text-[#FFD200]" />
                     </div>
@@ -475,14 +479,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('content')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FE3F5E]">Community Posts</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.totalPosts?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.totalPosts?.toLocaleString() || 0}</p>
                       </div>
                       <FileText className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
@@ -490,14 +494,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('system')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FFD200]">Storage Used</p>
-                        <p className="text-2xl font-bold text-white">{formatBytes(metrics?.storageUsed || 0)}</p>
+                        <p className="text-2xl font-bold text-gray-800">{formatBytes(metrics?.storageUsed || 0)}</p>
                       </div>
                       <Database className="h-8 w-8 text-[#FFD200]" />
                     </div>
@@ -505,14 +509,14 @@ export default function AdminDashboard() {
                 </Card>
 
                 <Card 
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/8 transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl cursor-pointer hover:bg-white/95 transition-all duration-300 shadow-lg"
                   onClick={() => setSelectedTab('moderation')}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-[#FE3F5E]">Pending Reports</p>
-                        <p className="text-2xl font-bold text-white">{metrics?.reportsPending?.toLocaleString() || 0}</p>
+                        <p className="text-2xl font-bold text-gray-800">{metrics?.reportsPending?.toLocaleString() || 0}</p>
                       </div>
                       <AlertTriangle className="h-8 w-8 text-[#FE3F5E]" />
                     </div>
@@ -524,7 +528,7 @@ export default function AdminDashboard() {
 
           {/* Privacy Override Tab - Admin can see ALL user information */}
           <TabsContent value="privacy" className="space-y-6">
-            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
+            <Card className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -532,7 +536,7 @@ export default function AdminDashboard() {
                       <Shield className="h-5 w-5" />
                       Admin Privacy Override Panel
                     </CardTitle>
-                    <CardDescription className="text-white/60">
+                    <CardDescription className="text-gray-600">
                       🔒 Access ALL user information regardless of privacy settings. Admin-only capability.
                     </CardDescription>
                   </div>
