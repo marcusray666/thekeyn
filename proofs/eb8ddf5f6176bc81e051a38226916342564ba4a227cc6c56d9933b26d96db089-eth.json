@@ -1,0 +1,9 @@
+{
+  "fileHash": "eb8ddf5f6176bc81e051a38226916342564ba4a227cc6c56d9933b26d96db089",
+  "blockNumber": 23144617,
+  "blockHash": "0x08d3dfdc80ed3dacec78318a196bd0738585c600e0cb4e6a8306947720071b56",
+  "timestamp": 1755238955000,
+  "parentHash": "0x3869fdc28512b831fc90bed3604864bec484e369fd88f5f843f83c29f3afbf61",
+  "anchorType": "ethereum_mainnet",
+  "verificationUrl": "https://etherscan.io/block/23144617"
+}

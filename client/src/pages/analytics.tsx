@@ -44,11 +44,16 @@ export default function Analytics() {
     isLoading, 
     hasData: !!analyticsData, 
     analyticsData,
-    error: error?.message 
+    error: error?.message,
+    timeRange 
   });
   
   if (error) {
     console.error("Analytics API error details:", error);
+  } else if (analyticsData) {
+    console.log("Analytics API returned data:", analyticsData);
+  } else {
+    console.log("Analytics API returned no data (null/undefined)");
   }
 
   // Handle error state - instead of showing error, show fallback data
@@ -68,8 +73,8 @@ export default function Analytics() {
 
   const analytics = analyticsData || fallbackAnalytics;
 
-  // Show no data state if user has no analytics data
-  if (!isLoading && analytics && analytics.totalViews === 0 && analytics.topWorks.length === 0) {
+  // Show no data state only if we have no API data and no error (meaning API succeeded but user has no works)
+  if (!isLoading && !error && !analyticsData) {
     return (
       <SimpleBackgroundEngine>
         <div className="min-h-screen pt-24 pb-32 relative overflow-hidden">

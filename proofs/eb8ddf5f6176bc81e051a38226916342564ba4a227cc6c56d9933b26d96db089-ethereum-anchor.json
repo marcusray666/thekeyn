@@ -1,0 +1,18 @@
+{
+  "fileHash": "0xeb8ddf5f6176bc81e051a38226916342564ba4a227cc6c56d9933b26d96db089",
+  "metadata": {
+    "title": "2599388_5",
+    "creator": "vladislavdonighevici111307",
+    "timestamp": 1755238963195
+  },
+  "ethereum": {
+    "anchorType": "block_reference",
+    "blockNumber": 23144617,
+    "blockHash": "0x08d3dfdc80ed3dacec78318a196bd0738585c600e0cb4e6a8306947720071b56",
+    "blockTimestamp": 1755238955,
+    "parentHash": "0x3869fdc28512b831fc90bed3604864bec484e369fd88f5f843f83c29f3afbf61",
+    "verificationUrl": "https://etherscan.io/block/23144617",
+    "note": "File hash anchored to Ethereum block without transaction"
+  },
+  "createdAt": "2025-08-15T06:22:43.263Z"
+}
