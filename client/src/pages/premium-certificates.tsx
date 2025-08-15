@@ -32,9 +32,7 @@ export default function PremiumCertificates() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
-        <SimpleBackgroundEngine />
-        
+      <SimpleBackgroundEngine className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="animate-pulse space-y-6">
             <div className="h-20 bg-white/60 rounded-3xl shadow-lg"></div>
@@ -45,14 +43,12 @@ export default function PremiumCertificates() {
             </div>
           </div>
         </div>
-      </div>
+      </SimpleBackgroundEngine>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
-      <SimpleBackgroundEngine />
-      
+    <SimpleBackgroundEngine className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 space-y-6 md:space-y-8 relative z-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
@@ -261,6 +257,6 @@ export default function PremiumCertificates() {
           </div>
         )}
       </div>
-    </div>
+    </SimpleBackgroundEngine>
   );
 }
