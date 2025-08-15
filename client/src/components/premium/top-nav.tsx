@@ -118,7 +118,7 @@ export function TopNav() {
 
   return (
     <nav 
-      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-50 transition-all duration-300 custom-bg ${
+      className={`hidden md:flex items-center justify-between px-8 py-3 fixed top-0 left-0 right-0 z-50 transition-all duration-300 custom-bg ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{

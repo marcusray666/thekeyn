@@ -188,9 +188,9 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
     window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: preference }));
     console.log('BackgroundPreferencesPanel: Dispatched backgroundUpdate event', preference);
     
-    // Track the interaction
-    try {
-      await apiRequest('/api/background/interactions', {
+    // Track the interaction (non-blocking)
+    setTimeout(() => {
+      apiRequest('/api/background/interactions', {
         method: 'POST',
         body: JSON.stringify({
           preferenceId: preference.id,
@@ -200,10 +200,10 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
         headers: {
           'Content-Type': 'application/json',
         },
+      }).catch(error => {
+        console.log('Background interaction tracking failed (non-critical):', error);
       });
-    } catch (error) {
-      console.log('Background interaction tracking failed (non-critical):', error);
-    }
+    }, 100);
     
     setSelectedPreference(preference);
     toast({

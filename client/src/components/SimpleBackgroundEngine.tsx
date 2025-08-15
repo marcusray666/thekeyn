@@ -61,19 +61,19 @@ export function SimpleBackgroundEngine({ children, className = '' }: SimpleBackg
   // Listen for background update events from BackgroundPreferencesPanel
   useEffect(() => {
     const handleBackgroundUpdate = (event: CustomEvent) => {
+      console.log('SimpleBackgroundEngine received backgroundUpdate event:', event.detail);
       const preference = event.detail;
       if (preference && preference.primaryColors && preference.primaryColors.length >= 2) {
         const [color1, color2] = preference.primaryColors;
         const gradient = `linear-gradient(135deg, ${color1}20 0%, ${color2}20 100%)`;
         setCurrentGradient(gradient);
+        console.log('SimpleBackgroundEngine updated background to:', gradient);
         
-        // Dispatch event for navigation to adapt
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('navigationBackgroundUpdate', { 
-            detail: { gradient, colors: preference.primaryColors }
-          }));
-          console.log('SimpleBackgroundEngine dispatched navigationBackgroundUpdate with colors:', preference.primaryColors);
-        }, 50);
+        // Immediately dispatch event for navigation to adapt
+        window.dispatchEvent(new CustomEvent('navigationBackgroundUpdate', { 
+          detail: { gradient, colors: preference.primaryColors }
+        }));
+        console.log('SimpleBackgroundEngine dispatched navigationBackgroundUpdate with colors:', preference.primaryColors);
       }
     };
 
