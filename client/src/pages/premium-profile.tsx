@@ -265,26 +265,26 @@ export default function PremiumProfile() {
 
               {/* Bio */}
               {profile?.bio && (
-                <p className="text-white/70 mb-6 max-w-2xl">{profile.bio}</p>
+                <p className="text-gray-600 mb-6 max-w-2xl">{profile.bio}</p>
               )}
 
               {/* Stats */}
               <div className="flex space-x-8">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{stats?.worksProtected || 0}</div>
-                  <div className="text-white/50 text-sm">Protected Works</div>
+                  <div className="text-2xl font-bold text-gray-800">{stats?.worksProtected || 0}</div>
+                  <div className="text-gray-600 text-sm">Protected Works</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{stats?.certificates || 0}</div>
-                  <div className="text-white/50 text-sm">Certificates</div>
+                  <div className="text-2xl font-bold text-gray-800">{stats?.certificates || 0}</div>
+                  <div className="text-gray-600 text-sm">Certificates</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{stats?.followers || 0}</div>
-                  <div className="text-white/50 text-sm">Followers</div>
+                  <div className="text-2xl font-bold text-gray-800">{stats?.followers || 0}</div>
+                  <div className="text-gray-600 text-sm">Followers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{stats?.communityLikes || 0}</div>
-                  <div className="text-white/50 text-sm">Likes</div>
+                  <div className="text-2xl font-bold text-gray-800">{stats?.communityLikes || 0}</div>
+                  <div className="text-gray-600 text-sm">Likes</div>
                 </div>
               </div>
             </div>
@@ -292,17 +292,17 @@ export default function PremiumProfile() {
         </div>
 
         {/* Content Tabs */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
+        <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden shadow-lg">
           {/* Tab Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
             <div className="flex space-x-6">
-              <button className="text-white font-medium border-b-2 border-[#FE3F5E] pb-2">
+              <button className="text-gray-800 font-medium border-b-2 border-[#FE3F5E] pb-2">
                 My Works
               </button>
-              <button className="text-white/70 hover:text-white transition-colors pb-2">
+              <button className="text-gray-600 hover:text-gray-800 transition-colors pb-2">
                 Liked
               </button>
-              <button className="text-white/70 hover:text-white transition-colors pb-2">
+              <button className="text-gray-600 hover:text-gray-800 transition-colors pb-2">
                 Saved
               </button>
             </div>
@@ -311,7 +311,7 @@ export default function PremiumProfile() {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'
+                  viewMode === 'grid' ? 'bg-gray-200/50 text-gray-800' : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 <Grid3X3 className="h-4 w-4" />
@@ -319,7 +319,7 @@ export default function PremiumProfile() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'
+                  viewMode === 'list' ? 'bg-gray-200/50 text-gray-800' : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 <List className="h-4 w-4" />
@@ -336,7 +336,7 @@ export default function PremiumProfile() {
                     <div 
                       key={post.id} 
                       onClick={() => handlePostClick(post)}
-                      className="aspect-square bg-white/5 rounded-2xl p-4 hover:bg-white/10 transition-colors cursor-pointer group"
+                      className="aspect-square bg-white/30 rounded-2xl p-4 hover:bg-white/50 transition-colors cursor-pointer group border border-gray-200/30"
                     >
                       <div className="flex flex-col h-full">
                         <div className="flex-1 flex items-center justify-center relative overflow-hidden rounded-xl">
@@ -364,8 +364,8 @@ export default function PremiumProfile() {
                           </div>
                         </div>
                         <div className="mt-2">
-                          <h3 className="text-white font-medium truncate">{post.title || post.filename}</h3>
-                          <p className="text-white/50 text-sm truncate">{post.username}</p>
+                          <h3 className="text-gray-800 font-medium truncate">{post.title || post.filename}</h3>
+                          <p className="text-gray-600 text-sm truncate">{post.username}</p>
                         </div>
                       </div>
                     </div>
@@ -387,11 +387,11 @@ export default function PremiumProfile() {
               )
             ) : (
               <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-6">
-                  <Edit3 className="h-12 w-12 text-white/50" />
+                <div className="w-24 h-24 mx-auto bg-gray-200/30 rounded-full flex items-center justify-center mb-6">
+                  <Edit3 className="h-12 w-12 text-gray-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">No Posts Yet</h3>
-                <p className="text-white/50 mb-6 max-w-sm mx-auto">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">No Posts Yet</h3>
+                <p className="text-gray-600 mb-6 max-w-sm mx-auto">
                   Share your first community post to start building your profile.
                 </p>
                 <Link href="/create-post">
