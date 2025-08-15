@@ -182,21 +182,28 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
 
   // Select preference function
   const selectPreference = async (preference: BackgroundPreference) => {
+    console.log('BackgroundPreferencesPanel: Selecting preference', preference);
+    
     // Apply the background immediately
     window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: preference }));
+    console.log('BackgroundPreferencesPanel: Dispatched backgroundUpdate event', preference);
     
     // Track the interaction
-    await apiRequest('/api/background/interactions', {
-      method: 'POST',
-      body: JSON.stringify({
-        preferenceId: preference.id,
-        interactionType: 'select',
-        pageContext: window.location.pathname,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      await apiRequest('/api/background/interactions', {
+        method: 'POST',
+        body: JSON.stringify({
+          preferenceId: preference.id,
+          interactionType: 'select',
+          pageContext: window.location.pathname,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.log('Background interaction tracking failed (non-critical):', error);
+    }
     
     setSelectedPreference(preference);
     toast({

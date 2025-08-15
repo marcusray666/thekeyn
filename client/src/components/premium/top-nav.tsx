@@ -67,13 +67,31 @@ export function TopNav() {
   // Listen for background changes and adapt navigation
   useEffect(() => {
     const handleNavigationBackgroundUpdate = (event: CustomEvent) => {
+      console.log('Navigation received background update:', event.detail);
       const { colors } = event.detail;
       if (colors && colors.length >= 2) {
         const [color1, color2] = colors;
         // Convert hex to rgba with opacity for navigation
-        const rgba1 = hexToRgba(color1, 0.12);
-        const rgba2 = hexToRgba(color2, 0.08);
-        const rgba3 = hexToRgba(color1, 0.10);
+        const rgba1 = hexToRgba(color1, 0.15);
+        const rgba2 = hexToRgba(color2, 0.10);
+        const rgba3 = hexToRgba(color1, 0.12);
+        
+        setNavBackground({
+          background: `linear-gradient(135deg, ${rgba1} 0%, ${rgba2} 50%, ${rgba3} 100%)`,
+          backgroundColor: rgba1
+        });
+        console.log('Navigation background updated to:', rgba1, rgba2, rgba3);
+      }
+    };
+
+    const handleBackgroundUpdate = (event: CustomEvent) => {
+      console.log('Navigation received direct background update:', event.detail);
+      const preference = event.detail;
+      if (preference && preference.primaryColors && preference.primaryColors.length >= 2) {
+        const [color1, color2] = preference.primaryColors;
+        const rgba1 = hexToRgba(color1, 0.15);
+        const rgba2 = hexToRgba(color2, 0.10);
+        const rgba3 = hexToRgba(color1, 0.12);
         
         setNavBackground({
           background: `linear-gradient(135deg, ${rgba1} 0%, ${rgba2} 50%, ${rgba3} 100%)`,
@@ -83,7 +101,11 @@ export function TopNav() {
     };
 
     window.addEventListener('navigationBackgroundUpdate', handleNavigationBackgroundUpdate);
-    return () => window.removeEventListener('navigationBackgroundUpdate', handleNavigationBackgroundUpdate);
+    window.addEventListener('backgroundUpdate', handleBackgroundUpdate);
+    return () => {
+      window.removeEventListener('navigationBackgroundUpdate', handleNavigationBackgroundUpdate);
+      window.removeEventListener('backgroundUpdate', handleBackgroundUpdate);
+    };
   }, []);
 
   // Helper function to convert hex to rgba
@@ -96,7 +118,7 @@ export function TopNav() {
 
   return (
     <nav 
-      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-all duration-300 custom-bg ${
+      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-50 transition-all duration-300 custom-bg ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{

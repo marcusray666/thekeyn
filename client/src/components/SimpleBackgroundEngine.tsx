@@ -68,9 +68,12 @@ export function SimpleBackgroundEngine({ children, className = '' }: SimpleBackg
         setCurrentGradient(gradient);
         
         // Dispatch event for navigation to adapt
-        window.dispatchEvent(new CustomEvent('navigationBackgroundUpdate', { 
-          detail: { gradient, colors: preference.primaryColors }
-        }));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('navigationBackgroundUpdate', { 
+            detail: { gradient, colors: preference.primaryColors }
+          }));
+          console.log('SimpleBackgroundEngine dispatched navigationBackgroundUpdate with colors:', preference.primaryColors);
+        }, 50);
       }
     };
 

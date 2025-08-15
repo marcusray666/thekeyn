@@ -94,7 +94,7 @@ export default function PremiumHome() {
         />
       </div>
       
-      <main className="pt-8 relative z-10">
+      <main className="pt-8 relative z-30">
         {/* Stories Section */}
         <div className="px-6 mb-4">
           <div className="flex space-x-6 overflow-x-auto pb-4">
