@@ -140,13 +140,13 @@ export default function PremiumCertificates() {
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white transition-all duration-300 shadow-xl">
+                <div key={cert.id} className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white transition-all duration-300 shadow-xl overflow-hidden">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <div className="flex-1 min-w-0 pr-3 overflow-hidden">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate overflow-hidden whitespace-nowrap">
                         {cert.title || cert.filename}
                       </h3>
-                      <p className="text-gray-700 text-sm">{cert.creatorName}</p>
+                      <p className="text-gray-700 text-sm truncate overflow-hidden whitespace-nowrap">{cert.creatorName}</p>
                     </div>
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       cert.isVerified 
@@ -201,9 +201,9 @@ export default function PremiumCertificates() {
             <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-3xl overflow-hidden shadow-xl">
               <div className="divide-y divide-white/50">
                 {filteredCertificates.map((cert) => (
-                  <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors">
+                  <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors overflow-hidden">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0 pr-4">
+                      <div className="flex-1 min-w-0 pr-6 max-w-[60%]">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-gradient-to-br from-[#FE3F5E] to-[#FFD200] rounded-xl flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-lg">
@@ -212,11 +212,11 @@ export default function PremiumCertificates() {
                                cert.mimeType?.startsWith('video/') ? '🎬' : '📄'}
                             </span>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-lg font-semibold text-gray-800 truncate">
+                          <div className="min-w-0 flex-1 overflow-hidden">
+                            <h3 className="text-lg font-semibold text-gray-800 truncate overflow-hidden whitespace-nowrap">
                               {cert.title || cert.filename}
                             </h3>
-                            <p className="text-gray-600 truncate">{cert.creatorName}</p>
+                            <p className="text-gray-600 truncate overflow-hidden whitespace-nowrap">{cert.creatorName}</p>
                           </div>
                         </div>
                       </div>
