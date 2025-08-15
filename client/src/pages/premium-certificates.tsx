@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Download, Share2, Eye, Search, Filter, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 
 export default function PremiumCertificates() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -31,14 +32,8 @@ export default function PremiumCertificates() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme" style={{
-        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.15) 0%, rgba(255, 210, 0, 0.15) 100%)',
-        backgroundAttachment: 'fixed'
-      }}>
-        {/* Enhanced background gradients to match profile page */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/20 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/20 rounded-full blur-[100px]"></div>
+      <div className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
+        <SimpleBackgroundEngine />
         
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="animate-pulse space-y-6">
@@ -55,14 +50,8 @@ export default function PremiumCertificates() {
   }
 
   return (
-    <div className="min-h-screen pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme" style={{
-      background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.15) 0%, rgba(255, 210, 0, 0.15) 100%)',
-      backgroundAttachment: 'fixed'
-    }}>
-      {/* Enhanced background gradients to match profile page */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/20 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/20 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen pt-24 pb-20 md:pb-32 relative overflow-hidden">
+      <SimpleBackgroundEngine />
       
       <div className="max-w-6xl mx-auto px-4 space-y-6 md:space-y-8 relative z-10">
         {/* Header */}
@@ -76,7 +65,7 @@ export default function PremiumCertificates() {
             </Link>
             <div className="hidden md:block w-px h-6 bg-gray-300"></div>
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Certificates</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-700">My Certificates</h1>
               <div className="px-3 py-1 bg-[#FE3F5E]/20 border border-[#FE3F5E]/50 rounded-full">
                 <span className="text-[#FE3F5E] text-sm font-medium">{certificates.length}</span>
               </div>
