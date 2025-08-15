@@ -59,35 +59,21 @@ export default function Analytics() {
   // Handle error state - instead of showing error, show fallback data
   // This prevents the error display and shows the "No Analytics Data Yet" state instead
 
-  // Create fallback data when API returns null (authentication issues) or no data
-  const fallbackAnalytics: AnalyticsData = {
-    totalViews: 0,
-    totalShares: 0,
-    totalDownloads: 0,
-    growthRate: 0,
-    monthlyViews: [],
-    topWorks: [],
-    deviceTypes: [],
-    geographicData: []
-  };
+  // Don't use fallback data - use actual data from API or show loading
+  const analytics = analyticsData;
 
-  const analytics = analyticsData || fallbackAnalytics;
-
-  // Show no data state only if we have no API data and no error (meaning API succeeded but user has no works)
-  if (!isLoading && !error && !analyticsData) {
+  // Show loading while data is being fetched
+  if (!analytics) {
     return (
       <SimpleBackgroundEngine>
         <div className="min-h-screen pt-24 pb-32 relative overflow-hidden">
           <div className="flex items-center justify-center min-h-[60vh] relative z-10">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <TrendingUp className="h-8 w-8 text-blue-400" />
+              <div className="w-16 h-16 mx-auto mb-4 relative">
+                <div className="absolute inset-0 border-4 border-[#FE3F5E]/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-t-[#FE3F5E] rounded-full animate-spin"></div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Analytics Data Yet</h3>
-              <p className="text-gray-600 text-sm mb-4">Upload and share your work to start seeing analytics.</p>
-              <Button onClick={() => setLocation('/upload')} className="accent-button">
-                Upload Your First Work
-              </Button>
+              <p className="text-gray-600 text-sm">Loading analytics...</p>
             </div>
           </div>
         </div>

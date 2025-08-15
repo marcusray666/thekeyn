@@ -1649,18 +1649,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userWorks = await storage.getUserWorks(userId);
       const totalDownloads = userWorks.length; // Each work is a "download"/protection
       
-      // Generate monthly data from REAL analytics
+      // Generate monthly data from REAL analytics - show recent 6 months
       const monthlyViews = [];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const currentDate = new Date();
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       
-      for (let i = 0; i < months.length; i++) {
-        const monthIndex = i;
-        const currentYear = new Date().getFullYear();
+      // Get last 6 months including current month
+      for (let i = 5; i >= 0; i--) {
+        const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        const monthIndex = targetDate.getMonth();
+        const year = targetDate.getFullYear();
         
         // Filter analytics for this month
         const monthAnalytics = userAnalytics.filter(day => {
           const dayDate = new Date(day.date);
-          return dayDate.getMonth() === monthIndex && dayDate.getFullYear() === currentYear;
+          return dayDate.getMonth() === monthIndex && dayDate.getFullYear() === year;
         });
         
         // Sum up views and engagement for this month
@@ -1668,7 +1671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const monthShares = monthAnalytics.reduce((sum, day) => sum + (day.totalEngagement || 0), 0);
         
         monthlyViews.push({
-          month: months[i],
+          month: monthNames[monthIndex],
           views: monthViews,
           shares: monthShares
         });
