@@ -117,7 +117,7 @@ export default function PremiumCertificates() {
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid' ? 'bg-gray-200/70 text-gray-800' : 'text-gray-600 hover:text-gray-800'
+                    viewMode === 'grid' ? 'bg-gray-200/50 text-gray-700' : 'text-gray-600 hover:text-gray-700'
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4" />
@@ -125,7 +125,7 @@ export default function PremiumCertificates() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list' ? 'bg-gray-200/70 text-gray-800' : 'text-gray-600 hover:text-gray-800'
+                    viewMode === 'list' ? 'bg-gray-200/50 text-gray-700' : 'text-gray-600 hover:text-gray-700'
                   }`}
                 >
                   <List className="h-4 w-4" />
@@ -140,13 +140,13 @@ export default function PremiumCertificates() {
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white transition-all duration-300 shadow-xl overflow-hidden">
+                <div key={cert.id} className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/95 transition-all duration-300 shadow-lg overflow-hidden">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0 pr-3 overflow-hidden">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate overflow-hidden whitespace-nowrap">
+                      <h3 className="text-lg font-semibold text-gray-700 truncate overflow-hidden whitespace-nowrap">
                         {cert.title || cert.filename}
                       </h3>
-                      <p className="text-gray-700 text-sm truncate overflow-hidden whitespace-nowrap">{cert.creatorName}</p>
+                      <p className="text-gray-600 text-sm truncate overflow-hidden whitespace-nowrap">{cert.creatorName}</p>
                     </div>
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       cert.isVerified 
@@ -160,13 +160,13 @@ export default function PremiumCertificates() {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Created:</span>
-                      <span className="text-gray-800">
+                      <span className="text-gray-600">
                         {new Date(cert.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Type:</span>
-                      <span className="text-gray-800">
+                      <span className="text-gray-600">
                         {cert.mimeType?.startsWith('image/') ? 'Image' :
                          cert.mimeType?.startsWith('audio/') ? 'Audio' :
                          cert.mimeType?.startsWith('video/') ? 'Video' : 'Document'}
@@ -174,7 +174,7 @@ export default function PremiumCertificates() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Hash:</span>
-                      <span className="text-gray-800 font-mono text-xs">
+                      <span className="text-gray-600 font-mono text-xs">
                         {cert.sha256Hash?.substring(0, 12)}...
                       </span>
                     </div>
@@ -198,7 +198,7 @@ export default function PremiumCertificates() {
               ))}
             </div>
           ) : (
-            <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-3xl overflow-hidden shadow-xl">
+            <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden shadow-lg">
               <div className="divide-y divide-white/50">
                 {filteredCertificates.map((cert) => (
                   <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors overflow-hidden">
@@ -213,7 +213,7 @@ export default function PremiumCertificates() {
                             </span>
                           </div>
                           <div className="min-w-0 flex-1 overflow-hidden">
-                            <h3 className="text-lg font-semibold text-gray-800 truncate overflow-hidden whitespace-nowrap">
+                            <h3 className="text-lg font-semibold text-gray-700 truncate overflow-hidden whitespace-nowrap">
                               {cert.title || cert.filename}
                             </h3>
                             <p className="text-gray-600 truncate overflow-hidden whitespace-nowrap">{cert.creatorName}</p>
