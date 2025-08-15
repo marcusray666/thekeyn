@@ -1637,28 +1637,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const timeRange = req.query.timeRange as string || '6m';
       
-      // Get user's works for analytics
-      const userWorks = await storage.getUserWorks(userId);
+      // Get REAL analytics data from user_analytics table
+      const userAnalytics = await storage.getUserAnalytics(userId, 180); // 6 months
       
-      // Calculate analytics based on real data
-      const totalViews = userWorks.reduce((sum, work) => sum + (work.viewCount || 0), 0);
-      const totalShares = userWorks.reduce((sum, work) => sum + (work.shareCount || 0), 0);
+      // Calculate totals from real analytics data
+      const totalViews = userAnalytics.reduce((sum, day) => sum + (day.postViews || 0) + (day.workViews || 0), 0);
+      const totalEngagement = userAnalytics.reduce((sum, day) => sum + (day.totalEngagement || 0), 0);
+      const totalNewFollowers = userAnalytics.reduce((sum, day) => sum + (day.newFollowers || 0), 0);
+      
+      // Get user's works for additional data
+      const userWorks = await storage.getUserWorks(userId);
       const totalDownloads = userWorks.length; // Each work is a "download"/protection
       
-      // Generate monthly data based on user's work creation dates
+      // Generate monthly data from REAL analytics
       const monthlyViews = [];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
       
-      for (const month of months) {
-        const monthWorks = userWorks.filter(work => {
-          const workDate = new Date(work.createdAt);
-          return workDate.getMonth() === months.indexOf(month);
+      for (let i = 0; i < months.length; i++) {
+        const monthIndex = i;
+        const currentYear = new Date().getFullYear();
+        
+        // Filter analytics for this month
+        const monthAnalytics = userAnalytics.filter(day => {
+          const dayDate = new Date(day.date);
+          return dayDate.getMonth() === monthIndex && dayDate.getFullYear() === currentYear;
         });
         
+        // Sum up views and engagement for this month
+        const monthViews = monthAnalytics.reduce((sum, day) => sum + (day.postViews || 0) + (day.workViews || 0), 0);
+        const monthShares = monthAnalytics.reduce((sum, day) => sum + (day.totalEngagement || 0), 0);
+        
         monthlyViews.push({
-          month,
-          views: monthWorks.reduce((sum, work) => sum + (work.viewCount || Math.floor(Math.random() * 500) + 100), 0),
-          shares: monthWorks.reduce((sum, work) => sum + (work.shareCount || Math.floor(Math.random() * 50) + 10), 0)
+          month: months[i],
+          views: monthViews,
+          shares: monthShares
         });
       }
       
@@ -1698,8 +1710,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const growthRate = userWorks.length > 0 ? (recentWorks.length / userWorks.length) * 100 : 0;
       
       res.json({
-        totalViews: totalViews || 0,
-        totalShares: totalShares || 0,
+        totalViews: totalViews,
+        totalShares: totalEngagement, // Using real engagement data
         totalDownloads,
         growthRate: Math.round(growthRate * 10) / 10,
         monthlyViews,
