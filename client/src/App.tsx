@@ -40,6 +40,7 @@ import Social from "@/pages/social";
 import Messages from "@/pages/messages";
 import Followers from "@/pages/followers";
 import ShareDemo from "@/pages/share-demo";
+import BackgroundDemo from "@/pages/background-demo";
 
 import Studio from "@/pages/studio";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -86,6 +87,7 @@ function Router() {
       <Route path="/user/:userId" component={Profile} />
       <Route path="/followers" component={Followers} />
       <Route path="/share-demo" component={ShareDemo} />
+      <Route path="/background-demo" component={BackgroundDemo} />
       <Route path="/settings" component={PremiumSettings} />
       <Route path="/security" component={Security} />
       <Route path="/certificate-guide" component={CertificateGuide} />
