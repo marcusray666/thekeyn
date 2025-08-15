@@ -228,11 +228,11 @@ export default function BlockchainVerification() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/15 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/15 rounded-full blur-[100px]"></div>
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-24 pb-12">
         {/* Header */}
@@ -245,9 +245,9 @@ export default function BlockchainVerification() {
             <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-2xl flex items-center justify-center">
               <Shield className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-white">Advanced Blockchain Verification</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Advanced Blockchain Verification</h1>
           </div>
-          <p className="text-xl text-white/60 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Generate cryptographically secure verification proofs for your digital works with multi-level security
           </p>
         </motion.div>
@@ -263,9 +263,9 @@ export default function BlockchainVerification() {
             <div className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Network className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-semibold text-white">Blockchain Network Status</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Blockchain Network Status</h3>
                 <RefreshCw 
-                  className="w-4 h-4 text-gray-400 cursor-pointer hover:text-white transition-colors"
+                  className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
                   onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/verification/network-status"] })}
                 />
               </div>
@@ -273,7 +273,7 @@ export default function BlockchainVerification() {
               {networkLoading ? (
                 <div className="flex items-center gap-2">
                   <LiquidGlassLoader size="sm" />
-                  <span className="text-gray-300">Checking network status...</span>
+                  <span className="text-gray-600">Checking network status...</span>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -303,14 +303,14 @@ export default function BlockchainVerification() {
         </motion.div>
 
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-md">
-            <TabsTrigger value="generate" className="data-[state=active]:bg-purple-600">
+          <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-md">
+            <TabsTrigger value="generate" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700">
               Generate Verification
             </TabsTrigger>
-            <TabsTrigger value="verify" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger value="verify" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700">
               Verify Proof
             </TabsTrigger>
-            <TabsTrigger value="batch" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger value="batch" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700">
               Batch Operations
             </TabsTrigger>
           </TabsList>
@@ -321,16 +321,16 @@ export default function BlockchainVerification() {
               {/* Generation Form */}
               <GlassCard>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-purple-400" />
                     Generate New Verification
                   </h3>
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="work-select" className="text-white">Select Work</Label>
+                      <Label htmlFor="work-select" className="text-gray-700">Select Work</Label>
                       <Select value={selectedWork?.toString()} onValueChange={(value) => setSelectedWork(parseInt(value))}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectTrigger className="bg-white/90 border-gray-300 text-gray-900">
                           <SelectValue placeholder="Choose a work to verify" />
                         </SelectTrigger>
                         <SelectContent>
@@ -344,9 +344,9 @@ export default function BlockchainVerification() {
                     </div>
 
                     <div>
-                      <Label htmlFor="verification-level" className="text-white">Verification Level</Label>
+                      <Label htmlFor="verification-level" className="text-gray-700">Verification Level</Label>
                       <Select value={verificationLevel} onValueChange={(value: any) => setVerificationLevel(value)}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectTrigger className="bg-white/90 border-gray-300 text-gray-900">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -357,12 +357,12 @@ export default function BlockchainVerification() {
                       </Select>
                     </div>
 
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <h4 className="font-medium text-white mb-2">{verificationLevel.charAt(0).toUpperCase() + verificationLevel.slice(1)} Verification</h4>
-                      <p className="text-sm text-gray-300 mb-2">
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-2">{verificationLevel.charAt(0).toUpperCase() + verificationLevel.slice(1)} Verification</h4>
+                      <p className="text-sm text-gray-700 mb-2">
                         {getVerificationLevelInfo(verificationLevel).description}
                       </p>
-                      <ul className="text-xs text-gray-400 space-y-1">
+                      <ul className="text-xs text-gray-600 space-y-1">
                         {getVerificationLevelInfo(verificationLevel).features.map((feature, index) => (
                           <li key={index} className="flex items-center gap-1">
                             <CheckCircle className="w-3 h-3 text-green-400" />
@@ -396,7 +396,7 @@ export default function BlockchainVerification() {
               {/* Generated Proof Display */}
               <GlassCard>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <FileCheck className="w-5 h-5 text-green-400" />
                     Generated Verification Proof
                   </h3>
@@ -405,29 +405,29 @@ export default function BlockchainVerification() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400">File Hash:</span>
-                          <p className="text-white font-mono text-xs break-all">{verificationProof.fileHash}</p>
+                          <span className="text-gray-600">File Hash:</span>
+                          <p className="text-gray-900 font-mono text-xs break-all">{verificationProof.fileHash}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">Certificate ID:</span>
-                          <p className="text-white font-mono text-xs">{verificationProof.certificateId}</p>
+                          <span className="text-gray-600">Certificate ID:</span>
+                          <p className="text-gray-900 font-mono text-xs">{verificationProof.certificateId}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">IPFS Hash:</span>
-                          <p className="text-white font-mono text-xs break-all">{verificationProof.ipfsHash}</p>
+                          <span className="text-gray-600">IPFS Hash:</span>
+                          <p className="text-gray-900 font-mono text-xs break-all">{verificationProof.ipfsHash}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">Blockchain Anchor:</span>
-                          <p className="text-white font-mono text-xs break-all">{verificationProof.blockchainAnchor}</p>
+                          <span className="text-gray-600">Blockchain Anchor:</span>
+                          <p className="text-gray-900 font-mono text-xs break-all">{verificationProof.blockchainAnchor}</p>
                         </div>
                       </div>
 
                       <div>
-                        <Label className="text-white mb-2 block">Full Verification Proof</Label>
+                        <Label className="text-gray-700 mb-2 block">Full Verification Proof</Label>
                         <Textarea 
                           value={JSON.stringify(verificationProof, null, 2)}
                           readOnly
-                          className="bg-black/40 border-white/20 text-white font-mono text-xs h-32"
+                          className="bg-gray-100 border-gray-300 text-gray-900 font-mono text-xs h-32"
                         />
                       </div>
 
@@ -435,14 +435,14 @@ export default function BlockchainVerification() {
                         <Button 
                           onClick={copyProofToClipboard}
                           variant="outline" 
-                          className="flex-1 border-white/20 text-white hover:bg-white/10"
+                          className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
                         >
                           <Copy className="w-4 h-4 mr-2" />
                           Copy Proof
                         </Button>
                         <Button 
                           variant="outline" 
-                          className="flex-1 border-white/20 text-white hover:bg-white/10"
+                          className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
                         >
                           <Share2 className="w-4 h-4 mr-2" />
                           Share
@@ -465,32 +465,32 @@ export default function BlockchainVerification() {
           <TabsContent value="verify">
             <GlassCard>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Eye className="w-5 h-5 text-blue-400" />
                   Verify Existing Proof
                 </h3>
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="verify-proof" className="text-white">Verification Proof (JSON)</Label>
+                    <Label htmlFor="verify-proof" className="text-gray-700">Verification Proof (JSON)</Label>
                     <Textarea 
                       id="verify-proof"
                       value={verifyingProof}
                       onChange={(e) => setVerifyingProof(e.target.value)}
                       placeholder="Paste the complete verification proof JSON here..."
-                      className="bg-white/10 border-white/20 text-white font-mono h-32"
+                      className="bg-white/90 border-gray-300 text-gray-900 font-mono h-32"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="verify-file" className="text-white">Original File (Optional)</Label>
+                    <Label htmlFor="verify-file" className="text-gray-700">Original File (Optional)</Label>
                     <Input 
                       id="verify-file"
                       type="file"
                       onChange={(e) => setVerifyingFile(e.target.files?.[0] || null)}
-                      className="bg-white/10 border-white/20 text-white"
+                      className="bg-white/90 border-gray-300 text-gray-900"
                     />
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Upload the original file to verify file hash integrity
                     </p>
                   </div>
@@ -521,14 +521,14 @@ export default function BlockchainVerification() {
           <TabsContent value="batch">
             <GlassCard>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Database className="w-5 h-5 text-cyan-400" />
                   Batch Verification Operations
                 </h3>
 
                 <div className="text-center py-8">
                   <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-400 mb-2">Batch operations coming soon</p>
+                  <p className="text-gray-600 mb-2">Batch operations coming soon</p>
                   <p className="text-sm text-gray-500">
                     Verify multiple works at once with bulk operations for enterprise users
                   </p>
