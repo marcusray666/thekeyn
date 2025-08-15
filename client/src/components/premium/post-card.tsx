@@ -14,11 +14,13 @@ interface PostCardProps {
     sha256Hash?: string;
     mimeType: string | null;
     thumbnailUrl?: string;
+    imageUrl?: string;
     isVerified: boolean;
     isProtected?: boolean;
     likesCount?: number;
     commentsCount?: number;
     description?: string;
+    username?: string;
   };
   onDetailsClick?: () => void;
 }
@@ -39,6 +41,45 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
     if (post.mimeType?.startsWith('audio/')) return '🎵';
     if (post.mimeType?.startsWith('video/')) return '🎬';
     return '📄';
+  };
+
+  const renderMediaPreview = () => {
+    // Get image URL from various possible sources
+    const imageUrl = post.imageUrl || post.thumbnailUrl;
+    
+    // For images, show the actual image
+    if (post.mimeType?.startsWith('image/') && (imageUrl || post.filename)) {
+      const imageSrc = imageUrl || `/api/files/${post.filename}`;
+      return (
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-800/50 flex-shrink-0">
+          <img
+            src={imageSrc}
+            alt={post.title || post.filename}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to emoji if image fails to load
+              const target = e.target as HTMLElement;
+              target.style.display = 'none';
+              const fallback = target.nextElementSibling as HTMLElement;
+              if (fallback) fallback.style.display = 'flex';
+            }}
+          />
+          <div 
+            className="w-full h-full flex items-center justify-center text-2xl bg-gray-800/50"
+            style={{ display: 'none' }}
+          >
+            🎨
+          </div>
+        </div>
+      );
+    }
+    
+    // For other file types, show emoji in a styled container
+    return (
+      <div className="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-2xl flex-shrink-0">
+        {getFileIcon()}
+      </div>
+    );
   };
 
   return (
@@ -99,7 +140,7 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
       {/* Content Preview */}
       <div className="mb-4">
         <div className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10">
-          <div className="text-4xl">{getFileIcon()}</div>
+          {renderMediaPreview()}
           <div className="flex-1">
             <h4 className="text-white font-medium truncate">{post.title || post.filename}</h4>
             {post.description && (
