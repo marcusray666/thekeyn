@@ -11,6 +11,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 
 export default function PremiumSettings() {
   const [, setLocation] = useLocation();
@@ -107,29 +108,25 @@ export default function PremiumSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-20 pb-32 px-4 relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+    <SimpleBackgroundEngine className="min-h-screen pt-20 pb-32 px-4 relative overflow-hidden light-theme">
       
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => setLocation('/profile')}
-            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Profile</span>
           </button>
           
-          <h1 className="text-3xl font-bold text-white">Settings</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
           
           <div className="w-20" />
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
+        <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden shadow-lg">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation */}
             <div className="border-b border-white/10 px-0">
@@ -374,6 +371,6 @@ export default function PremiumSettings() {
           </Tabs>
         </div>
       </div>
-    </div>
+    </SimpleBackgroundEngine>
   );
 }

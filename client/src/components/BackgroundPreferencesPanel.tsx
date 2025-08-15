@@ -94,12 +94,12 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Delete preference mutation
   const deletePreferenceMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/background-preferences/${id}`, {
+      return await apiRequest(`/api/background/preferences/${id}`, {
         method: 'DELETE',
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/background-preferences'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
       toast({
         title: 'Preference deleted',
         description: 'Background preference has been removed',
@@ -180,8 +180,36 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
     { value: 'relaxed', label: 'Relaxed', icon: '😌' },
   ];
 
+  // Select preference function
+  const selectPreference = async (preference: BackgroundPreference) => {
+    // Apply the background immediately
+    window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: preference }));
+    
+    // Track the interaction
+    await apiRequest('/api/background/interactions', {
+      method: 'POST',
+      body: JSON.stringify({
+        preferenceId: preference.id,
+        interactionType: 'select',
+        pageContext: window.location.pathname,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    setSelectedPreference(preference);
+    toast({
+      title: 'Background applied',
+      description: `${preference.gradientType} ${preference.colorScheme} background is now active`,
+    });
+  };
+
   const PreferenceCard = ({ preference }: { preference: BackgroundPreference }) => (
-    <Card className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200">
+    <Card 
+      className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200 cursor-pointer hover:shadow-lg"
+      onClick={() => selectPreference(preference)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -203,7 +231,10 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => deletePreferenceMutation.mutate(preference.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              deletePreferenceMutation.mutate(preference.id);
+            }}
             className="text-gray-400 hover:text-red-500"
           >
             <X className="h-4 w-4" />

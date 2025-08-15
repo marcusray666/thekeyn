@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 
 export default function PremiumProfile() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -233,7 +234,7 @@ export default function PremiumProfile() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-32 relative overflow-hidden light-theme">
+    <SimpleBackgroundEngine className="min-h-screen pt-20 pb-32 relative overflow-hidden light-theme">
       
       <div className="max-w-4xl mx-auto px-4 space-y-8 relative z-10">
         {/* Profile Header */}
@@ -530,6 +531,6 @@ export default function PremiumProfile() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </SimpleBackgroundEngine>
   );
 }

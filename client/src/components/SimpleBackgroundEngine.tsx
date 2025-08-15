@@ -58,6 +58,26 @@ export function SimpleBackgroundEngine({ children, className = '' }: SimpleBackg
     }
   }, [user]);
 
+  // Listen for background update events from BackgroundPreferencesPanel
+  useEffect(() => {
+    const handleBackgroundUpdate = (event: CustomEvent) => {
+      const preference = event.detail;
+      if (preference && preference.primaryColors && preference.primaryColors.length >= 2) {
+        const [color1, color2] = preference.primaryColors;
+        const gradient = `linear-gradient(135deg, ${color1}20 0%, ${color2}20 100%)`;
+        setCurrentGradient(gradient);
+        
+        // Dispatch event for navigation to adapt
+        window.dispatchEvent(new CustomEvent('navigationBackgroundUpdate', { 
+          detail: { gradient, colors: preference.primaryColors }
+        }));
+      }
+    };
+
+    window.addEventListener('backgroundUpdate', handleBackgroundUpdate);
+    return () => window.removeEventListener('backgroundUpdate', handleBackgroundUpdate);
+  }, []);
+
   return (
     <div 
       className={`min-h-screen ${className}`}

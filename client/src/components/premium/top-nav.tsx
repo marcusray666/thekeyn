@@ -23,6 +23,10 @@ export function TopNav() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [navBackground, setNavBackground] = useState({
+    background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.12) 0%, rgba(255, 210, 0, 0.08) 50%, rgba(254, 63, 94, 0.10) 100%)',
+    backgroundColor: 'rgba(254, 63, 94, 0.12)'
+  });
   
   // Search users query
   const { data: searchResults = [] } = useQuery({
@@ -60,14 +64,44 @@ export function TopNav() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
+  // Listen for background changes and adapt navigation
+  useEffect(() => {
+    const handleNavigationBackgroundUpdate = (event: CustomEvent) => {
+      const { colors } = event.detail;
+      if (colors && colors.length >= 2) {
+        const [color1, color2] = colors;
+        // Convert hex to rgba with opacity for navigation
+        const rgba1 = hexToRgba(color1, 0.12);
+        const rgba2 = hexToRgba(color2, 0.08);
+        const rgba3 = hexToRgba(color1, 0.10);
+        
+        setNavBackground({
+          background: `linear-gradient(135deg, ${rgba1} 0%, ${rgba2} 50%, ${rgba3} 100%)`,
+          backgroundColor: rgba1
+        });
+      }
+    };
+
+    window.addEventListener('navigationBackgroundUpdate', handleNavigationBackgroundUpdate);
+    return () => window.removeEventListener('navigationBackgroundUpdate', handleNavigationBackgroundUpdate);
+  }, []);
+
+  // Helper function to convert hex to rgba
+  const hexToRgba = (hex: string, alpha: number): string => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   return (
     <nav 
-      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-transform duration-300 custom-bg ${
+      className={`hidden md:flex items-center justify-between px-8 py-3 sticky top-0 z-40 transition-all duration-300 custom-bg ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{
-        backgroundColor: 'rgba(254, 63, 94, 0.12)',
-        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.12) 0%, rgba(255, 210, 0, 0.08) 50%, rgba(254, 63, 94, 0.10) 100%)',
+        backgroundColor: navBackground.backgroundColor,
+        background: navBackground.background,
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)'
       }}>
