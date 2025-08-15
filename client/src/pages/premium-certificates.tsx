@@ -31,18 +31,21 @@ export default function PremiumCertificates() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white/95 pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme">
-        {/* Background gradients */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+      <div className="min-h-screen pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme" style={{
+        background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.15) 0%, rgba(255, 210, 0, 0.15) 100%)',
+        backgroundAttachment: 'fixed'
+      }}>
+        {/* Enhanced background gradients to match profile page */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/20 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/20 rounded-full blur-[100px]"></div>
         
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="animate-pulse space-y-6">
-            <div className="h-20 bg-gray-200/50 rounded-3xl"></div>
+            <div className="h-20 bg-white/60 rounded-3xl shadow-lg"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="h-64 bg-gray-200/50 rounded-3xl"></div>
+                <div key={i} className="h-64 bg-white/60 rounded-3xl shadow-lg"></div>
               ))}
             </div>
           </div>
@@ -52,11 +55,14 @@ export default function PremiumCertificates() {
   }
 
   return (
-    <div className="min-h-screen bg-white/95 pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/5 via-transparent to-[#FFD200]/5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/10 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/10 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen pt-8 md:pt-20 pb-20 md:pb-32 relative overflow-hidden light-theme" style={{
+      background: 'linear-gradient(135deg, rgba(254, 63, 94, 0.15) 0%, rgba(255, 210, 0, 0.15) 100%)',
+      backgroundAttachment: 'fixed'
+    }}>
+      {/* Enhanced background gradients to match profile page */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FE3F5E]/20 via-transparent to-[#FFD200]/20"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FE3F5E]/20 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FFD200]/20 rounded-full blur-[100px]"></div>
       
       <div className="max-w-6xl mx-auto px-4 space-y-6 md:space-y-8 relative z-10">
         {/* Header */}
@@ -79,7 +85,7 @@ export default function PremiumCertificates() {
         </div>
 
         {/* Controls */}
-        <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
+        <div className="bg-white/90 backdrop-blur-xl border border-white/30 rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             {/* Search */}
             <div className="flex-1 max-w-md">
@@ -90,7 +96,7 @@ export default function PremiumCertificates() {
                   placeholder="Search certificates..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 bg-white/70 border-gray-200/50 text-gray-800 placeholder-gray-400 rounded-xl"
+                  className="pl-12 bg-white/80 border-white/40 text-gray-800 placeholder-gray-500 rounded-xl shadow-sm"
                 />
               </div>
             </div>
@@ -100,7 +106,7 @@ export default function PremiumCertificates() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="bg-white/70 border border-gray-200/50 text-gray-800 rounded-xl px-4 py-2 focus:outline-none focus:border-[#FE3F5E]"
+                className="bg-white/80 border border-white/40 text-gray-800 rounded-xl px-4 py-2 focus:outline-none focus:border-[#FE3F5E] shadow-sm"
               >
                 <option value="all" className="bg-white text-gray-800">All Certificates</option>
                 <option value="verified" className="bg-white text-gray-800">Verified</option>
@@ -134,7 +140,7 @@ export default function PremiumCertificates() {
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/90 transition-all duration-300">
+                <div key={cert.id} className="bg-white/90 backdrop-blur-xl border border-white/30 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/95 transition-all duration-300 shadow-lg">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-800 truncate">
@@ -192,10 +198,10 @@ export default function PremiumCertificates() {
               ))}
             </div>
           ) : (
-            <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden">
-              <div className="divide-y divide-gray-200/30">
+            <div className="bg-white/90 backdrop-blur-xl border border-white/30 rounded-3xl overflow-hidden shadow-lg">
+              <div className="divide-y divide-white/40">
                 {filteredCertificates.map((cert) => (
-                  <div key={cert.id} className="p-6 hover:bg-white/90 transition-colors">
+                  <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-4">
@@ -251,7 +257,7 @@ export default function PremiumCertificates() {
           )
         ) : (
           <div className="text-center py-12 md:py-16 px-4">
-            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gray-100/80 rounded-full flex items-center justify-center mb-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-white/60 rounded-full flex items-center justify-center mb-6 shadow-lg">
               <span className="text-3xl md:text-4xl">🛡️</span>
             </div>
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">No Certificates Found</h3>
