@@ -10,8 +10,18 @@ export default function WelcomeClean() {
       <div className="w-full max-w-4xl mx-auto text-center safe-area-inset">
         {/* Hero Section */}
         <div className="mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
-            TheKeyn
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+            <span 
+              className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] bg-clip-text text-transparent"
+              style={{
+                backgroundImage: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
+              TheKeyn
+            </span>
           </h1>
           
           <Badge className="mb-6 bg-white/60 backdrop-blur-md border-gray-200/50 text-gray-700 px-4 py-2">
