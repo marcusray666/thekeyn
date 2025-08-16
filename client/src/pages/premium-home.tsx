@@ -8,6 +8,7 @@ import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onb
 import { useOnboardingTriggers } from "@/hooks/use-onboarding";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 import { BackgroundPreferencesPanel } from "@/components/BackgroundPreferencesPanel";
+import { NeonSign } from "@/components/NeonSign";
 import React from "react";
 
 
@@ -78,6 +79,9 @@ export default function PremiumHome() {
 
   return (
     <SimpleBackgroundEngine className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
+      {/* Neon Sign */}
+      <NeonSign />
+      
       {/* Background Settings Button */}
       <div className="fixed top-20 right-6 z-50">
         <BackgroundPreferencesPanel 

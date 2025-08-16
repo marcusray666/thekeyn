@@ -417,6 +417,27 @@ a[href="/login"] > div {
     100% { background-position: 0% 50%; }
   }
 
+  /* Neon flicker animation */
+  @keyframes neon-flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+      text-shadow: 
+        0 0 5px #FF1744,
+        0 0 10px #FF1744,
+        0 0 15px #FF1744,
+        0 0 20px #FF1744,
+        0 0 35px #FF1744,
+        0 0 40px #FF1744;
+    }
+    
+    20%, 24%, 55% {
+      text-shadow: 
+        0 0 2px #FF1744,
+        0 0 5px #FF1744,
+        0 0 8px #FF1744,
+        0 0 12px #FF1744;
+    }
+  }
+
   /* Glass morphism button styles */
   .btn-glass {
     background: rgba(255, 255, 255, 0.1);
