@@ -185,11 +185,23 @@ export default function AdminDashboard() {
 
   const handleUserAction = async (userId: number, action: string, reason?: string) => {
     try {
-      const response = await fetch(`/api/admin/users/${userId}/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason }),
-      });
+      let response;
+      
+      if (action === 'delete') {
+        // DELETE method for user deletion
+        response = await fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason }),
+        });
+      } else {
+        // POST method for other actions (ban, unban, verify)
+        response = await fetch(`/api/admin/users/${userId}/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason }),
+        });
+      }
 
       if (response.ok) {
         refetchUsers();
@@ -691,6 +703,37 @@ export default function AdminDashboard() {
                                   Unban
                                 </Button>
                               )}
+                              
+                              {/* Delete User Button */}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="bg-gradient-to-r from-red-800/20 to-red-900/20 border-red-700/50 text-red-400 hover:from-red-700/30 hover:to-red-800/30 backdrop-blur-sm"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Delete User
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="bg-gray-800 border-gray-700">
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-red-400">Delete User Permanently</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently delete {user.username} and ALL associated data including posts, works, certificates, and blockchain records. This action CANNOT be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      className="bg-red-600 hover:bg-red-700"
+                                      onClick={() => handleUserAction(user.id, 'delete', 'Admin deletion - permanent removal')}
+                                    >
+                                      Delete Permanently
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                         </CardContent>
@@ -845,12 +888,42 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-emerald-500/50 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 backdrop-blur-sm"
+                              className="bg-white/5 border-white/20 text-emerald-400 hover:bg-white/10 backdrop-blur-xl rounded-xl"
                               onClick={() => handleUserAction(user.id, 'unban')}
                             >
-                              Unban
+                              <CheckCircle className="h-4 w-4" />
                             </Button>
                           )}
+                          
+                          {/* Delete User Button */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="bg-white/5 border-white/20 text-red-400 hover:bg-white/10 backdrop-blur-xl rounded-xl"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-gray-800 border-gray-700">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle className="text-red-400">Delete User Permanently</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete {user.username} and ALL associated data including posts, works, certificates, and blockchain records. This action CANNOT be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="border-gray-600">Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-red-600 hover:bg-red-700"
+                                  onClick={() => handleUserAction(user.id, 'delete', 'Admin deletion - permanent removal')}
+                                >
+                                  Delete Permanently
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     ))}

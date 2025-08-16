@@ -27,6 +27,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
   
   createWork(work: InsertWork): Promise<Work>;
   getWork(id: number): Promise<Work | undefined>;
@@ -218,6 +219,44 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    // Delete user and all associated data (cascading delete)
+    // Note: This will remove all user data including works, posts, comments, etc.
+    
+    // Delete in proper order to avoid foreign key constraints
+    await db.delete(messageReadStatus).where(eq(messageReadStatus.userId, id));
+    await db.delete(messages).where(eq(messages.senderId, id));
+    await db.delete(conversationParticipants).where(eq(conversationParticipants.userId, id));
+    await db.delete(conversations).where(eq(conversations.createdBy, id));
+    
+    await db.delete(backgroundInteractions).where(eq(backgroundInteractions.userId, id));
+    await db.delete(userBackgroundPreferences).where(eq(userBackgroundPreferences.userId, id));
+    
+    await db.delete(adminAuditLogs).where(eq(adminAuditLogs.adminId, id));
+    await db.delete(contentReports).where(eq(contentReports.reporterId, id));
+    
+    await db.delete(userAnalytics).where(eq(userAnalytics.userId, id));
+    await db.delete(userPreferences).where(eq(userPreferences.userId, id));
+    await db.delete(userNotifications).where(eq(userNotifications.userId, id));
+    await db.delete(userFollows).where(or(eq(userFollows.followerId, id), eq(userFollows.followingId, id)));
+    
+    await db.delete(postReactions).where(eq(postReactions.userId, id));
+    await db.delete(postComments).where(eq(postComments.userId, id));
+    await db.delete(posts).where(eq(posts.userId, id));
+    
+    await db.delete(notifications).where(eq(notifications.userId, id));
+    await db.delete(shares).where(eq(shares.userId, id));
+    await db.delete(comments).where(eq(comments.userId, id));
+    await db.delete(likes).where(eq(likes.userId, id));
+    await db.delete(follows).where(or(eq(follows.followerId, id), eq(follows.followingId, id)));
+    
+    await db.delete(certificates).where(eq(certificates.userId, id));
+    await db.delete(works).where(eq(works.userId, id));
+    
+    // Finally delete the user
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async createWork(insertWork: InsertWork): Promise<Work> {

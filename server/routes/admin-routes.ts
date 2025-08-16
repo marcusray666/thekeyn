@@ -181,6 +181,52 @@ export default function setupAdminRoutes(app: Express) {
     }
   });
 
+  // Delete user (permanent)
+  app.delete("/api/admin/users/:userId", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { reason } = req.body;
+
+      if (!reason) {
+        return res.status(400).json({ error: "Deletion reason is required" });
+      }
+
+      // Prevent admin from deleting themselves
+      if (userId === req.session!.userId!) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      // Get user info before deletion for logging
+      const userToDelete = await storage.getUser(userId);
+      if (!userToDelete) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Delete the user and all associated data
+      await storage.deleteUser(userId);
+      
+      // Log admin action
+      await storage.createAdminAuditLog({
+        adminId: req.session!.userId!,
+        action: 'user_deleted',
+        targetType: 'user',
+        targetId: userId.toString(),
+        details: JSON.stringify({ 
+          reason, 
+          deletedUsername: userToDelete.username,
+          deletedEmail: userToDelete.email 
+        }),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
   // Verify user
   app.post("/api/admin/users/:userId/verify", requireAdmin, async (req: Request, res: Response) => {
     try {
