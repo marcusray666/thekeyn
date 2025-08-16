@@ -24,31 +24,48 @@ export default function WelcomeClean() {
           </p>
         </div>
 
-        {/* CTA Buttons - Native HTML for Mobile Compatibility */}
-        <div className="flex flex-col gap-4 justify-center items-center mb-16 px-6 w-full max-w-sm mx-auto">
-          <a href="/register" className="w-full block no-underline">
-            <div className="w-full bg-[#FE3F5E] text-white text-lg font-bold px-8 py-5 rounded-2xl shadow-2xl min-h-[60px] flex items-center justify-center cursor-pointer border-0 outline-none select-none" 
-                 style={{ 
-                   WebkitAppearance: 'none', 
-                   WebkitTapHighlightColor: 'transparent',
-                   textDecoration: 'none',
-                   userSelect: 'none'
-                 }}>
-              <Crown className="h-6 w-6 mr-3 flex-shrink-0" />
-              <span>Get Started</span>
+        {/* CTA Buttons - iOS Safari Compatible */}
+        <div className="flex flex-col gap-6 justify-center items-center mb-16 px-6 w-full max-w-sm mx-auto">
+          <a href="/register" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+            <div 
+              className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+              style={{ 
+                backgroundColor: '#FE3F5E',
+                color: '#ffffff',
+                textDecoration: 'none',
+                userSelect: 'none',
+                WebkitAppearance: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <Crown className="h-7 w-7 mr-3 flex-shrink-0" style={{ color: '#ffffff' }} />
+              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started</span>
             </div>
           </a>
           
-          <a href="/login" className="w-full block no-underline">
-            <div className="w-full border-3 border-gray-700 bg-white text-gray-800 text-lg font-bold px-8 py-5 rounded-2xl min-h-[60px] flex items-center justify-center cursor-pointer shadow-2xl select-none" 
-                 style={{ 
-                   WebkitAppearance: 'none', 
-                   WebkitTapHighlightColor: 'transparent',
-                   textDecoration: 'none',
-                   userSelect: 'none',
-                   border: '3px solid #374151'
-                 }}>
-              <span>Loggin'</span>
+          <a href="/login" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+            <div 
+              className="w-full text-gray-800 text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+              style={{ 
+                backgroundColor: '#ffffff',
+                color: '#1f2937',
+                textDecoration: 'none',
+                userSelect: 'none',
+                WebkitAppearance: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                border: '3px solid #1f2937',
+                outline: 'none',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <span style={{ color: '#1f2937', fontWeight: 'bold' }}>Loggin'</span>
             </div>
           </a>
         </div>

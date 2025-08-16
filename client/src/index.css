@@ -17,6 +17,31 @@ button,
   touch-action: manipulation;
 }
 
+/* Force button colors on iOS Safari */
+a[href="/register"] > div {
+  background-color: #FE3F5E !important;
+  color: #ffffff !important;
+}
+
+a[href="/login"] > div {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 3px solid #1f2937 !important;
+}
+
+/* Prevent iOS Safari from overriding button styles */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  a[href="/register"] > div {
+    -webkit-background-clip: padding-box !important;
+    background-clip: padding-box !important;
+  }
+  
+  a[href="/login"] > div {
+    -webkit-background-clip: padding-box !important;
+    background-clip: padding-box !important;
+  }
+}
+
 
 
 /* White liquid glass theme */
