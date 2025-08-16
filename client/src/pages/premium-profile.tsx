@@ -365,10 +365,10 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md bg-white/95 hover:bg-white text-gray-900 hover:text-black shadow-lg border border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-xl"
+                                className="h-10 w-10 rounded-full bg-white hover:bg-gray-50 text-gray-800 hover:text-gray-900 shadow-xl border-2 border-gray-400 flex items-center justify-center transition-all duration-200 hover:shadow-2xl hover:border-gray-500"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreVertical className="h-5 w-5" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -440,9 +440,9 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md bg-white/95 hover:bg-white text-gray-900 hover:text-black shadow-lg border border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-xl"
+                                className="h-10 w-10 rounded-full bg-white hover:bg-gray-50 text-gray-800 hover:text-gray-900 shadow-xl border-2 border-gray-400 flex items-center justify-center transition-all duration-200 hover:shadow-2xl hover:border-gray-500"
                               >
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreVertical className="h-5 w-5" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
