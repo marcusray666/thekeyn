@@ -212,8 +212,8 @@ function WelcomePage() {
                 style={{ 
                   fontSize: 'clamp(4rem, 12vw, 6rem)',
                   lineHeight: '1.2',
-                  fontFamily: '"Courier New", "Monaco", "Lucida Console", monospace',
-                  fontWeight: 'bold',
+                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  fontWeight: '900',
                   color: '#FF1744',
                   textShadow: `
                     0 0 5px #FF1744,
@@ -223,7 +223,7 @@ function WelcomePage() {
                     0 0 35px #FF1744,
                     0 0 40px #FF1744
                   `,
-                  letterSpacing: '0.05em',
+                  letterSpacing: '-0.02em',
                   position: 'relative',
                   display: 'inline-block'
                 }}
