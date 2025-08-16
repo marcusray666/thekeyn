@@ -365,7 +365,19 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-10 w-10 rounded-full bg-white hover:bg-gray-50 text-gray-800 hover:text-gray-900 shadow-xl border-2 border-gray-400 flex items-center justify-center transition-all duration-200 hover:shadow-2xl hover:border-gray-500"
+                                style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#ffffff',
+                                  border: '2px solid #374151',
+                                  color: '#1f2937',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15)',
+                                  transition: 'all 0.2s ease'
+                                }}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreVertical className="h-5 w-5" />
@@ -440,7 +452,19 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-10 w-10 rounded-full bg-white hover:bg-gray-50 text-gray-800 hover:text-gray-900 shadow-xl border-2 border-gray-400 flex items-center justify-center transition-all duration-200 hover:shadow-2xl hover:border-gray-500"
+                                style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#ffffff',
+                                  border: '2px solid #374151',
+                                  color: '#1f2937',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15)',
+                                  transition: 'all 0.2s ease'
+                                }}
                               >
                                 <MoreVertical className="h-5 w-5" />
                               </button>
