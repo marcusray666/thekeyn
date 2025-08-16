@@ -10,7 +10,7 @@ export default function WelcomeClean() {
       <div className="w-full max-w-4xl mx-auto text-center safe-area-inset">
         {/* Hero Section */}
         <div className="mb-12">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-6 leading-tight">
             <span 
               className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] bg-clip-text text-transparent"
               style={{
