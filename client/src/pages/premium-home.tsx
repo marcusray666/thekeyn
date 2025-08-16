@@ -171,13 +171,13 @@ function WelcomePage() {
         </header>
 
         {/* Hero Section */}
-        <section className="px-6 py-20 text-center">
+        <section className="px-6 py-8 md:py-20 text-center">
           <div className="max-w-4xl mx-auto">
             <div 
-              className="mb-8 relative"
+              className="mb-4 md:mb-8 relative"
               style={{ 
-                paddingTop: '20px',
-                paddingBottom: '40px'
+                paddingTop: '10px',
+                paddingBottom: '20px'
               }}
             >
               <style jsx>{`
@@ -260,7 +260,7 @@ function WelcomePage() {
             </div>
             
             <h2 
-              className="font-bold text-white mb-6 leading-tight"
+              className="font-bold text-white mb-4 md:mb-6 leading-tight"
               style={{ 
                 fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
                 lineHeight: '1.1'
@@ -270,7 +270,7 @@ function WelcomePage() {
               <span className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent"> Creative Work</span>
             </h2>
             
-            <p className="text-xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/70 mb-6 md:mb-12 max-w-3xl mx-auto leading-relaxed">
               Instantly secure, prove, and defend your digital creations with blockchain-powered certificates. 
               Join thousands of creators protecting their intellectual property.
             </p>
