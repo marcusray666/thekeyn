@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Custom hook for managing mobile bottom navigation visibility based on scroll behavior and modal state
@@ -7,16 +7,14 @@ import React, { useEffect, useState } from "react";
 export function useScrollNavigation() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Check if any modals/dialogs are open by looking for Radix dialog overlays
-      const hasOpenModal = document.querySelector('[data-radix-dialog-overlay]') !== null;
-      
       // Hide navigation if modal is open
-      if (hasOpenModal) {
+      if (modalOpen) {
         setIsVisible(false);
         return;
       }
@@ -35,10 +33,21 @@ export function useScrollNavigation() {
       setLastScrollY(currentScrollY);
     };
 
-    // Also listen for DOM mutations to detect modal state changes
-    const handleModalToggle = () => {
-      const hasOpenModal = document.querySelector('[data-radix-dialog-overlay]') !== null;
-      if (hasOpenModal) {
+    const throttledScroll = throttle(handleScroll, 16); // ~60fps
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+    };
+  }, [lastScrollY, modalOpen]);
+
+  // Separate effect for modal state changes
+  useEffect(() => {
+    const handleModalStateChange = (event: CustomEvent) => {
+      const { isOpen } = event.detail;
+      setModalOpen(isOpen);
+      
+      if (isOpen) {
         setIsVisible(false);
       } else {
         // When modal closes, use current scroll position to determine visibility
@@ -47,23 +56,12 @@ export function useScrollNavigation() {
       }
     };
 
-    const throttledScroll = throttle(handleScroll, 16); // ~60fps
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    
-    // Listen for mutations to detect when modals are opened/closed
-    const observer = new MutationObserver(handleModalToggle);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['data-state']
-    });
+    window.addEventListener('modal-state-change', handleModalStateChange as EventListener);
     
     return () => {
-      window.removeEventListener('scroll', throttledScroll);
-      observer.disconnect();
+      window.removeEventListener('modal-state-change', handleModalStateChange as EventListener);
     };
-  }, [lastScrollY]);
+  }, []);
 
   return { isVisible };
 }

@@ -258,11 +258,14 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   );
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => {
+      // Dispatch custom event for navigation hiding
+      window.dispatchEvent(new CustomEvent('modal-state-change', { detail: { isOpen: open } }));
+    }}>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl md:max-h-[80vh] max-h-[85vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 mx-4 md:mx-auto w-[calc(100vw-2rem)] md:w-auto">
+      <DialogContent className="max-w-4xl md:max-h-[80vh] max-h-[85vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 w-[calc(100vw-2rem)] md:w-auto sm:max-w-[425px] left-4 right-4 translate-x-0 sm:left-[50%] sm:translate-x-[-50%]">
         <DialogHeader>
           <DialogTitle className="flex items-center text-gray-800">
             <Sparkles className="h-5 w-5 mr-2 text-pink-500" />
