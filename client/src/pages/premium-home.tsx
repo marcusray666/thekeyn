@@ -79,7 +79,7 @@ export default function PremiumHome() {
 
   return (
     <SimpleBackgroundEngine className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
-      {/* Neon Sign */}
+      {/* Neon Sign - Fixed to background */}
       <NeonSign />
       
       {/* Background Settings Button */}
