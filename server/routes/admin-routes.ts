@@ -34,7 +34,7 @@ export default function setupAdminRoutes(app: Express) {
       let user = null;
       let isAdmin = false;
       
-      if (isAuthenticated) {
+      if (isAuthenticated && session.userId) {
         user = await storage.getUser(session.userId);
         isAdmin = user?.role === 'admin';
       }

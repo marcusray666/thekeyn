@@ -242,7 +242,7 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
       followingCount: user.followingCount || 0,
       totalLikes: user.totalLikes || 0,
       themePreference: user.themePreference || 'light',
-      settings: user.settings || {},
+      settings: typeof user.settings === 'object' && user.settings !== null ? user.settings : {},
       lastLoginAt: user.lastLoginAt,
       isBanned: user.isBanned || false,
       banReason: user.banReason,
@@ -1289,8 +1289,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Error deleting physical file:', fileError);
         console.error('File deletion error details:', {
           filename: work.filename,
-          errorMessage: fileError.message,
-          errorStack: fileError.stack
+          errorMessage: fileError instanceof Error ? fileError.message : String(fileError),
+          errorStack: fileError instanceof Error ? fileError.stack : 'No stack trace'
         });
         // Continue with database deletion even if file deletion fails
       }
@@ -1317,7 +1317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Work deleted from database successfully`);
       } catch (dbError) {
         console.error('Error deleting work from database:', dbError);
-        throw new Error(`Failed to delete work from database: ${dbError.message}`);
+        throw new Error(`Failed to delete work from database: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
       }
 
       // Log the deletion for audit purposes
@@ -1532,7 +1532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/nft-mints/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const nftMint = await storage.getNftMint(parseInt(req.params.id));
-      if (!nftMint || nftMint.userId !== req.userId!) {
+      if (!nftMint || nftMint.userId !== req.user!.id) {
         return res.status(404).json({ message: 'NFT mint not found' });
       }
       res.json(nftMint);
@@ -1558,7 +1558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { tierId } = req.body;
       
       // Simulate payment processing and subscription update
-      const user = await storage.getUser(req.userId!);
+      const user = await storage.getUser(req.user!.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -1568,7 +1568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       expirationDate.setMonth(expirationDate.getMonth() + 1);
 
       // Update user subscription
-      await storage.updateUser(req.userId!, {
+      await storage.updateUser(req.user!.id, {
         subscriptionTier: tierId,
         subscriptionExpiresAt: expirationDate
       });
@@ -1623,13 +1623,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const worksProtected = userWorks.length;
       
       // Get certificates count (works with certificate URLs)
-      const certificates = userWorks.filter(work => work.certificateUrl).length;
+      const certificates = userWorks.filter(work => work.certificateId).length;
       
       // Get user's total likes from their posts (fallback for now)
       let communityLikes = 0;
       try {
         const userPosts = await storage.getUserPosts(userId);
-        communityLikes = userPosts.reduce((total, post) => total + (post.likesCount || 0), 0);
+        communityLikes = userPosts.reduce((total, post) => total + (post.likes || 0), 0);
       } catch (error) {
         console.log("getUserPosts not implemented, using fallback");
         communityLikes = Math.floor(Math.random() * 200) + 50;
@@ -1693,7 +1693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Filter analytics for this month
         const monthAnalytics = userAnalytics.filter(day => {
-          const dayDate = new Date(day.date);
+          const dayDate = day.date ? new Date(day.date) : new Date();
           return dayDate.getMonth() === monthIndex && dayDate.getFullYear() === year;
         });
         
@@ -2338,7 +2338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Main subscription endpoint with limits and usage
   app.get('/api/subscription', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       console.log('Subscription API - userId from auth:', userId);
       
       const user = await storage.getUser(userId);
@@ -2389,7 +2389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/subscription/status', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = await storage.getUser(req.userId!);
+      const user = await storage.getUser(req.user!.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -2408,7 +2408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel subscription
   app.post('/api/subscription/cancel', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -2441,7 +2441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reactivate subscription
   app.post('/api/subscription/reactivate', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -2470,14 +2470,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User settings routes
   app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = await storage.getUser(req.userId!);
+      const user = await storage.getUser(req.user!.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+      const settings = typeof user.settings === 'object' && user.settings !== null ? user.settings : {};
       res.json({
-        notifications: user.settings?.notifications || {},
-        privacy: user.settings?.privacy || {},
-        security: user.settings?.security || {},
+        notifications: settings.notifications || {},
+        privacy: settings.privacy || {},
+        security: settings.security || {},
         theme: user.themePreference || 'liquid-glass'
       });
     } catch (error) {
@@ -2512,7 +2513,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const updates = req.body;
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       console.log('Profile update request:', { userId, updates });
       

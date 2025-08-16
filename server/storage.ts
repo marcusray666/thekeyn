@@ -646,13 +646,7 @@ export class DatabaseStorage implements IStorage {
           await this.createNotification({
             userId: mentionedUser.id,
             type: 'mention',
-            title: 'You were mentioned in a post',
-            content: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content?.substring(0, 50)}..."`,
-            data: {
-              postId: post.id,
-              mentionedBy: postData.userId,
-              postTitle: postData.title
-            }
+            message: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content?.substring(0, 50)}..."`
           });
         }
       }

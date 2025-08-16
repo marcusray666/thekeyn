@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRoute } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { 
   ArrowLeft, 
@@ -125,15 +124,7 @@ export default function ReportTheft() {
     window.open(mailto);
   };
 
-  const sendDirectEmail = async () => {
-    // This would integrate with an email service like SendGrid
-    // For now, we'll just open the email client
-    openEmailClient();
-    toast({
-      title: "Email client opened",
-      description: "Your default email client has been opened with the takedown request.",
-    });
-  };
+
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] relative overflow-hidden">
