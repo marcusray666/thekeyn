@@ -120,7 +120,7 @@ export default function LoginClean() {
               onClick={loginMutation.isPending ? undefined : handleSubmit}
               className="w-full text-white text-base font-semibold px-6 py-3 rounded-xl min-h-[48px] flex items-center justify-center cursor-pointer select-none mt-6"
               style={{ 
-                backgroundColor: '#FE3F5E',
+                background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
                 color: '#ffffff',
                 textDecoration: 'none',
                 userSelect: 'none',
