@@ -27,7 +27,8 @@ export function NeonSign() {
         left: '1.5rem',
         opacity,
         fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',
-        lineHeight: '0.9'
+        lineHeight: '1.2',
+        paddingBottom: '0.25rem'
       }}
     >
       <span 
@@ -36,7 +37,10 @@ export function NeonSign() {
           backgroundImage: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
+          backgroundClip: 'text',
+          filter: 'drop-shadow(0 0 8px rgba(254, 63, 94, 0.4)) drop-shadow(0 0 15px rgba(254, 63, 94, 0.2))',
+          textShadow: '0 0 10px rgba(254, 63, 94, 0.3), 0 0 20px rgba(254, 63, 94, 0.2)',
+          display: 'block'
         }}
       >
         TheKeyn
