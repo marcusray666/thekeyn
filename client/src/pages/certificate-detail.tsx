@@ -309,9 +309,9 @@ export default function CertificateDetail() {
             Back to Certificates
           </Button>
           
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
+            <div className="flex-1 min-w-0 pr-4">
+              <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 truncate">
                 {certificate.work.title}
               </h1>
               <p className="text-white/60">
@@ -319,11 +319,11 @@ export default function CertificateDetail() {
               </p>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-shrink-0">
               <Button
                 onClick={handleShare}
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5"
+                className="border-gray-600 text-gray-300 hover:bg-white hover:bg-opacity-5 text-sm sm:text-base px-3 sm:px-4 py-2"
               >
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
@@ -331,9 +331,9 @@ export default function CertificateDetail() {
               
               <Button
                 onClick={handleDownloadCertificate}
-                className="btn-glass px-6 py-3 rounded-2xl font-semibold text-white"
+                className="btn-glass text-sm sm:text-base px-3 sm:px-6 py-2 sm:py-3 rounded-2xl font-semibold text-white whitespace-nowrap"
               >
-                <Download className="mr-2 h-4 w-4" />
+                <Download className="mr-2 h-4 w-4 flex-shrink-0" />
                 Download PDF
               </Button>
             </div>
