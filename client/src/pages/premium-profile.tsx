@@ -364,14 +364,12 @@ export default function PremiumProfile() {
                         <div className="absolute top-2 right-2 z-10">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200/50"
+                              <button
+                                className="h-8 w-8 rounded-md bg-white/95 hover:bg-white text-gray-900 hover:text-black shadow-lg border border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-xl"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreVertical className="h-4 w-4" />
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
@@ -441,13 +439,11 @@ export default function PremiumProfile() {
                         <div className="absolute top-4 right-4 z-10">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200/50"
+                              <button
+                                className="h-8 w-8 rounded-md bg-white/95 hover:bg-white text-gray-900 hover:text-black shadow-lg border border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-xl"
                               >
                                 <MoreVertical className="h-4 w-4" />
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
