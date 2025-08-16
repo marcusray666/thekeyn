@@ -262,7 +262,7 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50">
+      <DialogContent className="max-w-4xl md:max-h-[80vh] max-h-[85vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 mx-2 md:mx-auto w-[calc(100vw-1rem)] md:w-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center text-gray-800">
             <Sparkles className="h-5 w-5 mr-2 text-pink-500" />
@@ -275,16 +275,16 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
 
         <div className="space-y-6">
           {/* Quick Actions */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={() => generateGradientMutation.mutate()}
               disabled={generateGradientMutation.isPending}
-              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500"
+              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 w-full sm:w-auto"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${generateGradientMutation.isPending ? 'animate-spin' : ''}`} />
               Generate New Gradient
             </Button>
-            <Button variant="outline" className="bg-white/80">
+            <Button variant="outline" className="bg-white/80 w-full sm:w-auto">
               <Settings className="h-4 w-4 mr-2" />
               Advanced Settings
             </Button>
