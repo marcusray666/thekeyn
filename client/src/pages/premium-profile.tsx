@@ -367,7 +367,7 @@ export default function PremiumProfile() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
+                                className="h-8 w-8 p-0 bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200/50"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreVertical className="h-4 w-4" />
@@ -444,7 +444,7 @@ export default function PremiumProfile() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
+                                className="h-8 w-8 p-0 bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200/50"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
