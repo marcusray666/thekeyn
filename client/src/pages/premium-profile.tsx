@@ -11,12 +11,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
+import CommentsSection from "@/components/CommentsSection";
 
 export default function PremiumProfile() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [showMediaViewer, setShowMediaViewer] = useState(false);
-  const [newComment, setNewComment] = useState("");
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const { user } = useAuth();
@@ -81,37 +82,7 @@ export default function PremiumProfile() {
   });
 
   // Comment mutation
-  const commentMutation = useMutation({
-    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
-      return await apiRequest(`/api/community/posts/${postId}/comments`, {
-        method: 'POST',
-        body: JSON.stringify({ content }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    },
-    onSuccess: (data) => {
-      setNewComment("");
-      
-      // Update selected post with new comment count
-      if (selectedPost) {
-        setSelectedPost({
-          ...selectedPost,
-          comments: (selectedPost.comments || 0) + 1
-        });
-      }
-      
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/community/posts", "user", targetUserId] });
-      
-      toast({
-        title: "Comment added!",
-        description: "Your comment has been posted.",
-      });
-    },
-  });
+
 
   // Delete post mutation
   const deletePostMutation = useMutation({
@@ -150,14 +121,7 @@ export default function PremiumProfile() {
     }
   };
 
-  const handleComment = () => {
-    if (selectedPost && newComment.trim()) {
-      commentMutation.mutate({
-        postId: selectedPost.id,
-        content: newComment.trim(),
-      });
-    }
-  };
+
 
   const renderMediaContent = (post: any) => {
     if (post.imageUrl) {
@@ -523,52 +487,13 @@ export default function PremiumProfile() {
                   </div>
                 )}
 
-                {/* Comment Section */}
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {user?.username?.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 flex gap-2">
-                      <Input
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment..."
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                        onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-                      />
-                      <Button
-                        onClick={handleComment}
-                        disabled={!newComment.trim() || commentMutation.isPending}
-                        className="bg-[#FE3F5E] hover:bg-[#FE3F5E]/80"
-                      >
-                        Post
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Existing Comments Display (if available) */}
-                  {selectedPost.commentsData && selectedPost.commentsData.length > 0 && (
-                    <div className="space-y-3">
-                      {selectedPost.commentsData.map((comment: any, index: number) => (
-                        <div key={index} className="flex gap-3 p-3 bg-white/5 rounded-xl">
-                          <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold">
-                              {comment.username?.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-white/80 text-sm">{comment.content}</p>
-                            <p className="text-white/50 text-xs mt-1">
-                              @{comment.username} • {new Date(comment.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                {/* Comments Section */}
+                <div className="mt-6 pt-4 border-t border-white/10">
+                  <CommentsSection 
+                    postId={selectedPost.id.toString()} 
+                    postType="community" 
+                    currentUserId={user?.id}
+                  />
                 </div>
               </div>
             </div>
