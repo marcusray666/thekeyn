@@ -234,8 +234,7 @@ function WelcomePage() {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <LogoIcon size="sm" className="mr-2 text-white" />
-                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Loggin'</span>
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Loggin</span>
                 </div>
               </a>
             </div>
