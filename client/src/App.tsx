@@ -82,7 +82,7 @@ function Router() {
       <Route path="/nft-studio" component={NFTStudio} />
       <Route path="/nft-simple" component={SimplifiedNFT} />
       <Route path="/blockchain-verification" component={BlockchainVerification} />
-      <Route path="/verify" component={BlockchainVerification} />
+      <Route path="/verify" component={PremiumCertificates} />
       <Route path="/social" component={Social} />
       <Route path="/messages" component={Messages} />
       <Route path="/user/:userId" component={Profile} />
