@@ -88,6 +88,25 @@ div[data-radix-dropdown-menu-content] {
   background-color: transparent !important;
 }
 
+/* Invisible dropdown container - only show content */
+.invisible-dropdown-container {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.invisible-dropdown-container[data-state="open"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 button:focus,
 button:active,
 button:hover,
