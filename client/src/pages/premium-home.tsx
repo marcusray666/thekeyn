@@ -173,8 +173,24 @@ function WelcomePage() {
         {/* Hero Section */}
         <section className="px-6 py-20 text-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              TheKeyn
+            <h1 
+              className="font-black text-white mb-4 leading-tight"
+              style={{ 
+                fontSize: 'clamp(5rem, 15vw, 10rem)',
+                lineHeight: '0.9'
+              }}
+            >
+              <span 
+                className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, #FE3F5E, #FFD200)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                TheKeyn
+              </span>
             </h1>
             
             <div className="mb-6 inline-flex items-center px-4 py-2 text-[#FFD200] text-sm font-medium" style={{
@@ -189,7 +205,13 @@ function WelcomePage() {
               Digital Art Protection Platform
             </div>
             
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h2 
+              className="font-bold text-white mb-6 leading-tight"
+              style={{ 
+                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+                lineHeight: '1.1'
+              }}
+            >
               Protect Your
               <span className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent"> Creative Work</span>
             </h2>
