@@ -15,32 +15,39 @@ export function NeonSign() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  if (opacity <= 0) return null;
+
   return (
-    <span 
-      className="fixed font-inter text-2xl md:text-xl sm:text-lg font-bold tracking-wider text-[#FF1744] pointer-events-none"
+    <div 
+      className="fixed pointer-events-none select-none neon-text-pure"
       style={{
         position: 'fixed',
         zIndex: 0,
         top: '1.5rem',
         left: '1.5rem',
         opacity,
+        fontFamily: 'Inter, sans-serif',
+        fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',
+        fontWeight: 700,
+        letterSpacing: '0.05em',
+        color: '#FF1744',
         textShadow: `
-          0 0 5px #FF1744,
-          0 0 10px #FF1744,
-          0 0 15px #FF1744,
-          0 0 20px #FF1744,
-          0 0 35px #FF1744,
-          0 0 40px #FF1744
+          0 0 5px rgba(255, 23, 68, 0.8),
+          0 0 10px rgba(255, 23, 68, 0.6),
+          0 0 15px rgba(255, 23, 68, 0.4),
+          0 0 20px rgba(255, 23, 68, 0.3),
+          0 0 35px rgba(255, 23, 68, 0.2),
+          0 0 40px rgba(255, 23, 68, 0.1)
         `,
         animation: 'neon-flicker 3s ease-in-out infinite',
-        background: 'none',
-        border: 'none',
-        boxShadow: 'none',
-        margin: 0,
-        padding: 0
+        display: 'inline-block',
+        lineHeight: '1',
+        whiteSpace: 'nowrap',
+        isolation: 'isolate',
+        mixBlendMode: 'normal'
       }}
     >
       TheKeyn
-    </span>
+    </div>
   );
 }

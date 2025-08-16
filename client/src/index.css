@@ -421,21 +421,39 @@ a[href="/login"] > div {
   @keyframes neon-flicker {
     0%, 18%, 22%, 25%, 53%, 57%, 100% {
       text-shadow: 
-        0 0 5px #FF1744,
-        0 0 10px #FF1744,
-        0 0 15px #FF1744,
-        0 0 20px #FF1744,
-        0 0 35px #FF1744,
-        0 0 40px #FF1744;
+        0 0 5px rgba(255, 23, 68, 0.8),
+        0 0 10px rgba(255, 23, 68, 0.6),
+        0 0 15px rgba(255, 23, 68, 0.4),
+        0 0 20px rgba(255, 23, 68, 0.3),
+        0 0 35px rgba(255, 23, 68, 0.2),
+        0 0 40px rgba(255, 23, 68, 0.1);
     }
     
     20%, 24%, 55% {
       text-shadow: 
-        0 0 2px #FF1744,
-        0 0 5px #FF1744,
-        0 0 8px #FF1744,
-        0 0 12px #FF1744;
+        0 0 2px rgba(255, 23, 68, 0.6),
+        0 0 5px rgba(255, 23, 68, 0.4),
+        0 0 8px rgba(255, 23, 68, 0.3),
+        0 0 12px rgba(255, 23, 68, 0.2);
     }
+  }
+
+  /* Pure neon text with no background */
+  .neon-text-pure {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .neon-text-pure::before,
+  .neon-text-pure::after {
+    display: none !important;
   }
 
   /* Glass morphism button styles */
