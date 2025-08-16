@@ -241,10 +241,7 @@ export default function BlockchainVerification() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-2xl flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
+          <div className="mb-4">
             <h1 className="text-4xl font-bold text-gray-900">Advanced Blockchain Verification</h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
