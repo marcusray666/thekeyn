@@ -1,10 +1,12 @@
 import { formatTimeAgo } from "@/lib/utils";
-import { Share2, Heart, MessageCircle, CheckCircle } from "lucide-react";
+import { Share2, Heart, MessageCircle, CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ShareModal } from "./share-modal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import CommentsSection from "../CommentsSection";
 
 interface PostCardProps {
   post: {
@@ -35,8 +37,10 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [likes, setLikes] = useState(post.likesCount || post.likes || 0);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Like mutation for community posts
   const likeMutation = useMutation({
@@ -208,9 +212,16 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
             <span className="text-white/70 text-sm">{likes}</span>
           </button>
           
-          <button className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+          <button 
+            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowComments(!showComments);
+            }}
+          >
             <MessageCircle className="h-6 w-6" />
-            <span className="text-sm">{post.commentsCount || 0}</span>
+            <span className="text-sm">{post.commentsCount || post.comments || 0}</span>
+            {showComments ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           
           <button 
@@ -224,6 +235,17 @@ export function PostCard({ post, onDetailsClick }: PostCardProps) {
           </button>
         </div>
       </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <div className="mt-6 pt-4 border-t border-white/10">
+          <CommentsSection 
+            postId={post.id.toString()} 
+            postType="community" 
+            currentUserId={user?.id}
+          />
+        </div>
+      )}
 
       {/* Share Modal */}
       {showShareModal && (
