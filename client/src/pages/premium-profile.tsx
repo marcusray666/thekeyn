@@ -365,10 +365,11 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md hover:bg-white/20 text-gray-700 hover:text-gray-900 flex items-center justify-center"
+                                className="p-1 text-white hover:text-gray-200 flex items-center justify-center"
                                 onClick={(e) => e.stopPropagation()}
+                                style={{ background: 'none', border: 'none' }}
                               >
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreVertical className="h-5 w-5" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -441,9 +442,10 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md hover:bg-white/20 text-gray-700 hover:text-gray-900 flex items-center justify-center"
+                                className="p-1 text-white hover:text-gray-200 flex items-center justify-center"
+                                style={{ background: 'none', border: 'none' }}
                               >
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreVertical className="h-5 w-5" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
