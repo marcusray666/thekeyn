@@ -487,7 +487,11 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           {/* Comments Section */}
           {showComments && (
             <div className="mt-6 pt-4 border-t border-white/10">
-              <CommentsSection postId={post.id} />
+              <CommentsSection 
+                postId={post.id.toString()} 
+                postType="community" 
+                currentUserId={user?.id}
+              />
             </div>
           )}
         </CardContent>
