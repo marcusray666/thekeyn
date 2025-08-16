@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import BorderlessButton from "@/components/BorderlessButton";
+import NoBorderElement from "@/components/NoBorderElement";
 
 export default function PremiumUpload() {
   const [location, setLocation] = useLocation();
@@ -133,13 +133,13 @@ export default function PremiumUpload() {
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <BorderlessButton
+          <NoBorderElement
             onClick={() => setLocation('/')}
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Feed</span>
-          </BorderlessButton>
+          </NoBorderElement>
           
           <h1 className="text-3xl font-bold text-gray-800">
             {step === 'upload' && 'Protect Your Work'}

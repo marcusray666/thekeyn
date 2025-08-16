@@ -37,6 +37,24 @@ button,
   -webkit-appearance: none !important;
 }
 
+/* Absolutely no borders for this class */
+.no-border-absolutely-none,
+.no-border-absolutely-none *,
+.no-border-absolutely-none:focus,
+.no-border-absolutely-none:active,
+.no-border-absolutely-none:hover {
+  border: 0px none transparent !important;
+  outline: 0px none transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+}
+
 button:focus,
 button:active,
 button:hover,
