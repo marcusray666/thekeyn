@@ -15,6 +15,14 @@ button,
   -webkit-appearance: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  border: none !important;
+  outline: none !important;
+}
+
+button:focus,
+[role="button"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Force button colors on iOS Safari */
