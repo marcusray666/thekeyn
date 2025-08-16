@@ -399,7 +399,7 @@ export default function PremiumProfile() {
 
       {/* Media Viewer Modal */}
       <Dialog open={showMediaViewer} onOpenChange={setShowMediaViewer}>
-        <DialogContent className="max-w-4xl w-full bg-[#0F0F0F]/95 backdrop-blur-xl border border-white/10">
+        <DialogContent className="max-w-4xl max-h-[85vh] w-full bg-[#0F0F0F]/95 backdrop-blur-xl border border-white/10 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-white text-xl font-semibold">
               {selectedPost?.title || selectedPost?.filename}
