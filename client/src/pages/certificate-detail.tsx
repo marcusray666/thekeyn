@@ -23,6 +23,7 @@ import { LiquidGlassLoader } from "@/components/ui/liquid-glass-loader";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { WorkImage } from "@/components/work-image";
+import NoBorderElement from "@/components/NoBorderElement";
 
 interface CertificateData {
   id: number;
@@ -300,14 +301,13 @@ export default function CertificateDetail() {
       <div className="max-w-4xl mx-auto px-6 py-8 relative z-10 pt-24">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
+          <NoBorderElement
             onClick={() => setLocation('/certificates')}
-            className="bg-black/20 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 mb-4"
+            className="bg-black/20 backdrop-blur-sm text-white/70 hover:text-white hover:bg-white/10 mb-4 px-4 py-2 rounded-lg transition-colors no-border-absolutely-none"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Certificates
-          </Button>
+          </NoBorderElement>
           
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex-1 min-w-0 pr-4">
