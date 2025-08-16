@@ -176,7 +176,7 @@ function WelcomePage() {
             <h1 
               className="font-black text-white mb-4 leading-tight"
               style={{ 
-                fontSize: 'clamp(5rem, 15vw, 10rem)',
+                fontSize: 'clamp(4rem, 12vw, 6rem)',
                 lineHeight: '0.9'
               }}
             >
