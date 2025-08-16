@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useRoute } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { Share2, Edit3, Grid3X3, List, Heart, MessageCircle, Volume2 } from "lucide-react";
+import { Share2, Edit3, Grid3X3, List, Heart, MessageCircle, Volume2, Trash2, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/premium/post-card";
 import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
@@ -109,10 +110,31 @@ export default function PremiumProfile() {
         title: "Comment added!",
         description: "Your comment has been posted.",
       });
+    },
+  });
+
+  // Delete post mutation
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      return await apiRequest(`/api/social/posts/${postId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh the posts list
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts", "user", targetUserId] });
+      
       toast({
-        title: "Comment added!",
-        description: "Your comment has been posted.",
+        title: "Post deleted!",
+        description: "Your post has been removed.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete post",
+        variant: "destructive",
       });
     },
   });
@@ -335,10 +357,42 @@ export default function PremiumProfile() {
                   {posts.map((post) => (
                     <div 
                       key={post.id} 
-                      onClick={() => handlePostClick(post)}
-                      className="aspect-square bg-white/30 rounded-2xl p-4 hover:bg-white/50 transition-colors cursor-pointer group border border-gray-200/30"
+                      className="aspect-square bg-white/30 rounded-2xl p-4 hover:bg-white/50 transition-colors group border border-gray-200/30 relative"
                     >
-                      <div className="flex flex-col h-full">
+                      {/* Delete button - only show if viewing own profile */}
+                      {(!username || username === user?.username) && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deletePostMutation.mutate(post.id.toString());
+                                }}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Post
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                      
+                      <div 
+                        onClick={() => handlePostClick(post)}
+                        className="flex flex-col h-full cursor-pointer"
+                      >
                         <div className="flex-1 flex items-center justify-center relative overflow-hidden rounded-xl">
                           {post.imageUrl ? (
                             <img 
@@ -374,14 +428,40 @@ export default function PremiumProfile() {
               ) : (
                 <div className="space-y-6">
                   {posts.map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={{
-                        ...post,
-                        likesCount: post.likes || 0,
-                        commentsCount: post.comments || 0
-                      }}
-                    />
+                    <div key={post.id} className="relative">
+                      <PostCard
+                        post={{
+                          ...post,
+                          likesCount: post.likes || 0,
+                          commentsCount: post.comments || 0
+                        }}
+                      />
+                      {/* Delete button for list view - only show if viewing own profile */}
+                      {(!username || username === user?.username) && (
+                        <div className="absolute top-4 right-4 z-10">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => deletePostMutation.mutate(post.id.toString())}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Post
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )
@@ -469,6 +549,22 @@ export default function PremiumProfile() {
                     >
                       <Share2 className="h-4 w-4" />
                     </Button>
+                    
+                    {/* Delete button - only show if viewing own profile */}
+                    {(!username || username === user?.username) && (
+                      <Button
+                        onClick={() => {
+                          deletePostMutation.mutate(selectedPost.id.toString());
+                          setShowMediaViewer(false);
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        disabled={deletePostMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
 
