@@ -55,7 +55,7 @@ button,
   border-color: transparent !important;
 }
 
-/* Remove dropdown menu borders */
+/* Remove dropdown menu borders and background */
 [data-radix-popper-content-wrapper],
 [data-radix-dropdown-menu-content],
 [role="menu"],
@@ -63,9 +63,9 @@ button,
 .dropdown-content {
   border: 0px none transparent !important;
   outline: 0px none transparent !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px) !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
 }
 
 button:focus,

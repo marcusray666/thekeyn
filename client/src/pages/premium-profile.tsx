@@ -371,7 +371,7 @@ export default function PremiumProfile() {
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1) !important'}}>
+                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: 'none !important', background: 'transparent !important', backgroundColor: 'transparent !important'}}>
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -456,7 +456,7 @@ export default function PremiumProfile() {
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1) !important'}}>
+                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: 'none !important', background: 'transparent !important', backgroundColor: 'transparent !important'}}>
                               <DropdownMenuItem
                                 onClick={() => deletePostMutation.mutate(post.id.toString())}
                                 style={{ 
