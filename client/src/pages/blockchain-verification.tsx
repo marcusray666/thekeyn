@@ -202,27 +202,31 @@ export default function BlockchainVerification() {
     switch (level) {
       case 'basic':
         return {
-          description: 'Basic cryptographic verification with SHA-256 hashing',
-          features: ['File hash verification', 'Timestamp proof', 'Digital signature'],
-          price: 'Free'
+          description: 'Verify external files not uploaded to TheKeyn (works created elsewhere)',
+          features: ['External file verification', 'Basic timestamp proof', 'Downloadable certificate'],
+          price: 'Free',
+          useCase: 'Perfect for: Art created in other platforms, old works, client verification'
         };
       case 'enhanced':
         return {
-          description: 'Enhanced verification with IPFS storage and Merkle proofs',
-          features: ['All basic features', 'IPFS hash storage', 'Merkle tree proofs', 'Multi-network support'],
-          price: '$0.50'
+          description: 'Legal-grade verification with distributed storage for court evidence',
+          features: ['All basic features', 'IPFS permanent storage', 'Multi-blockchain anchoring', 'Legal certificate'],
+          price: '$0.50',
+          useCase: 'Perfect for: Commercial work, licensing, disputes, professional portfolios'
         };
       case 'premium':
         return {
-          description: 'Premium verification with blockchain anchoring and legal validity',
-          features: ['All enhanced features', 'Blockchain transaction', 'Legal certificate', 'Priority support'],
-          price: '$2.00'
+          description: 'Maximum security with priority processing and legal support',
+          features: ['All enhanced features', 'Priority blockchain inclusion', 'Attorney-ready documents', 'Expert witness support'],
+          price: '$2.00',
+          useCase: 'Perfect for: High-value works, ongoing legal cases, enterprise clients'
         };
       default:
         return {
           description: 'Unknown verification level',
           features: [],
-          price: 'N/A'
+          price: 'N/A',
+          useCase: ''
         };
     }
   };
@@ -242,11 +246,34 @@ export default function BlockchainVerification() {
           className="text-center mb-8"
         >
           <div className="mb-4">
-            <h1 className="text-4xl font-bold text-gray-900">Advanced Blockchain Verification</h1>
+            <h1 className="text-4xl font-bold text-gray-900">External Work Verification</h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Generate cryptographically secure verification proofs for your digital works with multi-level security
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
+            Verify digital works from outside TheKeyn or add enhanced verification to existing protected works
           </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-4xl mx-auto">
+            <h3 className="font-semibold text-blue-900 mb-2">📝 How This Differs From Regular Uploads</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
+              <div>
+                <p className="font-medium mb-1">Regular TheKeyn Upload (Free):</p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Automatic blockchain protection</li>
+                  <li>• Hash generation & certificate</li>
+                  <li>• Basic timestamp proof</li>
+                  <li>• Community sharing</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium mb-1">External Verification (Paid):</p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Verify works created elsewhere</li>
+                  <li>• Enhanced legal-grade certificates</li>
+                  <li>• Multi-network blockchain anchoring</li>
+                  <li>• Court-admissible evidence</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Network Status */}
@@ -355,9 +382,12 @@ export default function BlockchainVerification() {
                     </div>
 
                     <div className="bg-gray-100 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-2">{verificationLevel.charAt(0).toUpperCase() + verificationLevel.slice(1)} Verification</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">{verificationLevel.charAt(0).toUpperCase() + verificationLevel.slice(1)} Verification - {getVerificationLevelInfo(verificationLevel).price}</h4>
                       <p className="text-sm text-gray-700 mb-2">
                         {getVerificationLevelInfo(verificationLevel).description}
+                      </p>
+                      <p className="text-xs text-purple-600 mb-3 font-medium">
+                        {getVerificationLevelInfo(verificationLevel).useCase}
                       </p>
                       <ul className="text-xs text-gray-600 space-y-1">
                         {getVerificationLevelInfo(verificationLevel).features.map((feature, index) => (
