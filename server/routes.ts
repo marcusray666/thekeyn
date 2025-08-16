@@ -2558,7 +2558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Avatar upload endpoint
   app.post('/api/user/avatar', requireAuth, upload.single('avatar'), async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       const file = req.file;
 
       if (!file) {
@@ -2604,7 +2604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/password', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -2631,7 +2631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/theme', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { theme } = req.body;
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       await storage.updateUser(userId, { themePreference: theme });
       res.json({ message: "Theme updated successfully" });
@@ -2644,7 +2644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user settings
   app.get('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -2675,7 +2675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/settings', requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { type, settings } = req.body;
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -5158,7 +5158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       
-      if (req.userId !== userId) {
+      if (req.user!.id !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
       
@@ -5172,7 +5172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/background/preferences", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       const preferenceData = req.body;
       
       const preference = await storage.saveBackgroundPreference(userId, preferenceData);
@@ -5186,7 +5186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/background/preferences/:preferenceId", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const preferenceId = parseInt(req.params.preferenceId);
-      const userId = req.userId!;
+      const userId = req.user!.id;
       
       console.log(`DELETE /api/background/preferences/${preferenceId} - User: ${userId}`);
       
@@ -5215,7 +5215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/background/interactions", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.userId!;
+      const userId = req.user!.id;
       const interactionData = req.body;
       
       const interaction = await storage.trackBackgroundInteraction(userId, interactionData);
@@ -5231,7 +5231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.userId);
       const pageContext = req.query.page as string;
       
-      if (req.userId !== userId) {
+      if (req.user!.id !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
       
