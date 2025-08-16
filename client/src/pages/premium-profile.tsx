@@ -362,39 +362,27 @@ export default function PremiumProfile() {
                       {/* Delete button - only show if viewing own profile */}
                       {(!username || username === user?.username) && (
                         <div className="absolute top-2 right-2 z-10">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: 'none !important', background: 'transparent !important', backgroundColor: 'transparent !important'}}>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deletePostMutation.mutate(post.id.toString());
-                                }}
-                                style={{ 
-                                  color: '#6b7280', 
-                                  backgroundColor: '#ffffff',
-                                  fontWeight: '500',
-                                  fontSize: '16px',
-                                  padding: '12px 16px',
-                                  border: '0px none transparent !important',
-                                  outline: '0px none transparent !important',
-                                  borderRadius: '8px',
-                                  boxShadow: 'none !important'
-                                }}
-                                className="no-border-absolutely-none"
-                              >
-                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#6b7280' }} />
-                                Delete Post
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deletePostMutation.mutate(post.id.toString());
+                            }}
+                            style={{ 
+                              color: '#6b7280', 
+                              backgroundColor: '#ffffff',
+                              fontWeight: '500',
+                              fontSize: '14px',
+                              padding: '8px 12px',
+                              border: '0px none transparent !important',
+                              outline: '0px none transparent !important',
+                              borderRadius: '8px',
+                              boxShadow: 'none !important'
+                            }}
+                            className="no-border-absolutely-none flex items-center gap-2"
+                          >
+                            <Trash2 style={{ width: '16px', height: '16px', color: '#6b7280' }} />
+                            Delete
+                          </button>
                         </div>
                       )}
                       
@@ -448,35 +436,27 @@ export default function PremiumProfile() {
                       {/* Delete button for list view - only show if viewing own profile */}
                       {(!username || username === user?.username) && (
                         <div className="absolute top-4 right-4 z-10">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="no-border-absolutely-none" style={{border: '0px none transparent !important', outline: '0px none transparent !important', boxShadow: 'none !important', background: 'transparent !important', backgroundColor: 'transparent !important'}}>
-                              <DropdownMenuItem
-                                onClick={() => deletePostMutation.mutate(post.id.toString())}
-                                style={{ 
-                                  color: '#6b7280', 
-                                  backgroundColor: '#ffffff',
-                                  fontWeight: '500',
-                                  fontSize: '16px',
-                                  padding: '12px 16px',
-                                  border: '0px none transparent !important',
-                                  outline: '0px none transparent !important',
-                                  borderRadius: '8px',
-                                  boxShadow: 'none !important'
-                                }}
-                                className="no-border-absolutely-none"
-                              >
-                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#6b7280' }} />
-                                Delete Post
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deletePostMutation.mutate(post.id.toString());
+                            }}
+                            style={{ 
+                              color: '#6b7280', 
+                              backgroundColor: '#ffffff',
+                              fontWeight: '500',
+                              fontSize: '14px',
+                              padding: '8px 12px',
+                              border: '0px none transparent !important',
+                              outline: '0px none transparent !important',
+                              borderRadius: '8px',
+                              boxShadow: 'none !important'
+                            }}
+                            className="no-border-absolutely-none flex items-center gap-2"
+                          >
+                            <Trash2 style={{ width: '16px', height: '16px', color: '#6b7280' }} />
+                            Delete
+                          </button>
                         </div>
                       )}
                     </div>
