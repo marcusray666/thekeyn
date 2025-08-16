@@ -134,7 +134,7 @@ export default function PremiumUpload() {
         <div className="flex items-center justify-between mb-8">
           <div
             onClick={() => setLocation('/')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer no-border-override"
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -143,6 +143,7 @@ export default function PremiumUpload() {
                 setLocation('/');
               }
             }}
+            style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Feed</span>

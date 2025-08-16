@@ -16,13 +16,25 @@ button,
 .glass-button,
 .btn,
 .inline-flex,
-[class*="button"] {
+[class*="button"],
+.no-border-override {
   -webkit-appearance: none !important;
   -webkit-tap-highlight-color: transparent !important;
   touch-action: manipulation;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
+}
+
+/* Nuclear override for specific element */
+.no-border-override,
+.no-border-override:focus,
+.no-border-override:active,
+.no-border-override:hover {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
 }
 
 button:focus,
