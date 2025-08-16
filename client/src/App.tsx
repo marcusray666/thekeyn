@@ -35,7 +35,7 @@ import SimplifiedNFT from "@/pages/simplified-nft";
 import Subscription from "@/pages/subscription";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import SubscriptionCancelled from "@/pages/subscription-cancelled";
-import BlockchainVerification from "@/pages/blockchain-verification";
+
 import Social from "@/pages/social";
 import Messages from "@/pages/messages";
 import Followers from "@/pages/followers";
@@ -81,7 +81,7 @@ function Router() {
       <Route path="/nft-minting" component={NFTMinting} />
       <Route path="/nft-studio" component={NFTStudio} />
       <Route path="/nft-simple" component={SimplifiedNFT} />
-      <Route path="/blockchain-verification" component={BlockchainVerification} />
+
       <Route path="/verify" component={PremiumCertificates} />
       <Route path="/social" component={Social} />
       <Route path="/messages" component={Messages} />

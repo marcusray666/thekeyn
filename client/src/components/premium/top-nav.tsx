@@ -286,15 +286,7 @@ export function TopNav() {
                 </div>
               </Link>
               
-              <Link href="/blockchain-verification">
-                <div 
-                  className="px-4 py-3 hover:bg-gray-100/60 transition-colors cursor-pointer flex items-center space-x-3"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span className="text-lg">⛓️</span>
-                  <span className="font-medium text-gray-800">Blockchain Verification</span>
-                </div>
-              </Link>
+
 
               {/* Admin Dashboard - Only for admin users */}
               {(user as any)?.role === 'admin' && (
