@@ -82,20 +82,7 @@ export default function PremiumHome() {
       
 
       
-      {/* Background Settings Button */}
-      <div className="fixed top-20 right-6 z-50">
-        <BackgroundPreferencesPanel 
-          trigger={
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="bg-white/90 backdrop-blur-xl border-gray-200/50 hover:bg-white shadow-lg"
-            >
-              <Palette className="h-4 w-4" />
-            </Button>
-          }
-        />
-      </div>
+
       
       <main className="pt-24 relative z-30">
         {/* Stories Section */}

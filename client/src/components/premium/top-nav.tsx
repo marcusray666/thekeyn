@@ -1,10 +1,11 @@
 import { Link } from "wouter";
-import { Search, Bell, MessageCircle, Upload, User } from "lucide-react";
+import { Search, Bell, MessageCircle, Upload, User, Palette } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { BackgroundPreferencesPanel } from "@/components/BackgroundPreferencesPanel";
 
 
 export function TopNav() {
@@ -226,6 +227,15 @@ export function TopNav() {
 
       {/* Actions */}
       <div className="flex items-center space-x-6">
+        {/* Background Settings Button */}
+        <BackgroundPreferencesPanel 
+          trigger={
+            <Button className="glass-button p-3">
+              <Palette className="h-5 w-5" />
+            </Button>
+          }
+        />
+        
         <Link href="/create-post">
           <Button className="glass-button !px-4 !py-2">
             <Upload className="h-5 w-5 mr-2" />
