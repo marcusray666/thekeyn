@@ -375,12 +375,29 @@ function WelcomePage() {
             <p className="text-xl text-white/70 mb-12">
               Join thousands of creators who trust Loggin' with their most valuable digital assets.
             </p>
-            <Link href="/register">
-              <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white px-12 py-4 text-xl font-semibold hover:opacity-90 transition-opacity">
-                Get Started for Free
-                <Crown className="ml-3 h-6 w-6" />
-              </Button>
-            </Link>
+            <div className="flex justify-center">
+              <a href="/register" className="block no-underline" style={{ textDecoration: 'none' }}>
+                <div 
+                  className="text-white text-xl font-bold px-12 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  style={{ 
+                    background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    userSelect: 'none',
+                    WebkitAppearance: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started for Free</span>
+                  <Crown className="ml-3 h-6 w-6" style={{ color: '#ffffff' }} />
+                </div>
+              </a>
+            </div>
           </div>
         </section>
 
