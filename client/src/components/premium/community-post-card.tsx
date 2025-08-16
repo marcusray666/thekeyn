@@ -328,15 +328,15 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
     <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-4 md:p-6 mb-4 hover:bg-white/80 transition-all duration-300 shadow-lg">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 min-w-0 flex-1 pr-4">
           <Link href={`/user/${post.userId}`}>
             <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100/60 p-2 rounded-lg transition-colors -m-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] rounded-full flex items-center justify-center flex-shrink-0">
                 {profileImage ? (
                   <img
                     src={profileImage}
                     alt={displayName}
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-white font-semibold">
@@ -344,16 +344,16 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                   </span>
                 )}
               </div>
-              <div>
-                <h3 className="text-gray-800 font-semibold hover:text-[#FE3F5E] transition-colors">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-gray-800 font-semibold hover:text-[#FE3F5E] transition-colors truncate">
                   {displayName}
                 </h3>
-                <p className="text-gray-500 text-sm">@{post.username} • {formatTimeAgo(post.createdAt)}</p>
+                <p className="text-gray-500 text-sm truncate">@{post.username} • {formatTimeAgo(post.createdAt)}</p>
               </div>
             </div>
           </Link>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-shrink-0">
           {post.isProtected && (
             <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
               <span className="text-white text-xs font-semibold">PROTECTED</span>
@@ -367,12 +367,12 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60"
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 flex-shrink-0"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white/90 backdrop-blur-xl border-gray-200/50 text-gray-800 shadow-xl">
+              <DropdownMenuContent align="end" className="bg-white/90 backdrop-blur-xl border-gray-200/50 text-gray-800 shadow-xl">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem 
