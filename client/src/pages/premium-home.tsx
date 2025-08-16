@@ -181,8 +181,8 @@ function WelcomePage() {
               }}
             >
               <style jsx>{`
-                @keyframes neonFlicker {
-                  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                @keyframes neonGlow {
+                  0%, 50%, 100% {
                     text-shadow: 
                       0 0 5px #FF1744,
                       0 0 10px #FF1744,
@@ -190,15 +190,21 @@ function WelcomePage() {
                       0 0 20px #FF1744,
                       0 0 35px #FF1744,
                       0 0 40px #FF1744;
-                    filter: brightness(1);
+                    opacity: 1;
                   }
-                  20%, 24%, 55% {
-                    text-shadow: none;
-                    filter: brightness(0.8);
+                  75% {
+                    text-shadow: 
+                      0 0 2px #FF1744,
+                      0 0 5px #FF1744,
+                      0 0 8px #FF1744,
+                      0 0 12px #FF1744,
+                      0 0 18px #FF1744,
+                      0 0 20px #FF1744;
+                    opacity: 0.8;
                   }
                 }
                 .neon-text {
-                  animation: neonFlicker 4s infinite alternate;
+                  animation: neonGlow 3s ease-in-out infinite;
                 }
               `}</style>
               <h1 
@@ -218,7 +224,6 @@ function WelcomePage() {
                     0 0 40px #FF1744
                   `,
                   letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
                   position: 'relative',
                   display: 'inline-block'
                 }}
