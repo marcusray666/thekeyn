@@ -365,22 +365,10 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="no-border-absolutely-none"
+                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
                                 onClick={(e) => e.stopPropagation()}
-                                style={{ 
-                                  background: 'transparent', 
-                                  border: 'none', 
-                                  padding: '4px',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderRadius: '0',
-                                  boxShadow: 'none',
-                                  outline: 'none'
-                                }}
                               >
-                                <MoreVertical style={{ width: '20px', height: '20px', color: 'white' }} />
+                                <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -389,10 +377,15 @@ export default function PremiumProfile() {
                                   e.stopPropagation();
                                   deletePostMutation.mutate(post.id.toString());
                                 }}
-                                className="text-red-600 focus:text-red-600 focus:bg-red-50 hover:bg-red-50 hover:text-red-700 font-medium"
-                                style={{ color: '#dc2626', backgroundColor: '#fef2f2' }}
+                                style={{ 
+                                  color: '#ffffff', 
+                                  backgroundColor: '#dc2626',
+                                  fontWeight: '600',
+                                  fontSize: '16px',
+                                  padding: '12px 16px'
+                                }}
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#ffffff' }} />
                                 Delete Post
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -453,30 +446,23 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="no-border-absolutely-none"
-                                style={{ 
-                                  background: 'transparent', 
-                                  border: 'none', 
-                                  padding: '4px',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderRadius: '0',
-                                  boxShadow: 'none',
-                                  outline: 'none'
-                                }}
+                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
                               >
-                                <MoreVertical style={{ width: '20px', height: '20px', color: 'white' }} />
+                                <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => deletePostMutation.mutate(post.id.toString())}
-                                className="text-red-600 focus:text-red-600 focus:bg-red-50 hover:bg-red-50 hover:text-red-700 font-medium"
-                                style={{ color: '#dc2626', backgroundColor: '#fef2f2' }}
+                                style={{ 
+                                  color: '#ffffff', 
+                                  backgroundColor: '#dc2626',
+                                  fontWeight: '600',
+                                  fontSize: '16px',
+                                  padding: '12px 16px'
+                                }}
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#ffffff' }} />
                                 Delete Post
                               </DropdownMenuItem>
                             </DropdownMenuContent>
