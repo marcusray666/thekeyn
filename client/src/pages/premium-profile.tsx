@@ -365,23 +365,10 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                style={{
-                                  width: '44px',
-                                  height: '44px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#ef4444',
-                                  border: '3px solid #ffffff',
-                                  color: '#ffffff',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
-                                  transition: 'all 0.2s ease',
-                                  zIndex: 1000
-                                }}
+                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreVertical style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+                                <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -390,7 +377,8 @@ export default function PremiumProfile() {
                                   e.stopPropagation();
                                   deletePostMutation.mutate(post.id.toString());
                                 }}
-                                className="text-red-600 focus:text-red-600"
+                                className="text-red-600 focus:text-red-600 focus:bg-red-50 hover:bg-red-50 hover:text-red-700 font-medium"
+                                style={{ color: '#dc2626', backgroundColor: '#fef2f2' }}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete Post
@@ -453,28 +441,16 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                style={{
-                                  width: '44px',
-                                  height: '44px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#ef4444',
-                                  border: '3px solid #ffffff',
-                                  color: '#ffffff',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
-                                  transition: 'all 0.2s ease',
-                                  zIndex: 1000
-                                }}
+                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
                               >
-                                <MoreVertical style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+                                <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => deletePostMutation.mutate(post.id.toString())}
-                                className="text-red-600 focus:text-red-600"
+                                className="text-red-600 focus:text-red-600 focus:bg-red-50 hover:bg-red-50 hover:text-red-700 font-medium"
+                                style={{ color: '#dc2626', backgroundColor: '#fef2f2' }}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete Post
