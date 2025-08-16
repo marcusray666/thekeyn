@@ -127,15 +127,17 @@ a[href="/login"] > div {
   }
   
   .post-card {
-    @apply bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 
+    @apply bg-white/70 backdrop-blur-xl rounded-3xl p-6 
            transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
            shadow-lg hover:bg-white/80;
+    border: none !important;
   }
   
   .glass-button {
     @apply bg-white/60 hover:bg-white/80 backdrop-blur-xl 
            text-gray-800 rounded-full px-6 py-3 font-medium transition-all duration-200 
-           hover:scale-105 active:scale-95 border border-gray-200/30 shadow-lg;
+           hover:scale-105 active:scale-95 shadow-lg;
+    border: none !important;
   }
   
   .accent-button {
@@ -151,9 +153,10 @@ a[href="/login"] > div {
   }
   
   .upload-zone {
-    @apply rounded-3xl p-12 bg-gray-50/50 backdrop-blur-xl border border-gray-200/50
-           transition-all duration-300 hover:bg-[#FE3F5E]/5 hover:border-[#FE3F5E]/20
+    @apply rounded-3xl p-12 bg-gray-50/50 backdrop-blur-xl
+           transition-all duration-300 hover:bg-[#FE3F5E]/5
            text-center cursor-pointer shadow-lg;
+    border: none !important;
   }
   
   .nav-item {
@@ -179,7 +182,7 @@ a[href="/login"] > div {
   input[type="text"], input[type="email"], input[type="password"], textarea {
     color: #262626 !important;
     background-color: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
   }
   
   input[type="text"]::placeholder, 
@@ -293,7 +296,7 @@ a[href="/login"] > div {
   nav:not(.custom-bg) {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(20px) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-bottom: none !important;
   }
   
   nav span, nav div, nav a, nav button {
@@ -342,7 +345,7 @@ a[href="/login"] > div {
     /* Form inputs need clear boundaries - WHITE THEME */
     input, textarea, select {
       background: rgba(255, 255, 255, 0.8) !important;
-      border: 2px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(8px) !important;
       color: #1f2937 !important;
     }
@@ -375,7 +378,7 @@ a[href="/login"] > div {
     
     /* Profile avatar borders - WHITE THEME */
     .creator-avatar {
-      border: 2px solid rgba(0, 0, 0, 0.2) !important;
+      border: none !important;
       background: rgba(255, 255, 255, 0.8) !important;
       backdrop-filter: blur(8px) !important;
     }
@@ -403,7 +406,7 @@ a[href="/login"] > div {
   @media (min-width: 769px) {
     .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
       background: rgba(255, 255, 255, 0.7) !important;
-      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(16px) !important;
       -webkit-backdrop-filter: blur(16px) !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
@@ -819,7 +822,7 @@ a[href="/login"] > div {
 
 .light-theme .nav-glass {
   background: rgba(255, 255, 255, 0.98) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
   backdrop-filter: blur(20px) !important;
 }
 
@@ -1056,7 +1059,7 @@ a[href="/login"] > div {
 
 .light-theme .bg-black\/40 {
   background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
 }
 
 .light-theme .backdrop-blur-xl {
@@ -1116,7 +1119,7 @@ a[href="/login"] > div {
 /* Light theme conversation cards */
 .light-theme .bg-slate-800\/50 {
   background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
 }
 
 .light-theme .hover\:bg-slate-700:hover {
@@ -1135,7 +1138,7 @@ a[href="/login"] > div {
   background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
   transition: all 0.3s ease;
   color: #374151 !important;
 }
@@ -1193,7 +1196,7 @@ nav:not(.custom-bg), .nav-glass {
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
   z-index: 1000;
 }
 
@@ -1398,7 +1401,7 @@ nav *, .nav-glass * {
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
   box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -1444,7 +1447,7 @@ nav *, .nav-glass * {
 .light-theme .work-preview-modal {
   background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
