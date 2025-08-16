@@ -127,12 +127,22 @@ export function TopNav() {
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)'
       }}>
-      {/* Brand Name */}
+      {/* Brand Name with Role Badge */}
       <Link href="/">
         <div className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] bg-clip-text text-transparent">
             TheKeyn
           </h1>
+          {user && (
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 px-2 py-1 rounded-full">
+              <span className="text-xs font-medium" style={{
+                color: user.role === 'admin' ? '#FFD700' : '#FE3F5E'
+              }}>
+                {user.role === 'admin' ? 'Admin' : 
+                 (user.subscriptionTier === 'pro' || user.subscriptionTier === 'starter') ? 'Premium' : 'User'}
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
