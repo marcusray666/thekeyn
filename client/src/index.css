@@ -19,14 +19,14 @@ button,
 
 /* Force button colors on iOS Safari */
 a[href="/register"] > div {
-  background-color: #FE3F5E !important;
+  background: linear-gradient(to right, #FE3F5E, #FF6B8A) !important;
   color: #ffffff !important;
 }
 
 a[href="/login"] > div {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-  border: 3px solid #1f2937 !important;
+  background: linear-gradient(to right, #FE3F5E, #FFD200) !important;
+  color: #ffffff !important;
+  border: none !important;
 }
 
 /* Prevent iOS Safari from overriding button styles */

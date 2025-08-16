@@ -196,18 +196,48 @@ function WelcomePage() {
               Join thousands of creators protecting their intellectual property.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register">
-                <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] text-white px-8 py-4 text-lg font-semibold hover:opacity-90 transition-opacity">
-                  Sign up to start protecting your work
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] text-white px-10 py-5 text-xl font-semibold hover:opacity-90 transition-opacity">
+            <div className="flex flex-col gap-6 justify-center items-center px-6 w-full max-w-sm mx-auto">
+              <a href="/register" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+                <div 
+                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  style={{ 
+                    background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    userSelect: 'none',
+                    WebkitAppearance: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started for Free</span>
+                </div>
+              </a>
+              <a href="/login" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+                <div 
+                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  style={{ 
+                    background: 'linear-gradient(to right, #FE3F5E, #FFD200)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    userSelect: 'none',
+                    WebkitAppearance: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
                   <LogoIcon size="md" className="mr-3 text-white" />
-                  Loggin'
-                </Button>
-              </Link>
+                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Loggin'</span>
+                </div>
+              </a>
             </div>
           </div>
         </section>
