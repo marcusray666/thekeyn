@@ -8,7 +8,7 @@ import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onb
 import { useOnboardingTriggers } from "@/hooks/use-onboarding";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 import { BackgroundPreferencesPanel } from "@/components/BackgroundPreferencesPanel";
-import { NeonSign } from "@/components/NeonSign";
+
 import React from "react";
 
 
@@ -79,8 +79,22 @@ export default function PremiumHome() {
 
   return (
     <SimpleBackgroundEngine className="min-h-screen pb-24 md:pb-0 relative overflow-hidden light-theme">
-      {/* Neon Sign - Fixed to background */}
-      <NeonSign />
+      
+      {/* User Role Badge - Replacement for NeonSign */}
+      <div className="fixed top-20 left-6 z-50 pointer-events-none">
+        {currentUser && (
+          <div className="flex items-center gap-2">
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium" style={{
+                color: currentUser.role === 'admin' ? '#FFD700' : '#FE3F5E'
+              }}>
+                {currentUser.role === 'admin' ? 'Admin' : 
+                 (currentUser.subscriptionTier === 'pro' || currentUser.subscriptionTier === 'starter') ? 'Premium' : 'User'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
       
       {/* Background Settings Button */}
       <div className="fixed top-20 right-6 z-50">
