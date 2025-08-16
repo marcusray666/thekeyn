@@ -119,9 +119,26 @@ export default function LoginClean() {
             <button 
               type="submit" 
               disabled={loginMutation.isPending}
-              className="w-full h-12 text-white font-semibold bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl mt-6"
+              className="w-full text-white text-base font-semibold px-6 py-3 rounded-xl min-h-[48px] flex items-center justify-center cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              style={{ 
+                backgroundColor: '#FE3F5E',
+                color: '#ffffff',
+                textDecoration: 'none',
+                userSelect: 'none',
+                WebkitAppearance: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: '0 4px 12px -2px rgba(254, 63, 94, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '600'
+              }}
             >
-              {loginMutation.isPending ? "Logging in..." : "Log In"}
+              <span style={{ color: '#ffffff', fontWeight: '600' }}>
+                {loginMutation.isPending ? "Logging in..." : "Log In"}
+              </span>
             </button>
           </form>
 
