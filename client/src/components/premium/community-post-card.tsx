@@ -361,7 +361,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 flex-shrink-0"
+                  className="h-8 w-8 p-0 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 flex-shrink-0"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
