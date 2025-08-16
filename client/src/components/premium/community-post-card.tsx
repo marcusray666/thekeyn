@@ -354,12 +354,6 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
           </Link>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0">
-          {post.isProtected && (
-            <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
-              <span className="text-white text-xs font-semibold">PROTECTED</span>
-            </div>
-          )}
-          
           {/* Delete Menu - Show for post owner or admin */}
           {(currentUserId === post.userId || isAdmin) && (
             <DropdownMenu>
@@ -448,10 +442,15 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
       </div>
 
       {/* AI Verification Badge */}
-      <div className="flex items-center space-x-2 mb-4">
+      <div className="flex items-center justify-between mb-4">
         <div className="bg-green-100 border border-green-200 px-2 py-1 rounded-full">
           <span className="text-green-700 text-xs font-medium">✓ Verified by AI</span>
         </div>
+        {post.isProtected && (
+          <div className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] px-3 py-1 rounded-full">
+            <span className="text-white text-xs font-semibold">PROTECTED</span>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
