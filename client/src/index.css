@@ -272,7 +272,7 @@ a[href="/login"] > div {
   .post-card, .glass-card, .bg-white\/5, 
   .bg-white\/10, .backdrop-blur-xl {
     background: rgba(255, 255, 255, 0.7) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
   }
@@ -311,7 +311,7 @@ a[href="/login"] > div {
     /* Post cards need clear boundaries on mobile - WHITE THEME */
     .post-card {
       background: rgba(255, 255, 255, 0.8) !important;
-      border: 2px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
@@ -322,7 +322,7 @@ a[href="/login"] > div {
     /* Profile sections need clear boundaries - WHITE THEME */
     .bg-white\/5, .backdrop-blur-xl {
       background: rgba(255, 255, 255, 0.7) !important;
-      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(8px) !important;
       -webkit-backdrop-filter: blur(8px) !important;
     }
@@ -335,9 +335,9 @@ a[href="/login"] > div {
       color: #1f2937 !important;
     }
     
-    /* Buttons need clear boundaries - WHITE THEME */
+    /* Buttons styling for mobile - WHITE THEME - NO BORDERS */
     button, .btn, [role="button"] {
-      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       background: rgba(255, 255, 255, 0.7) !important;
       backdrop-filter: blur(8px) !important;
       color: #1f2937 !important;
@@ -346,7 +346,7 @@ a[href="/login"] > div {
     /* Certificate cards need extra clear boundaries - WHITE THEME */
     .mobile-card, .border.border-white\/20 {
       background: rgba(255, 255, 255, 0.8) !important;
-      border: 2px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
@@ -355,7 +355,7 @@ a[href="/login"] > div {
     /* Enhanced visual boundaries for ALL cards and sections - WHITE THEME */
     .bg-white\/5, .bg-white\/10, .backdrop-blur-xl, .rounded-3xl {
       background: rgba(255, 255, 255, 0.7) !important;
-      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      border: none !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
