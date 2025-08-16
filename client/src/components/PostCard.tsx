@@ -225,7 +225,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
               {!isOwner && <FollowButton userId={post.userId} />}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white rounded-full">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
