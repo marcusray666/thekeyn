@@ -381,7 +381,7 @@ function WelcomePage() {
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">Legal Certificate</h3>
                 <p className="text-white/60 leading-relaxed">
-                  Receive a professional PDF certificate with QR code that serves as legal proof of your creative ownership worldwide.
+                  Receive a professional PDF certificate with QR code that may serve as additional legal proof of your creative ownership.
                 </p>
               </div>
             </div>
