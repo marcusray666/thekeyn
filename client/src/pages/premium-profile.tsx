@@ -365,7 +365,7 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
+                                className="h-8 w-8 rounded-md hover:bg-white/20 text-gray-700 hover:text-gray-900 flex items-center justify-center"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreVertical className="h-4 w-4" />
@@ -441,7 +441,7 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 shadow-md border border-gray-200"
+                                className="h-8 w-8 rounded-md hover:bg-white/20 text-gray-700 hover:text-gray-900 flex items-center justify-center"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </button>
