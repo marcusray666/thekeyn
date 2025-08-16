@@ -237,7 +237,7 @@ function WelcomePage() {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Loggin</span>
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Login</span>
                 </div>
               </a>
             </div>
@@ -339,30 +339,50 @@ function WelcomePage() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* How It Works Section */}
         <section className="px-6 py-20" style={{
           background: 'rgba(255, 255, 255, 0.05)',
           border: 'none',
           boxShadow: 'none',
           outline: 'none'
         }}>
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">25K+</div>
-                <div className="text-white/60">Works Protected</div>
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
+              How TheKeyn Protects Your Work
+            </h2>
+            <p className="text-white/60 text-center mb-16 max-w-2xl mx-auto">
+              Three simple steps to secure your creative intellectual property forever
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">1</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">Upload & Verify</h3>
+                <p className="text-white/60 leading-relaxed">
+                  Upload your artwork, music, writing, or any digital creation. Our AI instantly verifies and analyzes your content.
+                </p>
               </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">5K+</div>
-                <div className="text-white/60">Active Creators</div>
+              
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#FFD200] to-[#FFA500] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">2</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">Blockchain Protection</h3>
+                <p className="text-white/60 leading-relaxed">
+                  Your work gets timestamped and anchored to the Ethereum blockchain, creating permanent, immutable proof of ownership.
+                </p>
               </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">$2M+</div>
-                <div className="text-white/60">IP Value Protected</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">99.9%</div>
-                <div className="text-white/60">Uptime</div>
+              
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#8B5CF6] to-[#A855F7] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">3</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">Legal Certificate</h3>
+                <p className="text-white/60 leading-relaxed">
+                  Receive a professional PDF certificate with QR code that serves as legal proof of your creative ownership worldwide.
+                </p>
               </div>
             </div>
           </div>
