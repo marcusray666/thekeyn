@@ -174,6 +174,10 @@ function WelcomePage() {
         {/* Hero Section */}
         <section className="px-6 py-20 text-center">
           <div className="max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              TheKeyn
+            </h1>
+            
             <div className="mb-6 inline-flex items-center px-4 py-2 text-[#FFD200] text-sm font-medium" style={{
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '9999px',
@@ -186,10 +190,10 @@ function WelcomePage() {
               Digital Art Protection Platform
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
               Protect Your
               <span className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent"> Creative Work</span>
-            </h1>
+            </h2>
             
             <p className="text-xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
               Instantly secure, prove, and defend your digital creations with blockchain-powered certificates. 

@@ -10,14 +10,18 @@ export default function WelcomeClean() {
       <div className="w-full max-w-4xl mx-auto text-center safe-area-inset">
         {/* Hero Section */}
         <div className="mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
+            TheKeyn
+          </h1>
+          
           <Badge className="mb-6 bg-white/60 backdrop-blur-md border-gray-200/50 text-gray-700 px-4 py-2">
             <Sparkles className="h-4 w-4 mr-2" />
             Digital Art Protection Platform
           </Badge>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-gray-800 px-2">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-gray-800 px-2">
             Protect Your Creative Work
-          </h1>
+          </h2>
           
           <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
             Instantly secure, prove, and defend your digital creations with blockchain-powered certificates. Join thousands of creators protecting their intellectual property.
