@@ -9,20 +9,34 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Force all buttons to have no borders - aggressive override */
 button, 
 [role="button"], 
-.cursor-pointer {
-  -webkit-appearance: none;
-  -webkit-tap-highlight-color: transparent;
+.cursor-pointer,
+.glass-button,
+.btn,
+.inline-flex,
+[class*="button"] {
+  -webkit-appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
   touch-action: manipulation;
   border: none !important;
   outline: none !important;
+  box-shadow: none !important;
 }
 
 button:focus,
-[role="button"]:focus {
+button:active,
+button:hover,
+[role="button"]:focus,
+[role="button"]:active,
+[role="button"]:hover,
+.glass-button:focus,
+.glass-button:active,
+.glass-button:hover {
   outline: none !important;
   box-shadow: none !important;
+  border: none !important;
 }
 
 /* Force button colors on iOS Safari */
@@ -683,7 +697,7 @@ a[href="/login"] > div {
 .light-theme .glass-button {
   background: rgba(255, 255, 255, 0.7) !important;
   color: #374151 !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -691,7 +705,7 @@ a[href="/login"] > div {
 .light-theme .glass-button:hover {
   background: rgba(255, 255, 255, 0.9) !important;
   color: #1f2937 !important;
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  border: none !important;
 }
 
 /* Light theme navigation */
