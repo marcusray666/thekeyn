@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CommunityPostCard } from "@/components/premium/community-post-card";
 import { Plus, Users, Sparkles, Zap, Crown, CheckCircle2, Palette } from "lucide-react";
-import { LogoIcon } from "@/components/ui/logo-icon";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { OnboardingManager, ONBOARDING_FLOWS } from "@/components/onboarding/onboarding-manager";
@@ -376,7 +375,7 @@ function WelcomePage() {
               Ready to Protect Your Creative Work?
             </h2>
             <p className="text-xl text-white/70 mb-12">
-              Join thousands of creators who trust Loggin' with their most valuable digital assets.
+              Join thousands of creators who trust TheKeyn with their most valuable digital assets.
             </p>
             <div className="flex justify-center">
               <a href="/register" className="block no-underline" style={{ textDecoration: 'none' }}>
@@ -407,11 +406,8 @@ function WelcomePage() {
         {/* Footer */}
         <footer className="px-6 py-12">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="flex items-center justify-center space-x-2 mb-6">
-              <LogoIcon className="w-8 h-8 text-white" />
-            </div>
             <p className="text-white/60">
-              © 2025 Loggin'. Protecting creators' rights through blockchain technology.
+              © 2025 TheKeyn. Protecting creators' rights through blockchain technology.
             </p>
           </div>
         </footer>

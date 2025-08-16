@@ -69,7 +69,7 @@ export default function WelcomeClean() {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-              <span style={{ color: '#1f2937', fontWeight: '600' }}>Loggin</span>
+              <span style={{ color: '#1f2937', fontWeight: '600' }}>Login</span>
             </div>
           </a>
         </div>
