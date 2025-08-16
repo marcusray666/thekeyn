@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, User, Bell, Lock, Save, Eye, EyeOff, Shield } from "lucide-react";
+import { ArrowLeft, User, Lock, Save, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,35 +33,7 @@ export default function PremiumSettings() {
     confirmPassword: "",
   });
   
-  const [notificationSettings, setNotificationSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: true,
-    certificateAlerts: true,
-    theftReports: true,
-    socialInteractions: true,
-    marketingEmails: false,
-    likes: true,
-    comments: true,
-    follows: true,
-    mentions: true,
-    workViews: false,
-    weeklyDigest: true,
-    newFeatures: true,
-  });
-  
-  const [privacySettings, setPrivacySettings] = useState({
-    publicProfile: true,
-    showStatistics: true,
-    allowIndexing: false,
-    showFollowers: true,
-    showFollowing: true,
-    allowDirectMessages: true,
-    showOnlineStatus: true,
-    showLastSeen: false,
-    allowTagging: true,
-    allowMentions: true,
-    requireApprovalForTags: false,
-  });
+
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -130,7 +102,7 @@ export default function PremiumSettings() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation */}
             <div className="border-b border-gray-200/50 px-0">
-              <div className="grid w-full grid-cols-4 bg-transparent py-0">
+              <div className="grid w-full grid-cols-2 bg-transparent py-0">
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
@@ -141,28 +113,6 @@ export default function PremiumSettings() {
                 >
                   <User className="h-4 w-4" />
                   <span className="font-medium">Profile</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('notifications')}
-                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
-                    activeTab === 'notifications' 
-                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
-                      : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-200/30'
-                  }`}
-                >
-                  <Bell className="h-4 w-4" />
-                  <span className="font-medium">Notifications</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('privacy')}
-                  className={`flex items-center justify-center space-x-2 px-4 py-4 border-b-2 transition-all ${
-                    activeTab === 'privacy' 
-                      ? 'border-[#FE3F5E] text-[#FE3F5E] bg-[#FE3F5E]/5' 
-                      : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-200/30'
-                  }`}
-                >
-                  <Shield className="h-4 w-4" />
-                  <span className="font-medium">Privacy</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('security')}
@@ -291,51 +241,7 @@ export default function PremiumSettings() {
               </Button>
             </TabsContent>
 
-            {/* Notifications Tab */}
-            <TabsContent value="notifications" className="p-8 space-y-8">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-6">Email Notifications</h3>
-                <div className="space-y-4">
-                  {Object.entries(notificationSettings).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between">
-                      <Label htmlFor={key} className="text-gray-700 font-medium capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </Label>
-                      <Switch
-                        id={key}
-                        checked={value}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings(prev => ({ ...prev, [key]: checked }))
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
 
-            {/* Privacy Tab */}
-            <TabsContent value="privacy" className="p-8 space-y-8">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-6">Privacy Settings</h3>
-                <div className="space-y-4">
-                  {Object.entries(privacySettings).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between">
-                      <Label htmlFor={key} className="text-gray-700 font-medium capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </Label>
-                      <Switch
-                        id={key}
-                        checked={value}
-                        onCheckedChange={(checked) => 
-                          setPrivacySettings(prev => ({ ...prev, [key]: checked }))
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
 
             {/* Security Tab */}
             <TabsContent value="security" className="p-8 space-y-8">
