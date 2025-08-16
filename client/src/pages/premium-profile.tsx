@@ -365,11 +365,22 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="p-1 text-white hover:text-gray-200 flex items-center justify-center"
+                                className="no-border-absolutely-none"
                                 onClick={(e) => e.stopPropagation()}
-                                style={{ background: 'none', border: 'none' }}
+                                style={{ 
+                                  background: 'transparent', 
+                                  border: 'none', 
+                                  padding: '4px',
+                                  color: 'white',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: '0',
+                                  boxShadow: 'none',
+                                  outline: 'none'
+                                }}
                               >
-                                <MoreVertical className="h-5 w-5" />
+                                <MoreVertical style={{ width: '20px', height: '20px', color: 'white' }} />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -442,10 +453,21 @@ export default function PremiumProfile() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="p-1 text-white hover:text-gray-200 flex items-center justify-center"
-                                style={{ background: 'none', border: 'none' }}
+                                className="no-border-absolutely-none"
+                                style={{ 
+                                  background: 'transparent', 
+                                  border: 'none', 
+                                  padding: '4px',
+                                  color: 'white',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: '0',
+                                  boxShadow: 'none',
+                                  outline: 'none'
+                                }}
                               >
-                                <MoreVertical className="h-5 w-5" />
+                                <MoreVertical style={{ width: '20px', height: '20px', color: 'white' }} />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
