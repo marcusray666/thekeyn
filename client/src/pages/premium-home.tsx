@@ -174,21 +174,42 @@ function WelcomePage() {
         <section className="px-6 py-20 text-center">
           <div className="max-w-4xl mx-auto">
             <h1 
-              className="font-black text-white mb-4 leading-tight"
+              className="font-black text-white mb-4 leading-tight relative"
               style={{ 
                 fontSize: 'clamp(4rem, 12vw, 6rem)',
                 lineHeight: '0.9'
               }}
             >
               <span 
-                className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent"
+                className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] bg-clip-text text-transparent relative inline-block"
                 style={{
-                  backgroundImage: 'linear-gradient(to right, #FE3F5E, #FFD200)',
+                  backgroundImage: 'linear-gradient(135deg, #FE3F5E 0%, #FF6B8A 50%, #FFD200 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0 4px 12px rgba(254, 63, 94, 0.3)) drop-shadow(0 0 20px rgba(255, 210, 0, 0.2))',
+                  textShadow: '0 0 30px rgba(254, 63, 94, 0.5)',
+                  letterSpacing: '-0.02em',
+                  fontWeight: '900',
+                  position: 'relative'
                 }}
               >
+                <span style={{ 
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(135deg, #FE3F5E 0%, #FF6B8A 50%, #FFD200 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'blur(8px)',
+                  opacity: 0.6,
+                  zIndex: -1
+                }}>
+                  TheKeyn
+                </span>
                 TheKeyn
               </span>
             </h1>
