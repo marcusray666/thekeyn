@@ -378,14 +378,19 @@ export default function PremiumProfile() {
                                   deletePostMutation.mutate(post.id.toString());
                                 }}
                                 style={{ 
-                                  color: '#ffffff', 
-                                  backgroundColor: '#dc2626',
+                                  color: '#dc2626', 
+                                  backgroundColor: 'rgba(220, 38, 38, 0.1)',
                                   fontWeight: '600',
                                   fontSize: '16px',
-                                  padding: '12px 16px'
+                                  padding: '12px 16px',
+                                  border: 'none',
+                                  outline: 'none',
+                                  borderRadius: '8px',
+                                  backdropFilter: 'blur(10px)'
                                 }}
+                                className="no-border-absolutely-none"
                               >
-                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#ffffff' }} />
+                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#dc2626' }} />
                                 Delete Post
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -455,14 +460,19 @@ export default function PremiumProfile() {
                               <DropdownMenuItem
                                 onClick={() => deletePostMutation.mutate(post.id.toString())}
                                 style={{ 
-                                  color: '#ffffff', 
-                                  backgroundColor: '#dc2626',
+                                  color: '#dc2626', 
+                                  backgroundColor: 'rgba(220, 38, 38, 0.1)',
                                   fontWeight: '600',
                                   fontSize: '16px',
-                                  padding: '12px 16px'
+                                  padding: '12px 16px',
+                                  border: 'none',
+                                  outline: 'none',
+                                  borderRadius: '8px',
+                                  backdropFilter: 'blur(10px)'
                                 }}
+                                className="no-border-absolutely-none"
                               >
-                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#ffffff' }} />
+                                <Trash2 style={{ width: '18px', height: '18px', marginRight: '8px', color: '#dc2626' }} />
                                 Delete Post
                               </DropdownMenuItem>
                             </DropdownMenuContent>
