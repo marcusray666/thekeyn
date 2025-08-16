@@ -96,9 +96,9 @@ export default function Login() {
         <GlassCard className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold gradient-text mb-4">Loggin'</h1>
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-white/60">Sign in to your Loggin' account</p>
+            <h1 className="text-3xl font-bold gradient-text mb-4">TheKeyn</h1>
+            <h2 className="text-2xl font-bold text-white mb-2">Log In</h2>
+            <p className="text-white/60">Access your creative protection platform</p>
           </div>
 
           {/* Login Form */}
@@ -141,20 +141,34 @@ export default function Login() {
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full relative overflow-hidden"
+              className="w-full text-white text-base font-semibold px-6 py-3 rounded-lg min-h-[48px] flex items-center justify-center cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                userSelect: 'none',
+                WebkitAppearance: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: '0 4px 12px -2px rgba(254, 63, 94, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
             >
               {loginMutation.isPending ? (
                 <ButtonLoader />
               ) : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
+                  <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff' }} />
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Log In</span>
                 </>
               )}
-            </Button>
+            </button>
           </form>
 
           {/* Footer */}
