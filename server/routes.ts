@@ -525,10 +525,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Certificate data not found" });
       }
       
-      // Return certificate with work data
+      // Get current user information to show updated username
+      const currentUser = await storage.getUser(work.userId);
+      
+      // Return certificate with work data and current user info
       res.json({
         ...certificate,
-        work
+        work: {
+          ...work,
+          // Override stored creatorName with current username
+          creatorName: currentUser?.username || work.creatorName
+        }
       });
     } catch (error) {
       console.error("Error fetching certificate:", error);
@@ -543,6 +550,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Only get the user's own works and their associated certificates
       const userWorks = await storage.getUserWorks(userId);
       
+      // Get current user info for updated username
+      const currentUser = req.user;
+      
       // Get certificates for user's works only
       const certificatesWithWorks = await Promise.all(
         userWorks.map(async (work) => {
@@ -550,7 +560,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (cert) {
             return {
               ...cert,
-              work: work,
+              work: {
+                ...work,
+                // Override stored creatorName with current username
+                creatorName: currentUser?.username || work.creatorName
+              },
             };
           }
           return null;
