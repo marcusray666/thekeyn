@@ -237,7 +237,7 @@ function WelcomePage() {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Login</span>
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Log In</span>
                 </div>
               </a>
             </div>
