@@ -210,7 +210,7 @@ function WelcomePage() {
               <h1 
                 className="neon-text relative inline-block"
                 style={{ 
-                  fontSize: 'clamp(4rem, 12vw, 6rem)',
+                  fontSize: 'clamp(3rem, 10vw, 4.5rem)',
                   lineHeight: '1.2',
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                   fontWeight: '900',
