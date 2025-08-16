@@ -6,6 +6,7 @@ import { ArrowLeft, Download, Share2, Eye, Search, Filter, Grid3X3, List } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
+import NoBorderElement from "@/components/NoBorderElement";
 
 export default function PremiumCertificates() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -54,15 +55,15 @@ export default function PremiumCertificates() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
             <Link href="/">
-              <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors">
+              <NoBorderElement className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors">
                 <ArrowLeft className="h-5 w-5" />
                 <span className="text-sm md:text-base">Back to Feed</span>
-              </button>
+              </NoBorderElement>
             </Link>
             <div className="hidden md:block w-px h-6 bg-gray-300"></div>
             <div className="flex items-center space-x-3">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-700">My Certificates</h1>
-              <div className="px-3 py-1 bg-[#FE3F5E]/20 border border-[#FE3F5E]/50 rounded-full">
+              <div className="px-3 py-1 bg-[#FE3F5E]/20 rounded-full no-border-absolutely-none">
                 <span className="text-[#FE3F5E] text-sm font-medium">{certificates.length}</span>
               </div>
             </div>
@@ -70,7 +71,7 @@ export default function PremiumCertificates() {
         </div>
 
         {/* Controls */}
-        <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-xl">
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-xl no-border-absolutely-none">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             {/* Search */}
             <div className="flex-1 max-w-md">
@@ -81,7 +82,7 @@ export default function PremiumCertificates() {
                   placeholder="Search certificates..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 bg-white/90 border-white/50 text-gray-900 placeholder-gray-600 rounded-xl shadow-sm"
+                  className="pl-12 bg-white/90 text-gray-900 placeholder-gray-600 rounded-xl shadow-sm no-border-absolutely-none"
                 />
               </div>
             </div>
@@ -91,7 +92,7 @@ export default function PremiumCertificates() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="bg-white/90 border border-white/50 text-gray-900 rounded-xl px-4 py-2 focus:outline-none focus:border-[#FE3F5E] shadow-sm"
+                className="bg-white/90 text-gray-900 rounded-xl px-4 py-2 focus:outline-none shadow-sm no-border-absolutely-none"
               >
                 <option value="all" className="bg-white text-gray-900">All Certificates</option>
                 <option value="verified" className="bg-white text-gray-900">Verified</option>
@@ -125,7 +126,7 @@ export default function PremiumCertificates() {
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredCertificates.map((cert) => (
-                <div key={cert.id} className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/95 transition-all duration-300 shadow-lg overflow-hidden">
+                <div key={cert.id} className="bg-white/90 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 hover:bg-white/95 transition-all duration-300 shadow-lg overflow-hidden no-border-absolutely-none">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0 pr-3 overflow-hidden">
                       <h3 className="text-lg font-semibold text-gray-700 truncate overflow-hidden whitespace-nowrap">
@@ -135,8 +136,8 @@ export default function PremiumCertificates() {
                     </div>
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       cert.isVerified 
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                        : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                        ? 'bg-green-500/20 text-green-400 no-border-absolutely-none' 
+                        : 'bg-yellow-500/20 text-yellow-400 no-border-absolutely-none'
                     }`}>
                       {cert.isVerified ? 'Verified' : 'Pending'}
                     </div>
@@ -183,7 +184,7 @@ export default function PremiumCertificates() {
               ))}
             </div>
           ) : (
-            <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden shadow-lg">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-lg no-border-absolutely-none">
               <div className="divide-y divide-white/50">
                 {filteredCertificates.map((cert) => (
                   <div key={cert.id} className="p-6 hover:bg-white/95 transition-colors overflow-hidden">
@@ -209,8 +210,8 @@ export default function PremiumCertificates() {
                       <div className="flex items-center space-x-4 flex-shrink-0">
                         <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                           cert.isVerified 
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                            : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                            ? 'bg-green-500/20 text-green-400 no-border-absolutely-none' 
+                            : 'bg-yellow-500/20 text-yellow-400 no-border-absolutely-none'
                         }`}>
                           {cert.isVerified ? 'Verified' : 'Pending'}
                         </div>
