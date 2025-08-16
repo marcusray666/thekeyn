@@ -877,7 +877,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Fetching works for user ID:", userId);
       const works = await storage.getUserWorks(userId);
       console.log("Found works:", works.length, works.map(w => ({ id: w.id, title: w.title, userId: w.userId })));
-      res.json(works);
+      
+      // Map database fields to frontend expected format
+      const mappedWorks = works.map(work => ({
+        ...work,
+        // Map moderation status to frontend expected fields
+        isVerified: work.moderationStatus === 'approved',
+        isProtected: work.blockchainHash && work.blockchainHash.length > 0,
+        sha256Hash: work.fileHash, // Map for frontend compatibility
+        // Ensure certificate data is included
+        certificateId: work.certificateId,
+        filename: work.filename,
+        originalName: work.originalName,
+        mimeType: work.mimeType,
+        fileSize: work.fileSize,
+        creatorName: work.creatorName
+      }));
+      
+      res.json(mappedWorks);
     } catch (error) {
       console.error("Error fetching user works:", error);
       res.status(500).json({ error: "Failed to fetch works" });
