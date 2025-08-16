@@ -225,38 +225,43 @@ export class DatabaseStorage implements IStorage {
     // Delete user and all associated data (cascading delete)
     // Note: This will remove all user data including works, posts, comments, etc.
     
-    // Delete in proper order to avoid foreign key constraints
-    await db.delete(messageReadStatus).where(eq(messageReadStatus.userId, id));
-    await db.delete(messages).where(eq(messages.senderId, id));
-    await db.delete(conversationParticipants).where(eq(conversationParticipants.userId, id));
-    await db.delete(conversations).where(eq(conversations.createdBy, id));
-    
-    await db.delete(backgroundInteractions).where(eq(backgroundInteractions.userId, id));
-    await db.delete(userBackgroundPreferences).where(eq(userBackgroundPreferences.userId, id));
-    
-    await db.delete(adminAuditLogs).where(eq(adminAuditLogs.adminId, id));
-    await db.delete(contentReports).where(eq(contentReports.reporterId, id));
-    
-    await db.delete(userAnalytics).where(eq(userAnalytics.userId, id));
-    await db.delete(userPreferences).where(eq(userPreferences.userId, id));
-    await db.delete(userNotifications).where(eq(userNotifications.userId, id));
-    await db.delete(userFollows).where(or(eq(userFollows.followerId, id), eq(userFollows.followingId, id)));
-    
-    await db.delete(postReactions).where(eq(postReactions.userId, id));
-    await db.delete(postComments).where(eq(postComments.userId, id));
-    await db.delete(posts).where(eq(posts.userId, id));
-    
-    await db.delete(notifications).where(eq(notifications.userId, id));
-    await db.delete(shares).where(eq(shares.userId, id));
-    await db.delete(comments).where(eq(comments.userId, id));
-    await db.delete(likes).where(eq(likes.userId, id));
-    await db.delete(follows).where(or(eq(follows.followerId, id), eq(follows.followingId, id)));
-    
-    await db.delete(certificates).where(eq(certificates.userId, id));
-    await db.delete(works).where(eq(works.userId, id));
-    
-    // Finally delete the user
-    await db.delete(users).where(eq(users.id, id));
+    try {
+      // Delete in proper order to avoid foreign key constraints
+      // Start with dependent data first
+      
+      // Delete social data
+      await db.delete(postReactions).where(eq(postReactions.userId, id));
+      await db.delete(postComments).where(eq(postComments.userId, id));
+      await db.delete(posts).where(eq(posts.userId, id));
+      
+      // Delete follows
+      await db.delete(userFollows).where(or(eq(userFollows.followerId, id), eq(userFollows.followingId, id)));
+      
+      // Delete subscription data
+      await db.delete(subscriptionUsage).where(eq(subscriptionUsage.userId, id));
+      await db.delete(subscriptions).where(eq(subscriptions.userId, id));
+      
+      // Delete NFT data
+      await db.delete(nftMints).where(eq(nftMints.userId, id));
+      
+      // Get works first, then delete certificates
+      const userWorks = await db.select({ id: works.id }).from(works).where(eq(works.userId, id));
+      
+      // Delete certificates for user's works
+      for (const work of userWorks) {
+        await db.delete(certificates).where(eq(certificates.workId, work.id));
+      }
+      
+      // Delete works
+      await db.delete(works).where(eq(works.userId, id));
+      
+      // Finally delete the user
+      await db.delete(users).where(eq(users.id, id));
+      
+    } catch (error) {
+      console.error('Error during user deletion:', error);
+      throw error;
+    }
   }
 
   async createWork(insertWork: InsertWork): Promise<Work> {
