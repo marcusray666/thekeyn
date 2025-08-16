@@ -116,10 +116,9 @@ export default function LoginClean() {
               />
             </div>
 
-            <button 
-              type="submit" 
-              disabled={loginMutation.isPending}
-              className="w-full text-white text-base font-semibold px-6 py-3 rounded-xl min-h-[48px] flex items-center justify-center cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            <div 
+              onClick={loginMutation.isPending ? undefined : handleSubmit}
+              className="w-full text-white text-base font-semibold px-6 py-3 rounded-xl min-h-[48px] flex items-center justify-center cursor-pointer select-none mt-6"
               style={{ 
                 backgroundColor: '#FE3F5E',
                 color: '#ffffff',
@@ -133,13 +132,14 @@ export default function LoginClean() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: '600'
+                opacity: loginMutation.isPending ? '0.5' : '1',
+                pointerEvents: loginMutation.isPending ? 'none' : 'auto'
               }}
             >
               <span style={{ color: '#ffffff', fontWeight: '600' }}>
                 {loginMutation.isPending ? "Logging in..." : "Log In"}
               </span>
-            </button>
+            </div>
           </form>
 
           <div className="text-center pt-6 mt-6 border-t border-gray-200/50">
