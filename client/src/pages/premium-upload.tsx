@@ -132,13 +132,21 @@ export default function PremiumUpload() {
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <button
+          <div
             onClick={() => setLocation('/')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors border-0 bg-transparent p-0 outline-none focus:outline-none"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setLocation('/');
+              }
+            }}
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Feed</span>
-          </button>
+          </div>
           
           <h1 className="text-3xl font-bold text-gray-800">
             {step === 'upload' && 'Protect Your Work'}
@@ -349,12 +357,20 @@ export default function PremiumUpload() {
                 </Button>
               </div>
 
-              <Button
+              <div
                 onClick={() => setLocation('/')}
-                className="w-full glass-button"
+                className="w-full glass-button cursor-pointer text-center py-3 rounded-xl transition-colors flex items-center justify-center"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setLocation('/');
+                  }
+                }}
               >
                 Back to Feed
-              </Button>
+              </div>
             </div>
           )}
         </div>
