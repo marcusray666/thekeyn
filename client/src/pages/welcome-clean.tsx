@@ -10,7 +10,13 @@ export default function WelcomeClean() {
       <div className="w-full max-w-4xl mx-auto text-center safe-area-inset">
         {/* Hero Section */}
         <div className="mb-12">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-6 leading-tight">
+          <h1 
+            className="font-black mb-6 leading-tight"
+            style={{ 
+              fontSize: 'clamp(4rem, 12vw, 8rem)',
+              lineHeight: '0.9'
+            }}
+          >
             <span 
               className="bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] bg-clip-text text-transparent"
               style={{
@@ -29,7 +35,13 @@ export default function WelcomeClean() {
             Digital Art Protection Platform
           </Badge>
           
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-gray-800 px-2">
+          <h2 
+            className="font-bold mb-4 sm:mb-6 text-gray-800 px-2"
+            style={{ 
+              fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+              lineHeight: '1.1'
+            }}
+          >
             Protect Your Creative Work
           </h2>
           
