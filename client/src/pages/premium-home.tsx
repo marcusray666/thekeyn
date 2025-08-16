@@ -197,67 +197,47 @@ function WelcomePage() {
             </p>
 
             <div className="flex flex-col gap-6 justify-center items-center px-6 w-full max-w-sm mx-auto">
-              <button 
-                onClick={() => window.location.href = '/register'}
-                className="w-full"
-                style={{ 
-                  backgroundColor: '#FE3F5E',
-                  background: '#FE3F5E',
-                  color: '#ffffff',
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  padding: '24px 32px',
-                  borderRadius: '16px',
-                  minHeight: '64px',
-                  border: 'none',
-                  outline: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  userSelect: 'none',
-                  WebkitAppearance: 'none',
-                  appearance: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-                  boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  WebkitBackgroundClip: 'padding-box',
-                  backgroundClip: 'padding-box'
-                }}>
-                Get Started for Free
-              </button>
-              <button 
-                onClick={() => window.location.href = '/login'}
-                className="w-full"
-                style={{ 
-                  backgroundColor: '#FFD200',
-                  background: '#FFD200',
-                  color: '#1f2937',
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  padding: '24px 32px',
-                  borderRadius: '16px',
-                  minHeight: '64px',
-                  border: 'none',
-                  outline: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  userSelect: 'none',
-                  WebkitAppearance: 'none',
-                  appearance: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-                  boxShadow: '0 10px 25px -5px rgba(255, 210, 0, 0.4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  WebkitBackgroundClip: 'padding-box',
-                  backgroundClip: 'padding-box'
-                }}>
-                <LogoIcon size="md" className="mr-3" style={{ color: '#1f2937' }} />
-                Loggin'
-              </button>
+              <a href="/register" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+                <div 
+                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  style={{ 
+                    background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    userSelect: 'none',
+                    WebkitAppearance: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started for Free</span>
+                </div>
+              </a>
+              <a href="/login" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
+                <div 
+                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  style={{ 
+                    background: 'linear-gradient(to right, #FE3F5E, #FFD200)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    userSelect: 'none',
+                    WebkitAppearance: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                  <LogoIcon size="md" className="mr-3 text-white" />
+                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Loggin'</span>
+                </div>
+              </a>
             </div>
           </div>
         </section>

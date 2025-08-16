@@ -17,53 +17,28 @@ button,
   touch-action: manipulation;
 }
 
-/* Force button colors on iOS Safari with maximum specificity */
-a[href="/register"] > div,
-a[href="/register"] div {
-  background-color: #FE3F5E !important;
-  background: #FE3F5E !important;
-  background-image: linear-gradient(to right, #FE3F5E, #FF6B8A) !important;
+/* Force button colors on iOS Safari */
+a[href="/register"] > div {
+  background: linear-gradient(to right, #FE3F5E, #FF6B8A) !important;
   color: #ffffff !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
 }
 
-a[href="/login"] > div,
-a[href="/login"] div {
-  background-color: #FE3F5E !important;
-  background: #FE3F5E !important;
-  background-image: linear-gradient(to right, #FE3F5E, #FFD200) !important;
+a[href="/login"] > div {
+  background: linear-gradient(to right, #FE3F5E, #FFD200) !important;
   color: #ffffff !important;
   border: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
 }
 
-/* iOS Safari specific overrides */
-@supports (-webkit-touch-callout: none) {
+/* Prevent iOS Safari from overriding button styles */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
   a[href="/register"] > div {
-    background: #FE3F5E !important;
-    background-color: #FE3F5E !important;
     -webkit-background-clip: padding-box !important;
     background-clip: padding-box !important;
   }
   
   a[href="/login"] > div {
-    background: #FE3F5E !important;
-    background-color: #FE3F5E !important;
     -webkit-background-clip: padding-box !important;
     background-clip: padding-box !important;
-  }
-}
-
-/* Additional Safari mobile targeting */
-@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 0) {
-  a[href="/register"] > div {
-    background: #FE3F5E !important;
-  }
-  
-  a[href="/login"] > div {
-    background: #FE3F5E !important;
   }
 }
 

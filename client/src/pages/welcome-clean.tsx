@@ -31,22 +31,17 @@ export default function WelcomeClean() {
               className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
               style={{ 
                 backgroundColor: '#FE3F5E',
-                background: '#FE3F5E',
-                backgroundImage: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
                 color: '#ffffff',
                 textDecoration: 'none',
                 userSelect: 'none',
                 WebkitAppearance: 'none',
-                appearance: 'none',
                 WebkitTapHighlightColor: 'transparent',
                 border: 'none',
                 outline: 'none',
                 boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                WebkitBackgroundClip: 'padding-box',
-                backgroundClip: 'padding-box'
+                justifyContent: 'center'
               }}>
               <Crown className="h-7 w-7 mr-3 flex-shrink-0" style={{ color: '#ffffff' }} />
               <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started</span>
