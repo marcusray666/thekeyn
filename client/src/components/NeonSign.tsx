@@ -38,7 +38,7 @@ export function NeonSign() {
       style={{
         position: 'fixed',
         zIndex: 0,
-        top: '1.5rem',
+        top: '5.5rem',
         left: '1.5rem',
         opacity,
         fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',

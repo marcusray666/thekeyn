@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { LogoIcon } from "@/components/ui/logo-icon";
+
 
 export function TopNav() {
   const { user } = useAuth();
@@ -127,10 +127,12 @@ export function TopNav() {
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)'
       }}>
-      {/* Logo */}
+      {/* Brand Name */}
       <Link href="/">
         <div className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform">
-          <LogoIcon className="w-10 h-10" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#FE3F5E] to-[#FF6B8A] bg-clip-text text-transparent">
+            TheKeyn
+          </h1>
         </div>
       </Link>
 
