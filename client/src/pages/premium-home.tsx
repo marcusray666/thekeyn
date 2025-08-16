@@ -196,10 +196,10 @@ function WelcomePage() {
               Join thousands of creators protecting their intellectual property.
             </p>
 
-            <div className="flex flex-col gap-6 justify-center items-center px-6 w-full max-w-sm mx-auto">
+            <div className="flex flex-col gap-4 justify-center items-center px-6 w-full max-w-xs mx-auto">
               <a href="/register" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
                 <div 
-                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  className="w-full text-white text-base font-semibold px-6 py-3 rounded-lg min-h-[48px] flex items-center justify-center cursor-pointer select-none" 
                   style={{ 
                     background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
                     color: '#ffffff',
@@ -209,17 +209,17 @@ function WelcomePage() {
                     WebkitTapHighlightColor: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    boxShadow: '0 4px 12px -2px rgba(254, 63, 94, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started for Free</span>
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Get Started for Free</span>
                 </div>
               </a>
               <a href="/login" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
                 <div 
-                  className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  className="w-full text-white text-base font-semibold px-6 py-3 rounded-lg min-h-[48px] flex items-center justify-center cursor-pointer select-none" 
                   style={{ 
                     background: 'linear-gradient(to right, #FE3F5E, #FFD200)',
                     color: '#ffffff',
@@ -229,13 +229,13 @@ function WelcomePage() {
                     WebkitTapHighlightColor: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    boxShadow: '0 4px 12px -2px rgba(254, 63, 94, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <LogoIcon size="md" className="mr-3 text-white" />
-                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Loggin'</span>
+                  <LogoIcon size="sm" className="mr-2 text-white" />
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Loggin'</span>
                 </div>
               </a>
             </div>
@@ -378,7 +378,7 @@ function WelcomePage() {
             <div className="flex justify-center">
               <a href="/register" className="block no-underline" style={{ textDecoration: 'none' }}>
                 <div 
-                  className="text-white text-xl font-bold px-12 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+                  className="text-white text-lg font-semibold px-8 py-4 rounded-xl min-h-[52px] flex items-center justify-center cursor-pointer select-none" 
                   style={{ 
                     background: 'linear-gradient(to right, #FE3F5E, #FF6B8A)',
                     color: '#ffffff',
@@ -388,13 +388,13 @@ function WelcomePage() {
                     WebkitTapHighlightColor: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4)',
+                    boxShadow: '0 6px 16px -4px rgba(254, 63, 94, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                  <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started for Free</span>
-                  <Crown className="ml-3 h-6 w-6" style={{ color: '#ffffff' }} />
+                  <span style={{ color: '#ffffff', fontWeight: '600' }}>Get Started for Free</span>
+                  <Crown className="ml-2 h-5 w-5" style={{ color: '#ffffff' }} />
                 </div>
               </a>
             </div>

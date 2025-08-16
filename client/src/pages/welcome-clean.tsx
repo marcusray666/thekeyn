@@ -25,10 +25,10 @@ export default function WelcomeClean() {
         </div>
 
         {/* CTA Buttons - iOS Safari Compatible */}
-        <div className="flex flex-col gap-6 justify-center items-center mb-16 px-6 w-full max-w-sm mx-auto">
+        <div className="flex flex-col gap-4 justify-center items-center mb-16 px-6 w-full max-w-xs mx-auto">
           <a href="/register" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
             <div 
-              className="w-full text-white text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+              className="w-full text-white text-base font-semibold px-6 py-3 rounded-lg min-h-[48px] flex items-center justify-center cursor-pointer select-none" 
               style={{ 
                 backgroundColor: '#FE3F5E',
                 color: '#ffffff',
@@ -38,19 +38,19 @@ export default function WelcomeClean() {
                 WebkitTapHighlightColor: 'transparent',
                 border: 'none',
                 outline: 'none',
-                boxShadow: '0 10px 25px -5px rgba(254, 63, 94, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 4px 12px -2px rgba(254, 63, 94, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-              <Crown className="h-7 w-7 mr-3 flex-shrink-0" style={{ color: '#ffffff' }} />
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>Get Started</span>
+              <Crown className="h-5 w-5 mr-2 flex-shrink-0" style={{ color: '#ffffff' }} />
+              <span style={{ color: '#ffffff', fontWeight: '600' }}>Get Started</span>
             </div>
           </a>
           
           <a href="/login" className="w-full block no-underline" style={{ textDecoration: 'none' }}>
             <div 
-              className="w-full text-gray-800 text-xl font-bold px-8 py-6 rounded-2xl min-h-[64px] flex items-center justify-center cursor-pointer select-none" 
+              className="w-full text-gray-800 text-base font-semibold px-6 py-3 rounded-lg min-h-[48px] flex items-center justify-center cursor-pointer select-none" 
               style={{ 
                 backgroundColor: '#ffffff',
                 color: '#1f2937',
@@ -58,14 +58,14 @@ export default function WelcomeClean() {
                 userSelect: 'none',
                 WebkitAppearance: 'none',
                 WebkitTapHighlightColor: 'transparent',
-                border: '3px solid #1f2937',
+                border: '2px solid #1f2937',
                 outline: 'none',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-              <span style={{ color: '#1f2937', fontWeight: 'bold' }}>Loggin'</span>
+              <span style={{ color: '#1f2937', fontWeight: '600' }}>Loggin'</span>
             </div>
           </a>
         </div>
