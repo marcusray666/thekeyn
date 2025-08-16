@@ -1,5 +1,4 @@
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Sparkles, Crown } from "lucide-react";
 // LogoIcon component will be replaced with simple text
@@ -25,27 +24,33 @@ export default function WelcomeClean() {
           </p>
         </div>
 
-        {/* CTA Buttons - Fixed for Mobile */}
-        <div className="flex flex-col gap-4 justify-center items-center mb-16 px-4 w-full max-w-md mx-auto">
-          <Link href="/register" className="w-full">
-            <Button 
-              size="lg" 
-              className="w-full bg-[#FE3F5E] hover:bg-[#FE3F5E]/90 text-white text-lg px-8 py-4 rounded-2xl shadow-2xl hover:shadow-xl transition-all duration-300 min-h-[56px]"
-            >
-              <Crown className="h-6 w-6 mr-3" />
-              Get Started
-            </Button>
-          </Link>
+        {/* CTA Buttons - Native HTML for Mobile Compatibility */}
+        <div className="flex flex-col gap-4 justify-center items-center mb-16 px-6 w-full max-w-sm mx-auto">
+          <a href="/register" className="w-full block no-underline">
+            <div className="w-full bg-[#FE3F5E] text-white text-lg font-bold px-8 py-5 rounded-2xl shadow-2xl min-h-[60px] flex items-center justify-center cursor-pointer border-0 outline-none select-none" 
+                 style={{ 
+                   WebkitAppearance: 'none', 
+                   WebkitTapHighlightColor: 'transparent',
+                   textDecoration: 'none',
+                   userSelect: 'none'
+                 }}>
+              <Crown className="h-6 w-6 mr-3 flex-shrink-0" />
+              <span>Get Started</span>
+            </div>
+          </a>
           
-          <Link href="/login" className="w-full">
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="w-full border-2 border-gray-400 bg-white/80 text-gray-800 hover:bg-gray-50 text-lg px-8 py-4 rounded-2xl backdrop-blur-sm min-h-[56px] shadow-lg"
-            >
-              Loggin'
-            </Button>
-          </Link>
+          <a href="/login" className="w-full block no-underline">
+            <div className="w-full border-3 border-gray-700 bg-white text-gray-800 text-lg font-bold px-8 py-5 rounded-2xl min-h-[60px] flex items-center justify-center cursor-pointer shadow-2xl select-none" 
+                 style={{ 
+                   WebkitAppearance: 'none', 
+                   WebkitTapHighlightColor: 'transparent',
+                   textDecoration: 'none',
+                   userSelect: 'none',
+                   border: '3px solid #374151'
+                 }}>
+              <span>Loggin'</span>
+            </div>
+          </a>
         </div>
 
         {/* Feature Preview */}

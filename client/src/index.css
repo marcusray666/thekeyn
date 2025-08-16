@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Safari button fixes */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, 
+[role="button"], 
+.cursor-pointer {
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 
 
 /* White liquid glass theme */
