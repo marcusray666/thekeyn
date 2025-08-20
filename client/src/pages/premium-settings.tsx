@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
+import { NoBorderElement } from "@/components/NoBorderElement";
 
 export default function PremiumSettings() {
   const [, setLocation] = useLocation();
@@ -125,15 +126,13 @@ export default function PremiumSettings() {
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Button
+          <NoBorderElement
             onClick={() => setLocation('/profile')}
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-800 hover:bg-gray-100/50"
+            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Profile
-          </Button>
+            <ArrowLeft className="h-5 w-5" />
+            <span className="text-sm md:text-base">Back to Profile</span>
+          </NoBorderElement>
           
           <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
           
