@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Plus, FileText, User } from "lucide-react";
+import { Home, Plus, FileText, User, Settings } from "lucide-react";
 import { LogoIcon } from "@/components/ui/logo-icon";
 import { cn } from "@/lib/utils";
 import { useScrollNavigation } from "@/hooks/use-scroll-navigation";
@@ -7,8 +7,8 @@ import { useScrollNavigation } from "@/hooks/use-scroll-navigation";
 const navItems = [
   { icon: Home, label: "Home", route: "/" },
   { icon: Plus, label: "Upload", route: "/upload" },
-  { icon: FileText, label: "Certs", route: "/certificates" },
-  { icon: () => <LogoIcon size="sm" />, label: "Verify", route: "/verify" },
+  { icon: FileText, label: "Works", route: "/certificates" },
+  { icon: Settings, label: "Settings", route: "/settings" },
   { icon: User, label: "Profile", route: "/profile" },
 ];
 
