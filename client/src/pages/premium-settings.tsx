@@ -59,9 +59,40 @@ export default function PremiumSettings() {
     },
   });
 
-  const handleProfileUpdate = () => {
+  const updatePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      return apiRequest("/api/user/password", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Updated",
+        description: "Your password has been successfully changed.",
+      });
+      // Clear password fields after successful update
+      setProfileSettings(prev => ({
+        ...prev,
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      }));
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Password Change Failed",
+        description: error.message || "Failed to update password.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleProfileUpdate = async () => {
     const { currentPassword, newPassword, confirmPassword, ...profileData } = profileSettings;
     
+    // Check password confirmation if password is being changed
     if (newPassword && newPassword !== confirmPassword) {
       toast({
         title: "Password Mismatch",
@@ -71,12 +102,21 @@ export default function PremiumSettings() {
       return;
     }
 
-    const updateData = {
-      ...profileData,
-      ...(newPassword && { currentPassword, newPassword })
-    };
+    try {
+      // Update profile data first
+      await updateProfileMutation.mutateAsync(profileData);
 
-    updateProfileMutation.mutate(updateData);
+      // Update password if provided
+      if (newPassword && currentPassword) {
+        await updatePasswordMutation.mutateAsync({
+          currentPassword,
+          newPassword
+        });
+      }
+    } catch (error) {
+      // Error handling is done in the individual mutations
+      console.error("Profile update error:", error);
+    }
   };
 
   return (
@@ -233,11 +273,11 @@ export default function PremiumSettings() {
 
               <Button
                 onClick={handleProfileUpdate}
-                disabled={updateProfileMutation.isPending}
+                disabled={updateProfileMutation.isPending || updatePasswordMutation.isPending}
                 className="accent-button"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                {(updateProfileMutation.isPending || updatePasswordMutation.isPending) ? "Saving..." : "Save Changes"}
               </Button>
             </TabsContent>
 
