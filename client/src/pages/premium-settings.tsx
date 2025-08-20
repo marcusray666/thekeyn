@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
-import { NoBorderElement } from "@/components/NoBorderElement";
+import NoBorderElement from "@/components/NoBorderElement";
 
 export default function PremiumSettings() {
   const [, setLocation] = useLocation();
