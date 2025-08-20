@@ -194,20 +194,20 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
 
   const PreferenceCard = ({ preference }: { preference: BackgroundPreference }) => (
     <Card 
-      className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200 cursor-pointer hover:shadow-lg"
+      className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200 cursor-pointer hover:shadow-lg min-h-[140px] md:min-h-[160px]"
       onClick={() => selectPreference(preference)}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2 md:pb-3 p-3 md:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
             <div 
-              className="w-8 h-8 rounded-lg border-2 border-gray-200"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-lg border-2 border-gray-200 flex-shrink-0"
               style={{
                 background: `linear-gradient(45deg, ${preference.primaryColors.slice(0, 2).join(', ')})`
               }}
             />
-            <div>
-              <CardTitle className="text-sm text-gray-800 capitalize">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-xs md:text-sm text-gray-800 capitalize truncate">
                 {preference.gradientType} {preference.colorScheme}
               </CardTitle>
               <CardDescription className="text-xs">
@@ -222,18 +222,18 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
               e.stopPropagation();
               deletePreferenceMutation.mutate(preference.id);
             }}
-            className="text-gray-400 hover:text-red-500"
+            className="text-gray-400 hover:text-red-500 flex-shrink-0 p-1 md:p-2"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3 md:h-4 md:w-4" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 p-3 md:p-4">
         <div className="flex flex-wrap gap-1 mb-2">
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs px-2 py-0.5">
             {preference.moodTag}
           </Badge>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs px-2 py-0.5">
             {preference.animationSpeed}
           </Badge>
         </div>
@@ -265,29 +265,29 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl md:max-h-[80vh] max-h-[85vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 w-[calc(100vw-2rem)] md:w-auto sm:max-w-[425px] left-4 right-4 translate-x-0 sm:left-[50%] sm:translate-x-[-50%]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center text-gray-800">
+      <DialogContent className="max-w-5xl lg:max-h-[85vh] md:max-h-[90vh] max-h-[95vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] lg:w-auto sm:max-w-[600px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1200px] left-2 right-2 sm:left-4 sm:right-4 md:left-8 md:right-8 lg:left-auto lg:right-auto translate-x-0 lg:left-[50%] lg:translate-x-[-50%]">
+        <DialogHeader className="pb-4 md:pb-6">
+          <DialogTitle className="flex items-center text-gray-800 text-base md:text-lg">
             <Sparkles className="h-5 w-5 mr-2 text-pink-500" />
             Personalized Background Engine
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-gray-600 text-sm md:text-base">
             Customize your background preferences and let AI learn from your choices
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Quick Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row md:flex-row lg:flex-row gap-3 md:gap-4">
             <Button
               onClick={() => generateGradientMutation.mutate()}
               disabled={generateGradientMutation.isPending}
-              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 w-full sm:w-auto"
+              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 w-full sm:w-auto flex-1 md:flex-none py-2 md:py-2 text-sm md:text-base"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${generateGradientMutation.isPending ? 'animate-spin' : ''}`} />
               Generate New Gradient
             </Button>
-            <Button variant="outline" className="bg-white/80 w-full sm:w-auto">
+            <Button variant="outline" className="bg-white/80 w-full sm:w-auto flex-1 md:flex-none py-2 md:py-2 text-sm md:text-base">
               <Settings className="h-4 w-4 mr-2" />
               Advanced Settings
             </Button>
@@ -303,30 +303,30 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4">
+                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg">
+                    <div className="text-xl md:text-2xl font-bold text-gray-800">
                       {analytics.filter(a => a.interactionType === 'like').length}
                     </div>
-                    <div className="text-sm text-gray-600">Liked Gradients</div>
+                    <div className="text-xs md:text-sm text-gray-600">Liked Gradients</div>
                   </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
+                    <div className="text-xl md:text-2xl font-bold text-gray-800">
                       {Math.round(analytics.reduce((acc, a) => acc + (a.timeSpent || 0), 0) / 60)}
                     </div>
-                    <div className="text-sm text-gray-600">Minutes Viewing</div>
+                    <div className="text-xs md:text-sm text-gray-600">Minutes Viewing</div>
                   </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg">
+                    <div className="text-xl md:text-2xl font-bold text-gray-800">
                       {new Set(analytics.map(a => a.pageContext)).size}
                     </div>
-                    <div className="text-sm text-gray-600">Pages Visited</div>
+                    <div className="text-xs md:text-sm text-gray-600">Pages Visited</div>
                   </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
+                    <div className="text-xl md:text-2xl font-bold text-gray-800">
                       {analytics.filter(a => a.timeOfDay === 'evening').length > analytics.length / 2 ? '🌙' : '☀️'}
                     </div>
-                    <div className="text-sm text-gray-600">Preferred Time</div>
+                    <div className="text-xs md:text-sm text-gray-600">Preferred Time</div>
                   </div>
                 </div>
               </CardContent>
@@ -335,7 +335,7 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
 
           {/* Saved Preferences */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Saved Preferences</h3>
+            <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Your Saved Preferences</h3>
             {isLoading ? (
               <div className="text-center py-8 text-gray-500">Loading preferences...</div>
             ) : preferences.length === 0 ? (
@@ -349,7 +349,7 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                 {preferences.map((preference: BackgroundPreference) => (
                   <PreferenceCard key={preference.id} preference={preference} />
                 ))}
@@ -369,14 +369,14 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
               <p className="text-sm text-gray-600 mb-4">
                 Click "Generate New Gradient" above to let AI create personalized backgrounds that match your style and mood.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg border border-gray-200">
-                  <div className="text-sm font-medium text-gray-800">Smart Learning</div>
-                  <div className="text-xs text-gray-600 mt-1">AI learns from your interactions to suggest better backgrounds</div>
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div className="p-3 md:p-4 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg border border-gray-200">
+                  <div className="text-sm md:text-base font-medium text-gray-800">Smart Learning</div>
+                  <div className="text-xs md:text-sm text-gray-600 mt-1">AI learns from your interactions to suggest better backgrounds</div>
                 </div>
-                <div className="p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-gray-200">
-                  <div className="text-sm font-medium text-gray-800">Context Aware</div>
-                  <div className="text-xs text-gray-600 mt-1">Backgrounds adapt based on time of day and page context</div>
+                <div className="p-3 md:p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-gray-200">
+                  <div className="text-sm md:text-base font-medium text-gray-800">Context Aware</div>
+                  <div className="text-xs md:text-sm text-gray-600 mt-1">Backgrounds adapt based on time of day and page context</div>
                 </div>
               </div>
             </CardContent>
