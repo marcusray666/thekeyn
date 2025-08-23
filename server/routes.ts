@@ -348,7 +348,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Session middleware is already configured in server/index.ts - do not duplicate
 
-  // Serve uploaded files with proper headers
+  // DEPRECATED: Local file serving - being replaced with cloud object storage
+  // Keep for backward compatibility during migration
   app.use("/uploads", express.static("uploads", {
     setHeaders: (res, path) => {
       // Set proper MIME type for images
@@ -5150,6 +5151,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.sendStatus(404);
       }
       return res.sendStatus(500);
+    }
+  });
+
+  // Object Storage Routes - Cloud file storage that persists across deployments
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  app.post("/api/objects/upload", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ error: "Failed to generate upload URL" });
+    }
+  });
+
+  // Object Storage completion endpoint - called after successful upload
+  app.post("/api/objects/complete", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { uploadURL } = req.body;
+      
+      if (!uploadURL) {
+        return res.status(400).json({ error: "Upload URL is required" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      
+      // Normalize the upload URL to get the object path
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      
+      // Set ACL policy for public visibility (for social posts)
+      await objectStorageService.trySetObjectEntityAclPolicy(objectPath, {
+        owner: userId.toString(),
+        visibility: "public", // Public for social media posts
+        aclRules: [],
+      });
+
+      res.json({ 
+        success: true, 
+        objectPath,
+        message: "File upload completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error completing upload:", error);
+      res.status(500).json({ error: "Failed to complete upload" });
     }
   });
 
