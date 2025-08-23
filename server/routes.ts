@@ -348,41 +348,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Session middleware is already configured in server/index.ts - do not duplicate
 
-  // DEPRECATED: Local file serving - being replaced with cloud object storage
-  // Keep for backward compatibility during migration
+  // Object storage serving routes - replaces local /uploads
+  // Serve public objects from cloud storage
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Serve private objects from cloud storage (for authenticated users)
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Get upload URL for objects
+  app.post("/api/objects/upload", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Complete object upload (set metadata)
+  app.post("/api/objects/complete", async (req, res) => {
+    try {
+      const { uploadURL, filename, mimeType } = req.body;
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      
+      res.json({ 
+        objectPath,
+        message: "Object upload completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error completing object upload:", error);
+      res.status(500).json({ error: "Failed to complete upload" });
+    }
+  });
+
+  // DEPRECATED: Local file serving - Keep for backward compatibility during migration
   app.use("/uploads", express.static("uploads", {
     setHeaders: (res, path) => {
-      // Set proper MIME type for images
-      if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
-        res.setHeader('Content-Type', 'image/jpeg');
-      } else if (path.endsWith('.png')) {
-        res.setHeader('Content-Type', 'image/png');
-      } else if (path.endsWith('.gif')) {
-        res.setHeader('Content-Type', 'image/gif');
-      } else if (path.endsWith('.webp')) {
-        res.setHeader('Content-Type', 'image/webp');
-      }
-      // Set proper MIME type for videos
-      else if (path.endsWith('.mp4')) {
-        res.setHeader('Content-Type', 'video/mp4');
-      } else if (path.endsWith('.webm')) {
-        res.setHeader('Content-Type', 'video/webm');
-      } else if (path.endsWith('.mov') || path.endsWith('.quicktime')) {
-        res.setHeader('Content-Type', 'video/quicktime');
-      } else if (path.endsWith('.avi')) {
-        res.setHeader('Content-Type', 'video/x-msvideo');
-      }
-      // Set proper MIME type for audio
-      else if (path.endsWith('.mp3')) {
-        res.setHeader('Content-Type', 'audio/mpeg');
-      } else if (path.endsWith('.wav')) {
-        res.setHeader('Content-Type', 'audio/wav');
-      } else if (path.endsWith('.ogg')) {
-        res.setHeader('Content-Type', 'audio/ogg');
-      } else if (path.endsWith('.m4a')) {
-        res.setHeader('Content-Type', 'audio/mp4');
-      }
-      // Allow CORS for all media files
+      // Set proper MIME type and CORS headers
+      const mimeTypes: Record<string, string> = {
+        '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp',
+        '.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime', '.avi': 'video/x-msvideo',
+        '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.m4a': 'audio/mp4'
+      };
+      const ext = path.substring(path.lastIndexOf('.'));
+      if (mimeTypes[ext]) res.setHeader('Content-Type', mimeTypes[ext]);
       res.setHeader('Access-Control-Allow-Origin', '*');
     }
   }));
@@ -5317,6 +5354,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching background recommendations:", error);
       res.status(500).json({ error: "Failed to fetch background recommendations" });
+    }
+  });
+
+  // Get background analytics for a user
+  app.get("/api/background/analytics/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      if (req.user!.id !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const analytics = await storage.getBackgroundAnalytics(userId);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching background analytics:", error);
+      res.status(500).json({ error: "Failed to fetch background analytics" });
     }
   });
 
