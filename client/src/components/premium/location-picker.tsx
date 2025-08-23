@@ -190,14 +190,14 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
       {/* Search Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0F0F0F] border border-white/10 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden shadow-xl">
             {/* Header */}
-            <div className="p-4 border-b border-white/10">
+            <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-semibold text-lg">Select Location</h3>
+                <h3 className="text-gray-900 font-semibold text-lg">Select Location</h3>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-white/50 hover:text-white transition-colors"
+                  className="text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -205,13 +205,13 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
 
               {/* Search Input */}
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-white/50" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
                 <Input
                   type="text"
                   placeholder="Search for a location (e.g., Soho, NYC)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white/10 border-white/30 text-white placeholder-white/60 rounded-xl pl-10 focus:bg-white/20 focus:border-white/50"
+                  className="bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 rounded-xl pl-10 focus:bg-white focus:border-gray-300"
                   autoFocus
                 />
               </div>
@@ -222,7 +222,7 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
               {isLoading ? (
                 <div className="p-4 text-center">
                   <div className="w-6 h-6 border-2 border-[#FE3F5E] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-white/60 text-sm">Searching locations...</p>
+                  <p className="text-gray-500 text-sm">Searching locations...</p>
                 </div>
               ) : searchResults.length > 0 ? (
                 <div className="py-2">
@@ -230,15 +230,15 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
                     <button
                       key={result.place_id}
                       onClick={() => handleLocationSelect(result)}
-                      className="w-full text-left p-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0"
+                      className="w-full text-left p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
                       <div className="flex items-start space-x-3">
                         <MapPin className="h-4 w-4 text-[#FE3F5E] mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-white font-medium text-sm leading-tight">
+                          <p className="text-gray-900 font-medium text-sm leading-tight">
                             {formatLocationName(result)}
                           </p>
-                          <p className="text-white/50 text-xs mt-1 line-clamp-2">
+                          <p className="text-gray-500 text-xs mt-1 line-clamp-2">
                             {result.display_name}
                           </p>
                         </div>
@@ -248,15 +248,15 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
                 </div>
               ) : searchQuery.length >= 2 ? (
                 <div className="p-4 text-center">
-                  <MapPin className="h-8 w-8 text-white/30 mx-auto mb-2" />
-                  <p className="text-white/60 text-sm">No locations found</p>
-                  <p className="text-white/40 text-xs mt-1">Try a different search term</p>
+                  <MapPin className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">No locations found</p>
+                  <p className="text-gray-400 text-xs mt-1">Try a different search term</p>
                 </div>
               ) : (
                 <div className="p-4 text-center">
-                  <MapPin className="h-8 w-8 text-white/30 mx-auto mb-2" />
-                  <p className="text-white/60 text-sm">Search for a location</p>
-                  <p className="text-white/40 text-xs mt-1">Try searching for "Soho NYC" or "Times Square"</p>
+                  <MapPin className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">Search for a location</p>
+                  <p className="text-gray-400 text-xs mt-1">Try searching for "Soho NYC" or "Times Square"</p>
                   
                   {/* Current location button */}
                   {currentLocation && (
@@ -272,7 +272,7 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
 
                   {/* Popular locations */}
                   <div className="mt-4 space-y-2">
-                    <p className="text-white/40 text-xs text-center mb-2">Popular locations:</p>
+                    <p className="text-gray-400 text-xs text-center mb-2">Popular locations:</p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {['Soho, NYC', 'Times Square, NYC', 'Brooklyn, NYC', 'Los Angeles, CA', 'Miami, FL', 'Chicago, IL'].map((location) => (
                         <button
@@ -281,7 +281,7 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
                             onLocationSelect(location);
                             setIsOpen(false);
                           }}
-                          className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white text-xs rounded-full transition-colors"
+                          className="px-3 py-1 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 text-xs rounded-full transition-colors"
                         >
                           {location}
                         </button>
@@ -294,17 +294,17 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
 
             {/* Quick Actions */}
             {selectedLocation && (
-              <div className="p-4 border-t border-white/10 bg-white/5">
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-400" />
-                    <span className="text-white/80 text-sm">Current: {selectedLocation}</span>
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-gray-700 text-sm">Current: {selectedLocation}</span>
                   </div>
                   <Button
                     onClick={clearLocation}
                     variant="outline"
                     size="sm"
-                    className="bg-transparent border-white/20 text-white/70 hover:bg-white/10"
+                    className="bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     Clear
                   </Button>
