@@ -2711,7 +2711,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Interface implementation methods
-  async saveBackgroundPreference(userId: number, preferenceData: any): Promise<any> {
+  async saveBackgroundPreference(userId: number, preferenceData: any): Promise<UserBackgroundPreference> {
     console.log('saveBackgroundPreference called with:', { userId, preferenceData });
     
     const preference = await this.createBackgroundPreference({
@@ -2720,11 +2720,12 @@ export class DatabaseStorage implements IStorage {
       colorScheme: preferenceData.colorScheme,
       primaryColors: preferenceData.primaryColors,
       secondaryColors: preferenceData.secondaryColors || [],
-      direction: preferenceData.direction,
+      direction: preferenceData.direction || 'to bottom right',
       intensity: preferenceData.intensity,
       animationSpeed: preferenceData.animationSpeed,
-      timeOfDayPreference: preferenceData.timeOfDayPreference,
+      timeOfDayPreference: preferenceData.timeOfDay || preferenceData.timeOfDayPreference,
       moodTag: preferenceData.moodTag,
+      usageCount: preferenceData.usageCount || 1,
       userRating: preferenceData.userRating,
     });
     return preference;

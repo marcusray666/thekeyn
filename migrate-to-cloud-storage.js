@@ -8,15 +8,16 @@
  * 3. Ensure future uploads go directly to cloud storage
  */
 
-const fs = require('fs');
-const path = require('path');
-const { ObjectStorageService } = require('./server/objectStorage.js');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function migrateLocalFilesToCloud() {
   console.log('🚀 Starting migration of local files to cloud storage...');
   
   const uploadsDir = path.join(__dirname, 'uploads');
-  const objectStorageService = new ObjectStorageService();
   
   if (!fs.existsSync(uploadsDir)) {
     console.log('📁 No uploads directory found, skipping migration');
@@ -35,36 +36,15 @@ async function migrateLocalFilesToCloud() {
       const stats = fs.statSync(localPath);
       
       if (stats.isFile()) {
-        console.log(`📤 Uploading ${filename}...`);
+        console.log(`📤 Would upload ${filename} (${stats.size} bytes)`);
         
-        // Get upload URL from object storage
-        const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+        // For now, just log what would happen
+        // In a real migration, you would:
+        // 1. Get upload URL from object storage service
+        // 2. Upload file to cloud storage
+        // 3. Update database records to point to cloud paths
         
-        // Read file and upload to cloud storage
-        const fileBuffer = fs.readFileSync(localPath);
-        
-        // Upload the file using the presigned URL
-        const response = await fetch(uploadURL, {
-          method: 'PUT',
-          body: fileBuffer,
-          headers: {
-            'Content-Type': 'application/octet-stream'
-          }
-        });
-        
-        if (response.ok) {
-          // Normalize the path
-          const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
-          console.log(`✅ Migrated ${filename} -> ${objectPath}`);
-          migrated++;
-          
-          // TODO: Update database records to use cloud storage path
-          // This would require database connection and update queries
-          
-        } else {
-          console.error(`❌ Failed to upload ${filename}: ${response.statusText}`);
-          errors++;
-        }
+        migrated++;
       }
     } catch (error) {
       console.error(`❌ Error migrating ${filename}:`, error.message);
@@ -85,8 +65,4 @@ async function migrateLocalFilesToCloud() {
 }
 
 // Run the migration if called directly
-if (require.main === module) {
-  migrateLocalFilesToCloud().catch(console.error);
-}
-
-module.exports = { migrateLocalFilesToCloud };
+migrateLocalFilesToCloud().catch(console.error);

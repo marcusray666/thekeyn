@@ -380,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get upload URL for objects
+  // Get upload URL for objects (no auth required for public uploads)
   app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
@@ -2094,11 +2094,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         protectedWorkId: work.id,
         hashtags: [...hashtags, 'protected', 'verified', 'blockchain'],
         tags: ['protected-work', 'certificate'],
-        // Use work's file info for display - check if it's cloud storage or local
-        imageUrl: work.mimeType?.startsWith('image/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
-        videoUrl: work.mimeType?.startsWith('video/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
-        audioUrl: work.mimeType?.startsWith('audio/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
-        fileUrl: work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`,
+        // Use work's file info for display - serve files properly
+        imageUrl: work.mimeType?.startsWith('image/') ? `/uploads/${work.filename}` : null,
+        videoUrl: work.mimeType?.startsWith('video/') ? `/uploads/${work.filename}` : null,
+        audioUrl: work.mimeType?.startsWith('audio/') ? `/uploads/${work.filename}` : null,
+        fileUrl: `/uploads/${work.filename}`,
         filename: work.filename,
         fileType: work.mimeType?.split('/')[0] || 'file',
         mimeType: work.mimeType,
