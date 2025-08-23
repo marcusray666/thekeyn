@@ -1,23 +1,59 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Download, Share2, Eye, Search, Filter, Grid3X3, List } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ArrowLeft, Download, Share2, Eye, Search, Filter, Grid3X3, List, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SimpleBackgroundEngine } from "@/components/SimpleBackgroundEngine";
 import NoBorderElement from "@/components/NoBorderElement";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PremiumCertificates() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'verified' | 'pending'>('all');
+  const [deletingWorkId, setDeletingWorkId] = useState<number | null>(null);
+  const { toast } = useToast();
 
   // Fetch user's certificates
   const { data: certificates = [], isLoading } = useQuery({
     queryKey: ["/api/works"],
     queryFn: () => apiRequest("/api/works"),
   });
+
+  // Delete work mutation
+  const deleteWorkMutation = useMutation({
+    mutationFn: async (workId: number) => {
+      const response = await apiRequest(`/api/works/${workId}`, {
+        method: 'DELETE',
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/works'] });
+      setDeletingWorkId(null);
+      toast({
+        title: "Work deleted",
+        description: "Your protected work has been permanently deleted.",
+      });
+    },
+    onError: (error: any) => {
+      setDeletingWorkId(null);
+      toast({
+        title: "Delete failed",
+        description: error.message || "Failed to delete work",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteWork = (workId: number, workTitle: string) => {
+    if (confirm(`Are you sure you want to permanently delete "${workTitle}"? This action cannot be undone and will remove the blockchain certificate.`)) {
+      setDeletingWorkId(workId);
+      deleteWorkMutation.mutate(workId);
+    }
+  };
 
   const filteredCertificates = certificates.filter(cert => {
     const matchesSearch = cert.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -179,6 +215,16 @@ export default function PremiumCertificates() {
                     <Button className="glass-button">
                       <Share2 className="h-4 w-4" />
                     </Button>
+                    <Button 
+                      className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-600" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDeleteWork(cert.id, cert.title || cert.filename);
+                      }}
+                      disabled={deletingWorkId === cert.id}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -232,6 +278,16 @@ export default function PremiumCertificates() {
                           </Button>
                           <Button className="glass-button">
                             <Share2 className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-600" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleDeleteWork(cert.id, cert.title || cert.filename);
+                            }}
+                            disabled={deletingWorkId === cert.id}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
