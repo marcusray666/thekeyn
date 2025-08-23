@@ -20,11 +20,14 @@ const app = express();
 // Enable trust proxy for production deployments
 app.set('trust proxy', 1);
 
-// CORS Configuration for separate frontend hosting
+// CORS Configuration for Railway deployment
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
         process.env.FRONTEND_URL,
+        // Railway deployment patterns
+        /https:\/\/.*\.railway\.app$/,
+        /https:\/\/.*\.up\.railway\.app$/,
         // Add patterns for common hosting services
         /https:\/\/.*\.vercel\.app$/,
         /https:\/\/.*\.netlify\.app$/,
@@ -34,6 +37,7 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
@@ -105,6 +109,7 @@ app.use(session({
     httpOnly: true,
     maxAge: 60 * 60 * 1000, // 1 hour timeout
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser set domain
   },
 }));
 

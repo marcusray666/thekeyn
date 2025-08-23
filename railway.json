@@ -15,7 +15,11 @@
         "NODE_ENV": "production",
         "DATABASE_URL": "${{loggin-db.DATABASE_URL}}",
         "SESSION_SECRET": "${{Replit.loggin-session-secret}}",
-        "FRONTEND_URL": "https://${{RAILWAY_STATIC_URL}}"
+        "FRONTEND_URL": "https://${{RAILWAY_STATIC_URL}}",
+        "DEFAULT_OBJECT_STORAGE_BUCKET_ID": "replit-objstore-8e9fd686-47d3-4f2e-adc9-a263bcbb927b",
+        "PUBLIC_OBJECT_SEARCH_PATHS": "/replit-objstore-8e9fd686-47d3-4f2e-adc9-a263bcbb927b/public",
+        "PRIVATE_OBJECT_DIR": "/replit-objstore-8e9fd686-47d3-4f2e-adc9-a263bcbb927b/.private",
+        "PORT": "${{PORT}}"
       }
     }
   }
