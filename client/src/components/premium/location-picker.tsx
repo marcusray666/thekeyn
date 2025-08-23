@@ -211,7 +211,7 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
                   placeholder="Search for a location (e.g., Soho, NYC)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white/5 border-white/20 text-white placeholder-white/50 rounded-xl pl-10"
+                  className="bg-white/10 border-white/30 text-white placeholder-white/60 rounded-xl pl-10 focus:bg-white/20 focus:border-white/50"
                   autoFocus
                 />
               </div>

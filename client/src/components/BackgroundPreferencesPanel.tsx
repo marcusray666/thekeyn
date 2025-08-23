@@ -1,95 +1,84 @@
-import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Palette, 
+  RefreshCw, 
+  Settings, 
+  Sparkles,
+  X,
+  Heart,
+} from 'lucide-react';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Palette, Sparkles, Settings, Heart, X, RefreshCw } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
-
+// Background preference interface
 interface BackgroundPreference {
   id: number;
-  gradientType: string;
-  colorScheme: string;
+  userId: number;
+  gradientType: 'linear' | 'radial' | 'conic' | 'mesh';
+  colorScheme: 'warm' | 'cool' | 'vibrant' | 'monochrome' | 'pastel';
   primaryColors: string[];
   intensity: number;
-  animationSpeed: string;
-  moodTag?: string;
+  animationSpeed: 'slow' | 'medium' | 'fast' | 'none';
+  moodTag: 'energetic' | 'calm' | 'creative' | 'professional' | 'focused' | 'relaxed';
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
   usageCount: number;
-  userRating?: number;
-  lastUsed: string;
+  userRating?: number | null;
+  context: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface BackgroundPreferencesPanelProps {
-  trigger?: React.ReactNode;
+interface BackgroundPreferencesProps {
+  trigger?: React.ReactElement;
 }
 
-export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPanelProps) {
+export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Local state
   const [selectedPreference, setSelectedPreference] = useState<BackgroundPreference | null>(null);
 
-  // Fetch user preferences
-  const { data: preferences = [], isLoading, error: preferencesError } = useQuery({
+  // Fetch background preferences with proper typing
+  const { data: preferences = [], isLoading } = useQuery<BackgroundPreference[]>({
     queryKey: [`/api/background/preferences/${user?.id}`],
     enabled: !!user?.id,
-    retry: 3,
-    refetchOnWindowFocus: false,
   });
 
-  // Log for debugging
-  console.log('Background preferences query:', {
-    userId: user?.id,
-    preferences,
-    isLoading,
-    error: preferencesError
+  // Fetch analytics with proper typing
+  const { data: analytics = [] } = useQuery<any[]>({
+    queryKey: [`/api/background/analytics/${user?.id}`],
+    enabled: !!user?.id,
   });
-
-  // Fetch analytics
-  const { data: analytics = [] } = useQuery({
-    queryKey: [`/api/background/recommendations/${user?.id}`],
-    enabled: !!user,
-  });
-
-
-
-
 
   // Delete preference mutation
   const deletePreferenceMutation = useMutation({
-    mutationFn: async (id: number) => {
-      console.log('Deleting preference with ID:', id);
-      const response = await apiRequest(`/api/background/preferences/${id}`, {
+    mutationFn: async (preferenceId: number) => {
+      return apiRequest(`/api/background/preferences/${preferenceId}`, {
         method: 'DELETE',
       });
-      console.log('Delete response:', response);
-      return response;
     },
-    onSuccess: (data, id) => {
-      console.log('Delete successful, invalidating queries for user:', user?.id);
-      // Invalidate multiple possible query keys to ensure update
-      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/background/preferences'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/background/recommendations/${user?.id}`] });
-      
-      // Force refetch
-      queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
-      
+    onSuccess: () => {
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
+      }
       toast({
         title: 'Preference deleted',
         description: 'Background preference has been removed',
-      });
-    },
-    onError: (error) => {
-      console.error('Error deleting preference:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete background preference',
-        variant: 'destructive',
       });
     },
   });
@@ -97,29 +86,25 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Generate new gradient mutation
   const generateGradientMutation = useMutation({
     mutationFn: async () => {
+      console.log('BackgroundPreferencesPanel: Starting gradient generation for user', user?.id);
+      
       if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
-      // Generate a random gradient based on user preferences
-      const gradientTypes = ['linear', 'radial', 'conic'];
-      const schemes = colorSchemeOptions;
-      
-      const randomType = gradientTypes[Math.floor(Math.random() * gradientTypes.length)];
-      const randomScheme = schemes[Math.floor(Math.random() * schemes.length)];
-      
+      // Generate AI preference
       const newGradient = {
-        gradientType: randomType,
-        colorScheme: randomScheme.value,
-        primaryColors: randomScheme.colors,
-        secondaryColors: [], // Add secondary colors
-        intensity: 0.7 + Math.random() * 0.3, // 0.7 to 1.0
-        animationSpeed: ['slow', 'medium', 'fast'][Math.floor(Math.random() * 3)],
-        direction: Math.floor(Math.random() * 360) + 'deg',
-        moodTag: 'generated',
-        timeOfDayPreference: 'any',
+        gradientType: 'linear' as const,
+        colorScheme: 'vibrant' as const,
+        primaryColors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'],
+        intensity: 0.8,
+        animationSpeed: 'medium' as const,
+        moodTag: 'creative' as const,
+        timeOfDay: 'afternoon' as const,
         usageCount: 1,
-        userRating: 5.0
+        userRating: null,
+        context: 'dashboard',
+        userId: user.id,
       };
 
       console.log('Generating new gradient:', newGradient);
@@ -133,60 +118,36 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
       });
 
       console.log('API response:', response);
-      return response;
+      return response as BackgroundPreference;
     },
-    onSuccess: (newGradient) => {
+    onSuccess: (newGradient: BackgroundPreference) => {
       console.log('Successfully created new gradient preference:', newGradient);
       
       // Force refresh the preferences list
-      queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
-      queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
+        queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
+      }
       
       toast({
         title: 'New gradient generated',
         description: 'A personalized gradient has been created and saved to your preferences',
       });
       
-      // Apply the new gradient immediately
+      // Apply the new gradient
       if (newGradient) {
-        window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: newGradient }));
+        selectPreference(newGradient);
       }
     },
-    onError: (error: any) => {
-      console.error('Error generating gradient:', error);
-      const errorMessage = error?.message || error?.toString() || 'Failed to generate new gradient';
+    onError: (error) => {
+      console.error('Failed to generate gradient:', error);
       toast({
-        title: 'Error',
-        description: errorMessage,
+        title: 'Generation failed',
+        description: 'Unable to create a new gradient. Please try again.',
         variant: 'destructive',
       });
     },
   });
-
-  const colorSchemeOptions = [
-    { value: 'warm', label: 'Warm', colors: ['#FE3F5E', '#FFD200'] },
-    { value: 'cool', label: 'Cool', colors: ['#667eea', '#764ba2'] },
-    { value: 'vibrant', label: 'Vibrant', colors: ['#fa709a', '#fee140'] },
-    { value: 'pastel', label: 'Pastel', colors: ['#a8edea', '#fed6e3'] },
-    { value: 'monochrome', label: 'Monochrome', colors: ['#2d3748', '#4a5568'] },
-    { value: 'professional', label: 'Professional', colors: ['#4facfe', '#00f2fe'] },
-  ];
-
-  const gradientTypeOptions = [
-    { value: 'linear', label: 'Linear', icon: '↗️' },
-    { value: 'radial', label: 'Radial', icon: '⭕' },
-    { value: 'conic', label: 'Conic', icon: '🌀' },
-    { value: 'mesh', label: 'Mesh', icon: '🕸️' },
-  ];
-
-  const moodOptions = [
-    { value: 'energetic', label: 'Energetic', icon: '⚡' },
-    { value: 'calm', label: 'Calm', icon: '🧘' },
-    { value: 'creative', label: 'Creative', icon: '🎨' },
-    { value: 'professional', label: 'Professional', icon: '💼' },
-    { value: 'focused', label: 'Focused', icon: '🎯' },
-    { value: 'relaxed', label: 'Relaxed', icon: '😌' },
-  ];
 
   // Select preference function
   const selectPreference = async (preference: BackgroundPreference) => {
@@ -337,25 +298,25 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4">
                   <div className="text-center p-3 md:p-4 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg">
                     <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {analytics.filter(a => a.interactionType === 'like').length}
+                      {analytics.filter((a: any) => a.interactionType === 'like').length}
                     </div>
                     <div className="text-xs md:text-sm text-gray-600">Liked Gradients</div>
                   </div>
                   <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
                     <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {Math.round(analytics.reduce((acc, a) => acc + (a.timeSpent || 0), 0) / 60)}
+                      {Math.round(analytics.reduce((acc: any, a: any) => acc + (a.timeSpent || 0), 0) / 60)}
                     </div>
                     <div className="text-xs md:text-sm text-gray-600">Minutes Viewing</div>
                   </div>
                   <div className="text-center p-3 md:p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg">
                     <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {new Set(analytics.map(a => a.pageContext)).size}
+                      {new Set(analytics.map((a: any) => a.pageContext)).size}
                     </div>
                     <div className="text-xs md:text-sm text-gray-600">Pages Visited</div>
                   </div>
                   <div className="text-center p-3 md:p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
                     <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {analytics.filter(a => a.timeOfDay === 'evening').length > analytics.length / 2 ? '🌙' : '☀️'}
+                      {analytics.filter((a: any) => a.timeOfDay === 'evening').length > analytics.length / 2 ? '🌙' : '☀️'}
                     </div>
                     <div className="text-xs md:text-sm text-gray-600">Preferred Time</div>
                   </div>
