@@ -166,11 +166,11 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
       {/* Location Display / Trigger */}
       <div
         onClick={() => setIsOpen(true)}
-        className="flex items-center justify-between bg-white/10 border border-white/20 rounded-xl px-4 py-3 cursor-pointer hover:bg-white/15 transition-colors"
+        className="flex items-center justify-between bg-white/90 border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-white transition-colors shadow-sm"
       >
         <div className="flex items-center space-x-2">
-          <MapPin className="h-4 w-4 text-white/70" />
-          <span className={`text-sm ${selectedLocation ? 'text-white' : 'text-white/50'}`}>
+          <MapPin className="h-4 w-4 text-gray-600" />
+          <span className={`text-sm font-medium ${selectedLocation ? 'text-gray-900' : 'text-gray-500'}`}>
             {selectedLocation || placeholder}
           </span>
         </div>
@@ -180,7 +180,7 @@ export function LocationPicker({ selectedLocation, onLocationSelect, placeholder
               e.stopPropagation();
               clearLocation();
             }}
-            className="text-white/50 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="h-4 w-4" />
           </button>

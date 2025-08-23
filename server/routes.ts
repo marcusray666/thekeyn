@@ -370,7 +370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const objectStorageService = new ObjectStorageService();
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
-      objectStorageService.downloadObject(objectFile, res);
+      await objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
       console.error("Error serving object:", error);
       if (error instanceof ObjectNotFoundError) {
@@ -2094,11 +2094,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         protectedWorkId: work.id,
         hashtags: [...hashtags, 'protected', 'verified', 'blockchain'],
         tags: ['protected-work', 'certificate'],
-        // Use work's file info for display
-        imageUrl: work.mimeType?.startsWith('image/') ? `/api/files/${work.filename}` : null,
-        videoUrl: work.mimeType?.startsWith('video/') ? `/api/files/${work.filename}` : null,
-        audioUrl: work.mimeType?.startsWith('audio/') ? `/api/files/${work.filename}` : null,
-        fileUrl: `/api/files/${work.filename}`,
+        // Use work's file info for display - check if it's cloud storage or local
+        imageUrl: work.mimeType?.startsWith('image/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
+        videoUrl: work.mimeType?.startsWith('video/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
+        audioUrl: work.mimeType?.startsWith('audio/') ? (work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`) : null,
+        fileUrl: work.filename.startsWith('/objects/') ? work.filename : `/uploads/${work.filename}`,
         filename: work.filename,
         fileType: work.mimeType?.split('/')[0] || 'file',
         mimeType: work.mimeType,
@@ -5271,12 +5271,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/background/preferences/:userId", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = parseInt(req.params.userId);
+      console.log(`GET /api/background/preferences/${userId} - Current user: ${req.user?.id}`);
       
       if (req.user!.id !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
       
       const preferences = await storage.getUserBackgroundPreferences(userId);
+      console.log(`Found ${preferences.length} preferences for user ${userId}`);
       res.json(preferences);
     } catch (error) {
       console.error("Error fetching background preferences:", error);
@@ -5289,7 +5291,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const preferenceData = req.body;
       
+      console.log('POST /api/background/preferences - User:', userId, 'Data:', preferenceData);
+      
       const preference = await storage.saveBackgroundPreference(userId, preferenceData);
+      console.log('Saved preference:', preference);
       res.json(preference);
     } catch (error) {
       console.error("Error saving background preference:", error);

@@ -104,21 +104,26 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
         usageCount: 1,
         userRating: null,
         context: 'dashboard',
-        userId: user.id,
       };
 
       console.log('Generating new gradient:', newGradient);
 
-      const response = await apiRequest('/api/background/preferences', {
+      const response = await fetch('/api/background/preferences', {
         method: 'POST',
         body: JSON.stringify(newGradient),
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
-      console.log('API response:', response);
-      return response as BackgroundPreference;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('API response:', result);
+      return result as BackgroundPreference;
     },
     onSuccess: (newGradient: BackgroundPreference) => {
       console.log('Successfully created new gradient preference:', newGradient);
