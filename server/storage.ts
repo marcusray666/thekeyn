@@ -2567,13 +2567,18 @@ export class DatabaseStorage implements IStorage {
 
   async createBackgroundPreference(data: InsertUserBackgroundPreference): Promise<UserBackgroundPreference> {
     try {
+      console.log('Creating background preference with data:', data);
+      
       const [preference] = await db
         .insert(userBackgroundPreferences)
         .values(data)
         .returning();
 
+      console.log('Successfully created background preference:', preference);
       return preference;
     } catch (error: any) {
+      console.error('Error in createBackgroundPreference:', error);
+      
       // Handle case where table doesn't exist in production
       if (error.message?.includes('user_background_preferences') && error.message?.includes('does not exist')) {
         console.log('Background preferences table not found, skipping creation');
@@ -2707,12 +2712,14 @@ export class DatabaseStorage implements IStorage {
 
   // Interface implementation methods
   async saveBackgroundPreference(userId: number, preferenceData: any): Promise<any> {
+    console.log('saveBackgroundPreference called with:', { userId, preferenceData });
+    
     const preference = await this.createBackgroundPreference({
       userId,
       gradientType: preferenceData.gradientType,
       colorScheme: preferenceData.colorScheme,
       primaryColors: preferenceData.primaryColors,
-      secondaryColors: preferenceData.secondaryColors,
+      secondaryColors: preferenceData.secondaryColors || [],
       direction: preferenceData.direction,
       intensity: preferenceData.intensity,
       animationSpeed: preferenceData.animationSpeed,

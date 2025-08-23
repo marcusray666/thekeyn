@@ -34,9 +34,19 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   const [selectedPreference, setSelectedPreference] = useState<BackgroundPreference | null>(null);
 
   // Fetch user preferences
-  const { data: preferences = [], isLoading } = useQuery({
+  const { data: preferences = [], isLoading, error: preferencesError } = useQuery({
     queryKey: [`/api/background/preferences/${user?.id}`],
-    enabled: !!user,
+    enabled: !!user?.id,
+    retry: 3,
+    refetchOnWindowFocus: false,
+  });
+
+  // Log for debugging
+  console.log('Background preferences query:', {
+    userId: user?.id,
+    preferences,
+    isLoading,
+    error: preferencesError
   });
 
   // Fetch analytics
@@ -87,6 +97,10 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
   // Generate new gradient mutation
   const generateGradientMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
       // Generate a random gradient based on user preferences
       const gradientTypes = ['linear', 'radial', 'conic'];
       const schemes = colorSchemeOptions;
@@ -98,35 +112,52 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPan
         gradientType: randomType,
         colorScheme: randomScheme.value,
         primaryColors: randomScheme.colors,
+        secondaryColors: [], // Add secondary colors
         intensity: 0.7 + Math.random() * 0.3, // 0.7 to 1.0
         animationSpeed: ['slow', 'medium', 'fast'][Math.floor(Math.random() * 3)],
         direction: Math.floor(Math.random() * 360) + 'deg',
         moodTag: 'generated',
+        timeOfDayPreference: 'any',
+        usageCount: 1,
+        userRating: 5.0
       };
 
-      return await apiRequest('/api/background/preferences', {
+      console.log('Generating new gradient:', newGradient);
+
+      const response = await apiRequest('/api/background/preferences', {
         method: 'POST',
         body: JSON.stringify(newGradient),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+
+      console.log('API response:', response);
+      return response;
     },
     onSuccess: (newGradient) => {
+      console.log('Successfully created new gradient preference:', newGradient);
+      
+      // Force refresh the preferences list
       queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
+      queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user?.id}`] });
+      
       toast({
         title: 'New gradient generated',
         description: 'A personalized gradient has been created and saved to your preferences',
       });
       
-      // Trigger background refresh instead of page reload
-      window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: newGradient }));
+      // Apply the new gradient immediately
+      if (newGradient) {
+        window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: newGradient }));
+      }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error generating gradient:', error);
+      const errorMessage = error?.message || error?.toString() || 'Failed to generate new gradient';
       toast({
         title: 'Error',
-        description: 'Failed to generate new gradient',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
