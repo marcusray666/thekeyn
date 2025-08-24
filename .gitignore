@@ -68,4 +68,6 @@ temp/
 # Replit specific (development only)
 .replit
 replit.nix
-.upm/
+.upm/package.json.bak
+scripts/migrate.ts.bak
+scripts/migrate.local.ts
