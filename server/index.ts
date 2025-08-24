@@ -238,31 +238,55 @@ app.use(session({
     console.log('🚂 Railway deployment detected - forcing production mode');
   }
   
-  // Setup database schema in a more reliable way
+  // Idempotent database initialization for safe Railway deployments
   async function initializeDatabase() {
     try {
       console.log('🔧 Initializing database...');
       
-      // First attempt database migration if needed
-      try {
-        await pool.query("SELECT 1 FROM users LIMIT 1");
-        console.log('✅ Database schema verified');
-      } catch (err) {
-        console.log('⚠️ Database schema missing, running migration...');
+      // Comprehensive schema verification - check critical tables exist
+      const criticalTables = ['users', 'works', 'certificates', 'posts', 'user_background_preferences', 'background_interactions'];
+      const missingTables = [];
+      
+      for (const table of criticalTables) {
         try {
+          await pool.query(`SELECT 1 FROM ${table} LIMIT 1`);
+          console.log(`✅ Table verified: ${table}`);
+        } catch (err) {
+          console.log(`⚠️ Missing table: ${table}`);
+          missingTables.push(table);
+        }
+      }
+      
+      if (missingTables.length === 0) {
+        console.log('✅ Database schema verified - all tables exist');
+      } else {
+        console.log(`⚠️ Missing ${missingTables.length} tables: ${missingTables.join(', ')}`);
+        console.log('🔄 Running safe migration...');
+        
+        try {
+          // First try our custom idempotent migration script
           const { execSync } = await import('child_process');
+          console.log('🔄 Running idempotent migrations...');
+          execSync('tsx scripts/migrate.ts', { 
+            stdio: 'inherit',
+            timeout: 45000 
+          });
+          
+          // Then sync schema with Drizzle
+          console.log('🔄 Syncing schema with Drizzle...');
           execSync('npm run db:push', { 
             stdio: 'inherit',
             timeout: 30000 
           });
-          console.log('✅ Database migration completed');
+          
+          console.log('✅ Database migration completed successfully');
         } catch (migrationErr) {
-          console.warn('⚠️ Migration failed, will create minimal schema');
+          console.warn('⚠️ Migration failed, creating minimal schema as fallback');
           await createMinimalSchema();
         }
       }
       
-      // Ensure admin user exists
+      // Ensure admin user exists (idempotent)
       await ensureAdminUser();
       
     } catch (err) {

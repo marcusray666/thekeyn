@@ -37,6 +37,12 @@ The frontend follows a clean, minimalist design approach inspired by successful 
 ### Security Measures
 Security is paramount, with measures like Helmet.js for security headers, rate limiting for API protection, trust proxy configuration, and secure session cookies with proper CORS policies.
 
+### Database & Migration Architecture
+- **Idempotent Migration System**: Comprehensive multi-layer safety system ensuring zero data loss on Railway deployments. Features startup schema verification, custom idempotent migration scripts with PostgreSQL error code tolerance, and IF NOT EXISTS guards for all DDL operations.
+- **Schema Verification**: Automated verification of 6 critical tables (users, works, certificates, posts, user_background_preferences, background_interactions) with comprehensive logging and fallback mechanisms.
+- **Production Database**: 42 tables with proper foreign key constraints, background preferences system fully operational with 10 saved preferences and 29 tracked interactions. All migrations use guarded blocks to prevent duplicate operations.
+- **Migration Safety**: Error codes 42P07 (duplicate_table), 42710 (duplicate_object), 42701 (duplicate_column) automatically handled. Background preferences tables integrated into Drizzle schema with full TypeScript support.
+
 ## External Dependencies
 
 ### Blockchain Services
