@@ -2375,68 +2375,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserWorks(userId: number): Promise<any[]> {
-    try {
-      const userWorks = await db
-        .select()
-        .from(works)
-        .where(eq(works.userId, userId))
-        .orderBy(desc(works.createdAt))
-        .limit(20);
 
-      return userWorks;
-    } catch (error) {
-      console.error("Error getting user works:", error);
-      return [];
-    }
-  }
-
-  async followUser(followerId: number, followingId: number): Promise<any> {
-    try {
-      // Check if already following
-      const existingFollow = await db
-        .select()
-        .from(userFollows)
-        .where(and(
-          eq(userFollows.followerId, followerId),
-          eq(userFollows.followingId, followingId)
-        ))
-        .limit(1);
-
-      if (existingFollow.length > 0) {
-        return existingFollow[0];
-      }
-
-      // Create new follow relationship
-      const [follow] = await db
-        .insert(userFollows)
-        .values({
-          followerId,
-          followingId,
-          createdAt: new Date().toISOString()
-        })
-        .returning();
-
-      return follow;
-    } catch (error) {
-      console.error("Error following user:", error);
-      throw error;
-    }
-  }
-
-  async unfollowUser(followerId: number, followingId: number): Promise<void> {
-    try {
-      await db
-        .delete(userFollows)
-        .where(and(
-          eq(userFollows.followerId, followerId),
-          eq(userFollows.followingId, followingId)
-        ));
-    } catch (error) {
-      console.error("Error unfollowing user:", error);
-      throw error;
-    }
-  }
 
   async discoverUsers(currentUserId: number): Promise<any[]> {
     try {
