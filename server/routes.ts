@@ -5371,8 +5371,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
       
-      const analytics = await storage.getBackgroundAnalytics(userId);
-      res.json(analytics);
+      // For now, return empty analytics to prevent Railway deployment crashes
+      // This will be enabled once the database schema is fully synced
+      res.json([]);
+      
+      // TODO: Re-enable once analytics table is properly deployed
+      // const analytics = await storage.getBackgroundAnalytics(userId);
+      // res.json(analytics);
     } catch (error) {
       console.error("Error fetching background analytics:", error);
       res.status(500).json({ error: "Failed to fetch background analytics" });

@@ -2648,21 +2648,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getBackgroundAnalytics(userId: number, days: number = 30): Promise<BackgroundInteraction[]> {
-    const daysAgo = new Date();
-    daysAgo.setDate(daysAgo.getDate() - days);
+    try {
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - days);
 
-    const analytics = await db
-      .select()
-      .from(backgroundInteractions)
-      .where(
-        and(
-          eq(backgroundInteractions.userId, userId),
-          gte(backgroundInteractions.createdAt, daysAgo)
+      const analytics = await db
+        .select()
+        .from(backgroundInteractions)
+        .where(
+          and(
+            eq(backgroundInteractions.userId, userId),
+            gte(backgroundInteractions.createdAt, daysAgo)
+          )
         )
-      )
-      .orderBy(desc(backgroundInteractions.createdAt));
+        .orderBy(desc(backgroundInteractions.createdAt));
 
-    return analytics;
+      return analytics;
+    } catch (error: any) {
+      console.error('Error fetching background analytics:', error);
+      // Return empty array to prevent crashes during Railway deployment
+      return [];
+    }
   }
 
   async getPopularBackgroundTrends(limit: number = 10): Promise<{
