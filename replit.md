@@ -1,44 +1,11 @@
-# Loggin' Platform - Digital Art Protection & Social Network
+# TheKeyn - Digital Art Protection & Social Network
 
 ## Overview
-Loggin' is a comprehensive digital art protection platform that combines blockchain-powered copyright verification with social networking features. It enables creators to instantly protect their digital work with immutable blockchain certificates while building a community around authentic creative content. The platform's vision is to provide a robust solution for creators to secure their intellectual property in the digital age and foster a vibrant community for authentic content.
+TheKeyn is a comprehensive digital art protection platform that combines blockchain-powered copyright verification with social networking features. It enables creators to instantly protect their digital work with immutable blockchain certificates while building a community around authentic creative content. The platform's vision is to provide a robust solution for creators to secure their intellectual property in the digital age and foster a vibrant community for authentic content.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 UI animations: Disabled - user prefers static interface without motion effects.
-
-## Recent Changes (August 2025)
-- **Premium Instagram-Inspired Redesign**: Complete UI overhaul with white liquid glass theme and bold accent colors (#FE3F5E, #FFD200)
-- **Complete Theme System**: Fully functional light/dark mode toggle with theme-responsive components and proper CSS variables
-- **Instagram-Style Feed**: Implemented social feed with post cards, stories section, and floating action buttons
-- **Premium Components**: Created post cards, upload modals, top/bottom navigation with glassmorphic effects
-- **Object Storage Integration**: Implemented secure cloud storage with presigned URLs, ACL controls, and direct browser uploads
-- **Security Hardening**: Added helmet security headers, rate limiting, request validation, and centralized error handling
-- **Mobile-First Design**: Responsive layout with bottom navigation for mobile and top navigation for desktop
-- **AI Migration**: Successfully switched from OpenAI to Google Gemini AI for content moderation
-- **Content Separation Architecture**: Clear distinction between Community Posts (public social feed) and Certificates (private blockchain-protected works)
-- **Share to Community Feature**: Users can share protected works to community feed with "PROTECTED" badge marking
-- **AI Content Verification**: All posts display "Verified by AI" badge indicating content moderation for violence/adult content
-- **Messaging System**: Full real-time messaging with persistent conversations and back navigation
-- **Enhanced Navigation**: Profile dropdown includes certificates, analytics, blockchain verification, and settings
-- **Consistent Gradient Backgrounds**: Applied unified pink/yellow gradient atmospheric effects across all pages
-- **Animation System**: Created comprehensive animation components but disabled per user preference for static interface
-- **Logo Redesign**: Created custom LogoIcon component combining shield shape with thin paintbrush inside it, representing creative protection for artists. Updated all key pages (welcome, admin dashboard, navigation, premium home, studio) to use the new combined shield-paintbrush logo design
-- **Community Post Management**: Implemented delete functionality for community posts with admin privileges and user ownership checks, including audit logging for administrative actions
-- **Contextual Onboarding System**: Implemented comprehensive onboarding with AI-generated illustrations, contextual tooltips, and guided tours for welcome, dashboard, upload, and studio flows. Features backdrop overlays, progress tracking, step navigation, and persistent completion tracking via localStorage
-- **Production-Ready Infrastructure**: Environment validation, structured logging, comprehensive error handling, and security middleware for deployment readiness
-- **Styling Consistency Fixes (Aug 13, 2025)**: Updated all authenticated pages to use consistent white liquid glass theme matching login/welcome pages. Fixed dark backgrounds and text colors across premium-home, admin-dashboard, premium-certificates, dashboard, premium-profile, premium-upload, studio-unified, subscription, subscription-management, and user-dashboard pages to use light theme with proper glassmorphic effects and gray text colors
-- **Personalized Background System (Aug 15, 2025)**: Complete AI-powered background personalization engine with database schema (userBackgroundPreferences, backgroundInteractions), BackgroundEngine component with dynamic gradient generation, user preference learning algorithm, BackgroundPreferencesPanel for user controls, and full API backend integration with preference storage, interaction tracking, and intelligent recommendations based on user behavior patterns. Added SimpleBackgroundEngine to all authenticated pages (premium-home, premium-profile, premium-settings) with consistent light theme styling, proper text color adjustments (gray instead of white), and fixed main page spacing with pt-24 for navigation clearance. Fixed persistent background selection using localStorage to maintain user choice across sessions, removed manual preference creation for AI-only generation, and resolved database constraint issues in background interaction tracking
-- **Text Overflow Fixes (Aug 15, 2025)**: Resolved certificate card text overflow issues by implementing proper flex constraints (min-w-0, pr-4), adding flex-shrink-0 to icons and action buttons, and improving text truncation with ellipsis for long titles. Applied fixes to both grid and list view layouts ensuring consistent text handling across all certificate displays
-- **Protected Post Hide/Show Functionality (Aug 15, 2025)**: Implemented complete visibility control system for protected posts shared to community. Added isHidden database field, PATCH /api/community/posts/:postId/visibility endpoint for toggling visibility, enhanced community feed filtering to exclude hidden posts, and maintained full access to hidden posts in user's protected works section. Users can now share protected works to community and later hide them without affecting their certificate status, providing granular control over social sharing visibility
-- **Real Analytics Tracking Implementation (Aug 15, 2025)**: Fixed analytics system to show real user activity data instead of zeros. Implemented proper recordUserActivity() calls throughout the application (post creation, work uploads, likes, comments), updated /api/analytics endpoint to use user_analytics table data, and ensured real-time tracking of post views, work views, and total engagement. Analytics now display authentic user activity metrics with daily aggregation and proper database persistence
-- **Complete Rebranding to TheKeyn (Aug 16, 2025)**: Updated entire platform branding from "Loggin'" to "TheKeyn" across all welcome pages, navigation components, footer sections, and CTA text. Removed all logo/paintbrush icons from buttons and navigation for cleaner appearance. Platform hierarchy now established as "TheKeyn" main brand with "Digital Art Protection Platform" as descriptive tagline
-- **Admin User Deletion Functionality (Aug 16, 2025)**: Implemented complete user deletion system for admin users including backend storage method with proper cascading deletion, secure API endpoint with reason logging and audit trails, frontend admin dashboard interface with confirmation dialogs, safety measures preventing admin self-deletion, and comprehensive database cleanup covering all user-associated data (posts, works, certificates, subscriptions, social connections). Delete functionality accessible via trash icon buttons in admin dashboard user management sections
-- **Code Quality & Responsive Design Improvements (Aug 20, 2025)**: Successfully resolved all 155 LSP diagnostic errors through systematic authentication type fixes, storage schema improvements, and error handling enhancements. Fixed BackgroundPreferencesPanel responsive layout for optimal iPad, iPhone, and desktop viewing with improved modal sizing, grid layouts, typography scaling, and component spacing for cross-device compatibility
-- **Navigation Consistency & Split View Optimization (Aug 20, 2025)**: Optimized split view navigation by consolidating duplicate "Certs" and "Verify" buttons into unified "Works" section, added missing Settings access to mobile navigation, and ensured consistent back button styling across all pages using NoBorderElement for borderless, clean text-only appearance with gray-700/gray-900 color scheme
-- **Object Storage Implementation (Aug 23, 2025)**: Completely resolved deployment image loss issue by implementing Replit Cloud Object Storage system. Created comprehensive object storage infrastructure with ObjectStorageService, ObjectUploader component, ACL controls, and presigned URL uploads. Files now persist across deployments via cloud storage instead of local /uploads directory. Added new routes for cloud file serving (/objects/, /api/objects/upload, /api/objects/complete) while maintaining backward compatibility with existing local files. Platform now ready for production deployments without data loss.
-- **Background Preferences Simplification (Aug 24, 2025)**: Completely rewrote background preferences system removing unnecessary "Advanced Settings" and AI recommendation features. Streamlined interface now focuses on core functionality: generating backgrounds, saving user preferences, and applying selections. Removed complex ghost functionality, smart learning analytics, and context-aware features per user request. System now saves simple gradient preferences (linear/radial, warm/cool/vibrant/pastel color schemes) with proper localStorage persistence and database storage. Fixed authentication requirements for saving preferences and prepared system for Railway deployment.
-- **Database Migration Completion (Aug 24, 2025)**: Successfully completed full database schema migration with all 42 tables properly aligned between development and production. Fixed Railway deployment crash caused by background analytics column mismatch by adding error handling to analytics endpoints. All background preference tables (user_background_preferences, background_interactions) now exist with correct schema including gradient_id column. Resolved content_reports table conflicts and ensured database consistency for production deployment.
 
 ## System Architecture
 The application is architected for separate hosting with distinct frontend and backend applications, designed for scalability and maintainability.
@@ -48,25 +15,24 @@ The application is architected for separate hosting with distinct frontend and b
 - **Backend**: Node.js + Express.js, PostgreSQL + Drizzle ORM
 - **Blockchain**: Ethereum mainnet integration with Ethers.js
 - **Authentication**: Session-based with secure cookies
-- **File Storage**: Local filesystem with blockchain anchoring
-- **Animations**: Framer Motion for blockchain-inspired page transitions and micro-interactions
 
 ### Key Features and Design Decisions
-- **Authentication & User Management**: Session-based authentication with secure cookie handling, role-based access control (user, admin, moderator), and tiered subscription models (Free, Starter, Pro) with upload limits. An admin system provides a comprehensive dashboard for user management.
-- **Digital Work Protection**: Utilizes real blockchain verification via Ethereum mainnet anchoring. Files undergo SHA-256 hash generation for immutable fingerprinting, followed by professional PDF certificate generation with QR codes. It supports multi-format uploads (images, videos, PDFs, audio) up to 2GB.
-- **Social Networking Features**: Includes post creation and sharing with rich media, a follow/unfollow system, like, comment, and share functionalities, a direct messaging system, and a notification system for user interactions.
-- **Content Moderation**: Implements AI-powered content screening using keyword filtering and pattern recognition, generating automatic risk scores. An admin moderation dashboard manages a pending review queue, complemented by a user-driven content flagging system.
-- **Payment & Subscriptions**: Integrates with Stripe for subscription management, enforcing tier-based upload limits and handling subscription cancellations. Usage tracking is implemented for monthly upload quotas.
-- **Data Flow**: The system ensures a streamlined flow for uploads (validation → moderation → hash generation → blockchain anchoring → certificate creation → database storage) and social interactions (post creation → content screening → database storage → real-time updates → notification dispatch). Authentication follows a secure flow of credential validation → session creation → role verification → access control.
+- **Authentication & User Management**: Session-based authentication, role-based access control (user, admin, moderator), and tiered subscription models with upload limits. An admin system provides a comprehensive dashboard for user management.
+- **Digital Work Protection**: Utilizes real blockchain verification via Ethereum mainnet anchoring. Files undergo SHA-256 hash generation for immutable fingerprinting, followed by professional PDF certificate generation with QR codes. It supports multi-format uploads (images, videos, PDFs, audio).
+- **Social Networking Features**: Includes post creation and sharing with rich media, follow/unfollow system, like, comment, and share functionalities, direct messaging system, and a notification system for user interactions. Content separation architecture distinguishes between public social feed (Community Posts) and private blockchain-protected works (Certificates). Users can share protected works to the community feed with a "PROTECTED" badge.
+- **Content Moderation**: Implements AI-powered content screening using Google Gemini AI, generating automatic risk scores and displaying a "Verified by AI" badge. An admin moderation dashboard manages a pending review queue, complemented by a user-driven content flagging system.
+- **Payment & Subscriptions**: Integrates with Stripe for subscription management, enforcing tier-based upload limits and handling subscription cancellations.
+- **Data Flow**: The system ensures a streamlined flow for uploads (validation → moderation → hash generation → blockchain anchoring → certificate creation → database storage) and social interactions (post creation → content screening → database storage → real-time updates → notification dispatch).
+- **Object Storage**: Files persist across deployments via cloud object storage with ACL controls and presigned URLs.
 
 ### UI/UX Decisions
 The frontend follows a clean, minimalist design approach inspired by successful products like Notion and Instagram. Key design principles include:
-- **Focused Screens**: Each page has one primary action to reduce cognitive load
-- **Generous White Space**: Clean layouts with ample spacing for better readability
-- **Minimal Navigation**: Simple header with theme toggle and essential user actions
-- **Typography**: Inter font throughout for clean, modern appearance
-- **Color System**: Light/dark theme support with professional color palette
-- **Mobile-First**: Fully responsive design with large touch targets
+- **Premium Instagram-Inspired Redesign**: Complete UI overhaul with white liquid glass theme and bold accent colors (#FE3F5E, #FFD200).
+- **Complete Theme System**: Fully functional light/dark mode toggle with theme-responsive components and proper CSS variables.
+- **Mobile-First Design**: Responsive layout with bottom navigation for mobile and top navigation for desktop.
+- **Personalized Background System**: AI-powered background personalization engine that generates and saves gradient preferences (linear/radial, warm/cool/vibrant/pastel color schemes) with localStorage persistence and database storage.
+- **Logo Redesign**: Custom LogoIcon component combining a shield shape with a thin paintbrush inside it, representing creative protection for artists.
+- **Contextual Onboarding System**: Comprehensive onboarding with AI-generated illustrations, contextual tooltips, and guided tours for welcome, dashboard, upload, and studio flows.
 
 ### Security Measures
 Security is paramount, with measures like Helmet.js for security headers, rate limiting for API protection, trust proxy configuration, and secure session cookies with proper CORS policies.
@@ -76,15 +42,13 @@ Security is paramount, with measures like Helmet.js for security headers, rate l
 ### Blockchain Services
 - **Ethereum mainnet RPC** (via eth.llamarpc.com)
 - **Ethers.js library** for blockchain interactions
-- **OpenTimestamps** for Bitcoin anchoring (fallback)
 
 ### Payment Processing
 - **Stripe API** for subscription billing and payment processing
-- **Webhook handling** for subscription lifecycle events
 
-### Development Tools (Integrated)
-- **Vite** for frontend build and development
-- **Drizzle ORM** for type-safe database operations
-- **TanStack Query** for server state management
-- **Railway** (Platform for unified fullstack deployment)
+### AI Services
+- **Google Gemini AI** for content moderation
+
+### Cloud Services
+- **Replit Cloud Object Storage** for file persistence
 - **PostgreSQL** (via Neon or similar services for production database)

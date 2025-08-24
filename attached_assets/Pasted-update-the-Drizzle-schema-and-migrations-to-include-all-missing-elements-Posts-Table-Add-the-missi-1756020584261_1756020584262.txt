@@ -1,0 +1,34 @@
+update the Drizzle schema and migrations to include all missing elements:
+Posts Table: Add the missing columns to the posts table definition in backend/shared/schema.ts (or migrate to the community_posts table consistently). For example, include the fields defined in the dev schema (title, description, media URLs, hashtags, location, etc.) under the same table name used in production. For instance:
+export const posts = pgTable("posts", {
+  id: text("id").primaryKey().notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title"),                       // added
+  description: text("description"),           // added
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  // ... other media fields like videoUrl, audioUrl if needed
+  filename: text("filename"),
+  fileType: text("file_type"),
+  mimeType: text("mime_type"),
+  fileSize: integer("file_size"),
+  hashtags: text("hashtags").array().default([]),  // added
+  location: text("location"),                     // added
+  mentionedUsers: text("mentioned_users").array().default([]),  // added
+  isProtected: boolean("is_protected").default(false),          // added
+  protectedWorkId: integer("protected_work_id").references(() => works.id), // added
+  isHidden: boolean("is_hidden").default(false),   // added
+  tags: text("tags").array().default([]),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  views: integer("view_count").default(0),         // added
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+Then generate a Drizzle migration or write a SQL migration to add these columns (using ALTER TABLE ... ADD COLUMN IF NOT EXISTS). This ensures the posts community feed features (title, hashtags, etc.) work without 500 errors
+GitHub
+GitHub
+. If you have already created a community_posts table via a prior migration, consider consolidating to one table to avoid confusion – either update code to use community_posts (as the log snippet suggests
+GitHub
+) or stick with posts and drop the unused one.

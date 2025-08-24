@@ -203,12 +203,12 @@ export type NftMint = typeof nftMints.$inferSelect;
 export type InsertNftMint = z.infer<typeof insertNftMintSchema>;
 
 // Social posts table for Community feed
-export const posts = pgTable("community_posts", {
-  id: serial("id").primaryKey(),
+export const posts = pgTable("posts", {
+  id: text("id").primaryKey().notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   title: text("title"),
   description: text("description"),
-  content: text("content"),
+  content: text("content").notNull(),
   imageUrl: text("image_url"),
   videoUrl: text("video_url"),
   audioUrl: text("audio_url"),
@@ -219,27 +219,64 @@ export const posts = pgTable("community_posts", {
   fileSize: integer("file_size"),
   hashtags: text("hashtags").array().default([]), // Hashtag functionality
   location: text("location"), // Location where photo/content was created
-  mentions: text("mentions").array().default([]), // User mentions (original column)
-  mentionedUsers: text("mentioned_users").array().default([]), // User mentions (new column)
+  mentionedUsers: text("mentioned_users").array().default([]), // User mentions
   isProtected: boolean("is_protected").default(false), // For shared protected works
   protectedWorkId: integer("protected_work_id").references(() => works.id), // Reference to protected work if shared
   isHidden: boolean("is_hidden").default(false), // For hiding posts from community wall
   tags: text("tags").array().default([]),
-  likes: integer("like_count").default(0),
-  comments: integer("comment_count").default(0),
-  shares: integer("share_count").default(0),
-  views: integer("view_count").default(0),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  views: integer("views").default(0),
   moderationStatus: text("moderation_status"),
   moderationFlags: text("moderation_flags").array().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Keep community_posts for backward compatibility
+export const communityPosts = pgTable("community_posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title"),
+  description: text("description"),
+  content: text("content"),
+  imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  audioUrl: text("audio_url"),
+  fileUrl: text("file_url"),
+  filename: text("filename"),
+  fileType: text("file_type"),
+  mimeType: text("mime_type"),
+  fileSize: integer("file_size"),
+  hashtags: text("hashtags").array().default([]),
+  location: text("location"),
+  mentions: text("mentions").array().default([]),
+  mentionedUsers: text("mentioned_users").array().default([]),
+  isProtected: boolean("is_protected").default(false),
+  protectedWorkId: integer("protected_work_id").references(() => works.id),
+  isHidden: boolean("is_hidden").default(false),
+  tags: text("tags").array().default([]),
+  likeCount: integer("like_count").default(0),
+  commentCount: integer("comment_count").default(0),
+  shareCount: integer("share_count").default(0),
+  viewCount: integer("view_count").default(0),
+  moderationStatus: text("moderation_status"),
+  moderationFlags: text("moderation_flags").array().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Schema for posts table
 export const insertPostSchema = createInsertSchema(posts).pick({
+  userId: true,
   title: true,
   description: true,
   content: true,
   imageUrl: true,
+  videoUrl: true,
+  audioUrl: true,
+  fileUrl: true,
   filename: true,
   fileType: true,
   mimeType: true,
@@ -253,6 +290,8 @@ export const insertPostSchema = createInsertSchema(posts).pick({
   tags: true,
 });
 
+export const updatePostSchema = insertPostSchema.partial();
+
 export type Post = typeof posts.$inferSelect & {
   username: string;
   displayName?: string;
@@ -261,6 +300,7 @@ export type Post = typeof posts.$inferSelect & {
   isLiked?: boolean;
 };
 export type InsertPost = z.infer<typeof insertPostSchema>;
+export type UpdatePost = z.infer<typeof updatePostSchema>;
 
 // Post comments table
 export const postComments = pgTable("post_comments", {
@@ -578,22 +618,7 @@ export const follows = pgTable("follows", {
 });
 
 // Community posts table - for posts shared to the public feed
-export const communityPosts = pgTable("community_posts", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  workId: integer("work_id").references(() => works.id), // Optional - if sharing protected work
-  title: text("title").notNull(),
-  description: text("description"),
-  filename: text("filename"),
-  mimeType: text("mime_type"),
-  isProtected: boolean("is_protected").default(false), // True if shared from protected works
-  likesCount: integer("likes_count").default(0),
-  commentsCount: integer("comments_count").default(0),
-  shareCount: integer("share_count").default(0),
-  viewCount: integer("view_count").default(0),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 export const likes = pgTable("likes", {
   id: serial("id").primaryKey(),
