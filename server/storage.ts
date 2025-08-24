@@ -222,8 +222,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(id: number): Promise<void> {
-    // Delete user and all associated data (cascading delete)
-    // Note: This will remove all user data including works, posts, comments, etc.
+    // CRITICAL OPERATION: Delete user and all associated data (cascading delete)
+    // WARNING: This will remove all user data including works, posts, comments, etc.
+    // SAFETY: Only operates on single user ID - no bulk operations
+    
+    // Additional safety check - prevent deletion if no valid ID
+    if (!id || id <= 0) {
+      throw new Error('Invalid user ID for deletion');
+    }
+    
+    console.log(`⚠️ CRITICAL: Deleting user ${id} and all associated data`);
     
     try {
       // Delete in proper order to avoid foreign key constraints
@@ -356,8 +364,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteWork(id: number): Promise<void> {
-    // Delete related records first to avoid foreign key constraints
-    // For now, we'll handle this with raw SQL since the table structure may vary
+    // SAFE OPERATION: Delete single work and related records
+    // SCOPE: Limited to specific work ID only
+    
+    // Safety check - prevent deletion if no valid ID
+    if (!id || id <= 0) {
+      throw new Error('Invalid work ID for deletion');
+    }
+    
+    console.log(`🗑️ Deleting work ${id} and related records`);
     
     try {
       // Delete copyright applications if they exist

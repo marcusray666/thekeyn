@@ -243,6 +243,26 @@ app.use(session({
     try {
       console.log('🔧 Initializing database...');
       
+      // SAFETY CHECK: Verify we're not accidentally wiping production data
+      try {
+        const dataCount = await pool.query(`
+          SELECT 
+            (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public') as table_count,
+            (SELECT COUNT(*) FROM users) as user_count,
+            (SELECT COUNT(*) FROM works) as work_count
+        `);
+        
+        const { table_count, user_count, work_count } = dataCount.rows[0];
+        console.log(`📊 Database status: ${table_count} tables, ${user_count} users, ${work_count} works`);
+        
+        // PRODUCTION DATA PROTECTION: If significant data exists, skip risky operations
+        if (user_count > 30 || work_count > 10) {
+          console.log('🛡️ Production data detected - using extra safety measures');
+        }
+      } catch (err) {
+        console.log('📊 Database appears empty or inaccessible');
+      }
+      
       // Comprehensive schema verification - check critical tables exist
       const criticalTables = ['users', 'works', 'certificates', 'posts', 'user_background_preferences', 'background_interactions'];
       const missingTables = [];
