@@ -16,29 +16,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { 
   Palette, 
-  RefreshCw, 
-  Settings, 
-  Sparkles,
+  RefreshCw,
   X,
   Heart,
 } from 'lucide-react';
 
-// Background preference interface
+// Simple background preference interface
 interface BackgroundPreference {
   id: number;
   userId: number;
-  gradientType: 'linear' | 'radial' | 'conic' | 'mesh';
-  colorScheme: 'warm' | 'cool' | 'vibrant' | 'monochrome' | 'pastel';
+  gradientType: 'linear' | 'radial';
+  colorScheme: 'warm' | 'cool' | 'vibrant' | 'pastel';
   primaryColors: string[];
   intensity: number;
-  animationSpeed: 'slow' | 'medium' | 'fast' | 'none';
-  moodTag: 'energetic' | 'calm' | 'creative' | 'professional' | 'focused' | 'relaxed';
-  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
   usageCount: number;
-  userRating?: number | null;
-  context: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
 interface BackgroundPreferencesProps {
@@ -59,12 +51,6 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
     enabled: !!user?.id,
   });
 
-  // Fetch analytics with proper typing
-  const { data: analytics = [] } = useQuery<any[]>({
-    queryKey: [`/api/background/analytics/${user?.id}`],
-    enabled: !!user?.id,
-  });
-
   // Delete preference mutation
   const deletePreferenceMutation = useMutation({
     mutationFn: async (preferenceId: number) => {
@@ -77,7 +63,7 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
         queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
       }
       toast({
-        title: 'Preference deleted',
+        title: 'Background deleted',
         description: 'Background preference has been removed',
       });
     },
@@ -86,57 +72,43 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
   // Generate new gradient mutation
   const generateGradientMutation = useMutation({
     mutationFn: async () => {
-      console.log('BackgroundPreferencesPanel: Starting gradient generation for user', user?.id);
-      
       if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
-      // Generate AI preference
-      const newGradient = {
-        gradientType: 'linear' as const,
-        colorScheme: 'vibrant' as const,
-        primaryColors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'],
-        intensity: 0.8,
-        animationSpeed: 'medium' as const,
-        moodTag: 'creative' as const,
-        timeOfDay: 'afternoon' as const,
-        usageCount: 1,
-        userRating: null,
-        context: 'dashboard',
+      // Generate simple gradient
+      const gradientTypes = ['linear', 'radial'] as const;
+      const colorSchemes = ['warm', 'cool', 'vibrant', 'pastel'] as const;
+      const colorPalettes = {
+        warm: ['#FF6B6B', '#FFE066', '#FF8E53', '#FF6B9D'],
+        cool: ['#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'],
+        vibrant: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'],
+        pastel: ['#FFB6C1', '#E6E6FA', '#B0E0E6', '#F0E68C']
       };
 
-      console.log('Generating new gradient:', newGradient);
+      const randomGradientType = gradientTypes[Math.floor(Math.random() * gradientTypes.length)];
+      const randomColorScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+      
+      const newGradient = {
+        gradientType: randomGradientType,
+        colorScheme: randomColorScheme,
+        primaryColors: colorPalettes[randomColorScheme],
+        intensity: Math.random() * 0.4 + 0.6, // 0.6 to 1.0
+        usageCount: 1,
+      };
 
-      const response = await fetch('/api/background/preferences', {
+      return apiRequest('/api/background/preferences', {
         method: 'POST',
-        body: JSON.stringify(newGradient),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        body: newGradient,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('API response:', result);
-      return result as BackgroundPreference;
     },
     onSuccess: (newGradient: BackgroundPreference) => {
-      console.log('Successfully created new gradient preference:', newGradient);
-      
-      // Force refresh the preferences list
       if (user?.id) {
         queryClient.invalidateQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
-        queryClient.refetchQueries({ queryKey: [`/api/background/preferences/${user.id}`] });
       }
-      
       toast({
-        title: 'New gradient generated',
-        description: 'A personalized gradient has been created and saved to your preferences',
+        title: 'New background generated',
+        description: 'A personalized background has been created and saved',
       });
       
       // Apply the new gradient
@@ -145,10 +117,9 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
       }
     },
     onError: (error) => {
-      console.error('Failed to generate gradient:', error);
       toast({
         title: 'Generation failed',
-        description: 'Unable to create a new gradient. Please try again.',
+        description: 'Unable to create a new background. Please try again.',
         variant: 'destructive',
       });
     },
@@ -156,31 +127,11 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
 
   // Select preference function
   const selectPreference = async (preference: BackgroundPreference) => {
-    console.log('BackgroundPreferencesPanel: Selecting preference', preference);
-    
     // Save to localStorage for persistence across sessions
     localStorage.setItem('selectedBackgroundPreference', JSON.stringify(preference));
     
     // Apply the background immediately
     window.dispatchEvent(new CustomEvent('backgroundUpdate', { detail: preference }));
-    console.log('BackgroundPreferencesPanel: Dispatched backgroundUpdate event', preference);
-    
-    // Track the interaction (non-blocking)
-    setTimeout(() => {
-      apiRequest('/api/background/interactions', {
-        method: 'POST',
-        body: JSON.stringify({
-          preferenceId: preference.id,
-          interactionType: 'select',
-          pageContext: window.location.pathname,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).catch(error => {
-        console.log('Background interaction tracking failed (non-critical):', error);
-      });
-    }, 100);
     
     setSelectedPreference(preference);
     toast({
@@ -191,20 +142,20 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
 
   const PreferenceCard = ({ preference }: { preference: BackgroundPreference }) => (
     <Card 
-      className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200 cursor-pointer hover:shadow-lg min-h-[140px] md:min-h-[160px]"
+      className="bg-white/80 backdrop-blur-xl border-gray-200/50 hover:bg-white/90 transition-all duration-200 cursor-pointer hover:shadow-lg min-h-[120px]"
       onClick={() => selectPreference(preference)}
     >
-      <CardHeader className="pb-2 md:pb-3 p-3 md:p-4">
+      <CardHeader className="pb-2 p-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
             <div 
-              className="w-8 h-8 md:w-10 md:h-10 rounded-lg border-2 border-gray-200 flex-shrink-0"
+              className="w-8 h-8 rounded-lg border-2 border-gray-200 flex-shrink-0"
               style={{
                 background: `linear-gradient(45deg, ${preference.primaryColors.slice(0, 2).join(', ')})`
               }}
             />
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-xs md:text-sm text-gray-800 capitalize truncate">
+              <CardTitle className="text-sm text-gray-800 capitalize truncate">
                 {preference.gradientType} {preference.colorScheme}
               </CardTitle>
               <CardDescription className="text-xs">
@@ -219,29 +170,18 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
               e.stopPropagation();
               deletePreferenceMutation.mutate(preference.id);
             }}
-            className="text-gray-400 hover:text-red-500 flex-shrink-0 p-1 md:p-2"
+            className="text-gray-400 hover:text-red-500 flex-shrink-0 p-1"
           >
-            <X className="h-3 w-3 md:h-4 md:w-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 p-3 md:p-4">
-        <div className="flex flex-wrap gap-1 mb-2">
-          <Badge variant="outline" className="text-xs px-2 py-0.5">
-            {preference.moodTag}
-          </Badge>
-          <Badge variant="outline" className="text-xs px-2 py-0.5">
-            {preference.animationSpeed}
-          </Badge>
-        </div>
+      <CardContent className="pt-0 p-3">
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span>Intensity: {Math.round(preference.intensity * 100)}%</span>
-          {preference.userRating && (
-            <div className="flex items-center">
-              <Heart className="h-3 w-3 text-red-400 mr-1" />
-              <span>{preference.userRating.toFixed(1)}</span>
-            </div>
-          )}
+          <Badge variant="outline" className="text-xs">
+            {preference.colorScheme}
+          </Badge>
         </div>
       </CardContent>
     </Card>
@@ -255,129 +195,57 @@ export function BackgroundPreferencesPanel({ trigger }: BackgroundPreferencesPro
   );
 
   return (
-    <Dialog onOpenChange={(open) => {
-      // Dispatch custom event for navigation hiding
-      window.dispatchEvent(new CustomEvent('modal-state-change', { detail: { isOpen: open } }));
-    }}>
+    <Dialog>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-5xl lg:max-h-[85vh] md:max-h-[90vh] max-h-[95vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] lg:w-auto sm:max-w-[600px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1200px] left-2 right-2 sm:left-4 sm:right-4 md:left-8 md:right-8 lg:left-auto lg:right-auto translate-x-0 lg:left-[50%] lg:translate-x-[-50%]">
-        <DialogHeader className="pb-4 md:pb-6">
-          <DialogTitle className="flex items-center text-gray-800 text-base md:text-lg">
-            <Sparkles className="h-5 w-5 mr-2 text-pink-500" />
-            Personalized Background Engine
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-gray-200/50">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="flex items-center text-gray-800">
+            <Palette className="h-5 w-5 mr-2 text-pink-500" />
+            Background Preferences
           </DialogTitle>
-          <DialogDescription className="text-gray-600 text-sm md:text-base">
-            Customize your background preferences and let AI learn from your choices
+          <DialogDescription className="text-gray-600">
+            Customize your background preferences
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 md:space-y-6">
-          {/* Quick Actions */}
-          <div className="flex flex-col sm:flex-row md:flex-row lg:flex-row gap-3 md:gap-4">
+        <div className="space-y-4">
+          {/* Generate Button */}
+          <div className="flex">
             <Button
               onClick={() => generateGradientMutation.mutate()}
               disabled={generateGradientMutation.isPending}
-              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 w-full sm:w-auto flex-1 md:flex-none py-2 md:py-2 text-sm md:text-base"
+              className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white hover:from-pink-600 hover:to-yellow-500 w-full"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${generateGradientMutation.isPending ? 'animate-spin' : ''}`} />
-              Generate New Gradient
-            </Button>
-            <Button variant="outline" className="bg-white/80 w-full sm:w-auto flex-1 md:flex-none py-2 md:py-2 text-sm md:text-base">
-              <Settings className="h-4 w-4 mr-2" />
-              Advanced Settings
+              Generate New Background
             </Button>
           </div>
 
-          {/* Learning Insights */}
-          {analytics.length > 0 && (
-            <Card className="bg-white/80 backdrop-blur-xl border-gray-200/50">
-              <CardHeader>
-                <CardTitle className="text-gray-800">Your Preferences</CardTitle>
-                <CardDescription>
-                  AI insights based on your usage patterns
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4">
-                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg">
-                    <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {analytics.filter((a: any) => a.interactionType === 'like').length}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600">Liked Gradients</div>
-                  </div>
-                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                    <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {Math.round(analytics.reduce((acc: any, a: any) => acc + (a.timeSpent || 0), 0) / 60)}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600">Minutes Viewing</div>
-                  </div>
-                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg">
-                    <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {new Set(analytics.map((a: any) => a.pageContext)).size}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600">Pages Visited</div>
-                  </div>
-                  <div className="text-center p-3 md:p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-                    <div className="text-xl md:text-2xl font-bold text-gray-800">
-                      {analytics.filter((a: any) => a.timeOfDay === 'evening').length > analytics.length / 2 ? '🌙' : '☀️'}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600">Preferred Time</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Saved Preferences */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Your Saved Preferences</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Your Saved Backgrounds</h3>
             {isLoading ? (
               <div className="text-center py-8 text-gray-500">Loading preferences...</div>
             ) : preferences.length === 0 ? (
               <Card className="bg-white/80 backdrop-blur-xl border-gray-200/50">
                 <CardContent className="text-center py-8">
                   <Palette className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No saved preferences yet</p>
-                  <p className="text-sm text-gray-400">
+                  <h4 className="text-lg font-semibold text-gray-700 mb-2">No saved backgrounds yet</h4>
+                  <p className="text-gray-500 mb-4">
                     Use the app and interact with backgrounds to build your personal preference profile
                   </p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-                {preferences.map((preference: BackgroundPreference) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {preferences.map((preference) => (
                   <PreferenceCard key={preference.id} preference={preference} />
                 ))}
               </div>
             )}
           </div>
-
-          {/* AI Recommendations */}
-          <Card className="bg-white/80 backdrop-blur-xl border-gray-200/50">
-            <CardHeader>
-              <CardTitle className="text-gray-800">AI Recommendations</CardTitle>
-              <CardDescription>
-                Personalized suggestions based on your preferences and usage patterns
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Click "Generate New Gradient" above to let AI create personalized backgrounds that match your style and mood.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <div className="p-3 md:p-4 bg-gradient-to-br from-pink-50 to-yellow-50 rounded-lg border border-gray-200">
-                  <div className="text-sm md:text-base font-medium text-gray-800">Smart Learning</div>
-                  <div className="text-xs md:text-sm text-gray-600 mt-1">AI learns from your interactions to suggest better backgrounds</div>
-                </div>
-                <div className="p-3 md:p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-gray-200">
-                  <div className="text-sm md:text-base font-medium text-gray-800">Context Aware</div>
-                  <div className="text-xs md:text-sm text-gray-600 mt-1">Backgrounds adapt based on time of day and page context</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </DialogContent>
     </Dialog>
