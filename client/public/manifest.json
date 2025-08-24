@@ -1,6 +1,6 @@
 {
-  "name": "Loggin' - Digital Art Protection",
-  "short_name": "Loggin'",
+  "name": "TheKeyn - Create. Protect. Own your art",
+  "short_name": "TheKeyn",
   "description": "Protect your digital artwork with blockchain certificates and connect with fellow creators",
   "start_url": "/",
   "display": "standalone",
@@ -92,12 +92,12 @@
   "related_applications": [
     {
       "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.loggin.app",
-      "id": "com.loggin.app"
+      "url": "https://play.google.com/store/apps/details?id=com.thekeyn.app",
+      "id": "com.thekeyn.app"
     },
     {
       "platform": "itunes",
-      "url": "https://apps.apple.com/app/loggin/id123456789"
+      "url": "https://apps.apple.com/app/thekeyn/id123456789"
     }
   ]
 }
