@@ -2556,9 +2556,10 @@ export class DatabaseStorage implements IStorage {
 
       return preferences;
     } catch (error: any) {
-      // Handle case where table doesn't exist in production
-      if (error.message?.includes('user_background_preferences') && error.message?.includes('does not exist')) {
-        console.log('Background preferences table not found, returning empty array');
+      console.error('Error in getUserBackgroundPreferences:', error);
+      // Handle case where column doesn't exist in production
+      if (error.message?.includes('gradient_type') || error.message?.includes('color_scheme') || error.message?.includes('does not exist')) {
+        console.log('Background preferences table/columns not found, returning empty array');
         return [];
       }
       throw error;
@@ -2579,9 +2580,9 @@ export class DatabaseStorage implements IStorage {
     } catch (error: any) {
       console.error('Error in createBackgroundPreference:', error);
       
-      // Handle case where table doesn't exist in production
-      if (error.message?.includes('user_background_preferences') && error.message?.includes('does not exist')) {
-        console.log('Background preferences table not found, skipping creation');
+      // Handle case where table/columns don't exist in production
+      if (error.message?.includes('user_background_preferences') || error.message?.includes('gradient_type') || error.message?.includes('color_scheme')) {
+        console.log('Background preferences table/columns not found, skipping creation');
         // Return a mock object to prevent crashes
         return {
           id: 0,
