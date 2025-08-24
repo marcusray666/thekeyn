@@ -20,6 +20,7 @@ import {
 import { db } from "./db";
 import { eq, desc, and, gte, sql, ne, isNull, ilike, or, lt, gt } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import crypto from "crypto";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -631,14 +632,21 @@ export class DatabaseStorage implements IStorage {
 
   // Posts functionality implementation
   async createPost(postData: InsertPost & { userId: number }): Promise<Post> {
+    // Generate unique ID for the post
+    const postId = crypto.randomUUID();
+    
     const [post] = await db
       .insert(posts)
       .values({
+        id: postId,
         userId: postData.userId,
         title: postData.title,
         description: postData.description,
-        content: postData.content || postData.title, // Use title as content if no content provided
+        content: postData.content || postData.title || '', // Use title as content fallback
         imageUrl: postData.imageUrl,
+        videoUrl: postData.videoUrl,
+        audioUrl: postData.audioUrl,
+        fileUrl: postData.fileUrl,
         filename: postData.filename,
         fileType: postData.fileType,
         mimeType: postData.mimeType,
@@ -650,6 +658,10 @@ export class DatabaseStorage implements IStorage {
         protectedWorkId: postData.protectedWorkId,
         isHidden: postData.isHidden || false,
         tags: postData.tags || [],
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        views: 0,
       })
       .returning();
     
@@ -677,7 +689,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async getPostById(postId: number): Promise<Post | null> {
+  async getPostById(postId: string): Promise<Post | null> {
     const [post] = await db
       .select()
       .from(posts)
@@ -696,7 +708,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async updatePostVisibility(postId: number, isHidden: boolean): Promise<Post> {
+  async updatePostVisibility(postId: string, isHidden: boolean): Promise<Post> {
     const [updatedPost] = await db
       .update(posts)
       .set({ 

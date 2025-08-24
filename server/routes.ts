@@ -3162,11 +3162,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      const { content, tags } = req.body;
+      const { title, description, content, tags, location, mentionedUsers, isProtected, protectedWorkId } = req.body;
       const file = req.file;
 
-      if (!content || content.trim().length === 0) {
-        return res.status(400).json({ message: "Post content is required" });
+      // Allow either title or content to be present
+      if ((!title || title.trim().length === 0) && (!content || content.trim().length === 0)) {
+        return res.status(400).json({ message: "Post title or content is required" });
       }
 
       let imageUrl = null;
@@ -3205,17 +3206,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Detected file type:", fileType);
       }
 
-      const parsedTags = tags ? JSON.parse(tags) : [];
+      const parsedTags = tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : [];
+      const parsedMentionedUsers = mentionedUsers ? (typeof mentionedUsers === 'string' ? JSON.parse(mentionedUsers) : mentionedUsers) : [];
 
       const post = await storage.createPost({
         userId,
-        content: content.trim(),
+        title: title?.trim() || null,
+        description: description?.trim() || null,
+        content: content?.trim() || title?.trim() || '', // Use title as content fallback
         imageUrl,
+        videoUrl: fileType === 'video' ? imageUrl : null,
+        audioUrl: fileType === 'audio' ? imageUrl : null,
+        fileUrl: fileType === 'document' ? imageUrl : null,
         filename: file ? file.filename : null,
         fileType,
         mimeType: file ? file.mimetype : null,
         fileSize: file ? file.size : null,
+        location: location?.trim() || null,
+        mentionedUsers: parsedMentionedUsers,
+        isProtected: isProtected === 'true' || isProtected === true,
+        protectedWorkId: protectedWorkId ? parseInt(protectedWorkId) : null,
         tags: parsedTags
+      });
+
+      console.log("Post created successfully:", {
+        id: post.id,
+        title: post.title,
+        hasImage: !!post.imageUrl,
+        fileType: post.fileType
       });
 
       res.status(201).json(post);
