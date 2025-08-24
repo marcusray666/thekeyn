@@ -1,0 +1,39 @@
+Background Preferences Tables: Include the userBackgroundPreferences and backgroundInteractions tables in the migration schema. In backend/shared/schema.ts, add entries for these tables mirroring the structure used in development:
+export const userBackgroundPreferences = pgTable("user_background_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  gradientType: text("gradient_type").notNull(),
+  colorScheme: text("color_scheme").notNull(),
+  primaryColors: text("primary_colors").array().notNull(),
+  secondaryColors: text("secondary_colors").array(),
+  direction: text("direction"),
+  intensity: real("intensity").default(1.0),
+  animationSpeed: text("animation_speed").default("medium"),
+  timeOfDayPreference: text("time_of_day_preference"),
+  moodTag: text("mood_tag"),
+  usageCount: integer("usage_count").default(1),
+  lastUsed: timestamp("last_used").defaultNow(),
+  userRating: real("user_rating"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export const backgroundInteractions = pgTable("background_interactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  gradientId: text("gradient_id").notNull(),
+  interactionType: text("interaction_type").notNull(),
+  timeSpent: integer("time_spent"),
+  pageContext: text("page_context"),
+  deviceType: text("device_type"),
+  timeOfDay: text("time_of_day"),
+  weatherContext: text("weather_context"),
+  sessionDuration: integer("session_duration"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+Then run drizzle-kit generate to create a migration, or manually add an SQL migration equivalent to scripts/create-background-tables.sql (which was used as a hotfix)
+GitHub
+GitHub
+. This ensures these tables exist so that background preference APIs (saving preferences, tracking interactions) function without falling back to “skip” logic
+GitHub
+GitHub
+. In production, after deploying the migration, you can drop the temporary error-handling branches in the code that return empty results when these tables are missing.

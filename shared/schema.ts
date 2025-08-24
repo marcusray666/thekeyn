@@ -617,8 +617,39 @@ export const follows = pgTable("follows", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Community posts table - for posts shared to the public feed
+// Background preferences tables
+export const userBackgroundPreferences = pgTable("user_background_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  gradientType: text("gradient_type").notNull(),
+  colorScheme: text("color_scheme").notNull(),
+  primaryColors: text("primary_colors").array().notNull(),
+  secondaryColors: text("secondary_colors").array(),
+  direction: text("direction"),
+  intensity: real("intensity").default(1.0),
+  animationSpeed: text("animation_speed").default("medium"),
+  timeOfDayPreference: text("time_of_day_preference"),
+  moodTag: text("mood_tag"),
+  usageCount: integer("usage_count").default(1),
+  lastUsed: timestamp("last_used").defaultNow(),
+  userRating: real("user_rating"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
+export const backgroundInteractions = pgTable("background_interactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  gradientId: text("gradient_id").notNull(),
+  interactionType: text("interaction_type").notNull(),
+  timeSpent: integer("time_spent"),
+  pageContext: text("page_context"),
+  deviceType: text("device_type"),
+  timeOfDay: text("time_of_day"),
+  weatherContext: text("weather_context"),
+  sessionDuration: integer("session_duration"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const likes = pgTable("likes", {
   id: serial("id").primaryKey(),
@@ -780,40 +811,7 @@ export type ConversationParticipant = typeof conversationParticipants.$inferSele
 export type InsertConversationParticipant = z.infer<typeof insertConversationParticipantSchema>;
 export type MessageReadStatus = typeof messageReadStatus.$inferSelect;
 
-// Personalized Background Engine Tables
-export const userBackgroundPreferences = pgTable("user_background_preferences", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  gradientType: text("gradient_type").notNull(), // linear, radial, conic, mesh
-  colorScheme: text("color_scheme").notNull(), // warm, cool, vibrant, pastel, monochrome
-  primaryColors: text("primary_colors").array().notNull(), // hex color codes
-  secondaryColors: text("secondary_colors").array(), // hex color codes
-  direction: text("direction"), // for linear gradients: to-r, to-br, etc.
-  intensity: real("intensity").default(1.0), // 0.1 to 2.0
-  animationSpeed: text("animation_speed").default("medium"), // slow, medium, fast, none
-  timeOfDayPreference: text("time_of_day_preference"), // morning, afternoon, evening, night
-  moodTag: text("mood_tag"), // energetic, calm, creative, professional, etc.
-  usageCount: integer("usage_count").default(1),
-  lastUsed: timestamp("last_used").defaultNow(),
-  userRating: real("user_rating"), // 1.0 to 5.0, implicit based on time spent
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
 
-// Background Interaction Analytics
-export const backgroundInteractions = pgTable("background_interactions", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  gradientId: text("gradient_id").notNull(), // generated gradient identifier
-  interactionType: text("interaction_type").notNull(), // view, like, dislike, skip, save
-  timeSpent: integer("time_spent"), // seconds spent viewing
-  pageContext: text("page_context"), // which page the background was shown on
-  deviceType: text("device_type"), // mobile, desktop, tablet
-  timeOfDay: text("time_of_day"), // morning, afternoon, evening, night
-  weatherContext: text("weather_context"), // if available via geolocation
-  sessionDuration: integer("session_duration"), // total session time when interaction happened
-  createdAt: timestamp("created_at").defaultNow(),
-});
 
 // Background Schemas
 export const insertUserBackgroundPreferenceSchema = createInsertSchema(userBackgroundPreferences).pick({
@@ -843,7 +841,6 @@ export const insertBackgroundInteractionSchema = createInsertSchema(backgroundIn
   sessionDuration: true,
 });
 
-// Background Types
 export type UserBackgroundPreference = typeof userBackgroundPreferences.$inferSelect;
 export type InsertUserBackgroundPreference = z.infer<typeof insertUserBackgroundPreferenceSchema>;
 export type BackgroundInteraction = typeof backgroundInteractions.$inferSelect;
