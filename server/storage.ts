@@ -675,6 +675,7 @@ export class DatabaseStorage implements IStorage {
           await this.createNotification({
             userId: mentionedUser.id,
             type: 'mention',
+            title: 'Mentioned in Post',
             message: `@${(await this.getUser(postData.userId))?.username} mentioned you in a post: "${postData.title || postData.content?.substring(0, 50)}..."`
           });
         }
@@ -686,8 +687,8 @@ export class DatabaseStorage implements IStorage {
     return {
       ...post,
       username: user?.username || 'unknown',
-      displayName: user?.displayName,
-      profileImageUrl: user?.profileImageUrl,
+      displayName: user?.displayName || undefined,
+      profileImageUrl: user?.profileImageUrl || undefined,
     };
   }
 
@@ -705,8 +706,8 @@ export class DatabaseStorage implements IStorage {
     return {
       ...post,
       username: user?.username || 'unknown',
-      displayName: user?.displayName,
-      profileImageUrl: user?.profileImageUrl,
+      displayName: user?.displayName || undefined,
+      profileImageUrl: user?.profileImageUrl || undefined,
     };
   }
 
@@ -769,23 +770,26 @@ export class DatabaseStorage implements IStorage {
       })
       .from(posts)
       .innerJoin(users, eq(posts.userId, users.id))
+      .where(userId ? eq(posts.userId, userId) : or(eq(posts.isHidden, false), isNull(posts.isHidden)))
       .orderBy(desc(posts.createdAt))
       .limit(limit)
       .offset(offset);
-
-    if (userId) {
-      query = query.where(eq(posts.userId, userId));
-    } else {
-      // For community feed, exclude hidden posts
-      query = query.where(or(eq(posts.isHidden, false), isNull(posts.isHidden)));
-    }
 
     return await query;
   }
 
   async getPost(id: string): Promise<Post | undefined> {
     const [post] = await db.select().from(posts).where(eq(posts.id, id));
-    return post || undefined;
+    if (!post) return undefined;
+    
+    // Get user info to complete Post type
+    const user = await this.getUser(post.userId);
+    return {
+      ...post,
+      username: user?.username || 'unknown',
+      displayName: user?.displayName || undefined,
+      profileImageUrl: user?.profileImageUrl || undefined,
+    };
   }
 
   async likePost(userId: number, postId: string): Promise<void> {
@@ -793,7 +797,7 @@ export class DatabaseStorage implements IStorage {
     const [existingLike] = await db
       .select()
       .from(postReactions)
-      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+      .where(and(eq(postReactions.postId, parseInt(postId)), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
 
     if (existingLike) {
       // User already liked this post, so this is an unlike action
@@ -803,7 +807,7 @@ export class DatabaseStorage implements IStorage {
 
     // Add like reaction
     await db.insert(postReactions).values({
-      postId,
+      postId: parseInt(postId),
       userId,
       type: 'like'
     });
@@ -822,7 +826,7 @@ export class DatabaseStorage implements IStorage {
     // Remove like reaction
     await db
       .delete(postReactions)
-      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+      .where(and(eq(postReactions.postId, parseInt(postId)), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
 
     // Decrement the likes counter
     await db
@@ -968,12 +972,12 @@ export class DatabaseStorage implements IStorage {
     // Delete post reactions (likes, etc.)
     await db
       .delete(postReactions)
-      .where(eq(postReactions.postId, id));
+      .where(eq(postReactions.postId, parseInt(id)));
     
     // Delete post comments
     await db
       .delete(postComments)
-      .where(eq(postComments.postId, id));
+      .where(eq(postComments.postId, parseInt(id)));
     
     // Finally delete the post
     await db
@@ -1044,8 +1048,39 @@ export class DatabaseStorage implements IStorage {
 
   async getUserPosts(userId: number): Promise<Post[]> {
     const userPosts = await db
-      .select()
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        title: posts.title,
+        description: posts.description,
+        content: posts.content,
+        imageUrl: posts.imageUrl,
+        videoUrl: posts.videoUrl,
+        audioUrl: posts.audioUrl,
+        fileUrl: posts.fileUrl,
+        filename: posts.filename,
+        fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
+        hashtags: posts.hashtags,
+        location: posts.location,
+        mentionedUsers: posts.mentionedUsers,
+        isProtected: posts.isProtected,
+        protectedWorkId: posts.protectedWorkId,
+        isHidden: posts.isHidden,
+        tags: posts.tags,
+        likes: posts.likes,
+        comments: posts.comments,
+        shares: posts.shares,
+        views: posts.views,
+        moderationStatus: posts.moderationStatus,
+        moderationFlags: posts.moderationFlags,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        username: users.username,
+      })
       .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
       .where(eq(posts.userId, userId))
       .orderBy(desc(posts.createdAt));
 
@@ -1057,7 +1092,7 @@ export class DatabaseStorage implements IStorage {
     const [comment] = await db
       .insert(postComments)
       .values({
-        postId: commentData.postId,
+        postId: parseInt(commentData.postId.toString()),
         userId: commentData.userId,
         content: commentData.content,
         parentId: commentData.parentId,
@@ -1072,7 +1107,7 @@ export class DatabaseStorage implements IStorage {
         comments: sql`${posts.comments} + 1`,
         updatedAt: new Date()
       })
-      .where(eq(posts.id, commentData.postId));
+      .where(eq(posts.id, commentData.postId.toString()));
     
     return comment;
   }
@@ -1092,11 +1127,11 @@ export class DatabaseStorage implements IStorage {
         createdAt: postComments.createdAt,
         updatedAt: postComments.updatedAt,
         username: users.username,
-        userImage: users.profileImageUrl,
+        userImage: users.profileImageUrl ?? undefined,
       })
       .from(postComments)
       .innerJoin(users, eq(postComments.userId, users.id))
-      .where(eq(postComments.postId, postId))
+      .where(eq(postComments.postId, parseInt(postId)))
       .orderBy(desc(postComments.createdAt))
       .limit(limit)
       .offset(offset);
