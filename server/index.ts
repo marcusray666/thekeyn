@@ -139,11 +139,19 @@ app.use(session({
     }
   }
 
-  // Set up Vite middleware for development
+  // Configure serving mode based on environment
   if (process.env.NODE_ENV === 'development') {
-    const { setupVite } = await import('./vite.js');
-    await setupVite(app, server);
-    console.log('🎨 Vite development server configured');
+    try {
+      // Only load Vite in development mode
+      const { setupVite } = await import('./vite.js');
+      await setupVite(app, server);
+      console.log('🎨 Vite development server configured');
+    } catch (error) {
+      console.error('⚠️ Vite setup failed, falling back to static serving:', error);
+      // Fallback to static files in development
+      const path = await import('path');
+      app.use(express.static(path.join(process.cwd(), 'dist/public')));
+    }
   } else {
     // In production, serve static files directly without importing vite.ts
     const path = await import('path');
