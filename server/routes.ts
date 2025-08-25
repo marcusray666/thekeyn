@@ -9,6 +9,7 @@ import multer from "multer";
 // Session middleware imports removed - already configured in server/index.ts
 import { z } from "zod";
 import Stripe from "stripe";
+import { config } from "./config/environment.js";
 import { fileURLToPath } from 'url';
 import { storage } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
@@ -64,8 +65,8 @@ declare module 'express-session' {
   }
 }
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe with centralized config
+const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
   apiVersion: "2025-06-30.basil",
 });
 

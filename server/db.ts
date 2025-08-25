@@ -5,31 +5,11 @@ import * as blockchainSchema from "@shared/blockchain-schema";
 
 console.log("🔧 Using standard PostgreSQL connection for Railway");
 
-// Security: Only debug in development
-if (process.env.NODE_ENV !== 'production') {
-  console.log("🔍 Environment check:");
-  console.log("  NODE_ENV:", process.env.NODE_ENV);
-  console.log("  DATABASE_URL exists:", !!process.env.DATABASE_URL);
-}
-
-if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL environment variable is missing!");
-  if (process.env.NODE_ENV === 'production') {
-    console.error("🔧 Railway deployment fix:");
-    console.error("   1. Check loggin-fullstack service Variables tab");
-    console.error("   2. Ensure DATABASE_URL = ${{loggin-db.DATABASE_URL}}");
-    console.error("   3. Verify loggin-db PostgreSQL service is running");
-  } else {
-    console.error("🔧 Development fix:");
-    console.error("   1. Go to Secrets tab (🔒 icon in sidebar)");
-    console.error("   2. Add DATABASE_URL with your PostgreSQL connection string");
-    console.error("   3. Restart your Repl");
-  }
-  throw new Error("DATABASE_URL must be set. Check Railway variables or Replit Secrets.");
-}
+// Configuration validation is handled in environment.ts
+import { config } from "./config/environment.js";
 
 // Log DATABASE_URL format for debugging (without credentials)
-const dbUrl = process.env.DATABASE_URL;
+const dbUrl = config.DATABASE_URL;
 const urlProtocol = dbUrl.split('://')[0];
 const urlHost = dbUrl.split('@')[1]?.split('/')[0];
 console.log("🔗 DATABASE_URL format check:");
@@ -46,14 +26,14 @@ if (urlHost && !urlHost.includes(':5432')) {
 
 // Standard PostgreSQL pool configuration for Railway
 const connectionConfig = {
-  connectionString: process.env.DATABASE_URL,
+  connectionString: config.DATABASE_URL,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
   statement_timeout: 15000,
   query_timeout: 15000,
   allowExitOnIdle: false,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 };
 
 export const pool = new Pool(connectionConfig);

@@ -5,12 +5,8 @@ import ConnectPgSimple from "connect-pg-simple";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-// Security: Only log essential info in production
-if (process.env.NODE_ENV !== 'production') {
-  console.log('🔍 Environment check:');
-  console.log('  NODE_ENV:', process.env.NODE_ENV);
-  console.log('  DATABASE_URL exists:', !!process.env.DATABASE_URL);
-}
+// Validate environment configuration before importing other modules
+import { config, isDevelopment } from "./config/environment.js";
 
 import { pool } from "./db.js";
 import { registerRoutes } from "./routes.js";
@@ -22,9 +18,9 @@ app.set('trust proxy', 1);
 
 // CORS Configuration for Railway deployment
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
+  origin: config.NODE_ENV === 'production' 
     ? [
-        process.env.FRONTEND_URL,
+        config.FRONTEND_URL,
         // Railway deployment patterns
         /https:\/\/.*\.railway\.app$/,
         /https:\/\/.*\.up\.railway\.app$/,
@@ -229,7 +225,7 @@ app.use(session({
     res.status(status).json({ error: message });
   });
 
-  const PORT = parseInt(process.env.PORT || '5000');
+  const PORT = parseInt(config.PORT);
   
   // Railway automatically sets NODE_ENV=production in production environment
   // Force production mode for Railway deployment
