@@ -1,4 +1,5 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, decimal, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, decimal, real, doublePrecision } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { nanoid } from "nanoid";
@@ -621,20 +622,24 @@ export const follows = pgTable("follows", {
 export const userBackgroundPreferences = pgTable("user_background_preferences", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  gradientType: text("gradient_type").notNull(),
-  colorScheme: text("color_scheme").notNull(),
-  primaryColor: text("primary_color").notNull(),
-  secondaryColor: text("secondary_color"),
-  direction: text("direction"),
-  intensity: real("intensity").default(1.0),
-  animationSpeed: text("animation_speed").default("medium"),
+
+  // NEW canonical columns (plural arrays)
+  gradientType: text("gradient_type").notNull().default("linear"),
+  colorScheme: text("color_scheme").notNull().default("cool"),
+  primaryColors: text("primary_colors").array().notNull().default(sql`ARRAY[]::text[]`),
+  secondaryColors: text("secondary_colors").array().notNull().default(sql`ARRAY[]::text[]`),
+
+  direction: text("direction").notNull().default("to bottom right"),
+  intensity: doublePrecision("intensity").notNull().default(0.5),
+
+  animationSpeed: text("animation_speed").notNull().default("medium"),
   timeOfDayPreference: text("time_of_day_preference"),
   moodTag: text("mood_tag"),
-  usageCount: integer("usage_count").default(1),
-  lastUsed: timestamp("last_used").defaultNow(),
-  userRating: real("user_rating"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+
+  usageCount: integer("usage_count").notNull().default(0),
+  lastUsed: timestamp("last_used", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
 
 export const backgroundInteractions = pgTable("background_interactions", {
@@ -818,15 +823,14 @@ export const insertUserBackgroundPreferenceSchema = createInsertSchema(userBackg
   userId: true,
   gradientType: true,
   colorScheme: true,
-  primaryColor: true,
-  secondaryColor: true,
+  primaryColors: true,
+  secondaryColors: true,
   direction: true,
   intensity: true,
   animationSpeed: true,
   timeOfDayPreference: true,
   moodTag: true,
   usageCount: true,
-  userRating: true,
 });
 
 export const insertBackgroundInteractionSchema = createInsertSchema(backgroundInteractions).pick({

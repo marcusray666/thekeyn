@@ -2715,7 +2715,6 @@ export class DatabaseStorage implements IStorage {
       timeOfDayPreference: preferenceData.timeOfDay || preferenceData.timeOfDayPreference || preferenceData.time_of_day_preference || null,
       moodTag: preferenceData.moodTag || preferenceData.mood_tag || null,
       usageCount: preferenceData.usageCount || 1,
-      userRating: preferenceData.userRating || null,
     });
     return preference;
   }
