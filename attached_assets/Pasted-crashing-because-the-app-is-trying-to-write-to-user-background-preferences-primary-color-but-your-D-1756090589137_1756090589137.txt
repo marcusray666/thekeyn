@@ -1,0 +1,42 @@
+crashing because the app is trying to write to user_background_preferences.primary_color, but your DB has primary_colors (array) instead. So Postgres says “column primary_color… does not exist”.
+Fastest, safe fix: add the singular columns the code expects, and (optionally) backfill them from the arrays. No breaking renames, no data loss.
+1) Add a small migration
+Create a new file migrations/0004_background_prefs_compat.sql with this exact SQL:
+-- Make code that uses singular columns work on DBs that have arrays.
+-- Safe to re-run.
+
+ALTER TABLE user_background_preferences
+  ADD COLUMN IF NOT EXISTS primary_color text,
+  ADD COLUMN IF NOT EXISTS secondary_color text;
+
+-- If the array columns exist and have values, backfill the new columns
+-- but don't overwrite anything already set.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='user_background_preferences' AND column_name='primary_colors'
+  ) THEN
+    EXECUTE $i$
+      UPDATE user_background_preferences
+      SET primary_color = COALESCE(primary_color, (primary_colors)[1]),
+          secondary_color = COALESCE(secondary_color, (secondary_colors)[1])
+    $i$;
+  END IF;
+END$$;
+2) Build & push (your repo already runs migrations on start)
+npm run build
+git add migrations/0004_background_prefs_compat.sql
+git commit -m "fix(db): add primary_color/secondary_color compatibility columns"
+git push
+Your prestart migrator will run on Railway and apply this automatically.
+(You already fixed the earlier dist/migrate.js issue and the missing env vars.)
+3) Verify quickly on Railway
+Open Deploy logs; you should see “Applied migration: 0004_background_prefs_compat.sql”.
+Optional SQL check (Railway’s psql shell or any SQL client):
+\d+ user_background_preferences
+SELECT id, primary_color, secondary_color, primary_colors, secondary_colors
+FROM user_background_preferences
+ORDER BY id DESC LIMIT 5;
+Why I’m not renaming
+Renaming primary_colors → primary_color would leave the column as text[], but your code is clearly inserting a text value. That type mismatch would break. Adding the singular columns is the least risky, keeps your current code working, and doesn’t destroy existing data.
