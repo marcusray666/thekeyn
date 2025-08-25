@@ -2649,19 +2649,34 @@ export class DatabaseStorage implements IStorage {
   async saveBackgroundPreference(userId: number, preferenceData: any): Promise<UserBackgroundPreference> {
     console.log('saveBackgroundPreference called with:', { userId, preferenceData });
     
+    // Adapter: Handle both singular and plural color inputs, normalize to arrays
+    const primaryColors = Array.isArray(preferenceData.primary_colors)
+      ? preferenceData.primary_colors
+      : Array.isArray(preferenceData.primaryColors)
+      ? preferenceData.primaryColors
+      : preferenceData.primary_color ? [preferenceData.primary_color] : [];
+
+    const secondaryColors = Array.isArray(preferenceData.secondary_colors)
+      ? preferenceData.secondary_colors
+      : Array.isArray(preferenceData.secondaryColors)
+      ? preferenceData.secondaryColors
+      : preferenceData.secondary_color ? [preferenceData.secondary_color] : [];
+
     const preference = await this.createBackgroundPreference({
       userId,
-      gradientType: preferenceData.gradientType,
-      colorScheme: preferenceData.colorScheme,
-      primaryColors: preferenceData.primaryColors,
-      secondaryColors: preferenceData.secondaryColors || [],
+      gradientType: preferenceData.gradientType || preferenceData.gradient_type || 'linear',
+      colorScheme: preferenceData.colorScheme || preferenceData.color_scheme || 'cool',
+      primaryColors,
+      secondaryColors,
       direction: preferenceData.direction || 'to bottom right',
-      intensity: preferenceData.intensity,
-      animationSpeed: preferenceData.animationSpeed,
-      timeOfDayPreference: preferenceData.timeOfDay || preferenceData.timeOfDayPreference,
-      moodTag: preferenceData.moodTag,
+      intensity: preferenceData.intensity || 0.5,
+      animationSpeed: typeof preferenceData.animationSpeed === 'number'
+        ? String(preferenceData.animationSpeed)
+        : (preferenceData.animationSpeed || preferenceData.animation_speed || 'medium'),
+      timeOfDayPreference: preferenceData.timeOfDay || preferenceData.timeOfDayPreference || preferenceData.time_of_day_preference || null,
+      moodTag: preferenceData.moodTag || preferenceData.mood_tag || null,
       usageCount: preferenceData.usageCount || 1,
-      userRating: preferenceData.userRating,
+      userRating: preferenceData.userRating || null,
     });
     return preference;
   }
