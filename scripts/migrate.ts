@@ -19,12 +19,22 @@ async function run() {
   console.log('🔄 Starting idempotent migration process...');
   console.log(`📍 Database URL format: ${url!.split('@')[1] || 'local'}`);
   
+  // Test database connection first
+  try {
+    const client = await pool.connect();
+    console.log('✅ Database connection successful');
+    client.release();
+  } catch (err) {
+    console.error('❌ Database connection failed:', err);
+    throw err;
+  }
+  
   // Try multiple potential migration paths for development vs production
   const possiblePaths = [
     path.resolve('migrations'),           // Development
     path.resolve('dist/migrations'),      // Production build
-    path.resolve(__dirname, 'migrations'), // Relative to script
-    path.resolve(__dirname, '../migrations'), // One level up
+    path.resolve(process.cwd(), 'migrations'), // From working directory
+    path.resolve(process.cwd(), 'dist/migrations'), // From working directory dist
   ];
   
   let dir = '';
@@ -126,7 +136,20 @@ async function createEssentialTables() {
 }
 
 run()
-  .catch(() => process.exit(1))
+  .catch((error) => {
+    console.error('❌ Migration process failed:', error);
+    console.error('Error details:', {
+      message: error?.message,
+      code: error?.code,
+      stack: error?.stack?.split('\n').slice(0, 5).join('\n')
+    });
+    process.exit(1);
+  })
   .finally(async () => {
-    await pool.end();
+    try {
+      await pool.end();
+      console.log('🔒 Database connection closed');
+    } catch (err) {
+      console.error('⚠️  Error closing database connection:', err);
+    }
   });
