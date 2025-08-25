@@ -1,0 +1,56 @@
+It’s still the same root cause: your server bundle (dist/index.js) contains a static import of @vitejs/plugin-react. That means somewhere in your server code there’s a top-level import (directly or via a file it imports). In production Railway doesn’t install devDeps, so Node can’t resolve it and crashes.
+Do this exactly:
+1) Find the offending import
+Run these locally in the repo root:
+# look in the built file to prove it’s there
+grep -n "@vitejs/plugin-react" dist/index.js
+
+# find which source file pulls it in
+rg -n "@vitejs/plugin-react|from 'vite'|from \"vite\"|vite.config" server scripts
+You’ll see a top-level import in server/index.ts or in another server/* helper, or something like import react from '@vitejs/plugin-react'.
+2) Remove all top-level Vite imports from the server
+Open every file that matched the search and delete any of these at the top:
+// ❌ delete any/all of these
+import { createServer as createViteServer } from 'vite';
+import react from '@vitejs/plugin-react';
+import viteConfig from '../vite.config';
+3) Re-add Vite only for local dev (dynamic, guarded)
+In server/index.ts, add this guarded block (and only this—no other Vite code):
+// dev-only Vite middleware (safe: not executed in production)
+if (process.env.NODE_ENV !== 'production' && process.env.USE_VITE_DEV === '1') {
+  try {
+    const { createServer } = await import('vite');
+    const react = (await import('@vitejs/plugin-react')).default;
+
+    const vite = await createServer({
+      root: path.resolve(process.cwd(), 'client'),
+      server: { middlewareMode: true },
+      plugins: [react()],
+    });
+
+    app.use(vite.middlewares);
+    console.log('Vite dev middleware enabled');
+  } catch (err) {
+    console.error('Vite dev middleware failed to start:', err);
+  }
+}
+No other part of the server should reference vite or react() or viteConfig.
+4) Rebuild and verify the bundle is clean
+npm run build
+# prove the bundle no longer references the plugin
+if grep -q "@vitejs/plugin-react" dist/index.js; then
+  echo "❌ still importing @vitejs/plugin-react in dist/index.js"; exit 1;
+else
+  echo "✅ no vite plugin in server bundle";
+fi
+Commit & deploy:
+git add server
+git commit -m "fix: strip Vite from server; dev-only dynamic import"
+git push
+5) (Temporary emergency workaround—optional)
+If you must get production up before editing code, you can make the missing module error go away by letting Railway install devDeps:
+In Railway → Variables, add NPM_CONFIG_PRODUCTION=false (or temporarily move vite and @vitejs/plugin-react to dependencies).
+Redeploy.
+After you apply the proper fix above, remove that variable / move packages back.
+Why this appeared now
+Your build step bundles the server with esbuild and leaves packages external. A stray top-level import ... from '@vitejs/plugin-react' got into the server code (or a file it imports). Locally it works because devDeps exist; on Railway they don’t, so the process crashes. Removing that static import fixes it permanently.
