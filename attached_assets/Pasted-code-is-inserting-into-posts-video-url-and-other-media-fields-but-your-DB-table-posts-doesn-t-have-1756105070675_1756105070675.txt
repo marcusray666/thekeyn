@@ -1,0 +1,35 @@
+code is inserting into posts.video_url (and other media fields) but your DB table posts doesn’t have those columns. Postgres throws:
+error: column "video_url" of relation "posts" does not exist
+Nothing is “wrong” with Vite or Railway here—your app code and database schema are out of sync. We recently added media fields (video/audio/file, tags, counters, etc.) in createPost, but the migration that adds those columns hasn’t been applied to your live DB.
+Fast, safe fix (no data loss)
+Add the missing columns to posts with an idempotent migration, push, and redeploy. This won’t drop/erase anything—only adds columns if they’re missing.
+Create a migration file in your repo:
+migrations/2025_08_24_add_posts_media_columns.sql
+-- Add media / metadata columns to posts (safe to re-run)
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS video_url           text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS audio_url           text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS file_url            text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS filename            text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS file_type           text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS mime_type           text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS file_size           integer;
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS hashtags            text[] DEFAULT '{}'::text[];
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS location            text;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS mentioned_users     text[] DEFAULT '{}'::text[];
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_protected        boolean DEFAULT false;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS protected_work_id   integer
+  REFERENCES works(id) ON DELETE SET NULL;
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_hidden           boolean DEFAULT false;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS tags                text[] DEFAULT '{}'::text[];
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes               integer DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS comments            integer DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS shares              integer DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS views               integer DEFAULT 0;
+
+-- (optional but helpful) basic indexes
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
