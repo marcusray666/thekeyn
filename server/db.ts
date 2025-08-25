@@ -5,10 +5,12 @@ import * as blockchainSchema from "@shared/blockchain-schema";
 
 console.log("🔧 Using standard PostgreSQL connection for Railway");
 
-// Debug environment variables for Railway deployment
-console.log("🔍 Environment check:");
-console.log("  NODE_ENV:", process.env.NODE_ENV);
-console.log("  DATABASE_URL exists:", !!process.env.DATABASE_URL);
+// Security: Only debug in development
+if (process.env.NODE_ENV !== 'production') {
+  console.log("🔍 Environment check:");
+  console.log("  NODE_ENV:", process.env.NODE_ENV);
+  console.log("  DATABASE_URL exists:", !!process.env.DATABASE_URL);
+}
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL environment variable is missing!");

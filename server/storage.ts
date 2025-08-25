@@ -2354,7 +2354,14 @@ export class DatabaseStorage implements IStorage {
 
 
 
-  async discoverUsers(currentUserId: number): Promise<any[]> {
+  async discoverUsers(currentUserId: number): Promise<Array<User & { 
+    followerCount: number; 
+    followingCount: number; 
+    workCount: number; 
+    isFollowing: boolean;
+    isOnline: boolean;
+    lastSeen: string;
+  }>> {
     try {
       const discoveredUsers = await db
         .select({
@@ -2396,7 +2403,21 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getPostPreview(postId: number): Promise<any | null> {
+  async getPostPreview(postId: number): Promise<{
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    creatorName: string;
+    creatorId: number;
+    createdAt: string;
+    isVerified: boolean;
+    stats: {
+      views: number;
+      likes: number;
+      shares: number;
+    };
+  } | null> {
     try {
       // This would get community post data for preview
       // For now, return a mock response since posts system isn't fully implemented
@@ -2421,7 +2442,21 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getWorkPreview(workId: number): Promise<any | null> {
+  async getWorkPreview(workId: number): Promise<{
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    creatorName: string;
+    creatorId: number;
+    createdAt: string;
+    isVerified: boolean;
+    stats: {
+      views: number;
+      likes: number;
+      shares: number;
+    };
+  } | null> {
     try {
       const work = await db
         .select({
@@ -2504,8 +2539,8 @@ export class DatabaseStorage implements IStorage {
 
       console.log('Successfully created background preference:', preference.id);
       return preference;
-    } catch (error: any) {
-      console.error('Error creating background preference:', error);
+    } catch (error) {
+      console.error('Error creating background preference:', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -2529,8 +2564,8 @@ export class DatabaseStorage implements IStorage {
 
       console.log(`Recorded background interaction: ${interaction.interactionType} for user ${interaction.userId}`);
       return interaction;
-    } catch (error: any) {
-      console.error('Error recording background interaction:', error);
+    } catch (error) {
+      console.error('Error recording background interaction:', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }

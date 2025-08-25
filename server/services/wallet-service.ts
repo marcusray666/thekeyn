@@ -35,7 +35,7 @@ export class WalletService {
         privateKey: encryptedPrivateKey,
       };
     } catch (error) {
-      console.error('Wallet generation error:', error);
+      console.error('Wallet generation error:', error instanceof Error ? error.message : 'Unknown error');
       throw new Error('Failed to generate wallet');
     }
   }
@@ -99,7 +99,7 @@ export class WalletService {
 
       return new ethers.Wallet(masterPrivateKey, provider);
     } catch (error) {
-      console.error('Wallet instance error:', error);
+      console.error('Wallet instance error:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }

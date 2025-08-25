@@ -193,7 +193,7 @@ export class AdvancedBlockchainVerification {
       };
       
     } catch (error) {
-      console.error('Ethereum transaction failed:', error);
+      console.error('Ethereum transaction failed:', error instanceof Error ? error.message : 'Network error');
       
       // Fallback to block anchor
       const fallbackResult = await this.createBlockAnchorProof(fileHash, metadata);
@@ -275,7 +275,7 @@ export class AdvancedBlockchainVerification {
       };
       
     } catch (error) {
-      console.error('Block anchor creation failed:', error);
+      console.error('Block anchor creation failed:', error instanceof Error ? error.message : 'Unknown error');
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'

@@ -128,10 +128,10 @@ async function generateBlockchainHash(): Promise<string> {
       .update(JSON.stringify(blockchainData))
       .digest('hex');
     
-    console.log(`Real blockchain anchor created:`);
-    console.log(`- Block: ${currentBlock.number}`);
-    console.log(`- Block Hash: ${currentBlock.hash}`);
-    console.log(`- Verification Hash: ${blockchainHash}`);
+    // Log blockchain anchor creation (non-sensitive info)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`Blockchain anchor created - Block: ${currentBlock.number}`);
+    }
     
     return blockchainHash;
   } catch (error) {
