@@ -11,34 +11,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import CommentsSection from "@/components/CommentsSection";
 
-interface CommunityPost {
-  id: string;
-  userId: number;
-  title: string;
-  description?: string;
-  content: string;
-  imageUrl?: string;
-  filename?: string;
-  fileType?: string;
-  mimeType?: string;
-  fileSize?: number;
-  hashtags?: string[];
-  location?: string;
-  mentionedUsers?: string[];
-  isProtected: boolean;
-  protectedWorkId?: number;
-  tags?: string[];
-  likes: number;
-  comments: number;
-  shares: number;
-  views: number;
-  createdAt: string;
-  updatedAt: string;
-  username: string;
-  displayName?: string;
-  profileImageUrl?: string;
-  isLiked?: boolean;
-}
+import type { Post } from "@shared/schema";
+
+// Use Post type directly - it already includes all needed fields
+type CommunityPost = Post;
 
 interface CommunityPostCardProps {
   post: CommunityPost;
@@ -137,7 +113,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
     if (!post.hashtags || post.hashtags.length === 0) return null;
     return (
       <div className="flex flex-wrap gap-1 mt-2">
-        {post.hashtags.map((hashtag, index) => (
+        {post.hashtags.map((hashtag: string, index: number) => (
           <Link key={index} href={`/hashtag/${hashtag}`}>
             <span className="text-[#FE3F5E] hover:text-[#FF6B8A] text-sm cursor-pointer">
               #{hashtag}
@@ -149,11 +125,12 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
   };
 
   const renderMentions = () => {
+    // mentionedUsers field exists in schema
     if (!post.mentionedUsers || post.mentionedUsers.length === 0) return null;
     return (
       <div className="flex flex-wrap gap-1 mt-1">
         <span className="text-gray-500 text-sm">Mentioned:</span>
-        {post.mentionedUsers.map((username, index) => (
+        {post.mentionedUsers.map((username: string, index: number) => (
           <Link key={index} href={`/user/${username}`}>
             <span className="text-[#FE3F5E] hover:text-[#FF6B8A] text-sm cursor-pointer">
               @{username}
@@ -173,7 +150,7 @@ export function CommunityPostCard({ post, currentUserId, isAdmin = false }: Comm
           <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
             <img
               src={post.imageUrl}
-              alt={post.title}
+              alt={post.content}
               className="w-full h-auto max-h-96 object-contain"
               loading="lazy"
               onError={(e) => {

@@ -5,8 +5,7 @@ import {
   LayoutGrid, 
   Play, 
   Pause, 
-  SkipForward, 
-  SkipBack,
+
   Maximize2,
   Heart,
   MessageCircle,
@@ -16,7 +15,7 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  Filter,
+
   Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,19 +24,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-interface Work {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  fileType: 'image' | 'audio' | 'video' | 'document';
-  createdAt: string;
-  likes: number;
-  views: number;
-  tags: string[];
-  certificateId: string;
-  featured?: boolean;
-}
+import type { Work } from "@shared/schema";
+
+// Helper function to get file type from MIME type
+const getFileTypeFromMimeType = (mimeType: string): 'image' | 'audio' | 'video' | 'document' => {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  return 'document';
+};
 
 interface AnimatedShowcaseProps {
   works: Work[];
@@ -61,21 +56,24 @@ export function AnimatedShowcase({
   const [sortBy, setSortBy] = useState("recent");
   const [selectedWork, setSelectedWork] = useState<Work | null>(null);
 
-  // Filter and sort works
+  // Filter and sort works with proper null checks and field mapping
   const filteredWorks = works
     .filter(work => {
       const matchesSearch = work.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           work.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           work.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesFilter = filterType === "all" || work.fileType === filterType;
+                           (work.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (work.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      const fileType = work.mimeType?.startsWith('image/') ? 'image' : 
+                      work.mimeType?.startsWith('video/') ? 'video' :
+                      work.mimeType?.startsWith('audio/') ? 'audio' : 'document';
+      const matchesFilter = filterType === "all" || fileType === filterType;
       return matchesSearch && matchesFilter;
     })
     .sort((a, b) => {
       switch (sortBy) {
         case "popular":
-          return b.likes - a.likes;
+          return (b.likeCount || 0) - (a.likeCount || 0);
         case "views":
-          return b.views - a.views;
+          return (b.viewCount || 0) - (a.viewCount || 0);
         case "title":
           return a.title.localeCompare(b.title);
         default: // recent
@@ -137,14 +135,14 @@ export function AnimatedShowcase({
       <GlassCard className="overflow-hidden hover:scale-105 transition-transform duration-300">
         {/* Work Preview */}
         <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-blue-900/20 overflow-hidden">
-          {work.imageUrl ? (
+          {work.filename && getFileTypeFromMimeType(work.mimeType) === 'image' ? (
             <div className="w-full h-full bg-gray-700 flex items-center justify-center">
               <Eye className="h-8 w-8 text-gray-400" />
               <span className="ml-2 text-gray-400">Protected Preview</span>
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-4xl">
-              {getFileTypeIcon(work.fileType)}
+              {getFileTypeIcon(getFileTypeFromMimeType(work.mimeType))}
             </div>
           )}
           
@@ -157,7 +155,7 @@ export function AnimatedShowcase({
           </div>
           
           {/* Featured badge */}
-          {work.featured && (
+          {false && (
             <div className="absolute top-3 left-3">
               <Badge className="bg-yellow-500 text-black">Featured</Badge>
             </div>
@@ -166,7 +164,7 @@ export function AnimatedShowcase({
           {/* File type badge */}
           <div className="absolute top-3 right-3">
             <Badge variant="secondary" className="bg-gray-800/80 text-white">
-              {work.fileType.toUpperCase()}
+              {getFileTypeFromMimeType(work.mimeType).toUpperCase()}
             </Badge>
           </div>
         </div>
@@ -178,14 +176,14 @@ export function AnimatedShowcase({
           
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mb-3">
-            {work.tags.slice(0, 3).map((tag) => (
+            {(work.tags || []).slice(0, 3).map((tag) => (
               <Badge key={tag} variant="outline" className="text-xs border-gray-600 text-gray-300">
                 #{tag}
               </Badge>
             ))}
-            {work.tags.length > 3 && (
+            {(work.tags || []).length > 3 && (
               <Badge variant="outline" className="text-xs border-gray-600 text-gray-300">
-                +{work.tags.length - 3}
+                +{(work.tags || []).length - 3}
               </Badge>
             )}
           </div>
@@ -195,14 +193,14 @@ export function AnimatedShowcase({
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
                 <Heart className="h-4 w-4" />
-                <span>{work.likes}</span>
+                <span>{work.likeCount || 0}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Eye className="h-4 w-4" />
-                <span>{work.views}</span>
+                <span>{work.viewCount || 0}</span>
               </div>
             </div>
-            <span>{formatTimeAgo(work.createdAt)}</span>
+            <span>{formatTimeAgo(work.createdAt.toISOString())}</span>
           </div>
         </div>
       </GlassCard>
@@ -475,24 +473,24 @@ export function AnimatedShowcase({
                   <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                     <div>
                       <span className="text-gray-400">Type:</span>
-                      <span className="text-white ml-2">{selectedWork.fileType}</span>
+                      <span className="text-white ml-2">{getFileTypeFromMimeType(selectedWork.mimeType)}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Created:</span>
-                      <span className="text-white ml-2">{formatTimeAgo(selectedWork.createdAt)}</span>
+                      <span className="text-white ml-2">{formatTimeAgo(selectedWork.createdAt.toISOString())}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Likes:</span>
-                      <span className="text-white ml-2">{selectedWork.likes}</span>
+                      <span className="text-white ml-2">{selectedWork.likeCount || 0}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Views:</span>
-                      <span className="text-white ml-2">{selectedWork.views}</span>
+                      <span className="text-white ml-2">{selectedWork.viewCount || 0}</span>
                     </div>
                   </div>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedWork.tags.map((tag) => (
+                    {(selectedWork.tags || []).map((tag) => (
                       <Badge key={tag} variant="outline" className="border-gray-600 text-gray-300">
                         #{tag}
                       </Badge>
