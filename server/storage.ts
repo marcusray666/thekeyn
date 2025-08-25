@@ -1210,13 +1210,6 @@ export class DatabaseStorage implements IStorage {
 
   // Notifications functionality - keep the more complete implementation
 
-  async markNotificationRead(notificationId: number): Promise<void> {
-    await db
-      .update(userNotifications)
-      .set({ isRead: true })
-      .where(eq(userNotifications.id, notificationId));
-  }
-
   async markAllNotificationsRead(userId: number): Promise<void> {
     await db
       .update(userNotifications)
@@ -2283,35 +2276,7 @@ export class DatabaseStorage implements IStorage {
     return work;
   }
 
-  async searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]> {
-    try {
-      const searchResults = await db
-        .select({
-          id: users.id,
-          username: users.username,
-          displayName: users.displayName,
-          profileImageUrl: users.profileImageUrl,
-          isVerified: users.isVerified
-        })
-        .from(users)
-        .where(
-          and(
-            ne(users.id, currentUserId), // Exclude current user
-            ne(users.isBanned, true), // Exclude banned users
-            or(
-              ilike(users.username, `%${query}%`),
-              ilike(users.displayName, `%${query}%`)
-            )
-          )
-        )
-        .limit(10);
 
-      return searchResults;
-    } catch (error) {
-      console.error("Error searching users:", error);
-      return [];
-    }
-  }
 
   async findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null> {
     try {
