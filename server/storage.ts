@@ -2520,14 +2520,10 @@ export class DatabaseStorage implements IStorage {
         .where(eq(userBackgroundPreferences.userId, userId))
         .orderBy(desc(userBackgroundPreferences.lastUsed));
 
+      console.log(`Retrieved ${preferences.length} background preferences for user ${userId}`);
       return preferences;
     } catch (error: any) {
-      console.error('Error in getUserBackgroundPreferences:', error);
-      // Handle case where column doesn't exist in production
-      if (error.message?.includes('gradient_type') || error.message?.includes('color_scheme') || error.message?.includes('does not exist')) {
-        console.log('Background preferences table/columns not found, returning empty array');
-        return [];
-      }
+      console.error('Error retrieving background preferences:', error);
       throw error;
     }
   }
@@ -2541,34 +2537,10 @@ export class DatabaseStorage implements IStorage {
         .values(data)
         .returning();
 
-      console.log('Successfully created background preference:', preference);
+      console.log('Successfully created background preference:', preference.id);
       return preference;
     } catch (error: any) {
-      console.error('Error in createBackgroundPreference:', error);
-      
-      // Handle case where table/columns don't exist in production
-      if (error.message?.includes('user_background_preferences') || error.message?.includes('gradient_type') || error.message?.includes('color_scheme')) {
-        console.log('Background preferences table/columns not found, skipping creation');
-        // Return a mock object to prevent crashes
-        return {
-          id: 0,
-          userId: data.userId,
-          gradientType: data.gradientType || 'linear',
-          colorScheme: data.colorScheme || 'warm',
-          primaryColors: data.primaryColors || [],
-          secondaryColors: data.secondaryColors || [],
-          direction: data.direction,
-          intensity: data.intensity || 1.0,
-          animationSpeed: data.animationSpeed || 'medium',
-          timeOfDayPreference: data.timeOfDayPreference,
-          moodTag: data.moodTag,
-          usageCount: data.usageCount || 1,
-          lastUsed: new Date(),
-          userRating: data.userRating,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as UserBackgroundPreference;
-      }
+      console.error('Error creating background preference:', error);
       throw error;
     }
   }
@@ -2590,26 +2562,10 @@ export class DatabaseStorage implements IStorage {
         .values(data)
         .returning();
 
+      console.log(`Recorded background interaction: ${interaction.interactionType} for user ${interaction.userId}`);
       return interaction;
     } catch (error: any) {
-      // Handle case where table doesn't exist in production
-      if (error.message?.includes('background_interactions') && error.message?.includes('does not exist')) {
-        console.log('Background interactions table not found, skipping interaction recording');
-        // Return a mock object to prevent crashes
-        return {
-          id: 0,
-          userId: data.userId,
-          gradientId: data.gradientId,
-          interactionType: data.interactionType,
-          timeSpent: data.timeSpent,
-          pageContext: data.pageContext,
-          deviceType: data.deviceType,
-          timeOfDay: data.timeOfDay,
-          weatherContext: data.weatherContext,
-          sessionDuration: data.sessionDuration,
-          createdAt: new Date(),
-        } as BackgroundInteraction;
-      }
+      console.error('Error recording background interaction:', error);
       throw error;
     }
   }
@@ -2630,11 +2586,11 @@ export class DatabaseStorage implements IStorage {
         )
         .orderBy(desc(backgroundInteractions.createdAt));
 
+      console.log(`Retrieved ${analytics.length} background analytics for user ${userId} over ${days} days`);
       return analytics;
     } catch (error: any) {
       console.error('Error fetching background analytics:', error);
-      // Return empty array to prevent crashes during Railway deployment
-      return [];
+      throw error;
     }
   }
 
@@ -2643,18 +2599,24 @@ export class DatabaseStorage implements IStorage {
     colorScheme: string;
     usageCount: number;
   }[]> {
-    const trends = await db
-      .select({
-        gradientType: userBackgroundPreferences.gradientType,
-        colorScheme: userBackgroundPreferences.colorScheme,
-        usageCount: sql<number>`sum(${userBackgroundPreferences.usageCount})`.as('total_usage'),
-      })
-      .from(userBackgroundPreferences)
-      .groupBy(userBackgroundPreferences.gradientType, userBackgroundPreferences.colorScheme)
-      .orderBy(desc(sql`sum(${userBackgroundPreferences.usageCount})`))
-      .limit(limit);
+    try {
+      const trends = await db
+        .select({
+          gradientType: userBackgroundPreferences.gradientType,
+          colorScheme: userBackgroundPreferences.colorScheme,
+          usageCount: sql<number>`sum(${userBackgroundPreferences.usageCount})`.as('total_usage'),
+        })
+        .from(userBackgroundPreferences)
+        .groupBy(userBackgroundPreferences.gradientType, userBackgroundPreferences.colorScheme)
+        .orderBy(desc(sql`sum(${userBackgroundPreferences.usageCount})`))
+        .limit(limit);
 
-    return trends;
+      console.log(`Retrieved ${trends.length} popular background trends`);
+      return trends;
+    } catch (error: any) {
+      console.error('Error fetching background trends:', error);
+      throw error;
+    }
   }
 
   async updateBackgroundUsage(preferenceId: number): Promise<void> {
