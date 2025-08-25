@@ -19,8 +19,24 @@ async function run() {
   console.log('🔄 Starting idempotent migration process...');
   console.log(`📍 Database URL format: ${url!.split('@')[1] || 'local'}`);
   
-  const dir = path.resolve('migrations');
-  if (!fs.existsSync(dir)) {
+  // Try multiple potential migration paths for development vs production
+  const possiblePaths = [
+    path.resolve('migrations'),           // Development
+    path.resolve('dist/migrations'),      // Production build
+    path.resolve(__dirname, 'migrations'), // Relative to script
+    path.resolve(__dirname, '../migrations'), // One level up
+  ];
+  
+  let dir = '';
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      dir = testPath;
+      console.log(`📁 Using migrations from: ${dir}`);
+      break;
+    }
+  }
+  
+  if (!dir) {
     console.log('📁 No migrations folder found, creating essential tables...');
     await createEssentialTables();
     return;
