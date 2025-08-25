@@ -1,0 +1,213 @@
+You’ve got **three classes of problems** in that file that explode into “50+ issues”:
+
+1. The `IStorage` interface contains **duplicate methods with conflicting types** (e.g., `followUser`, `createNotification`, `getUserNotifications` are declared twice with different return types).
+2. Some implementations don’t match the interface types and/or Drizzle’s builder usage (e.g., calling `.where()` twice on a `select` builder, which becomes a non-builder after the first `.where`).
+3. A few queries hit **old tables/column names** (`notifications`, `follows`, `primary_color`) or even a symbol that doesn’t exist (`auditLogs`).
+
+Below are **drop-in fixes**. Apply them exactly and the TypeScript errors will fall away without touching your DB or migrations.
+
+---
+
+## 0) Clean the imports
+
+At the very top, you import both legacy and current tables. We’ll standardize on the current ones:
+
+* **Keep**: `userFollows`, `userNotifications`
+* **Remove**: `follows`, `notifications` (and any code that references them)
+
+So in your import line, delete the two legacy table names:
+
+```ts
+// remove these if still present in the import list
+// follows, notifications
+```
+
+---
+
+## 1) Fix the interface (remove duplicates, unify types)
+
+Right now `IStorage` declares many methods **twice** with different types, which makes your class “not assignable to base type”.
+
+* Keep the **user**-prefixed tables/DTOs: `UserFollow`, `InsertUserFollow`, `UserNotification`, `InsertUserNotification`.
+* Remove the duplicated “Social features” versions that use `Follow`, `Notification`, etc.
+
+Here is the **corrected** section for the parts that were duplicated (replace these blocks in `IStorage`):
+
+```ts
+// Social features (ONE set only, using user* types)
+getUserWorks(userId: number): Promise<Work[]>;
+followUser(followerId: number, followingId: number): Promise<UserFollow>;
+unfollowUser(followerId: number, followingId: number): Promise<void>;
+isFollowing(followerId: number, followingId: number): Promise<boolean>;
+likeWork(userId: number, workId: number): Promise<Like>;
+unlikeWork(userId: number, workId: number): Promise<void>;
+isWorkLiked(userId: number, workId: number): Promise<boolean>;
+addComment(comment: Partial<InsertComment>): Promise<Comment>;
+getWorkComments(workId: number): Promise<Comment[]>;
+shareWork(share: Partial<InsertShare>): Promise<Share>;
+
+// Notifications (ONE set only, using userNotifications types)
+createNotification(notification: InsertUserNotification): Promise<UserNotification>;
+getUserNotifications(
+  userId: number,
+  options?: { unreadOnly?: boolean; limit?: number; offset?: number }
+): Promise<UserNotification[]>;
+markNotificationRead(notificationId: number): Promise<void>;
+markAllNotificationsRead(userId: number): Promise<void>;
+getUnreadNotificationCount(userId: number): Promise<number>;
+```
+
+Also delete the second “User search for messaging” block that **redeclares** `getUserWorks`, `followUser`, `unfollowUser` etc. Keep each method **once** in the interface.
+
+---
+
+## 2) Notifications: use `userNotifications` everywhere + one `.where(...)`
+
+Replace your **three** notification methods in the class with these (they match the interface + Drizzle usage):
+
+```ts
+async createNotification(notification: InsertUserNotification): Promise<UserNotification> {
+  const [row] = await db.insert(userNotifications).values(notification).returning();
+  return row;
+}
+
+async getUserNotifications(
+  userId: number,
+  options: { unreadOnly?: boolean; limit?: number; offset?: number } = {}
+): Promise<UserNotification[]> {
+  const { unreadOnly = false, limit = 50, offset = 0 } = options;
+  const predicate = unreadOnly
+    ? and(eq(userNotifications.userId, userId), eq(userNotifications.isRead, false))
+    : eq(userNotifications.userId, userId);
+
+  return await db
+    .select()
+    .from(userNotifications)
+    .where(predicate) // call .where ONCE
+    .orderBy(desc(userNotifications.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+async markNotificationRead(notificationId: number): Promise<void> {
+  await db
+    .update(userNotifications)
+    .set({ isRead: true })
+    .where(eq(userNotifications.id, notificationId));
+}
+```
+
+And **delete** the older versions that use the `notifications` table and the version of `getUserNotifications` that accepts `(userId: number, unreadOnly = false)`.
+
+---
+
+## 3) `isWorkLiked` bug
+
+You only filter by `userId`, not by `workId`. Fix:
+
+```ts
+async isWorkLiked(userId: number, workId: number): Promise<boolean> {
+  const [row] = await db
+    .select()
+    .from(likes)
+    .where(and(eq(likes.userId, userId), eq(likes.workId, workId)))
+    .limit(1);
+
+  return !!row;
+}
+```
+
+---
+
+## 4) Drizzle builder rule: don’t chain `.where()` twice
+
+You hit this in your old `getUserNotifications` (and anywhere else you do `let q = select...where(...); if (...) q = q.where(...)`).
+**Build the predicate first**, then call `.where(predicate)` once—as shown in the replacement above.
+
+Search for any other spots with the same pattern and convert them to a single `.where(...)` with an `and(...)` predicate.
+
+---
+
+## 5) Admin counts: use `userFollows` (not `follows`)
+
+These subqueries use a non-existent `follows` table/columns. Replace with `userFollows` and its camelCase columns anywhere you compute follower/following counts.
+
+Example fixes:
+
+```ts
+// in getUserWithAllPrivateInfo() and getUserProfile(), discoverUsers(), etc.
+followerCount: sql`(SELECT count(*) FROM ${userFollows} WHERE ${userFollows.followingId} = ${users.id})`.as('followerCount'),
+followingCount: sql`(SELECT count(*) FROM ${userFollows} WHERE ${userFollows.followerId} = ${users.id})`.as('followingCount'),
+```
+
+(Do the same inside `getSystemMetrics()` if you referenced `follows` there.)
+
+---
+
+## 6) `getUserActivityLog`: `auditLogs` doesn’t exist
+
+You reference `auditLogs`, but the imported table is `adminAuditLogs`. Use that:
+
+```ts
+async getUserActivityLog(userId: number): Promise<any[]> {
+  try {
+    const activities = await db
+      .select()
+      .from(adminAuditLogs)
+      .where(eq(adminAuditLogs.targetId, String(userId)))
+      .orderBy(desc(adminAuditLogs.createdAt))
+      .limit(100);
+
+    return activities;
+  } catch (error) {
+    console.error("Error getting user activity log:", error);
+    return [];
+  }
+}
+```
+
+---
+
+## 7) Background prefs: you’re good — just ensure you never pass legacy keys
+
+Your `saveBackgroundPreference()` already normalizes colors to arrays and camelCase keys. Keep it.
+If you also allow **updates**, be sure to **strip** `primary_color` / `secondary_color` from any `updateBackgroundPreference` payload (the DB doesn’t have those columns). If needed, add a tiny sanitizer:
+
+```ts
+function sanitizeBgUpdate(u: Partial<UserBackgroundPreference>) {
+  const { /* legacy */ primary_color, secondary_color, ...rest } = u as any;
+  return rest;
+}
+
+// then in updateBackgroundPreference:
+.set({ ...sanitizeBgUpdate(updates), updatedAt: new Date() })
+```
+
+---
+
+## 8) Do a quick self-check locally
+
+```bash
+# 1) type-check (esbuild doesn’t type-check)
+npx tsc --noEmit
+
+# 2) build
+npm run build
+
+# 3) run your idempotent migrator only if needed
+# (safe: our migrations are IF NOT EXISTS / additive)
+DATABASE_URL='postgres://...shuttle.proxy.rlwy.net:PORT/railway?sslmode=require' node dist/migrate.js
+```
+
+If `tsc` still reports **exact** lines after these patches, paste those line numbers and I’ll give the one-liners to finish it.
+
+---
+
+### Why this fixes the “50 issues”
+
+* The interface no longer has **conflicting overloads**, so the class can implement it cleanly.
+* Notification methods match **one** table + correct builder usage (no second `.where()`).
+* Counts and admin queries use **real tables/columns** (`userFollows`).
+* Background prefs stop leaking non-existent `primary_color` columns into SQL.
+
+No schema changes, no data loss, and it keeps Railway happy.

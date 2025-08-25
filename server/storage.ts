@@ -1,5 +1,5 @@
 import { 
-  users, works, certificates, nftMints, posts, follows, likes, comments, shares, notifications,
+  users, works, certificates, nftMints, posts, likes, comments, shares,
   postComments, postReactions, userFollows, userNotifications, contentCategories, userPreferences, userAnalytics,
   marketplace, purchases, collaborationProjects, projectCollaborators, subscriptions, subscriptionUsage,
   blockchainVerifications, verificationAuditLog, adminAuditLogs, contentReports, systemMetrics,
@@ -10,8 +10,8 @@ import {
   type Post, type InsertPost, type PostComment, type InsertPostComment, type UserFollow, type InsertUserFollow,
   type UserNotification, type InsertUserNotification, type ContentCategory, type UserPreference, type UserAnalytic,
   type MarketplaceListing, type InsertMarketplaceListing, type Purchase, type CollaborationProject, type InsertCollaborationProject,
-  type ProjectCollaborator, type Follow, type InsertFollow, type Like, type InsertLike, type Comment, type InsertComment, 
-  type Share, type InsertShare, type Notification, type InsertNotification, type Subscription, type InsertSubscription,
+  type ProjectCollaborator, type Like, type InsertLike, type Comment, type InsertComment, 
+  type Share, type InsertShare, type Subscription, type InsertSubscription,
   type SubscriptionUsage, type InsertSubscriptionUsage, type BlockchainVerification, type InsertBlockchainVerification,
   type VerificationAuditLog, type InsertVerificationAuditLog,
   type Conversation, type InsertConversation, type Message, type InsertMessage,
@@ -54,7 +54,7 @@ export interface IStorage {
   // Social features
   getPublicWorks(options?: { userId?: number; limit?: number; offset?: number; filter?: string; search?: string; tags?: string[] }): Promise<Work[]>;
   getUserWorks(userId: number): Promise<Work[]>;
-  followUser(followerId: number, followingId: number): Promise<Follow>;
+  followUser(followerId: number, followingId: number): Promise<UserFollow>;
   unfollowUser(followerId: number, followingId: number): Promise<void>;
   isFollowing(followerId: number, followingId: number): Promise<boolean>;
   likeWork(userId: number, workId: number): Promise<Like>;
@@ -63,9 +63,6 @@ export interface IStorage {
   addComment(comment: Partial<InsertComment>): Promise<Comment>;
   getWorkComments(workId: number): Promise<Comment[]>;
   shareWork(share: Partial<InsertShare>): Promise<Share>;
-  createNotification(notification: Partial<InsertNotification>): Promise<Notification>;
-  getUserNotifications(userId: number, unreadOnly?: boolean): Promise<Notification[]>;
-  markNotificationRead(notificationId: number): Promise<void>;
   incrementWorkViews(workId: number): Promise<void>;
   getTrendingTags(limit?: number): Promise<string[]>;
   
@@ -88,9 +85,6 @@ export interface IStorage {
   likeComment(userId: number, commentId: number): Promise<void>;
   
   // Following functionality
-  followUser(followerId: number, followingId: number): Promise<UserFollow>;
-  unfollowUser(followerId: number, followingId: number): Promise<void>;
-  isFollowing(followerId: number, followingId: number): Promise<boolean>;
   getFollowers(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
   getFollowing(userId: number, options?: { limit?: number; offset?: number }): Promise<(User & { isFollowing?: boolean })[]>;
   getFollowStats(userId: number): Promise<{ followers: number; following: number }>;
@@ -164,9 +158,6 @@ export interface IStorage {
   searchUsers(query: string, currentUserId: number): Promise<{ id: number; username: string; displayName: string | null; profileImageUrl: string | null; isVerified: boolean | null; }[]>;
   findConversationBetweenUsers(userId1: number, userId2: number): Promise<any | null>;
   getUserProfile(userId: number, currentUserId: number): Promise<any | null>;
-  getUserWorks(userId: number): Promise<Work[]>;
-  followUser(followerId: number, followingId: number): Promise<any>;
-  unfollowUser(followerId: number, followingId: number): Promise<void>;
   discoverUsers(currentUserId: number): Promise<any[]>;
   getPostPreview(postId: number): Promise<any | null>;
   getWorkPreview(workId: number): Promise<any | null>;
@@ -569,9 +560,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async isWorkLiked(userId: number, workId: number): Promise<boolean> {
-    const result = await db.select().from(likes)
-      .where(eq(likes.userId, userId));
-    return result.length > 0;
+    const [row] = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.workId, workId)))
+      .limit(1);
+
+    return !!row;
   }
 
   async addComment(comment: Partial<InsertComment>): Promise<Comment> {
@@ -594,27 +589,34 @@ export class DatabaseStorage implements IStorage {
     return newShare;
   }
 
-  async createNotification(notification: Partial<InsertNotification>): Promise<Notification> {
-    const [newNotification] = await db.insert(notifications)
-      .values(notification as any)
-      .returning();
-    return newNotification;
+  async createNotification(notification: InsertUserNotification): Promise<UserNotification> {
+    const [row] = await db.insert(userNotifications).values(notification).returning();
+    return row;
   }
 
-  async getUserNotifications(userId: number, unreadOnly = false): Promise<Notification[]> {
-    let query = db.select().from(notifications).where(eq(notifications.userId, userId));
-    
-    if (unreadOnly) {
-      query = query.where(eq(notifications.isRead, false));
-    }
-    
-    return await query.orderBy(desc(notifications.createdAt));
+  async getUserNotifications(
+    userId: number,
+    options: { unreadOnly?: boolean; limit?: number; offset?: number } = {}
+  ): Promise<UserNotification[]> {
+    const { unreadOnly = false, limit = 50, offset = 0 } = options;
+    const predicate = unreadOnly
+      ? and(eq(userNotifications.userId, userId), eq(userNotifications.isRead, false))
+      : eq(userNotifications.userId, userId);
+
+    return await db
+      .select()
+      .from(userNotifications)
+      .where(predicate)
+      .orderBy(desc(userNotifications.createdAt))
+      .limit(limit)
+      .offset(offset);
   }
 
   async markNotificationRead(notificationId: number): Promise<void> {
-    await db.update(notifications)
+    await db
+      .update(userNotifications)
       .set({ isRead: true })
-      .where(eq(notifications.id, notificationId));
+      .where(eq(userNotifications.id, notificationId));
   }
 
   async incrementWorkViews(workId: number): Promise<void> {
@@ -2105,8 +2107,8 @@ export class DatabaseStorage implements IStorage {
         stripeCustomerId: users.stripeCustomerId,
         uploadCount: users.uploadCount,
         totalStorageUsed: users.totalStorageUsed,
-        followerCount: sql`(SELECT count(*) FROM ${follows} WHERE following_id = ${users.id})`.as('followerCount'),
-        followingCount: sql`(SELECT count(*) FROM ${follows} WHERE follower_id = ${users.id})`.as('followingCount'),
+        followerCount: sql`(SELECT count(*) FROM ${userFollows} WHERE ${userFollows.followingId} = ${users.id})`.as('followerCount'),
+        followingCount: sql`(SELECT count(*) FROM ${userFollows} WHERE ${userFollows.followerId} = ${users.id})`.as('followingCount'),
         totalLikes: sql`(SELECT count(*) FROM ${postReactions} WHERE user_id = ${users.id})`.as('totalLikes'),
         totalWorks: sql`(SELECT count(*) FROM ${works} WHERE user_id = ${users.id})`.as('totalWorks'),
         totalPosts: sql`(SELECT count(*) FROM ${posts} WHERE user_id = ${users.id})`.as('totalPosts')
@@ -2122,9 +2124,11 @@ export class DatabaseStorage implements IStorage {
   // Get user's complete activity log
   async getUserActivityLog(userId: number): Promise<any[]> {
     try {
-      const activities = await db.select().from(auditLogs)
-        .where(eq(auditLogs.targetId, userId.toString()))
-        .orderBy(desc(auditLogs.createdAt))
+      const activities = await db
+        .select()
+        .from(adminAuditLogs)
+        .where(eq(adminAuditLogs.targetId, String(userId)))
+        .orderBy(desc(adminAuditLogs.createdAt))
         .limit(100);
 
       return activities;
