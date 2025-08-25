@@ -1,0 +1,15 @@
+Unsafe Practices: In general, the code avoids obvious security pitfalls, but there are a few things to tidy up:
+Logging Sensitive Info: As mentioned, remove or guard the verbose logging of environment details and filesystem in index.ts once deployment issues are resolved. Also ensure no secrets (like Stripe keys or session secrets) ever get logged. The current logs print which env vars exist, but not their values
+GitHub
+ – that’s good. Just be mindful if you add any debug logs.
+Use of any: Some functions use any for convenience (e.g. discoverUsers returns Promise<any[]>
+GitHub
+, or background interactions using any in error handlers
+GitHub
+). It’s better to define proper return types to catch mistakes. Consider tightening these types (define a return interface or use the already generated types like UserBackgroundPreference instead of any). This will make the code more self-documenting and prevent type mismatches.
+Error Handling: The global error handler is in place
+GitHub
+ – ensure all async route handlers either use try/catch or pass errors to next() so that the global handler can respond with JSON. During the audit, we didn’t see uncaught promise warnings, so this is likely okay. Just verify that new code (like in your blockchain or background services) bubbles up errors properly. For instance, in openTimestampsService, if an error occurs after some async calls, it’s caught and logged, but make sure the calling route is aware if something truly failed (perhaps by throwing after logging, so the client isn’t left hanging or given a false “pending” status).
+SQL Safety: Using Drizzle ORM helps avoid SQL injection, and you’re parameterizing raw SQL in the few places you use it (e.g. pool.query in ensureAdminUser and minimal schema creation). Continue to follow that pattern. One thing to watch: in ensureAdminUser, you construct the INSERT with string interpolation for the table name and fields – that’s fine (they are static), but the values use parameterized $1, $2, ... which is good
+GitHub
+. Just ensure any raw SQL (like the manual deletion in deleteWork) is similarly careful. The given code uses template literals only for table names and uses Drizzle’s sql helper for values or constraints (e.g. sql\GREATEST(...)``) which is safe.
