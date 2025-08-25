@@ -4895,10 +4895,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📨 Fetching community posts...");
       console.log("Session userId:", req.session?.userId);
       
-      const limit = parseInt(req.query.limit as string) || 20;
-      const offset = parseInt(req.query.offset as string) || 0;
-      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      const limit = req.query.limit !== undefined ? Number(req.query.limit) : 20;
+      const offset = req.query.offset !== undefined ? Number(req.query.offset) : 0;
+      const userId = req.query.userId !== undefined ? Number(req.query.userId) : undefined;
       const currentUserId = req.session?.userId; // Optional for like status
+      
+      if (req.query.limit !== undefined && Number.isNaN(limit)) {
+        return res.status(400).json({ error: 'Invalid limit parameter' });
+      }
+      if (req.query.offset !== undefined && Number.isNaN(offset)) {
+        return res.status(400).json({ error: 'Invalid offset parameter' });
+      }
+      if (req.query.userId !== undefined && Number.isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid userId parameter' });
+      }
       
       console.log("Query params:", { limit, offset, userId, currentUserId });
       
@@ -4955,7 +4965,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single post
   app.get("/api/community/posts/:id", async (req, res) => {
     try {
-      const post = await storage.getPost(req.params.id);
+      const postId = Number(req.params.id);
+      
+      if (Number.isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      
+      const post = await storage.getPost(postId.toString());
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
@@ -4970,9 +4986,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/community/posts/:id/like", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.session!.userId;
-      const postId = req.params.id;
+      const postId = Number(req.params.id);
       
-      await storage.likePost(userId, postId);
+      if (Number.isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      
+      await storage.likePost(userId, postId.toString());
       
       // Track analytics for engagement
       await storage.recordUserActivity(userId, {
@@ -4990,14 +5010,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/community/posts/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.session!.userId;
-      const postId = req.params.id;
+      const postId = Number(req.params.id);
+      
+      if (Number.isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
       
       // Get user to check if they're admin
       const user = await storage.getUser(userId);
       const isAdmin = user?.role === 'admin';
       
       // Get the post to check ownership
-      const post = await storage.getPost(postId);
+      const post = await storage.getPost(postId.toString());
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
@@ -5007,7 +5031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "You can only delete your own posts" });
       }
       
-      await storage.deletePost(postId, userId);
+      await storage.deletePost(postId.toString(), userId);
       
       // Log admin action if admin is deleting someone else's post
       if (isAdmin && post.userId !== userId) {
@@ -5016,7 +5040,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             adminId: userId,
             action: 'post_deleted',
             targetType: 'post',
-            targetId: postId,
+            targetId: postId.toString(),
             details: JSON.stringify({ 
               reason: 'Admin deletion',
               originalUserId: post.userId,
@@ -5049,8 +5073,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Comment content is required" });
       }
       
+      const parsedPostId = Number(postId);
+      
+      if (Number.isNaN(parsedPostId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      
       const comment = await storage.createComment({
-        postId: parseInt(postId),
+        postId: parsedPostId,
         userId,
         content: content.trim(),
         parentId: parentId || null,
@@ -5071,12 +5101,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/posts/:id/comments", async (req, res) => {
     try {
-      const postId = parseInt(req.params.id);
-      const { limit = 50, offset = 0 } = req.query;
+      const postId = Number(req.params.id);
+      const limit = req.query.limit !== undefined ? Number(req.query.limit) : 50;
+      const offset = req.query.offset !== undefined ? Number(req.query.offset) : 0;
+      
+      if (Number.isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      if (req.query.limit !== undefined && Number.isNaN(limit)) {
+        return res.status(400).json({ error: 'Invalid limit parameter' });
+      }
+      if (req.query.offset !== undefined && Number.isNaN(offset)) {
+        return res.status(400).json({ error: 'Invalid offset parameter' });
+      }
       
       const comments = await storage.getPostComments(postId.toString(), {
-        limit: Number(limit),
-        offset: Number(offset),
+        limit,
+        offset,
       });
       
       res.json(comments);

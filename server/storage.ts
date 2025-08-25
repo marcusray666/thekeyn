@@ -763,7 +763,7 @@ export class DatabaseStorage implements IStorage {
         profileImageUrl: users.profileImageUrl,
         isLiked: sql<boolean>`EXISTS (
           SELECT 1 FROM ${postReactions} 
-          WHERE ${postReactions.postId} = ${posts.id} 
+          WHERE ${postReactions.postId}::text = ${posts.id} 
           AND ${postReactions.userId} = ${currentUserId || -1}
           AND ${postReactions.type} = 'like'
         )`.as('isLiked'),
