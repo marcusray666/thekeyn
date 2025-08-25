@@ -23,8 +23,8 @@ interface CommunityPostCardProps {
 }
 
 export function CommunityPostCard({ post, currentUserId, isAdmin = false }: CommunityPostCardProps) {
-  const [isLiked, setIsLiked] = useState(post.isLiked || false);
-  const [likes, setLikes] = useState(post.likes);
+  const [isLiked, setIsLiked] = useState(false); // isLiked not in schema
+  const [likes, setLikes] = useState(post.likes || 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
