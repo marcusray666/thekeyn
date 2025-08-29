@@ -11,7 +11,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { config } from "./config/environment.js";
 import { fileURLToPath } from 'url';
-import { storage } from "./storage";
+import { storage, uploadToR2 } from "./storage";
 import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import { createPostSchema, uploadUrlSchema, workUploadSchema, createApiError, isAllowedMediaType } from "@shared/validation";
 import blockchainRoutes from "./routes/blockchain-routes";
@@ -260,25 +260,9 @@ const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextF
   }
 };
 
-// Set up multer for file uploads
-const storage_multer = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = "uploads";
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const randomString = crypto.randomBytes(8).toString("hex");
-    const extension = path.extname(file.originalname);
-    cb(null, `${timestamp}-${randomString}${extension}`);
-  },
-});
-
+// Set up multer for file uploads (using memory storage for R2 upload)
 const upload = multer({
-  storage: storage_multer,
+  storage: multer.memoryStorage(), // Store files in memory as Buffer for R2 upload
   limits: {
     fileSize: 2 * 1024 * 1024 * 1024, // 2GB limit for 4K videos
   },
@@ -3174,7 +3158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let imageUrl = null;
       let fileType = null;
 
-      // Handle file upload
+      // Handle file upload to R2
       if (file) {
         console.log("File upload details:", {
           filename: file.filename,
@@ -3183,28 +3167,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           size: file.size
         });
         
-        imageUrl = file.filename;
-        const mimeType = file.mimetype.toLowerCase();
-        
-        // More specific file type detection
-        if (mimeType.startsWith('image/')) {
-          fileType = 'image';
-        } else if (mimeType.startsWith('video/') || 
-                   mimeType === 'video/quicktime' || 
-                   mimeType === 'video/x-msvideo' ||
-                   mimeType === 'video/avi' ||
-                   mimeType === 'video/mov') {
-          fileType = 'video';
-          console.log("Detected video file:", mimeType);
-        } else if (mimeType.startsWith('audio/')) {
-          fileType = 'audio';
-        } else if (mimeType === 'application/pdf') {
-          fileType = 'document';
-        } else {
-          fileType = 'document';
+        try {
+          // Upload to R2 and get CDN URL
+          const { url } = await uploadToR2({
+            buffer: file.buffer,
+            originalName: file.originalname,
+            mimetype: file.mimetype,
+            prefix: `posts/${userId}`,
+          });
+          
+          imageUrl = url; // Store CDN URL instead of local filename
+          
+          const mimeType = file.mimetype.toLowerCase();
+          
+          // More specific file type detection
+          if (mimeType.startsWith('image/')) {
+            fileType = 'image';
+          } else if (mimeType.startsWith('video/') || 
+                     mimeType === 'video/quicktime' || 
+                     mimeType === 'video/x-msvideo' ||
+                     mimeType === 'video/avi' ||
+                     mimeType === 'video/mov') {
+            fileType = 'video';
+            console.log("Detected video file:", mimeType);
+          } else if (mimeType.startsWith('audio/')) {
+            fileType = 'audio';
+          } else if (mimeType === 'application/pdf') {
+            fileType = 'document';
+          } else {
+            fileType = 'document';
+          }
+          
+          console.log("Detected file type:", fileType, "CDN URL:", url);
+        } catch (uploadError) {
+          console.error("Error uploading to R2:", uploadError);
+          throw new Error("File upload failed");
         }
-        
-        console.log("Detected file type:", fileType);
       }
 
       const parsedTags = tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : [];

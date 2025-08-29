@@ -20,7 +20,44 @@ import {
 import { db } from "./db";
 import { eq, desc, and, gte, sql, ne, isNull, ilike, or, lt, gt } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import crypto from "crypto";
+import crypto, { randomUUID } from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import path from "path";
+import mime from "mime-types";
+
+// Initialize Cloudflare R2 client
+const r2 = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
+export async function uploadToR2(opts: {
+  buffer: Buffer;
+  originalName: string;       // e.g. file.name
+  mimetype?: string;          // e.g. file.type
+  prefix?: string;            // e.g. `posts/${postId}` or `works/${workId}`
+}) {
+  const ext = path.extname(opts.originalName) || "";
+  const key = `${opts.prefix ?? "uploads"}/${randomUUID()}${ext}`.replace(/^\/+/, "");
+  const ct = (opts.mimetype && String(opts.mimetype)) ||
+             (mime.lookup(ext) || "application/octet-stream").toString();
+
+  await r2.send(new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET!,
+    Key: key,
+    Body: opts.buffer,
+    ContentType: ct,                              // <- critical
+    CacheControl: "public, max-age=31536000, immutable",
+  }));
+
+  const base = process.env.ASSET_BASE_URL ?? "https://cdn.thekeyn.com"; // your custom domain
+  const url = `${base}/${encodeURI(key)}`;
+  return { key, url, contentType: ct };
+}
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;

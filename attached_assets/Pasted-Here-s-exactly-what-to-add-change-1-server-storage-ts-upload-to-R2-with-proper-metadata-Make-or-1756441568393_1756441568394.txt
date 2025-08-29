@@ -1,0 +1,74 @@
+Here’s exactly what to add/change.
+1) server/storage.ts – upload to R2 with proper metadata
+Make (or edit) a helper that uploads the file to Cloudflare R2 and sets ContentType + CacheControl, and returns the CDN URL you’ll store in DB.
+// server/storage.ts
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuid } from "uuid";
+import path from "path";
+import mime from "mime-types";
+
+const r2 = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
+export async function uploadToR2(opts: {
+  buffer: Buffer;
+  originalName: string;       // e.g. file.name
+  mimetype?: string;          // e.g. file.type
+  prefix?: string;            // e.g. `posts/${postId}` or `works/${workId}`
+}) {
+  const ext = path.extname(opts.originalName) || "";
+  const key = `${opts.prefix ?? "uploads"}/${uuid()}${ext}`.replace(/^\/+/, "");
+  const ct = (opts.mimetype && String(opts.mimetype)) ||
+             (mime.lookup(ext) || "application/octet-stream").toString();
+
+  await r2.send(new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET!,
+    Key: key,
+    Body: opts.buffer,
+    ContentType: ct,                              // <- critical
+    CacheControl: "public, max-age=31536000, immutable",
+  }));
+
+  const base = process.env.ASSET_BASE_URL ?? "https://cdn.thekeyn.com"; // your custom domain
+  const url = `${base}/${encodeURI(key)}`;
+  return { key, url, contentType: ct };
+}
+2) server/routes.ts – use the helper and save the CDN URL
+Where you handle the form upload (e.g., POST /api/community/posts or “Protect Your Work”), call uploadToR2(...) and persist the returned url into posts.image_url (or the correct column for works).
+Example (pseudo-Express/Hono; adapt to your parser):
+import { uploadToR2 } from "./storage";
+// …
+app.post("/api/community/posts", async (c) => {
+  const userId = c.get("userId");
+  const form = await c.req.parseBody();        // or your multer/busboy/etc
+  const file = form["file"];                   // adapt: Buffer + name + mimetype
+
+  let imageUrl: string | null = null;
+  if (file) {
+    const { buffer, name, type } = file;       // adapt to your lib
+    const { url } = await uploadToR2({
+      buffer,
+      originalName: name,
+      mimetype: type,
+      prefix: `posts/${userId}`,               // or `works/${workId}`
+    });
+    imageUrl = url;                            // <- save this
+  }
+
+  const post = await db.createPost({
+    id: crypto.randomUUID(),                   // TEXT id now OK
+    userId,
+    title: form["title"],
+    description: form["description"],
+    image_url: imageUrl,                       // <- important
+    // …other fields
+  });
+
+  return c.json({ ok: true, post });
+});
