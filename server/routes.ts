@@ -3161,6 +3161,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
+      // Debug incoming request
+      console.log("📨 Incoming post request:", {
+        headers: req.headers['content-type'],
+        hasFile: !!req.file,
+        bodyKeys: Object.keys(req.body),
+        fileDetails: req.file ? {
+          fieldname: req.file.fieldname,
+          originalname: req.file.originalname,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+          hasBuffer: !!req.file.buffer
+        } : null
+      });
+
       const { title, description, content, tags, location, mentionedUsers, isProtected, protectedWorkId } = req.body;
       const file = req.file;
 

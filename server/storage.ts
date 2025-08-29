@@ -42,6 +42,14 @@ export async function uploadToR2(opts: {
   prefix?: string;            // e.g. `posts/${postId}` or `works/${workId}`
 }) {
   try {
+    // Validate required parameters
+    if (!opts.buffer) {
+      throw new Error("Buffer is required for R2 upload");
+    }
+    if (!opts.originalName) {
+      throw new Error("Original file name is required for R2 upload");
+    }
+
     console.log("🔧 R2 Upload Config:", {
       bucket: process.env.R2_BUCKET,
       accountId: process.env.R2_ACCOUNT_ID ? "SET" : "MISSING",
@@ -58,8 +66,9 @@ export async function uploadToR2(opts: {
     console.log("📤 Uploading to R2:", {
       key,
       contentType: ct,
-      bufferSize: opts.buffer.length,
-      originalName: opts.originalName
+      bufferSize: opts.buffer?.length || "UNDEFINED",
+      originalName: opts.originalName,
+      hasBuffer: !!opts.buffer
     });
 
     const command = new PutObjectCommand({
