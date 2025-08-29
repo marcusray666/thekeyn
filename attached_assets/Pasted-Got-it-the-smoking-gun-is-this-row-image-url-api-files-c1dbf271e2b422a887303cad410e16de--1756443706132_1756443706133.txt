@@ -1,0 +1,156 @@
+Got it — the smoking gun is this row:
+
+```
+image_url = /api/files/c1dbf271e2b422a887303cad410e16de
+```
+
+That means your app is still saving a **local API path** (`/api/files/...`) instead of a **public CDN URL**. After a redeploy those local files are gone, so the modal shows a broken image. And because nothing is writing to R2, your bucket stays empty.
+
+Here’s exactly what to change.
+
+---
+
+## 1) Wire uploads to Cloudflare R2
+
+**server/storage.ts** (or wherever you handle file saves)
+
+```ts
+// install: npm i @aws-sdk/client-s3
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import crypto from "crypto";
+
+const accountId = process.env.R2_ACCOUNT_ID!;
+const bucket    = process.env.R2_BUCKET!;
+const baseUrl   = process.env.ASSET_BASE_URL!; // e.g. https://cdn.thekeyn.com
+
+export const s3 = new S3Client({
+  region: "auto",
+  endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId:     process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+  forcePathStyle: true,
+});
+
+export async function saveToR2(file: {
+  buffer: Buffer;
+  mime: string;
+  name: string;
+}) {
+  const safeName = file.name.replace(/\s+/g, "-");
+  const key = `uploads/${crypto.randomUUID()}-${safeName}`;
+
+  await s3.send(new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: file.buffer,
+    ContentType: file.mime || "application/octet-stream", // IMPORTANT
+    CacheControl: "public, max-age=31536000, immutable",
+  }));
+
+  return { key, publicUrl: `${baseUrl}/${key}` };
+}
+```
+
+---
+
+## 2) Save the **publicUrl** to your posts table
+
+In your post-creation route (looks like `server/routes.ts`, the handler for `POST /api/community/posts`):
+
+```ts
+// pseudo-Express/Multer; adapt to your framework
+let imageUrl: string | null = null;
+
+if (req.file) {
+  const { publicUrl } = await saveToR2({
+    buffer: req.file.buffer,
+    mime: req.file.mimetype,
+    name: req.file.originalname,
+  });
+  imageUrl = publicUrl;            // <-- store the CDN URL, not /api/files/...
+}
+
+await db.insert(posts).values({
+  id: crypto.randomUUID(),         // you’re using TEXT IDs now
+  userId: currentUserId,
+  title,
+  description,
+  image_url: imageUrl,
+  // ... other columns
+});
+```
+
+Anywhere you currently do something like:
+
+```ts
+image_url = `/api/files/${someId}`
+```
+
+change it to the **CDN URL returned by `saveToR2`**.
+
+---
+
+## 3) Make the reader use the `image_url` directly
+
+Front-end render should be:
+
+```jsx
+<img src={post.image_url} alt={post.title} />
+```
+
+(no more `/api/files/...` indirection)
+
+---
+
+## 4) Optional backward-compat route (temporary)
+
+If parts of the UI still call `/api/files/:key`, add a simple redirect:
+
+```ts
+app.get("/api/files/:key(*)", (req, res) => {
+  const key = req.params.key; // only works if you stored the real object key
+  res.redirect(302, `${process.env.ASSET_BASE_URL}/${key}`);
+});
+```
+
+⚠️ Your DB currently stores a **random id** (not an R2 key), so this redirect won’t fix existing rows. The real fix is step 2: store the CDN URL (or at least the object **key**) going forward.
+
+---
+
+## 5) Verify quickly
+
+1. Upload a new post.
+2. In psql:
+
+```sql
+SELECT id, image_url
+FROM posts
+ORDER BY created_at DESC
+LIMIT 3;
+```
+
+You should see `https://cdn.thekeyn.com/...` values.
+
+3. In Cloudflare R2 → **Objects**, you should see a new `uploads/<uuid>-<filename>` key.
+4. Open the `image_url` in a new browser tab — it should load with a **200** and correct `Content-Type` in the Network panel.
+
+---
+
+## 6) What about the old broken images?
+
+Those were saved to the container’s filesystem and are gone after redeploy. Re-upload them so new CDN URLs are saved, or remove those posts. (If you still have the original files, we can script a one-time backfill to R2 and update `posts.image_url`.)
+
+---
+
+## 7) Common gotchas (quick checklist)
+
+* All these env vars exist in Railway and match your code:
+  `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `ASSET_BASE_URL`
+* `forcePathStyle: true` and `region: "auto"` are set.
+* You set `ContentType` on `PutObjectCommand`.
+* CORS in R2 allows your site origins for **GET/HEAD** (you already did).
+* Your DB now stores **full CDN URLs** going forward.
+
+If you paste your current upload handler (the function that returns `/api/files/...`) I’ll mark the exact lines to replace with `saveToR2` + `publicUrl`.

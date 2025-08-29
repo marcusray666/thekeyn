@@ -2190,7 +2190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               createdAt: certificate.createdAt
             } : null,
             isShareable: !!certificate && work.isPublic, // Only shareable if has certificate and is public
-            filePreview: work.mimeType?.startsWith('image/') ? `/api/files/${work.filename}` : null
+            filePreview: work.mimeType?.startsWith('image/') ? (work.filename?.startsWith('http') ? work.filename : `/api/files/${work.filename}`) : null
           };
         })
       );
@@ -2595,15 +2595,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Avatar upload:', {
         userId,
-        filename: file.filename,
         originalname: file.originalname,
         mimetype: file.mimetype,
         size: file.size
       });
 
-      // Update user profile with new avatar URL
-      const profileImageUrl = `/api/files/${file.filename}`;
-      await storage.updateUser(userId, { profileImageUrl });
+      try {
+        // Upload to R2 and get CDN URL
+        const { url } = await uploadToR2({
+          buffer: file.buffer,
+          originalName: file.originalname,
+          mimetype: file.mimetype,
+          prefix: `avatars/${userId}`,
+        });
+
+        // Update user profile with new avatar CDN URL
+        const profileImageUrl = url;
+        await storage.updateUser(userId, { profileImageUrl });
+        
+        console.log("Avatar uploaded to R2:", url);
+      } catch (uploadError) {
+        console.error("Error uploading avatar to R2:", uploadError);
+        throw new Error("Avatar upload failed");
+      }
 
       // Return updated user data
       const updatedUser = await storage.getUser(userId);
@@ -2616,7 +2630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         message: "Avatar updated successfully",
         user: userWithoutPassword,
-        avatarUrl: profileImageUrl
+        avatarUrl: updatedUser.profileImageUrl
       });
     } catch (error) {
       console.error("Error uploading avatar:", error);
@@ -2839,7 +2853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filename: post.filename || (post.imageUrl ? post.imageUrl.split('/').pop() : null),
         fileType: post.fileType || 'text',
         mimeType: post.mimeType || 'text/plain',
-        fileUrl: post.filename ? `/api/files/${post.filename}` : (post.imageUrl ? `/api/files/${post.imageUrl}` : null),
+        fileUrl: post.imageUrl || null, // Use the actual imageUrl (CDN URL) directly
         fileSize: post.fileSize || 0,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
@@ -4839,18 +4853,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fileSize = null;
 
       if (req.file) {
-        imageUrl = `/api/files/${req.file.filename}`;
-        filename = req.file.filename;
-        mimeType = req.file.mimetype;
-        fileSize = req.file.size;
-        
-        // Determine file type category
-        if (mimeType.startsWith('image/')) fileType = 'image';
-        else if (mimeType.startsWith('video/')) fileType = 'video';
-        else if (mimeType.startsWith('audio/')) fileType = 'audio';
-        else if (mimeType === 'application/pdf') fileType = 'pdf';
-        else if (mimeType.startsWith('text/')) fileType = 'text';
-        else fileType = 'document';
+        try {
+          // Upload to R2 and get CDN URL
+          const { url } = await uploadToR2({
+            buffer: req.file.buffer,
+            originalName: req.file.originalname,
+            mimetype: req.file.mimetype,
+            prefix: `community/${userId}`,
+          });
+          
+          imageUrl = url; // Store CDN URL instead of local path
+          filename = req.file.originalname; // Keep original filename
+          mimeType = req.file.mimetype;
+          fileSize = req.file.size;
+          
+          // Determine file type category
+          if (mimeType.startsWith('image/')) fileType = 'image';
+          else if (mimeType.startsWith('video/')) fileType = 'video';
+          else if (mimeType.startsWith('audio/')) fileType = 'audio';
+          else if (mimeType === 'application/pdf') fileType = 'pdf';
+          else if (mimeType.startsWith('text/')) fileType = 'text';
+          else fileType = 'document';
+          
+          console.log("Community post file uploaded to R2:", url);
+        } catch (uploadError) {
+          console.error("Error uploading community post file to R2:", uploadError);
+          throw new Error("File upload failed");
+        }
       }
 
       console.log("📝 Creating post with title:", title?.trim());
