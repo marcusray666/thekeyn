@@ -41,22 +41,52 @@ export async function uploadToR2(opts: {
   mimetype?: string;          // e.g. file.type
   prefix?: string;            // e.g. `posts/${postId}` or `works/${workId}`
 }) {
-  const ext = path.extname(opts.originalName) || "";
-  const key = `${opts.prefix ?? "uploads"}/${randomUUID()}${ext}`.replace(/^\/+/, "");
-  const ct = (opts.mimetype && String(opts.mimetype)) ||
-             (mime.lookup(ext) || "application/octet-stream").toString();
+  try {
+    console.log("🔧 R2 Upload Config:", {
+      bucket: process.env.R2_BUCKET,
+      accountId: process.env.R2_ACCOUNT_ID ? "SET" : "MISSING",
+      accessKey: process.env.R2_ACCESS_KEY_ID ? "SET" : "MISSING",
+      secretKey: process.env.R2_SECRET_ACCESS_KEY ? "SET" : "MISSING",
+      assetBaseUrl: process.env.ASSET_BASE_URL
+    });
 
-  await r2.send(new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET!,
-    Key: key,
-    Body: opts.buffer,
-    ContentType: ct,                              // <- critical
-    CacheControl: "public, max-age=31536000, immutable",
-  }));
+    const ext = path.extname(opts.originalName) || "";
+    const key = `${opts.prefix ?? "uploads"}/${randomUUID()}${ext}`.replace(/^\/+/, "");
+    const ct = (opts.mimetype && String(opts.mimetype)) ||
+               (mime.lookup(ext) || "application/octet-stream").toString();
 
-  const base = process.env.ASSET_BASE_URL ?? "https://cdn.thekeyn.com"; // your custom domain
-  const url = `${base}/${encodeURI(key)}`;
-  return { key, url, contentType: ct };
+    console.log("📤 Uploading to R2:", {
+      key,
+      contentType: ct,
+      bufferSize: opts.buffer.length,
+      originalName: opts.originalName
+    });
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET!,
+      Key: key,
+      Body: opts.buffer,
+      ContentType: ct,
+      CacheControl: "public, max-age=31536000, immutable",
+    });
+
+    const result = await r2.send(command);
+    console.log("✅ R2 Upload successful:", result);
+
+    const base = process.env.ASSET_BASE_URL ?? "https://cdn.thekeyn.com";
+    const url = `${base}/${encodeURI(key)}`;
+    
+    console.log("🌐 Generated CDN URL:", url);
+    return { key, url, contentType: ct };
+  } catch (error) {
+    console.error("❌ R2 Upload failed:", {
+      error: error.message,
+      stack: error.stack,
+      originalName: opts.originalName,
+      bufferSize: opts.buffer?.length || 0
+    });
+    throw new Error(`R2 upload failed: ${error.message}`);
+  }
 }
 
 export interface IStorage {
