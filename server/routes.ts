@@ -2147,10 +2147,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/community/posts/:postId/visibility", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user!.id;
-      const postId = parseInt(req.params.postId);
+      const postId = req.params.postId;
       const { isHidden } = req.body;
       
-      if (isNaN(postId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: "Invalid post ID" });
       }
 
@@ -4715,8 +4715,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // URL Preview API endpoints
   app.get("/api/preview/posts/:id", async (req: AuthenticatedRequest, res) => {
     try {
-      const postId = parseInt(req.params.id);
-      if (isNaN(postId)) {
+      const postId = req.params.id;
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: "Invalid post ID" });
       }
 
@@ -4965,13 +4965,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single post
   app.get("/api/community/posts/:id", async (req, res) => {
     try {
-      const postId = Number(req.params.id);
+      const postId = req.params.id;
       
-      if (Number.isNaN(postId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: 'Invalid post ID' });
       }
       
-      const post = await storage.getPost(postId.toString());
+      const post = await storage.getPost(postId);
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
@@ -4986,13 +4986,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/community/posts/:id/like", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.session!.userId;
-      const postId = Number(req.params.id);
+      const postId = req.params.id;
       
-      if (Number.isNaN(postId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: 'Invalid post ID' });
       }
       
-      await storage.likePost(userId, postId.toString());
+      await storage.likePost(userId, postId);
       
       // Track analytics for engagement
       await storage.recordUserActivity(userId, {
@@ -5010,9 +5010,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/community/posts/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.session!.userId;
-      const postId = Number(req.params.id);
+      const postId = req.params.id;
       
-      if (Number.isNaN(postId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: 'Invalid post ID' });
       }
       
@@ -5021,7 +5021,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isAdmin = user?.role === 'admin';
       
       // Get the post to check ownership
-      const post = await storage.getPost(postId.toString());
+      const post = await storage.getPost(postId);
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
@@ -5031,7 +5031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "You can only delete your own posts" });
       }
       
-      await storage.deletePost(postId.toString(), userId);
+      await storage.deletePost(postId, userId);
       
       // Log admin action if admin is deleting someone else's post
       if (isAdmin && post.userId !== userId) {
@@ -5073,14 +5073,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Comment content is required" });
       }
       
-      const parsedPostId = Number(postId);
-      
-      if (Number.isNaN(parsedPostId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: 'Invalid post ID' });
       }
       
       const comment = await storage.createComment({
-        postId: parsedPostId,
+        postId,
         userId,
         content: content.trim(),
         parentId: parentId || null,
@@ -5101,11 +5099,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/posts/:id/comments", async (req, res) => {
     try {
-      const postId = Number(req.params.id);
+      const postId = req.params.id;
       const limit = req.query.limit !== undefined ? Number(req.query.limit) : 50;
       const offset = req.query.offset !== undefined ? Number(req.query.offset) : 0;
       
-      if (Number.isNaN(postId)) {
+      if (!postId || postId.trim() === '') {
         return res.status(400).json({ error: 'Invalid post ID' });
       }
       if (req.query.limit !== undefined && Number.isNaN(limit)) {
@@ -5115,7 +5113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid offset parameter' });
       }
       
-      const comments = await storage.getPostComments(postId.toString(), {
+      const comments = await storage.getPostComments(postId, {
         limit,
         offset,
       });
