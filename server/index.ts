@@ -269,6 +269,17 @@ app.use(session({
         if (user_count > 30 || work_count > 10) {
           console.log('🛡️ Production data detected - using extra safety measures');
         }
+        
+        // Verify R2 environment variables
+        console.log("🔧 R2 Configuration Status:");
+        console.log("  R2_ACCOUNT_ID:", process.env.R2_ACCOUNT_ID ? "✅ SET" : "❌ MISSING");
+        console.log("  R2_ACCESS_KEY_ID:", process.env.R2_ACCESS_KEY_ID ? "✅ SET" : "❌ MISSING");
+        console.log("  R2_SECRET_ACCESS_KEY:", process.env.R2_SECRET_ACCESS_KEY ? "✅ SET" : "❌ MISSING");
+        console.log("  R2_BUCKET:", process.env.R2_BUCKET ? `✅ SET (${process.env.R2_BUCKET})` : "❌ MISSING");
+        console.log("  ASSET_BASE_URL:", process.env.ASSET_BASE_URL ? `✅ SET (${process.env.ASSET_BASE_URL})` : "❌ MISSING");
+        if (process.env.R2_ACCOUNT_ID) {
+          console.log("  R2 Endpoint:", `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`);
+        }
       } catch (err) {
         console.log('📊 Database appears empty or inaccessible');
       }

@@ -1,0 +1,157 @@
+You’ve got two separate issues showing in those logs:
+
+## 1) “No value provided for input HTTP label: **Bucket**”
+
+That only happens when the S3 client is called without a `Bucket` value. In production this usually means your env var isn’t set or the code is reading the wrong name.
+
+**Fix**
+In Railway → Variables, make sure these exist (and redeploy after saving):
+
+* `R2_ACCOUNT_ID` – your Cloudflare account ID
+* `R2_ACCESS_KEY_ID` – from the R2 API token
+* `R2_SECRET_ACCESS` (or `R2_SECRET_ACCESS_KEY` if your code uses that exact name)
+* `R2_BUCKET` – the bucket name (e.g. `thekeyn-uploads`)
+* `ASSET_BASE_URL` – `https://cdn.thekeyn.com` (or your public/dev R2 URL)
+
+Add a tiny startup log once (and delete later) to confirm they’re present:
+
+```ts
+console.log('R2 env present?',
+  !!process.env.R2_ACCOUNT_ID,
+  !!process.env.R2_ACCESS_KEY_ID,
+  !!process.env.R2_SECRET_ACCESS,
+  process.env.R2_BUCKET);
+```
+
+---
+
+## 2) “Cannot read properties of undefined (reading ‘length’)”
+
+This is coming from your upload handler. `req.file` is **undefined**, and your code tries `req.file.buffer.length`. That happens when:
+
+* Multer is using **disk storage** (no `file.buffer`), or
+* The field name doesn’t match (`upload.single('file')` but the client posts `image`, etc.), or
+* The request has no file.
+
+**Fix (server-side upload to R2 using memory storage + consistent field name)**
+
+### `storage.ts`
+
+```ts
+// storage.ts
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+const {
+  R2_ACCOUNT_ID,
+  R2_ACCESS_KEY_ID,
+  R2_SECRET_ACCESS,
+  R2_BUCKET,
+  ASSET_BASE_URL,
+} = process.env;
+
+export const r2 = new S3Client({
+  region: 'auto',
+  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: R2_ACCESS_KEY_ID!,
+    secretAccessKey: R2_SECRET_ACCESS!,
+  },
+});
+
+export async function uploadToR2(file: Express.Multer.File) {
+  if (!file) throw new Error('No file received');
+
+  // put files in a folder; sanitize name
+  const safe = file.originalname.replace(/[^a-zA-Z0-9._-]+/g, '_');
+  const key = `uploads/${Date.now()}_${safe}`;
+
+  await r2.send(new PutObjectCommand({
+    Bucket: R2_BUCKET!,            // <-- MUST be defined
+    Key: key,
+    Body: file.buffer,             // requires memoryStorage
+    ContentType: file.mimetype,
+    CacheControl: 'public, max-age=31536000, immutable',
+  }));
+
+  const url = `${ASSET_BASE_URL!.replace(/\/$/,'')}/${key}`;
+  return { key, url };
+}
+
+export function assetUrl(key: string) {
+  return `${ASSET_BASE_URL!.replace(/\/$/,'')}/${key}`;
+}
+```
+
+### `routes.ts`
+
+```ts
+import multer from 'multer';
+import express from 'express';
+import { uploadToR2, assetUrl } from './storage';
+
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() }); // <<< important
+
+// If you create posts and optionally attach a file:
+router.post('/api/community/posts', upload.single('file'), async (req, res) => {
+  try {
+    let imageUrl: string | null = null;
+
+    if (req.file) {
+      const { key, url } = await uploadToR2(req.file);
+      // store the CDN url directly OR just the key (then render with assetUrl)
+      imageUrl = url;
+    }
+
+    // ... create the post, including imageUrl
+    // db.createPost({ ..., image_url: imageUrl, ... });
+
+    res.json({ ok: true, imageUrl });
+  } catch (err) {
+    console.error('Error creating post:', err);
+    res.status(500).json({ error: 'File upload failed' });
+  }
+});
+
+// (Optional) backwards compatibility: redirect old /api/files/:key to CDN
+router.get('/api/files/:key(*)', (req, res) => {
+  const url = assetUrl(req.params.key);
+  res.redirect(302, url);
+});
+
+export default router;
+```
+
+### Front-end (make sure the field name is **file**)
+
+```ts
+const form = new FormData();
+form.append('file', fileInput.files[0]); // name must be 'file'
+form.append('title', title);
+form.append('description', desc);
+
+await fetch('/api/community/posts', { method: 'POST', body: form });
+```
+
+---
+
+## Why your images look broken after redeploy
+
+Your DB shows `image_url = '/api/files/<id>'` (the old local storage path). After moving to R2, either:
+
+* **Keep storing only the key** (e.g., `uploads/123_name.jpg`) and render with `ASSET_BASE_URL + '/' + key`, or
+* **Store the full CDN URL** returned by `uploadToR2` and render it directly.
+
+If you want a quick compatibility layer, keep the `/api/files/:key` route above that **redirects** to the CDN.
+
+---
+
+## Quick checklist to verify
+
+1. Railway Variables contain all 5 values and you redeployed.
+2. Your upload route uses `multer.memoryStorage()` and `upload.single('file')`.
+3. The client sends the file in a field named `file`.
+4. After an upload, check Cloudflare R2 → **Objects** → you should see `uploads/...`.
+5. In the browser Network tab, image requests should be `https://cdn.thekeyn.com/uploads/...` (status 200).
+
+If any of those doesn’t match, tell me which step fails and what log you see, and I’ll zero in on it.
