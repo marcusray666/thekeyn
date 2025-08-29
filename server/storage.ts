@@ -763,7 +763,7 @@ export class DatabaseStorage implements IStorage {
         profileImageUrl: users.profileImageUrl,
         isLiked: sql<boolean>`EXISTS (
           SELECT 1 FROM ${postReactions} 
-          WHERE ${postReactions.postId}::text = ${posts.id} 
+          WHERE ${postReactions.postId} = ${posts.id} 
           AND ${postReactions.userId} = ${currentUserId || -1}
           AND ${postReactions.type} = 'like'
         )`.as('isLiked'),
@@ -797,7 +797,7 @@ export class DatabaseStorage implements IStorage {
     const [existingLike] = await db
       .select()
       .from(postReactions)
-      .where(and(eq(postReactions.postId, parseInt(postId)), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
 
     if (existingLike) {
       // User already liked this post, so this is an unlike action
@@ -807,7 +807,7 @@ export class DatabaseStorage implements IStorage {
 
     // Add like reaction
     await db.insert(postReactions).values({
-      postId: parseInt(postId),
+      postId: postId,
       userId,
       type: 'like'
     });
@@ -826,7 +826,7 @@ export class DatabaseStorage implements IStorage {
     // Remove like reaction
     await db
       .delete(postReactions)
-      .where(and(eq(postReactions.postId, parseInt(postId)), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId), eq(postReactions.type, 'like')));
 
     // Decrement the likes counter
     await db

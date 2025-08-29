@@ -306,7 +306,7 @@ export type UpdatePost = z.infer<typeof updatePostSchema>;
 // Post comments table
 export const postComments = pgTable("post_comments", {
   id: serial("id").primaryKey(),
-  postId: integer("post_id").notNull(), // No foreign key constraint due to type mismatch
+  postId: text("post_id").references(() => posts.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   parentId: integer("parent_id"), // For reply threads
   content: text("content").notNull(),
@@ -319,7 +319,7 @@ export const postComments = pgTable("post_comments", {
 // Post reactions table (for different reaction types)
 export const postReactions = pgTable("post_reactions", {
   id: serial("id").primaryKey(),
-  postId: integer("post_id").notNull(), // No foreign key constraint due to type mismatch
+  postId: text("post_id").references(() => posts.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   type: text("type").notNull(), // 'like', 'love', 'fire', 'star', etc.
   createdAt: timestamp("created_at").defaultNow(),

@@ -1,0 +1,224 @@
+You’re hitting **schema drift** again—this time in the **posts** tables.
+
+From your logs:
+
+* `error: operator does not exist: text = integer` (when fetching posts)
+* `error creating post: invalid input syntax for type integer: "dd687f..."` (when creating a post)
+* earlier: `column "video_url" of relation "posts" does not exist`, `column "moderation_status" … does not exist`
+
+### What that means (plain English)
+
+1. Your **code now creates posts with a UUID string id** (`crypto.randomUUID()`), but in the database **`posts.id` is still an `INTEGER`**. So when you try to insert `"dd68..."` into an integer column, Postgres throws *“invalid input syntax for type integer”*.
+
+2. Some tables that reference posts (e.g. **`post_reactions.post_id`**, **`post_comments.post_id`**) are still `INTEGER`. But your code compares them to **`posts.id`** (string/uuid). That’s why Postgres says *“operator does not exist: text = integer”*.
+
+3. Your code writes/read columns like **`video_url`**, **`audio_url`**, **`file_url`**, **`filename`**, **`file_type`**, **`mime_type`**, **`file_size`**, **`hashtags` (text\[])**, **`mentioned_users` (text\[])**, **`moderation_status`**, **`is_hidden`**, **counters (likes/comments/shares/views)**, etc. Those **columns don’t exist yet** in the DB, so you saw “column … does not exist”.
+
+None of this is a server bug—it's the DB schema not matching the code.
+
+---
+
+## Fix it safely (no data loss)
+
+We’ll make the DB match your code:
+
+* Make `posts.id` **TEXT** (so your existing integer IDs will be preserved as strings; no risky UUID conversions).
+* Make `post_reactions.post_id` and `post_comments.post_id` **TEXT** to match.
+* Add the missing columns your code expects.
+
+> Run the following SQL once against your **production DB** (Railway → your Postgres → **Data** tab → **SQL** button, or via `psql` with your public connection string):
+
+```sql
+BEGIN;
+
+-- 1) Align primary key type to your code (string ids)
+ALTER TABLE posts
+  ALTER COLUMN id TYPE TEXT USING id::text;
+
+-- 2) Make all foreign keys that reference posts.id also TEXT
+DO $$
+BEGIN
+  -- post_reactions.post_id
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='post_reactions' AND column_name='post_id'
+  ) THEN
+    -- Drop FK if present
+    BEGIN
+      ALTER TABLE post_reactions DROP CONSTRAINT IF EXISTS post_reactions_post_id_fkey;
+    EXCEPTION WHEN undefined_object THEN
+      -- ignore
+    END;
+    ALTER TABLE post_reactions
+      ALTER COLUMN post_id TYPE TEXT USING post_id::text;
+    -- Re-create FK (optional if you want FK enforcement)
+    BEGIN
+      ALTER TABLE post_reactions
+        ADD CONSTRAINT post_reactions_post_id_fkey
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN
+      -- ignore
+    END;
+  END IF;
+
+  -- post_comments.post_id
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='post_comments' AND column_name='post_id'
+  ) THEN
+    BEGIN
+      ALTER TABLE post_comments DROP CONSTRAINT IF EXISTS post_comments_post_id_fkey;
+    EXCEPTION WHEN undefined_object THEN
+    END;
+    ALTER TABLE post_comments
+      ALTER COLUMN post_id TYPE TEXT USING post_id::text;
+    BEGIN
+      ALTER TABLE post_comments
+        ADD CONSTRAINT post_comments_post_id_fkey
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN
+    END;
+  END IF;
+END$$;
+
+-- 3) Make sure all columns your code uses exist on posts
+ALTER TABLE posts
+  ADD COLUMN IF NOT EXISTS title               TEXT,
+  ADD COLUMN IF NOT EXISTS description         TEXT,
+  ADD COLUMN IF NOT EXISTS content             TEXT,
+  ADD COLUMN IF NOT EXISTS image_url           TEXT,
+  ADD COLUMN IF NOT EXISTS video_url           TEXT,
+  ADD COLUMN IF NOT EXISTS audio_url           TEXT,
+  ADD COLUMN IF NOT EXISTS file_url            TEXT,
+  ADD COLUMN IF NOT EXISTS filename            TEXT,
+  ADD COLUMN IF NOT EXISTS file_type           TEXT,
+  ADD COLUMN IF NOT EXISTS mime_type           TEXT,
+  ADD COLUMN IF NOT EXISTS file_size           INTEGER,
+  ADD COLUMN IF NOT EXISTS hashtags            TEXT[],
+  ADD COLUMN IF NOT EXISTS location            TEXT,
+  ADD COLUMN IF NOT EXISTS mentioned_users     TEXT[],
+  ADD COLUMN IF NOT EXISTS is_protected        BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS protected_work_id   INTEGER,
+  ADD COLUMN IF NOT EXISTS tags                TEXT[],
+  ADD COLUMN IF NOT EXISTS likes               INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS comments            INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS shares              INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS views               INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS is_hidden           BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS created_at          TIMESTAMP DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS updated_at          TIMESTAMP DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS moderation_status   TEXT;
+
+-- 4) Optional: indexes you’ll likely want
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_reactions_post_id ON post_reactions(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON post_comments(post_id);
+
+COMMIT;
+```
+
+That change is **idempotent** (safe to run again) and will **not erase data**—existing integer IDs become strings like `"123"`; your new posts will use UUID strings like `"dd68..."`. Comparisons will now be `text = text`, and inserts of UUID strings will work.
+
+---
+
+## One tiny code tweak (optional but nice)
+
+You **can** keep setting `id: crypto.randomUUID()` in `createPost`. With the DB now `TEXT`, that’s fine. If you’d rather let the DB generate IDs, you could:
+
+* Remove `id: postId` in `createPost` and
+* Add a default: `ALTER TABLE posts ALTER COLUMN id SET DEFAULT gen_random_uuid()::text;` (requires `CREATE EXTENSION IF NOT EXISTS pgcrypto;`)
+
+But that’s optional—the SQL above already fixes your errors without touching code.
+
+---
+
+## Why your earlier errors happened
+
+* **“`video_url` does not exist”** → the column wasn’t in the DB; we add it.
+* **“operator does not exist: text = integer”** → `posts.id` string vs `post_reactions.post_id` integer; we made them both `TEXT`.
+* **“invalid input syntax for type integer: 'dd68…'”** → inserting a UUID string into `posts.id` integer; we changed `posts.id` to `TEXT`.
+
+---
+
+## After applying the SQL
+
+1. Redeploy the app (or just hit your post-creation flow again).
+2. Watch Railway **Deploy Logs**:
+
+   * The “operator does not exist” and “invalid input syntax” errors should disappear.
+3. Verify you can:
+
+   * Create a post with/without file upload
+   * Like a post (the `EXISTS` subquery now compares text to text)
+   * Fetch posts without errors
+
+---
+
+### Not related to these errors
+
+Your earlier **background preference** issue (singular vs arrays) is separate. Those fixes are already in your code and your DB shows `primary_colors`/`secondary_colors` as `text[]`, which is correct.
+
+---
+
+If you want me to include a **Drizzle schema snippet** for `posts` so your `@shared/schema` matches the DB, here’s a minimal shape you can compare to yours:
+
+```ts
+// in @shared/schema (drizzle-orm/pg-core)
+import { pgTable, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+
+export const posts = pgTable("posts", {
+  id: text("id").primaryKey(),               // TEXT PK
+  userId: integer("user_id").notNull(),      // FK to users.id (int)
+  title: text("title"),
+  description: text("description"),
+  content: text("content"),
+  imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  audioUrl: text("audio_url"),
+  fileUrl: text("file_url"),
+  filename: text("filename"),
+  fileType: text("file_type"),
+  mimeType: text("mime_type"),
+  fileSize: integer("file_size"),
+  hashtags: text("hashtags").array(),
+  location: text("location"),
+  mentionedUsers: text("mentioned_users").array(),
+  isProtected: boolean("is_protected").default(false),
+  protectedWorkId: integer("protected_work_id"),
+  tags: text("tags").array(),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  views: integer("views").default(0),
+  isHidden: boolean("is_hidden").default(false),
+  moderationStatus: text("moderation_status"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// And make sure postReactions/postComments use TEXT for postId:
+export const postReactions = pgTable("post_reactions", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  postId: text("post_id").notNull(),  // <— TEXT now
+  userId: integer("user_id").notNull(),
+  type: text("type").notNull(),       // 'like', etc.
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const postComments = pgTable("post_comments", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  postId: text("post_id").notNull(),  // <— TEXT now
+  userId: integer("user_id").notNull(),
+  content: text("content").notNull(),
+  parentId: integer("parent_id"),
+  mentionedUsers: text("mentioned_users").array(),
+  likes: integer("likes").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+```
+
+---
+
+If you run that SQL, you’ll unblock posting, liking, and fetching posts without breaking existing data.
