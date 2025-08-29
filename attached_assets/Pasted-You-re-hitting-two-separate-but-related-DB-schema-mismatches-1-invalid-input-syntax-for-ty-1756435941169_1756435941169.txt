@@ -1,0 +1,101 @@
+You’re hitting **two separate but related DB/schema mismatches**:
+
+1. **`invalid input syntax for type integer: 'a7daef00-…'`**
+   Your code creates posts with a UUID string (`crypto.randomUUID()`), but the DB column **`posts.id` is `INTEGER`**. Postgres refuses a string in an integer column.
+
+2. **`operator does not exist: text = integer` (from `getPosts`)**
+   In the `isLiked` subquery you compare **`post_reactions.post_id` (INTEGER)** to **`posts.id` (TEXT/UUID in code)**. That type mismatch triggers the operator error.
+
+You also earlier saw “column ‘video\_url’ / ‘moderation\_status’ does not exist” — those are just **missing columns** in `posts` compared to what the code expects.
+
+---
+
+## Fix (align DB to the code)
+
+Keep UUID **string** post IDs (least invasive), and update the DB in place.
+
+### 1) Run this once in psql
+
+```sql
+BEGIN;
+
+-- 1) Drop FKs that point to posts.id so we can change types
+ALTER TABLE IF EXISTS post_comments  DROP CONSTRAINT IF EXISTS post_comments_post_id_fkey;
+ALTER TABLE IF EXISTS post_reactions DROP CONSTRAINT IF EXISTS post_reactions_post_id_fkey;
+
+-- 2) Change child tables first: INTEGER -> TEXT
+ALTER TABLE IF EXISTS post_comments  ALTER COLUMN post_id  TYPE text USING post_id::text;
+ALTER TABLE IF EXISTS post_reactions ALTER COLUMN post_id  TYPE text USING post_id::text;
+
+-- 3) Change parent key: posts.id INTEGER -> TEXT
+ALTER TABLE posts ALTER COLUMN id TYPE text USING id::text;
+
+-- If posts.id had a sequence default, drop it (code supplies the UUID)
+ALTER TABLE posts ALTER COLUMN id DROP DEFAULT;
+
+-- 4) Add any columns your code uses but the DB lacks
+ALTER TABLE posts
+  ADD COLUMN IF NOT EXISTS title              text,
+  ADD COLUMN IF NOT EXISTS description        text,
+  ADD COLUMN IF NOT EXISTS content            text,
+  ADD COLUMN IF NOT EXISTS image_url          text,
+  ADD COLUMN IF NOT EXISTS video_url          text,
+  ADD COLUMN IF NOT EXISTS audio_url          text,
+  ADD COLUMN IF NOT EXISTS file_url           text,
+  ADD COLUMN IF NOT EXISTS filename           text,
+  ADD COLUMN IF NOT EXISTS file_type          text,
+  ADD COLUMN IF NOT EXISTS mime_type          text,
+  ADD COLUMN IF NOT EXISTS file_size          integer,
+  ADD COLUMN IF NOT EXISTS hashtags           text[] DEFAULT ARRAY[]::text[],
+  ADD COLUMN IF NOT EXISTS location           text,
+  ADD COLUMN IF NOT EXISTS mentioned_users    text[] DEFAULT ARRAY[]::text[],
+  ADD COLUMN IF NOT EXISTS is_protected       boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS protected_work_id  integer,
+  ADD COLUMN IF NOT EXISTS is_hidden          boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS tags               text[] DEFAULT ARRAY[]::text[],
+  ADD COLUMN IF NOT EXISTS likes              integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS comments           integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS shares             integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS views              integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS created_at         timestamp DEFAULT now(),
+  ADD COLUMN IF NOT EXISTS updated_at         timestamp DEFAULT now();
+
+-- 5) Recreate FKs
+ALTER TABLE IF EXISTS post_comments
+  ADD CONSTRAINT post_comments_post_id_fkey
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS post_reactions
+  ADD CONSTRAINT post_reactions_post_id_fkey
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE;
+
+COMMIT;
+```
+
+### 2) Sanity-check types
+
+```sql
+SELECT table_name, column_name, data_type
+FROM information_schema.columns
+WHERE table_name IN ('posts','post_reactions','post_comments')
+ORDER BY table_name, ordinal_position;
+```
+
+You want `posts.id = text`, `post_reactions.post_id = text`, `post_comments.post_id = text`.
+
+---
+
+## Why this cures the logs
+
+* Insert now succeeds because `posts.id` accepts the UUID string.
+* The `EXISTS (...) WHERE post_reactions.post_id = posts.id` comparison becomes `text = text`, so **no more “operator does not exist: text = integer.”**
+* Missing-column errors (e.g., `video_url`) stop because those columns now exist.
+
+---
+
+## Optional follow-ups (nice to have)
+
+* Ensure your Drizzle `posts` table in `@shared/schema` defines `id` as `text('id').primaryKey()` and `postReactions.postId` / `postComments.postId` as `text(...)` so future migrations don’t flip this back.
+* If you keep adding fields to `posts` in code, add a migration file (or SQL like above) so Railway stays in sync automatically.
+
+Try creating a post again after running the SQL. If anything still errors, paste the **first red line** above the stack (the one with `error: ...`) and we’ll pinpoint the next mismatch.
