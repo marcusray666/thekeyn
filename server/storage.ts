@@ -726,8 +726,8 @@ export class DatabaseStorage implements IStorage {
     return {
       ...updatedPost,
       username: user?.username || 'unknown',
-      displayName: user?.displayName,
-      profileImageUrl: user?.profileImageUrl,
+      displayName: user?.displayName || undefined,
+      profileImageUrl: user?.profileImageUrl || undefined,
     };
   }
 
@@ -972,12 +972,12 @@ export class DatabaseStorage implements IStorage {
     // Delete post reactions (likes, etc.)
     await db
       .delete(postReactions)
-      .where(eq(postReactions.postId, parseInt(id)));
+      .where(eq(postReactions.postId, id));
     
     // Delete post comments
     await db
       .delete(postComments)
-      .where(eq(postComments.postId, parseInt(id)));
+      .where(eq(postComments.postId, id));
     
     // Finally delete the post
     await db
@@ -993,16 +993,35 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: posts.id,
         userId: posts.userId,
+        title: posts.title,
+        description: posts.description,
         content: posts.content,
         imageUrl: posts.imageUrl,
+        videoUrl: posts.videoUrl,
+        audioUrl: posts.audioUrl,
+        fileUrl: posts.fileUrl,
+        filename: posts.filename,
         fileType: posts.fileType,
+        mimeType: posts.mimeType,
+        fileSize: posts.fileSize,
+        hashtags: posts.hashtags,
+        location: posts.location,
+        mentionedUsers: posts.mentionedUsers,
+        isProtected: posts.isProtected,
+        protectedWorkId: posts.protectedWorkId,
+        isHidden: posts.isHidden,
         tags: posts.tags,
         likes: posts.likes,
         comments: posts.comments,
         shares: posts.shares,
+        views: posts.views,
+        moderationStatus: posts.moderationStatus,
+        moderationFlags: posts.moderationFlags,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         username: users.username,
+        displayName: users.displayName,
+        profileImageUrl: users.profileImageUrl,
       })
       .from(posts)
       .innerJoin(users, eq(posts.userId, users.id))
@@ -1092,7 +1111,7 @@ export class DatabaseStorage implements IStorage {
     const [comment] = await db
       .insert(postComments)
       .values({
-        postId: parseInt(commentData.postId.toString()),
+        postId: commentData.postId.toString(),
         userId: commentData.userId,
         content: commentData.content,
         parentId: commentData.parentId,
@@ -1127,11 +1146,11 @@ export class DatabaseStorage implements IStorage {
         createdAt: postComments.createdAt,
         updatedAt: postComments.updatedAt,
         username: users.username,
-        userImage: users.profileImageUrl ?? undefined,
+        userImage: users.profileImageUrl || undefined,
       })
       .from(postComments)
       .innerJoin(users, eq(postComments.userId, users.id))
-      .where(eq(postComments.postId, parseInt(postId)))
+      .where(eq(postComments.postId, postId))
       .orderBy(desc(postComments.createdAt))
       .limit(limit)
       .offset(offset);
@@ -1176,8 +1195,12 @@ export class DatabaseStorage implements IStorage {
         username: users.username,
         email: users.email,
         passwordHash: users.passwordHash,
+        role: users.role,
         subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
         subscriptionExpiresAt: users.subscriptionExpiresAt,
+        monthlyUploads: users.monthlyUploads,
+        monthlyUploadLimit: users.monthlyUploadLimit,
         walletAddress: users.walletAddress,
         displayName: users.displayName,
         bio: users.bio,
@@ -1190,6 +1213,10 @@ export class DatabaseStorage implements IStorage {
         totalLikes: users.totalLikes,
         themePreference: users.themePreference,
         settings: users.settings,
+        lastUploadReset: users.lastUploadReset,
+        lastLoginAt: users.lastLoginAt,
+        isBanned: users.isBanned,
+        banReason: users.banReason,
         createdAt: users.createdAt,
       })
       .from(users)
@@ -1211,8 +1238,12 @@ export class DatabaseStorage implements IStorage {
         username: users.username,
         email: users.email,
         passwordHash: users.passwordHash,
+        role: users.role,
         subscriptionTier: users.subscriptionTier,
+        subscriptionStatus: users.subscriptionStatus,
         subscriptionExpiresAt: users.subscriptionExpiresAt,
+        monthlyUploads: users.monthlyUploads,
+        monthlyUploadLimit: users.monthlyUploadLimit,
         walletAddress: users.walletAddress,
         displayName: users.displayName,
         bio: users.bio,
@@ -1225,6 +1256,10 @@ export class DatabaseStorage implements IStorage {
         totalLikes: users.totalLikes,
         themePreference: users.themePreference,
         settings: users.settings,
+        lastUploadReset: users.lastUploadReset,
+        lastLoginAt: users.lastLoginAt,
+        isBanned: users.isBanned,
+        banReason: users.banReason,
         createdAt: users.createdAt,
       })
       .from(users)
