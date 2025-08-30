@@ -3154,6 +3154,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add basic request logging before multer middleware
+  app.use("/api/social/posts", (req, res, next) => {
+    if (req.method === 'POST') {
+      console.log("🎯 POST request to /api/social/posts received:", {
+        contentType: req.headers['content-type'],
+        contentLength: req.headers['content-length'],
+        hasAuth: !!req.session?.userId,
+        method: req.method
+      });
+    }
+    next();
+  });
+
   app.post("/api/social/posts", requireAuth, upload.single('file'), async (req, res) => {
     try {
       const userId = req.session.userId;
