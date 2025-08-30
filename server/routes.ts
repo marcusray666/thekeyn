@@ -4809,9 +4809,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Community Posts Routes
+  // Community Posts Routes - Use memory storage for R2 upload
   const postUpload = multer({
-    dest: "uploads/",
+    storage: multer.memoryStorage(), // ✅ Use memory storage for R2 upload
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
     fileFilter: (req, file, cb) => {
       // Allow all media types for community posts
