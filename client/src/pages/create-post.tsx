@@ -88,11 +88,44 @@ export default function CreatePost() {
       navigate("/");
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create post",
-        variant: "destructive",
-      });
+      console.log("Upload error details:", error);
+      
+      // Check if this is an upload limit error
+      const isUploadLimitError = error.message && (
+        error.message.includes("upload limit") || 
+        error.message.includes("monthly limit") ||
+        error.message.includes("subscription")
+      );
+
+      if (isUploadLimitError) {
+        // Show upgrade prompt for upload limit errors
+        toast({
+          title: "Upload Limit Reached",
+          description: (
+            <div className="space-y-3">
+              <p>You've reached your monthly upload limit. Upgrade your subscription to upload more works.</p>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => navigate("/subscription-management")}
+                  className="bg-gradient-to-r from-[#FE3F5E] to-[#FFD200] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  Upgrade Now
+                </button>
+                <span className="text-xs text-muted-foreground">Starting at $19/month</span>
+              </div>
+            </div>
+          ),
+          variant: "destructive",
+          duration: 8000, // Show longer for upgrade prompts
+        });
+      } else {
+        // Show standard error for other failures
+        toast({
+          title: "Upload Failed",
+          description: error.message || "Failed to create post. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
   });
 

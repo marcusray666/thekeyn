@@ -215,6 +215,25 @@ export function Navigation() {
                       </Link>
                     </DropdownMenuItem>
 
+                    <DropdownMenuItem asChild>
+                      <Link 
+                        href="/subscription-management" 
+                        className="flex items-center w-full py-2 px-2 rounded-sm transition-colors text-gray-700"
+                        style={{ color: 'rgb(75, 85, 99)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(254, 63, 94, 0.1)';
+                          e.currentTarget.style.color = 'rgb(31, 41, 55)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'rgb(75, 85, 99)';
+                        }}
+                      >
+                        <Crown className="mr-3 h-4 w-4" />
+                        Subscription
+                      </Link>
+                    </DropdownMenuItem>
+
                     {/* Admin Option - Only visible to admins */}
                     {user?.role === 'admin' && (
                       <>
