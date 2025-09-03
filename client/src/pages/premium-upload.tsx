@@ -128,11 +128,11 @@ export default function PremiumUpload() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-32 px-4 relative overflow-hidden light-theme">
+    <div className="min-h-screen pt-8 md:pt-16 pb-32 px-4 relative overflow-hidden light-theme">
       
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-12">
           <NoBorderElement
             onClick={() => setLocation('/')}
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
@@ -141,7 +141,7 @@ export default function PremiumUpload() {
             <span>Back to Feed</span>
           </NoBorderElement>
           
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             {step === 'upload' && 'Protect Your Work'}
             {step === 'processing' && 'Securing on Blockchain...'}
             {step === 'success' && 'Protected Successfully!'}
