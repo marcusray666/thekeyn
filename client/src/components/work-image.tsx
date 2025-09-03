@@ -3,12 +3,13 @@ import { FileText, Music, Video, Image as ImageIcon, File } from 'lucide-react';
 
 interface WorkImageProps {
   filename?: string;
+  fileUrl?: string; // CDN URL for accessing the file
   mimeType: string;
   title: string;
   className?: string;
 }
 
-export function WorkImage({ filename, mimeType, title, className = "w-full h-48" }: WorkImageProps) {
+export function WorkImage({ filename, fileUrl, mimeType, title, className = "w-full h-48" }: WorkImageProps) {
   const [imageError, setImageError] = useState(false);
 
   const getFileTypeIcon = (mimeType: string) => {
@@ -20,8 +21,15 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     return <File className="h-12 w-12 text-gray-400" />;
   };
 
+  // Get the correct file URL (prefer fileUrl, fallback to filename)
+  const getFileUrl = () => {
+    if (fileUrl) return fileUrl; // Use CDN URL if available
+    if (filename) return `/uploads/${filename}`; // Fallback to old path
+    return null;
+  };
+
   // Special handling for HEIC/HEIF files (not directly supported by browsers)
-  if (mimeType && (mimeType === 'image/heic' || mimeType === 'image/heif') && filename) {
+  if (mimeType && (mimeType === 'image/heic' || mimeType === 'image/heif') && (fileUrl || filename)) {
     return (
       <div className={`${className} flex flex-col items-center justify-center bg-gray-800/50 rounded-lg border-2 border-dashed border-yellow-600`}>
         <ImageIcon className="h-12 w-12 text-yellow-400" />
@@ -32,12 +40,12 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
     );
   }
 
-  // If it's an image and we have a filename, try to display it
-  if (mimeType && mimeType.startsWith('image/') && filename && !imageError) {
+  // If it's an image and we have a file URL, try to display it
+  if (mimeType && mimeType.startsWith('image/') && (fileUrl || filename) && !imageError) {
     return (
       <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex items-center justify-center`}>
         <img
-          src={`/uploads/${filename}`}
+          src={getFileUrl() || ''}
           alt={title}
           className="max-w-full max-h-full object-contain"
           onError={() => setImageError(true)}
@@ -48,11 +56,11 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
   }
 
   // If it's a video, display video player
-  if (mimeType && mimeType.startsWith('video/') && filename) {
+  if (mimeType && mimeType.startsWith('video/') && (fileUrl || filename)) {
     return (
       <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex items-center justify-center`}>
         <video
-          src={`/uploads/${filename}`}
+          src={getFileUrl() || ''}
           className="max-w-full max-h-full object-contain"
           controls
           preload="metadata"
@@ -65,7 +73,7 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
   }
 
   // If it's audio, display audio player
-  if (mimeType && mimeType.startsWith('audio/') && filename) {
+  if (mimeType && mimeType.startsWith('audio/') && (fileUrl || filename)) {
     return (
       <div className={`${className} relative overflow-hidden rounded-lg bg-gray-800/50 flex flex-col items-center justify-center p-6`}>
         <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-4">
@@ -73,7 +81,7 @@ export function WorkImage({ filename, mimeType, title, className = "w-full h-48"
         </div>
         <h3 className="text-white text-sm font-medium mb-4 text-center">{title}</h3>
         <audio
-          src={`/uploads/${filename}`}
+          src={getFileUrl() || ''}
           className="w-full"
           controls
           preload="metadata"

@@ -1090,11 +1090,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentAnalysis.plagiarismCheck?.confidence || 0
       );
 
+      // Upload file to R2 storage
+      console.log('Uploading file to R2 storage...');
+      const r2Result = await uploadToR2({
+        buffer: req.file.buffer,
+        originalName: req.file.originalname,
+        mimetype: req.file.mimetype,
+        prefix: 'works'
+      });
+      console.log('R2 upload successful:', r2Result.url);
+
       // Create work record
       console.log('Creating work record...');
       
-      // Generate filename for memory storage (since req.file.filename is undefined with memoryStorage)
-      const filename = `${Date.now()}-${req.file.originalname}`;
+      // Use the R2 CDN URL as filename for storage
+      const filename = r2Result.url;
       
       const work = await storage.createWork({
         title,
@@ -1103,6 +1113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         collaborators: collaboratorList,
         originalName: req.file.originalname,
         filename: filename,
+        fileUrl: r2Result.url, // Store CDN URL for easy access
         mimeType: req.file.mimetype,
         fileSize: req.file.size,
         fileHash,

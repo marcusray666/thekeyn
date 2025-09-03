@@ -8,7 +8,7 @@ interface CertificateData {
   creatorName: string;
   originalName: string;
   mimeType: string;
-  fileSize: number;
+  fileSize: number | null;
   fileHash: string;
   blockchainHash: string;
   createdAt: string;
@@ -127,7 +127,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<voi
   currentY = createInfoBox('Creator', data.creatorName, currentY);
   currentY = createInfoBox('File Name', data.originalName, currentY);
   currentY = createInfoBox('File Type', data.mimeType, currentY);
-  currentY = createInfoBox('File Size', formatFileSize(data.fileSize), currentY);
+  currentY = createInfoBox('File Size', formatFileSize(data.fileSize || 0), currentY);
   currentY = createInfoBox('Protection Date', formatDate(data.createdAt), currentY);
   
   // Description (if provided)

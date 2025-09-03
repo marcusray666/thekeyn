@@ -43,6 +43,7 @@ export const works = pgTable("works", {
   title: text("title").notNull(),
   description: text("description"),
   filename: text("filename"),
+  fileUrl: text("file_url"), // CDN URL for accessing the file
   originalName: text("original_name"),
   mimeType: text("mime_type").notNull(),
   fileSize: integer("file_size"),
@@ -139,6 +140,7 @@ export const insertWorkSchema = createInsertSchema(works).pick({
   title: true,
   description: true,
   filename: true,
+  fileUrl: true,
   originalName: true,
   mimeType: true,
   fileSize: true,
