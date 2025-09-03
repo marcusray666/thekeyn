@@ -1092,13 +1092,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create work record
       console.log('Creating work record...');
+      
+      // Generate filename for memory storage (since req.file.filename is undefined with memoryStorage)
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      
       const work = await storage.createWork({
         title,
         description: description || "",
         creatorName,
         collaborators: collaboratorList,
         originalName: req.file.originalname,
-        filename: req.file.filename,
+        filename: filename,
         mimeType: req.file.mimetype,
         fileSize: req.file.size,
         fileHash,
