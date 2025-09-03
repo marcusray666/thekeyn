@@ -98,8 +98,15 @@ const postLimiter = rateLimit({
   message: { error: "Too many posts, please try again later" },
 });
 
-function generateFileHash(filePath: string): string {
-  const fileBuffer = fs.readFileSync(filePath);
+function generateFileHash(source: string | Buffer): string {
+  let fileBuffer: Buffer;
+  if (typeof source === 'string') {
+    // If it's a file path, read from disk
+    fileBuffer = fs.readFileSync(source);
+  } else {
+    // If it's already a Buffer, use it directly
+    fileBuffer = source;
+  }
   return crypto.createHash("sha256").update(fileBuffer).digest("hex");
 }
 
@@ -940,6 +947,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Upload work endpoint
   app.post("/api/works", requireAuth, upload.single("file"), async (req: AuthenticatedRequest, res) => {
+    let tempFilePath: string | null = null;
+    
     try {
       console.log('Upload request received:', {
         hasFile: !!req.file,
@@ -997,10 +1006,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Generate file hash
-      console.log('Generating file hash for:', req.file.filename);
-      const fileHash = generateFileHash(req.file.path);
+      // Generate file hash from buffer (memory storage doesn't have req.file.path)
+      console.log('Generating file hash for:', req.file.originalname);
+      const fileHash = generateFileHash(req.file.buffer);
       const certificateId = generateCertificateId();
+
+      // For memory storage, we need to write buffer to temp file for AI analysis
+      // Create temp file for AI moderation (required for image analysis)
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+      tempFilePath = path.join(tempDir, `${Date.now()}-${req.file.originalname}`);
+      fs.writeFileSync(tempFilePath, req.file.buffer);
 
       // AI Content Moderation Analysis
       console.log('Running AI content moderation analysis...');
@@ -1008,7 +1026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contentAnalysis = await contentModerationService.analyzeContent(
         description || '',
         title,
-        req.file.path,
+        tempFilePath,
         fileHash,
         existingHashes
       );
@@ -1022,8 +1040,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle moderation decision
       if (contentAnalysis.overallDecision === 'rejected') {
-        // Delete uploaded file
-        fs.unlinkSync(req.file.path);
+        // Clean up temp file
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
         return res.status(400).json({
           error: "Content rejected by AI moderation",
           reason: "Your content was flagged for inappropriate material",
@@ -1097,8 +1117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limits = await storage.getUserSubscriptionLimits(userId);
       console.log('Subscription limits:', limits);
       
-      // Read file buffer for verification proof
-      const fileBuffer = fs.readFileSync(req.file.path);
+      // Use file buffer from memory storage
+      const fileBuffer = req.file.buffer;
       
       // Generate verification proof with REAL dual blockchain data
       console.log('Generating verification proof with dual blockchain anchor...');
@@ -1202,8 +1222,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Work uploaded, certified, and verified successfully",
         remainingUploads: uploadCheck.remainingUploads - 1,
       });
+
+      // Clean up temp file after successful processing
+      if (tempFilePath && fs.existsSync(tempFilePath)) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (cleanupError) {
+          console.error('Failed to clean up temp file:', cleanupError);
+        }
+      }
     } catch (error) {
       console.error("Error uploading work:", error);
+      
+      // Clean up temp file if it exists
+      if (tempFilePath && fs.existsSync(tempFilePath)) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch (cleanupError) {
+          console.error('Failed to clean up temp file:', cleanupError);
+        }
+      }
       
       // Check if it's a JSON parsing error
       if (error instanceof SyntaxError && error.message.includes('Unexpected token')) {
