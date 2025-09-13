@@ -490,8 +490,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
-      // Find user (case insensitive username)
-      const user = await storage.getUserByUsername(validatedData.username.toLowerCase());
+      // Find user by username or email (case insensitive)
+      const user = await storage.getUserByUsernameOrEmail(validatedData.username.toLowerCase());
       if (!user) {
         return res.status(401).json({ error: "Invalid username or password" });
       }

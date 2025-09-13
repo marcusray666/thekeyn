@@ -102,6 +102,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsernameOrEmail(usernameOrEmail: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   deleteUser(id: number): Promise<void>;
@@ -264,6 +265,17 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username.toLowerCase()));
+    return user || undefined;
+  }
+
+  async getUserByUsernameOrEmail(usernameOrEmail: string): Promise<User | undefined> {
+    const searchValue = usernameOrEmail.toLowerCase();
+    const [user] = await db.select().from(users).where(
+      or(
+        eq(users.username, searchValue),
+        eq(users.email, usernameOrEmail) // Use original case for email
+      )
+    );
     return user || undefined;
   }
 
