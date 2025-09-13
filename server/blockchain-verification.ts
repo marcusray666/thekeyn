@@ -124,7 +124,7 @@ export class AdvancedBlockchainVerification {
       const balance = await provider.getBalance(wallet.address);
       console.log('Wallet balance:', ethers.formatEther(balance), 'ETH');
       
-      if (balance === 0n) {
+      if (balance === BigInt(0)) {
         console.log('Wallet has no ETH, creating block anchor instead...');
         return await this.createBlockAnchorProof(fileHash, metadata);
       }
@@ -133,7 +133,7 @@ export class AdvancedBlockchainVerification {
       const tx = await wallet.sendTransaction({
         to: wallet.address, // Self-transaction to save gas
         data: ethers.hexlify(dataPayload),
-        value: 0n // No ETH transfer, just data
+        value: BigInt(0) // No ETH transfer, just data
       });
       
       console.log('Transaction submitted:', tx.hash);
