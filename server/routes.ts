@@ -18,6 +18,7 @@ import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
 import { WalletManager } from "./wallet-manager";
 import { SecureOpenTimestampsService } from "./secure-opentimestamps";
+import { BlockchainVerificationJobs } from "./background-jobs";
 import { contentModerationService } from "./services/content-moderation";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
@@ -330,6 +331,9 @@ const upload = multer({
     }
   },
 });
+
+// Initialize background jobs
+const backgroundJobs = new BlockchainVerificationJobs();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Basic health check endpoint
@@ -5565,6 +5569,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Background job management endpoints
+  // Get background job status
+  app.get("/api/admin/background-jobs/status", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const status = backgroundJobs.getStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching background job status:", error);
+      res.status(500).json({ error: "Failed to fetch background job status" });
+    }
+  });
+
+  // Manually trigger all background jobs
+  app.post("/api/admin/background-jobs/run", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      console.log(`🚀 Admin ${req.user!.username} manually triggered background jobs`);
+      await backgroundJobs.runAllJobsNow();
+      
+      res.json({ 
+        message: "Background jobs triggered successfully",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error running background jobs:", error);
+      res.status(500).json({ error: "Failed to run background jobs" });
+    }
+  });
+
+  // Get verification upgrade status for pending works using blockchainVerifications table
+  app.get("/api/admin/verification-status", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const works = await storage.getAllWorks();
+      
+      // Get verification statuses from blockchainVerifications table
+      const verifiedWorks = new Set<number>();
+      const confirmedWorks = new Set<number>();
+      
+      for (const work of works) {
+        const verification = await storage.getBlockchainVerificationByFileHash(work.fileHash);
+        if (verification) {
+          if (verification.blockchainAnchor.includes('verified') || verification.confidence >= 100) {
+            verifiedWorks.add(work.id);
+          } else if (verification.blockchainAnchor.includes('confirmed')) {
+            confirmedWorks.add(work.id);
+          }
+        }
+      }
+      
+      // Find works that have blockchain hashes but aren't verified/confirmed
+      const pendingWorks = works.filter(w => {
+        if (!w.blockchainHash) return false;
+        return !verifiedWorks.has(w.id) && !confirmedWorks.has(w.id);
+      });
+      
+      res.json({
+        totalWorks: works.length,
+        verifiedWorks: verifiedWorks.size,
+        confirmedWorks: confirmedWorks.size,
+        pendingVerification: pendingWorks.length,
+        pendingWorks: pendingWorks.map(w => ({
+          id: w.id,
+          title: w.title,
+          fileHash: w.fileHash,
+          blockchainHash: w.blockchainHash,
+          createdAt: w.createdAt
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching verification status:", error);
+      res.status(500).json({ error: "Failed to fetch verification status" });
+    }
+  });
+
   const httpServer = createServer(app);
+  
+  // Start background jobs for blockchain verification
+  console.log('🔧 Starting blockchain verification background jobs...');
+  backgroundJobs.start();
+  
+  // Graceful shutdown handling
+  process.on('SIGTERM', () => {
+    console.log('🛑 Received SIGTERM, shutting down background jobs...');
+    backgroundJobs.stop();
+  });
+  
+  process.on('SIGINT', () => {
+    console.log('🛑 Received SIGINT, shutting down background jobs...');
+    backgroundJobs.stop();
+  });
+  
   return httpServer;
 }
