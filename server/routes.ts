@@ -16,8 +16,8 @@ import { loginSchema, registerSchema, insertWorkSchema } from "@shared/schema";
 import { createPostSchema, uploadUrlSchema, workUploadSchema, createApiError, isAllowedMediaType } from "@shared/validation";
 import blockchainRoutes from "./routes/blockchain-routes";
 import adminRoutes from "./routes/admin-routes";
-import { blockchainVerification } from "./blockchain-verification";
-import { openTimestampsService } from "./opentimestamps-service";
+import { WalletManager } from "./wallet-manager";
+import { SecureOpenTimestampsService } from "./secure-opentimestamps";
 import { contentModerationService } from "./services/content-moderation";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
@@ -1057,17 +1057,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create REAL blockchain timestamp using OpenTimestamps AND Ethereum anchoring
       console.log('Creating real blockchain timestamp with dual anchoring...');
-      const timestampData = await openTimestampsService.createTimestamp(fileHash);
+      
+      // Initialize secure services
+      const walletManager = WalletManager.getInstance();
+      const otsService = new SecureOpenTimestampsService();
+      
+      // Create secure OpenTimestamps proof with proper binary format
+      const timestampData = await otsService.createBinaryTimestamp(req.file.buffer);
+      
+      // Save OTS file to storage if successful
+      let otsFilePath = null;
+      if (timestampData.success && timestampData.otsData) {
+        try {
+          otsFilePath = await otsService.saveOtsFile(timestampData.otsData, timestampData.otsFilename!);
+          console.log('✅ OTS file saved to:', otsFilePath);
+        } catch (error) {
+          console.error('Failed to save OTS file:', error);
+        }
+      }
       
       // Also create Ethereum transaction anchor for immediate verification
-      const ethereumResult = await blockchainVerification.createEthereumAnchorTransaction(fileHash, {
+      const ethereumResult = await walletManager.createBlockchainAnchor(fileHash, {
         title,
         creator: creatorName,
         timestamp: Date.now()
       });
       
-      // Use the verification hash from Ethereum anchoring as blockchain hash
-      const blockchainHash = ethereumResult.verificationHash || ethereumResult.blockHash || fileHash;
+      // Only use real blockchain hash from successful transaction - never fallback to fileHash
+      const blockchainHash = ethereumResult.transactionHash || null;
       
       console.log('Generated IDs:', { 
         fileHash, 
@@ -1146,32 +1163,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Bitcoin OpenTimestamps data
         bitcoin: {
-          otsProof: timestampData.ots,
+          otsProof: timestampData.success ? Buffer.from(timestampData.otsData || []).toString('base64') : null,
           otsFilename: timestampData.otsFilename,
-          calendarServers: timestampData.calendarUrls,
-          verificationStatus: timestampData.verificationStatus || 'pending',
+          verificationStatus: timestampData.status,
           verificationUrl: 'https://opentimestamps.org',
-          blockHeight: timestampData.blockHeight,
-          instructions: timestampData.verificationStatus === 'pending'
-            ? 'This timestamp is being anchored to Bitcoin blockchain. Full verification will be available in 1-6 hours.'
-            : 'Bitcoin timestamp confirmed and verifiable.'
+          instructions: timestampData.verificationInstructions || 'Binary OpenTimestamps proof created. Download and verify at opentimestamps.org',
+          success: timestampData.success,
+          error: timestampData.error
         },
         
         // Ethereum blockchain data
         ethereum: {
           success: ethereumResult.success,
-          transactionHash: ethereumResult.transactionHash,
-          blockNumber: ethereumResult.blockNumber,
-          blockHash: ethereumResult.blockHash,
-          blockTimestamp: ethereumResult.blockTimestamp,
-          gasUsed: ethereumResult.gasUsed,
-          verificationUrl: ethereumResult.verificationUrl,
-          proofFile: ethereumResult.proofFile,
-          error: ethereumResult.error,
-          anchorType: ethereumResult.transactionHash ? 'ethereum_transaction' : 'ethereum_block_reference',
+          transactionHash: ethereumResult.transactionHash || null,
+          blockNumber: ethereumResult.blockNumber || null,
+          blockHash: ethereumResult.blockHash || null,
+          verificationUrl: ethereumResult.verificationUrl || null,
+          error: ethereumResult.error || null,
+          needsFunding: ethereumResult.needsFunding || false,
+          status: ethereumResult.transactionHash ? 'confirmed' : ethereumResult.needsFunding ? 'awaiting_funding' : 'failed',
+          anchorType: ethereumResult.transactionHash ? 'ethereum_transaction' : null,
           instructions: ethereumResult.transactionHash 
             ? 'File hash anchored via Ethereum transaction - immediately verifiable on Etherscan.'
-            : 'File hash anchored to Ethereum block data - verifiable on Etherscan.'
+            : ethereumResult.needsFunding
+            ? 'Ethereum wallet needs funding to create blockchain anchor. Fund the application wallet to enable real blockchain verification.'
+            : 'Ethereum blockchain verification failed - no transaction created.'
         },
         
         // Combined verification info

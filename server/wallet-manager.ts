@@ -41,13 +41,13 @@ export class WalletManager {
       const newWallet = ethers.Wallet.createRandom();
       privateKey = newWallet.privateKey;
       
-      // Log the wallet address and funding instructions
+      // Log the wallet address and funding instructions (NEVER LOG PRIVATE KEY)
       console.log('🔐 NEW APPLICATION WALLET GENERATED:');
       console.log('📍 Address:', newWallet.address);
       console.log('💰 To enable blockchain verification, fund this wallet with ~$20-50 ETH');
       console.log('🔗 Etherscan:', `https://etherscan.io/address/${newWallet.address}`);
-      console.log('🚨 IMPORTANT: Set ETHEREUM_PRIVATE_KEY environment variable to:', privateKey);
-      console.log('   This ensures the same wallet is used across restarts.');
+      console.log('🚨 SECURITY: Set ETHEREUM_PRIVATE_KEY environment variable to the generated private key');
+      console.log('   Private key has been set for this session but will be lost on restart.');
       
       // Store for session use (will be lost on restart until env var is set)
       process.env.ETHEREUM_PRIVATE_KEY = privateKey;
